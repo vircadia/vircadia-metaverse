@@ -1,0 +1,58 @@
+//   Copyright 2020 Robert Adams
+//
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+
+'use strict';
+
+import express from 'express';
+const ActivityPubExpress = require( '../../activitypub-express/index.js' );
+
+import { Router } from 'express';
+
+const routes = {
+  actor: '/u/:actor',
+  object: '/o/:id',
+  activity: '/s/:id',
+  inbox: '/inbox/:actor',
+  outbox: '/outbox/:actor'
+};
+const apex = ActivitypubExpress({
+  domain: 'localhost',
+  actorParam: 'actor',
+  objectParam: 'id',
+  activityParam: 'id',
+  routes
+});
+
+const apexRouter = Router();
+
+apexRouter.use(express.json({ type: apex.consts.jsonldTypes }), apex);
+
+// define routes using prepacakged middleware collections
+apexRouter.route(routes.inbox)
+  .get(apex.net.inbox.get)
+  .post(apex.net.inbox.post);
+apexRouter.route(routes.outbox)
+  .get(apex.net.outbox.get)
+  .post(apex.net.outbox.post);
+apexRouter.get(routes.actor, apex.net.actor.get);
+apexRouter.get(routes.object, apex.net.object.get);
+apexRouter.get(routes.activity, apex.net.activityStream.get);
+apexRouter.get('/.well-known/webfinger', apex.net.webfinger.get);
+
+// custom side-effects for your app
+app.on('apex-create', msg => {
+  console.log(`New ${msg.object.type} from ${msg.actor} to ${msg.recipient}`)
+})
+
+export default apexRouter;
