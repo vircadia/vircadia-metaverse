@@ -14,19 +14,23 @@
 
 'use strict';
 
-import express from 'express';
-const ActivityPubExpress = require( '../../activitypub-express/index.js' );
+import Config from '../config';
 
+import express from 'express';
 import { Router } from 'express';
 
+import ActivityPubExpress from 'activitypub-express';
+
+const baseUrl = Config.activitypub["url-base"];
+
 const routes = {
-  actor: '/u/:actor',
-  object: '/o/:id',
-  activity: '/s/:id',
-  inbox: '/inbox/:actor',
-  outbox: '/outbox/:actor'
+  actor: baseUrl + '/u/:actor',
+  object: baseUrl + '/o/:id',
+  activity: baseUrl + '/s/:id',
+  inbox: baseUrl + '/inbox/:actor',
+  outbox: baseUrl + '/outbox/:actor'
 };
-const apex = ActivitypubExpress({
+const apex = ActivityPubExpress({
   domain: 'localhost',
   actorParam: 'actor',
   objectParam: 'id',
@@ -49,10 +53,5 @@ apexRouter.get(routes.actor, apex.net.actor.get);
 apexRouter.get(routes.object, apex.net.object.get);
 apexRouter.get(routes.activity, apex.net.activityStream.get);
 apexRouter.get('/.well-known/webfinger', apex.net.webfinger.get);
-
-// custom side-effects for your app
-app.on('apex-create', msg => {
-  console.log(`New ${msg.object.type} from ${msg.actor} to ${msg.recipient}`)
-})
 
 export default apexRouter;

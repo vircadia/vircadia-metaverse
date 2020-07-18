@@ -16,12 +16,16 @@
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
-const proc_metaverse_info: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procMetaverseInfo: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  resp.send( {
+    'metaverse': 'is',
+    'cool': 'nothing else'
+  });
 };
 
 const router = Router();
 
-router.get( '/api/metaverse_info',      proc_metaverse_info);
-router.get( '/api/v1/metaverse_info',   proc_metaverse_info);
+router.get( '/api/metaverse_info',      procMetaverseInfo);
+router.get( '/api/v1/metaverse_info',   procMetaverseInfo);
 
 export default router;

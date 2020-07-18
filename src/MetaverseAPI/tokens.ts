@@ -16,14 +16,16 @@
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
-const proc_post_oauth_token: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procPostOauthToken: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
-const proc_get_user_tokens_new: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procGetUserTokensNew: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
 
 const router = Router();
 
-router.post( '/oauth/token',      proc_post_oauth_token);
-router.get(  '/user/tokens/new',  proc_get_user_tokens_new);
+router.post( '/oauth/token',      procPostOauthToken);
+router.get(  '/user/tokens/new',  procGetUserTokensNew);
 
 export default router;

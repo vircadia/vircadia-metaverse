@@ -11,12 +11,11 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
-
+'use strict'
 
 import Config from './config';
 
 import express from 'express';
-import logger from 'morgan';
 
 import Route_Debugg       from './MetaverseAPI/debugg';
 import Route_MetaverseAPI from './MetaverseAPI/apiv1';
@@ -26,9 +25,14 @@ import Route_Errors       from './MetaverseAPI/errors';
 
 import Route_ActivityPub  from './ActivityPub/app';
 
+import morgan from 'morgan';
+import { Logger, morganOptions } from './Tools/Logging';
+
+Logger.setLogLevel(Config.debug.logLevel);
+
 const expr = express();
 
-expr.use(logger('dev'));
+expr.use(morgan('dev', morganOptions));
 
 // Print stuff out and other debugging pre-processing
 expr.use(Route_Debugg);
@@ -52,5 +56,11 @@ expr.use(Route_Misc);
 
 // Error Processing of requests
 expr.use(Route_Errors);
+
+// custom side-effects for your app
+// expr.on('apex-create', (msg: string) => {
+//   console.log(`New ${msg.object.type} from ${msg.actor} to ${msg.recipient}`)
+// });
+
 
 expr.listen( Config.server["listen-port"], Config.server["listen-host"]);

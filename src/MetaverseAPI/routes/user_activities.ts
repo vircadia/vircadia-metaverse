@@ -16,11 +16,12 @@
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
-const proc_post_user_activities: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procPostUserActivities: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
 
 const router = Router();
 
-router.post( '/user_activities',     proc_post_user_activities);
+router.post( '/user_activities',     procPostUserActivities);
 
 export default router;

@@ -18,7 +18,7 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
-const proc_options: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procOptions: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
   resp.header('Access-Control-Allow-Origin', '*');
   resp.header('Access-Control-Allow-Methods', 'GET, POST, DELETE, PUT, OPTIONS');
   resp.header('Access-Control-Allow-Headers', 'Content-Type, x-vircadia-error-handle');
@@ -27,6 +27,6 @@ const proc_options: RequestHandler = (req: Request, resp: Response, next: NextFu
 
 const router = Router();
 
-router.options('/',             proc_options);
+router.options('/',             procOptions);
 
 export default router;

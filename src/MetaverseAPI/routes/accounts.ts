@@ -18,27 +18,32 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
-const proc_get_accounts: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procGetAccounts: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
 
-const proc_post_account_id: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procPostAccountId: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
 
-const proc_delete_account_id: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procDeleteAccountId: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
 
-const proc_get_account_tokens: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procGetAccountTokens: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
 
-const proc_delete_account_tokens: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procDeleteAccountTokens: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
 
 const router = Router();
 
-router.get(   '/accounts',                            proc_get_accounts);
-router.post(  '/account/:accountId',                  proc_post_account_id);
-router.delete('/account/:accountId',                  proc_delete_account_id);
-router.get(   '/account/:accountId/tokens',           proc_get_account_tokens);
-router.delete('/account/:accountId/tokens/:tokenId',  proc_delete_account_tokens);
+router.get(   '/accounts',                            procGetAccounts);
+router.post(  '/account/:accountId',                  procPostAccountId);
+router.delete('/account/:accountId',                  procDeleteAccountId);
+router.get(   '/account/:accountId/tokens',           procGetAccountTokens);
+router.delete('/account/:accountId/tokens/:tokenId',  procDeleteAccountTokens);
 
 export default router;

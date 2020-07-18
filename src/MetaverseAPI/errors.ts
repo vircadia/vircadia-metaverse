@@ -15,6 +15,7 @@
 'use strict';
 
 import { Router, ErrorRequestHandler, Request, Response, NextFunction } from 'express';
+import { Logger } from '../Tools/Logging';
 
 import createError, { HttpError } from 'http-errors';
 

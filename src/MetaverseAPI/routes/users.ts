@@ -18,56 +18,71 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
-const proc_get_users: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procGetUsers: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
-const proc_post_users: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procPostUsers: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
-const proc_put_user_heartbeat: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procPutUserHeartbeat: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
-const proc_put_user_location: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procPutUserLocation: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
-const proc_get_user_location: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procGetUserLocation: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
-const proc_get_user_profile: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procGetUserProfile: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
-const proc_put_user_public_key: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procPutUserPublicKey: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
-const proc_get_users_public_key: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procGetUsersPublicKey: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
-const proc_get_user_friends: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procGetUserFriends: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
-const proc_post_user_friends: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procPostUserFriends: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
-const proc_delete_user_friends: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procDeleteUserFriends: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
-const proc_post_user_connection_request: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procPostUserConnectionRequest: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
-const proc_delete_user_connection: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procDeleteUserConnection: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
-const proc_get_user_locker: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procGetUserLocker: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
-const proc_post_user_locker: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procPostUserLocker: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
 
 const router = Router();
 
-router.get(   '/users',                       proc_get_users);
-router.post(  '/users',                       proc_post_users);
-router.put(   '/user/heartbeat',              proc_put_user_heartbeat);
+router.get(   '/users',                       procGetUsers);
+router.post(  '/users',                       procPostUsers);
+router.put(   '/user/heartbeat',              procPutUserHeartbeat);
 
-router.put(   '/user/location',               proc_put_user_location);
-router.get(   '/users/:username/location',    proc_get_user_location);
-router.get(   '/user/profile',                proc_get_user_profile);
-router.put(   '/user/public_key',             proc_put_user_public_key);
-router.get(   '/users/:username/public_key',  proc_get_users_public_key);
+router.put(   '/user/location',               procPutUserLocation);
+router.get(   '/users/:username/location',    procGetUserLocation);
+router.get(   '/user/profile',                procGetUserProfile);
+router.put(   '/user/public_key',             procPutUserPublicKey);
+router.get(   '/users/:username/public_key',  procGetUsersPublicKey);
 
-router.get(   '/user/friends',                proc_get_user_friends);
-router.post(  '/user/friends',                proc_post_user_friends);
-router.delete('/user/friends/:username',      proc_delete_user_friends);
-router.post(  '/user/connection_request',     proc_post_user_connection_request);
-router.delete('/user/connections/:username',  proc_delete_user_connection);
+router.get(   '/user/friends',                procGetUserFriends);
+router.post(  '/user/friends',                procPostUserFriends);
+router.delete('/user/friends/:username',      procDeleteUserFriends);
+router.post(  '/user/connection_request',     procPostUserConnectionRequest);
+router.delete('/user/connections/:username',  procDeleteUserConnection);
 
-router.get(   '/user/locker',                 proc_get_user_locker);
-router.post(  '/user/locker',                 proc_post_user_locker);
+router.get(   '/user/locker',                 procGetUserLocker);
+router.post(  '/user/locker',                 procPostUserLocker);
 
 export default router;

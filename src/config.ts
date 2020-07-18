@@ -12,7 +12,11 @@ export default {
     'metaverse-server': {
     },
     'activitypub': {
-      'url-base': '/vircadia/'
+      // NOTE: there shouldn't be a trailing slash
+      'url-base': '/vircadia'
+    },
+    'debug': {
+      'logLevel': 'debug'
     },
     'database': {
 

@@ -16,11 +16,12 @@
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
-const proc_all_debug: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procAllDebug: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
 
 const router = Router();
 
-router.all( '/',     proc_all_debug);
+router.all( '/',     procAllDebug);
 
 export default router;

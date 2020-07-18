@@ -16,11 +16,12 @@
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
-const proc_post_token_new: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procPostTokenNew: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
 
 const router = Router();
 
-router.post( '/token/new',     proc_post_token_new);
+router.post( '/token/new',     procPostTokenNew);
 
 export default router;

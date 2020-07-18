@@ -18,11 +18,12 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
-const proc_get_commerce_marketplace_key: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procGetCommerceMarketplaceKey: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
 
 const router = Router();
 
-router.get('/commerce/marketplace_key',    proc_get_commerce_marketplace_key);
+router.get('/commerce/marketplace_key',    procGetCommerceMarketplaceKey);
 
 export default router;

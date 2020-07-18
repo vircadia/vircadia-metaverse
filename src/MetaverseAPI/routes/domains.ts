@@ -18,34 +18,42 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
-const proc_get_domains_domainid: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procGetDomainsDomainid: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
-const proc_get_domains: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procGetDomains: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
-const proc_put_domains: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procPutDomains: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
-const proc_delete_domains: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procDeleteDomains: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
-const proc_put_domains_ice_server_address: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procPutDomainsIceServerAddress: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
-const proc_post_domains_temporary: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procPostDomainsTemporary: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
-const proc_put_domains_public_key: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procPutDomainsPublicKey: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
-const proc_get_domains_public_key: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procGetDomainsPublicKey: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
 };
 
 const router = Router();
 
-router.get(   '/domains/:domainId',             proc_get_domains_domainid);
-router.get(   '/domains',                       proc_get_domains);
-router.put(   '/domains/:domainId',             proc_put_domains);
-router.delete('/domains/:domainId',             proc_delete_domains);
+router.get(   '/domains/:domainId',             procGetDomainsDomainid);
+router.get(   '/domains',                       procGetDomains);
+router.put(   '/domains/:domainId',             procPutDomains);
+router.delete('/domains/:domainId',             procDeleteDomains);
 
-router.put(   '/domains/:domainId/ice_server_address', proc_put_domains_ice_server_address);
-router.post(  '/domains/temporary',             proc_post_domains_temporary);
+router.put(   '/domains/:domainId/ice_server_address', procPutDomainsIceServerAddress);
+router.post(  '/domains/temporary',             procPostDomainsTemporary);
 
-router.put(   '/domains/:domainId/public_key',  proc_put_domains_public_key);
-router.get(   '/domains/:domainId/public_key',  proc_get_domains_public_key);
+router.put(   '/domains/:domainId/public_key',  procPutDomainsPublicKey);
+router.get(   '/domains/:domainId/public_key',  procGetDomainsPublicKey);
 
 export default router;
