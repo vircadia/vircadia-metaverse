@@ -21,12 +21,16 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 const procOptions: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
   resp.header('Access-Control-Allow-Origin', '*');
   resp.header('Access-Control-Allow-Methods', 'GET, POST, DELETE, PUT, OPTIONS');
-  resp.header('Access-Control-Allow-Headers', 'Content-Type, x-vircadia-error-handle');
+  next();
+};
+const procVircadiaErrorHeader: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  resp.header('Access-Control-Allow-Headers', 'x-vircadia-error-handle');
   next();
 };
 
 const router = Router();
 
+router.all('/',                 procVircadiaErrorHeader);
 router.options('/',             procOptions);
 
 export default router;

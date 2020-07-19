@@ -14,7 +14,7 @@
 
 'use strict';
 
-import express from 'express';
+import { Router } from 'express';
 
 import APICORS        from './routes/CORS';
 import APIActivities  from './routes/user_activities';
@@ -23,13 +23,13 @@ import APIAccounts    from './routes/accounts';
 import APIDomain      from './routes/domains';
 import APICommerce    from './routes/commerce';
 
-const app = express();
+const router = Router();
 
-app.use(APICORS);
-app.use(APIActivities);
-app.use(APIUser);
-app.use(APIAccounts);
-app.use(APIDomain);
-app.use(APICommerce);
+router.use('api/v1/', APICORS);
+router.use('api/v1/', APIActivities);
+router.use('api/v1/', APIUser);
+router.use('api/v1/', APIAccounts);
+router.use('api/v1/', APIDomain);
+router.use('api/v1/', APICommerce);
 
-export default app;
+export default router;

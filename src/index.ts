@@ -19,8 +19,8 @@ import express from 'express';
 
 import Route_Debugg       from './MetaverseAPI/debugg';
 import Route_MetaverseAPI from './MetaverseAPI/apiv1';
-import Route_Misc         from './MetaverseAPI/misc';
 import Route_Tokens       from './MetaverseAPI/tokens';
+import Route_Misc         from './MetaverseAPI/misc';
 import Route_Errors       from './MetaverseAPI/errors';
 
 import Route_ActivityPub  from './ActivityPub/app';
@@ -32,6 +32,7 @@ Logger.setLogLevel(Config.debug.logLevel);
 
 const expr = express();
 
+// Setup the logger of messages
 expr.use(morgan('dev', morganOptions));
 
 // Print stuff out and other debugging pre-processing
@@ -41,18 +42,18 @@ expr.use(Route_Debugg);
 expr.use(express.json());
 
 // The base metaverse operations
-expr.use('/api/v1/', Route_MetaverseAPI);
+expr.use(Route_MetaverseAPI);
 
 // Acting as an ActivityPub server
 expr.use(Route_ActivityPub);
-
-// Serving static files
-expr.use(Config.server["static-base"], express.static('static'));
 
 expr.use(Route_Tokens);
 
 // There are various odd and end links that don't fit into the '/api/v1/ model
 expr.use(Route_Misc);
+
+// Serving static files
+expr.use(Config.server["static-base"], express.static('static'));
 
 // Error Processing of requests
 expr.use(Route_Errors);
@@ -61,6 +62,5 @@ expr.use(Route_Errors);
 // expr.on('apex-create', (msg: string) => {
 //   console.log(`New ${msg.object.type} from ${msg.actor} to ${msg.recipient}`)
 // });
-
 
 expr.listen( Config.server["listen-port"], Config.server["listen-host"]);
