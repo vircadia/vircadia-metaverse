@@ -30,7 +30,7 @@
     },
     "dependencies": {
         "@types/debug": "^4.1.5",
-        "activitypub-express": "0.0.8",
+        "activitypub-express": "file:../activitypub-express",
         "debug": "~2.6.9",
         "express": "~4.16.1",
         "http-errors": "~1.6.3",
