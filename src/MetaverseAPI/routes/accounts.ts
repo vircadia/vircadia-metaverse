@@ -12,14 +12,31 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
+'use strict'
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
+import { RESTResponse } from '../RESTResponse';
+
+import { Accounts } from '../../Entities/Accounts';
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
 const procGetAccounts: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
-  next();
+  const restResp = new RESTResponse(req, resp);
+
+  restResp.Data = {
+    accounts: [
+      {
+        'username': 'fred',
+        'accountId': 'lksjdlfaeoiraskjdlkhz832ad',
+      },
+      {
+        'username': 'wilma',
+        'accountId': 'a89s798sduhfiuwhqfohohawev',
+      }
+    ]
+  };
+  restResp.buildRESTResponse();
 };
 
 const procPostAccountId: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
