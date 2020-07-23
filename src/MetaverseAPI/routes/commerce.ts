@@ -15,15 +15,23 @@
 'use strict';
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
+import { setupMetaverseAPI, finishMetaverseAPI } from '../Middleware';
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
 const procGetCommerceMarketplaceKey: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  if (req.vRestResp) {
+    req.vRestResp.Data = {
+      'public_key': 'laksdjfioasdofuoavanvowieroiawueroaijsdlkfajsdlfjalsdkfjlasdjfaklhkoiu'
+    };
+  }
   next();
 };
 
 const router = Router();
 
-router.get('/api/v1/commerce/marketplace_key',    procGetCommerceMarketplaceKey);
+router.get('/api/v1/commerce/marketplace_key',  [ setupMetaverseAPI,
+                                                  procGetCommerceMarketplaceKey,
+                                                  finishMetaverseAPI ] );
 
 export default router;

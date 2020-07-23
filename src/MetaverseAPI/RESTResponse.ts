@@ -114,9 +114,7 @@ export class RESTResponse {
       responseData = {
           'status': this.Status,
       };
-      Logger.debug('buildRESTResponse: Data=' + JSON.stringify(this.Data));
       if (IsNotNullOrEmpty(this.Data)) {
-        Logger.debug('buildRESTResponse: adding data');
         responseData.data = this.Data;
       };
     }

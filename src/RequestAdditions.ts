@@ -30,6 +30,7 @@ declare global {
             vDomain?: DomainEntity;     // pointer to verified DomainEntity
             vDomainError?: string;      // if vDomain is not set, the reason why
             vDomainAPIKey?: string;      // if domain APIkey supplied in the request, it is passed here
+            vTokenId?: string;            // value from :tokenId
         }
     }
 }

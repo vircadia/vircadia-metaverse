@@ -21,7 +21,8 @@ export let Config = {
     },
     'debug': {
       'logLevel': 'debug',
-      'devel': true
+      'devel': true,
+      'metaverseapi-response-detail': true
     },
     'database': {
 

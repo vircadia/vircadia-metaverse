@@ -33,7 +33,6 @@ import morgan from 'morgan';
 import { Logger, morganOptions } from './Tools/Logging';
 
 Logger.setLogLevel(Config.debug.logLevel);
-Logger.debug('starting...');
 
 const expr = express();
 
@@ -68,7 +67,6 @@ expr.use(Route_Errors);
 //   console.log(`New ${msg.object.type} from ${msg.actor} to ${msg.recipient}`)
 // });
 
-Logger.debug('starting the listener ...');
 const server = Config.debug.devel ?
       http.createServer(expr)
           .listen(Config.server["listen-port"], Config.server["listen-host"])

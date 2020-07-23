@@ -23,23 +23,27 @@ import { DomainEntity } from '../Entities/DomainEntity';
 
 import { IsNullOrEmpty } from '../Tools/Misc';
 import { Logger } from '../Tools/Logging';
+import { Config } from '../config';
 
 // MetaverseAPI middleware.
 // The request is a standard MetaverseAPI JSON-in and JSON-out request.
 // Start by decorating the request with the building class that is used to create the response.
 export const setupMetaverseAPI: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('setupMetaverseAPI');
   req.vRestResp = new RESTResponse(req, resp);
   next();
 };
 
+// MetaverseAPI middleware.
+// Finish the API call by constructing the '{"status": "success", "data": RESPONSE }' JSON response
+// The request is terminated here by either 'resp.end()' or 'resp.json()'.
 export const finishMetaverseAPI: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('finishMetaverseAPI');
   if (req.vRestResp) {
     resp.statusCode = req.vRestResp.HTTPStatus;
     const response = req.vRestResp.buildRESTResponse();
     if (response) {
-      Logger.debug('finishMetaverseAPI: response: ' + JSON.stringify(response));
+      if (Config.debug["metaverseapi-response-detail"]) {
+        Logger.debug('finishMetaverseAPI: response: ' + JSON.stringify(response));
+      }
       resp.json(response);
     }
     else {
@@ -99,6 +103,16 @@ export const domainFromParams: RequestHandler = async (req: Request, resp: Respo
   };
   if (IsNullOrEmpty(req.vDomain)) {
     req.vDomainError = 'DomainId does not match a domain';
+  };
+  next();
+};
+
+// MetaverseAPI middleware.
+// The request has a :tokenId label that is returned in 'vTokenId'.
+export const tokenFromParams: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  Logger.debug('tokenFromParams');
+  if (req.vRestResp) {
+    req.vTokenId = req.params.tokenId;
   };
   next();
 };

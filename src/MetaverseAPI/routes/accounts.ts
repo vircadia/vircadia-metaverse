@@ -17,6 +17,7 @@
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 import { setupMetaverseAPI, finishMetaverseAPI } from '../Middleware';
 import { accountFromAuthToken, accountFromParams } from '../Middleware';
+import { tokenFromParams } from '../Middleware';
 
 import { Accounts } from '../../Entities/Accounts';
 
@@ -26,10 +27,7 @@ import { Logger } from '../../Tools/Logging';
 
 const procGetAccounts: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
   Logger.debug('procGetAccounts');
-  if (req.vRestResp) {
-    if (req.vAuthAccount) {
-      
-    }
+  if (req.vAuthAccount) {
     req.vRestResp.Data = {
       accounts: [
         {
@@ -42,6 +40,9 @@ const procGetAccounts: RequestHandler = (req: Request, resp: Response, next: Nex
         }
       ]
     };
+  }
+  else {
+    req.vRestResp.respondFailure('No account specified');
   };
   next();
 };
@@ -65,27 +66,28 @@ const procDeleteAccountTokens: RequestHandler = (req: Request, resp: Response, n
 const router = Router();
 
 router.get(   '/api/v1/accounts',                 [ setupMetaverseAPI,
-                                                    accountFromAuthToken,
+                                                    accountFromAuthToken,   // vRestResp.vAuthAccount
                                                     procGetAccounts,
                                                     finishMetaverseAPI ] );
 router.post(  '/api/v1/account/:accountId',       [ setupMetaverseAPI,
-                                                    accountFromAuthToken,
+                                                    accountFromAuthToken,   // vRestResp.vAuthAccount
                                                     accountFromParams,
                                                     procDeleteAccountId,
                                                     finishMetaverseAPI ] );
 router.delete('/api/v1/account/:accountId',       [ setupMetaverseAPI,
-                                                    accountFromAuthToken,
-                                                    accountFromParams,
+                                                    accountFromAuthToken,   // vRestResp.vAuthAccount
+                                                    accountFromParams,      // vRestResp.vAccount
                                                     procDeleteAccountId,
                                                     finishMetaverseAPI ] );
 router.get(   '/api/v1/account/:accountId/tokens',[ setupMetaverseAPI,
-                                                    accountFromAuthToken,
-                                                    accountFromParams,
+                                                    accountFromAuthToken,   // vRestResp.vAuthAccount
+                                                    accountFromParams,      // vRestResp.vAccount
                                                     procGetAccountTokens,
                                                     finishMetaverseAPI ] );
 router.delete('/api/v1/account/:accountId/tokens/:tokenId', [ setupMetaverseAPI,
-                                                    accountFromAuthToken,
-                                                    accountFromParams,
+                                                    accountFromAuthToken,   // vRestResp.vAuthAccount
+                                                    accountFromParams,      // vRestResp.vAccount
+                                                    tokenFromParams,        // vRestResp.vToken
                                                     procDeleteAccountTokens,
                                                     finishMetaverseAPI ] );
 

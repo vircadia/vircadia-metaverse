@@ -99,45 +99,43 @@ const procGetDomains: RequestHandler = async (req: Request, resp: Response, next
 // The sender can send or not send lots of different fields so we have to be specific
 const procPutDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   Logger.debug('procPutDomains');
-  if (req.vRestResp) {
-    if (req.vDomain) {
-      let apikey:string;
-      if (req.body && req.body.domain && req.body.domain.api_key) {
-        apikey = req.body.domain.api_key;
-      }
-      if (await verifyDomainAccess(req.vDomain, req.vRestResp.getAuthToken(), apikey)) {
-        const aDomain = req.vDomain;
-        const valuesToSet = req.body.domain;
-        if (valuesToSet.version) aDomain.version = valuesToSet.version;
-        if (valuesToSet.protocol_version) aDomain.protocol = valuesToSet.protocol_version;
-        if (valuesToSet.network_addr) aDomain.networkAddr = valuesToSet.network_addr;
-        if (valuesToSet.automatic_networking) aDomain.networkingMode = valuesToSet.automatic_networking;
-        if (valuesToSet.restricted) aDomain.restricted = valuesToSet.restricted;
-        if (valuesToSet.capacity) aDomain.capacity = valuesToSet.capacity;
-        if (valuesToSet.description) aDomain.description = valuesToSet.description;
-        if (valuesToSet.maturity) aDomain.maturity = valuesToSet.maturity;
-        if (valuesToSet.restriction) aDomain.restriction = valuesToSet.restriction;
-        if (valuesToSet.hosts) {
-          aDomain.hosts = CleanedStringArray(valuesToSet.hosts);
-        };
-        if (valuesToSet.tags) {
-          aDomain.tags = CleanedStringArray(valuesToSet.tags);
-        };
-        if (valuesToSet.heartbeat) {
-          if (valuesToSet.heartbeat.num_users) aDomain.numUsers = Number(valuesToSet.heartbeat.num_users);
-          if (valuesToSet.heartbeat.num_anon_users) aDomain.anonUsers = Number(valuesToSet.heartbeat.num_anon_users);
-          aDomain.totalUsers = aDomain.numUsers + aDomain.anonUsers;
-
-        };
-        aDomain.timeOfLastHeartbeat = new Date();
-      }
-      else {
-        req.vRestResp.respondFailure('Domain not authorized');
+  if (req.vDomain) {
+    let apikey:string;
+    if (req.body && req.body.domain && req.body.domain.api_key) {
+      apikey = req.body.domain.api_key;
+    }
+    if (await verifyDomainAccess(req.vDomain, req.vRestResp.getAuthToken(), apikey)) {
+      const aDomain = req.vDomain;
+      const valuesToSet = req.body.domain;
+      if (valuesToSet.version) aDomain.version = valuesToSet.version;
+      if (valuesToSet.protocol_version) aDomain.protocol = valuesToSet.protocol_version;
+      if (valuesToSet.network_addr) aDomain.networkAddr = valuesToSet.network_addr;
+      if (valuesToSet.automatic_networking) aDomain.networkingMode = valuesToSet.automatic_networking;
+      if (valuesToSet.restricted) aDomain.restricted = valuesToSet.restricted;
+      if (valuesToSet.capacity) aDomain.capacity = valuesToSet.capacity;
+      if (valuesToSet.description) aDomain.description = valuesToSet.description;
+      if (valuesToSet.maturity) aDomain.maturity = valuesToSet.maturity;
+      if (valuesToSet.restriction) aDomain.restriction = valuesToSet.restriction;
+      if (valuesToSet.hosts) {
+        aDomain.hosts = CleanedStringArray(valuesToSet.hosts);
       };
+      if (valuesToSet.tags) {
+        aDomain.tags = CleanedStringArray(valuesToSet.tags);
+      };
+      if (valuesToSet.heartbeat) {
+        if (valuesToSet.heartbeat.num_users) aDomain.numUsers = Number(valuesToSet.heartbeat.num_users);
+        if (valuesToSet.heartbeat.num_anon_users) aDomain.anonUsers = Number(valuesToSet.heartbeat.num_anon_users);
+        aDomain.totalUsers = aDomain.numUsers + aDomain.anonUsers;
+
+      };
+      aDomain.timeOfLastHeartbeat = new Date();
     }
     else {
-      req.vRestResp.respondFailure(req.vDomainError ?? 'Domain not found');
+      req.vRestResp.respondFailure('Domain not authorized');
     };
+  }
+  else {
+    req.vRestResp.respondFailure(req.vDomainError ?? 'Domain not found');
   };
   next();
 };
@@ -145,7 +143,7 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
 // DELETE /domains/:domainId
 const procDeleteDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   Logger.debug('procDeleteDomains');
-  if (req.vRestResp && req.vAuthAccount) {
+  if (req.vAuthAccount) {
     if (req.vAuthAccount.isAdmin) {
       if (req.vDomain) {
         Domains.removeDomain(req.vDomain);
@@ -157,28 +155,29 @@ const procDeleteDomains: RequestHandler = async (req: Request, resp: Response, n
     else {
       req.vRestResp.respondFailure('Not authorized');
     };
-  };
+  }
+  else {
+    req.vRestResp.respondFailure('Not authorized');
+  }
   next();
 };
 
 // PUT /domains/:domainId/ice_server_address
 const procPutDomainsIceServerAddress: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   Logger.debug('procPutDomainsIceServerAddress');
-  if (req.vRestResp) {
-    if (req.vDomain) {
-        let apikey:string;
-        if (req.body && req.body.domain && req.body.domain.api_key) {
-          apikey = req.body.domain.api_key;
-        }
-      if (verifyDomainAccess(req.vDomain, req.vRestResp.getAuthToken(), apikey)) {
-        if (req.body && req.body.domain && req.body.domain.ice_server_address) {
-          req.vDomain.iceServerAddr = req.body.domain.ice_server_address;
-        };
+  if (req.vDomain) {
+      let apikey:string;
+      if (req.body && req.body.domain && req.body.domain.api_key) {
+        apikey = req.body.domain.api_key;
       }
+    if (verifyDomainAccess(req.vDomain, req.vRestResp.getAuthToken(), apikey)) {
+      if (req.body && req.body.domain && req.body.domain.ice_server_address) {
+        req.vDomain.iceServerAddr = req.body.domain.ice_server_address;
+      };
     }
-    else {
-      req.vRestResp.respondFailure(req.vDomainError ?? 'unauthorized');
-    };
+  }
+  else {
+    req.vRestResp.respondFailure(req.vDomainError ?? 'unauthorized');
   };
 next();
 };
@@ -192,7 +191,7 @@ const procPostDomainsTemporary: RequestHandler = async (req: Request, resp: Resp
 // PUT /domains/:domainId/public_key
 const procPutDomainsPublicKey: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   Logger.debug('procPutDomainsPublicKey');
-  if (req.vRestResp && req.vDomain) {
+  if (req.vDomain) {
     let apikey:string;
     // Get 'api_key' from multipart body
     if (req.body && req.body.domain && req.body.domain.api_key) {
@@ -208,10 +207,13 @@ const procPutDomainsPublicKey: RequestHandler = async (req: Request, resp: Respo
 // GET /domains/:domainId/public_key
 const procGetDomainsPublicKey: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   Logger.debug('procGetDomainsPublicKey');
-  if (req.vRestResp && req.vDomainError) {
+  if (req.vDomain) {
     req.vRestResp.Data = {
       'public_key': req.vDomain.publicKey
     };
+  }
+  else {
+    req.vRestResp.respondFailure('No domain');
   };
   next();
 };
