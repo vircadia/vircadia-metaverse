@@ -24,6 +24,6 @@ const procGetCommerceMarketplaceKey: RequestHandler = (req: Request, resp: Respo
 
 const router = Router();
 
-router.get('/commerce/marketplace_key',    procGetCommerceMarketplaceKey);
+router.get('/api/v1/commerce/marketplace_key',    procGetCommerceMarketplaceKey);
 
 export default router;

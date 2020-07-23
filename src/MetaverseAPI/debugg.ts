@@ -16,7 +16,10 @@
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
+import { Logger } from '../Tools/Logging';
+
 const procAllDebug: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  Logger.debug('procAllDebug');
   next();
 };
 

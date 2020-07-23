@@ -17,10 +17,21 @@
 import Config from '../config';
 
 import { Request, Response } from 'express';
+import { IsNotNullOrEmpty } from '../Tools/Misc';
+import { Logger } from '../Tools/Logging';
+
+export enum HTTPStatusCode {
+  OK = 200,
+  BadRequest = 400,
+  Unauthorized = 401,
+  Forbidden = 403,
+  NotFound = 404,
+};
 
 export class RESTResponse {
-  Failure: boolean;
+  IsFailure: boolean;
   Status: string;
+  HTTPStatus: number;
   Data: any;
 
   private _request: Request;
@@ -30,7 +41,9 @@ export class RESTResponse {
   constructor(pReq : Request, pResp: Response) {
     this._request = pReq;
     this._response = pResp;
+    this.IsFailure = false;
     this.Status = 'success';
+    this.HTTPStatus = HTTPStatusCode.OK;
   };
 
   getRequest(): Request {
@@ -41,6 +54,22 @@ export class RESTResponse {
     return this._response;
   };
 
+  private _authToken:string = null;
+  getAuthToken(): string {
+    if (this._authToken === null) {
+      const auth = this._request.headers.authorization;
+      if (auth) {
+        if (auth.toLowerCase().startsWith('bearer ')) {
+          this._authToken = auth.substr(7);
+        }
+        else {
+          this._authToken = auth;
+        }
+      }
+    }
+    return this._authToken;
+  }
+
   respondSuccess() : RESTResponse {
     this.Status = 'success';
     return this;
@@ -48,7 +77,7 @@ export class RESTResponse {
 
   respondFailure( msg1: string, msg2?: string ) : RESTResponse {
     this.Status = 'failure';
-    this.Failure = true;
+    this.IsFailure = true;
     this._additionalFields.set('error', msg1);
     if (msg2) {
       this._additionalFields.set('errorInfo', msg2);
@@ -64,9 +93,9 @@ export class RESTResponse {
   // If successful, returns the standard response of
   //     { 'status': 'success', 'data': this._data }
   // Extra top-level things are added if in _addtionalFields
-  buildRESTResponse() : RESTResponse {
+  buildRESTResponse() : any {
     let responseData: any;
-    if (this.Failure) {
+    if (this.IsFailure) {
       // If a specific header is in the request, return errors as
       //     HTTP badrequest errors rather than just returning the JSON status
       if (Config["metaverse-server"]["http-error-on-failure"]) {
@@ -85,8 +114,10 @@ export class RESTResponse {
       responseData = {
           'status': this.Status,
       };
-      if (this.Data != null) {
-          responseData.data = this.Data;
+      Logger.debug('buildRESTResponse: Data=' + JSON.stringify(this.Data));
+      if (IsNotNullOrEmpty(this.Data)) {
+        Logger.debug('buildRESTResponse: adding data');
+        responseData.data = this.Data;
       };
     }
     if (this._additionalFields.size > 0) {
@@ -94,9 +125,6 @@ export class RESTResponse {
         responseData[key] = val;
       });
     };
-    if (responseData) {
-      this._response.json(responseData);
-    };
-    return this;
+    return responseData;
   };
 };

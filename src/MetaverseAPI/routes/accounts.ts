@@ -15,28 +15,35 @@
 'use strict'
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { RESTResponse } from '../RESTResponse';
+import { setupMetaverseAPI, finishMetaverseAPI } from '../Middleware';
+import { accountFromAuthToken, accountFromParams } from '../Middleware';
 
 import { Accounts } from '../../Entities/Accounts';
+
+import { Logger } from '../../Tools/Logging';
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
 const procGetAccounts: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
-  const restResp = new RESTResponse(req, resp);
-
-  restResp.Data = {
-    accounts: [
-      {
-        'username': 'fred',
-        'accountId': 'lksjdlfaeoiraskjdlkhz832ad',
-      },
-      {
-        'username': 'wilma',
-        'accountId': 'a89s798sduhfiuwhqfohohawev',
-      }
-    ]
+  Logger.debug('procGetAccounts');
+  if (req.vRestResp) {
+    if (req.vAuthAccount) {
+      
+    }
+    req.vRestResp.Data = {
+      accounts: [
+        {
+          'username': 'fred',
+          'accountId': 'lksjdlfaeoiraskjdlkhz832ad',
+        },
+        {
+          'username': 'wilma',
+          'accountId': 'a89s798sduhfiuwhqfohohawev',
+        }
+      ]
+    };
   };
-  restResp.buildRESTResponse();
+  next();
 };
 
 const procPostAccountId: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
@@ -57,10 +64,29 @@ const procDeleteAccountTokens: RequestHandler = (req: Request, resp: Response, n
 
 const router = Router();
 
-router.get(   '/accounts',                            procGetAccounts);
-router.post(  '/account/:accountId',                  procPostAccountId);
-router.delete('/account/:accountId',                  procDeleteAccountId);
-router.get(   '/account/:accountId/tokens',           procGetAccountTokens);
-router.delete('/account/:accountId/tokens/:tokenId',  procDeleteAccountTokens);
+router.get(   '/api/v1/accounts',                 [ setupMetaverseAPI,
+                                                    accountFromAuthToken,
+                                                    procGetAccounts,
+                                                    finishMetaverseAPI ] );
+router.post(  '/api/v1/account/:accountId',       [ setupMetaverseAPI,
+                                                    accountFromAuthToken,
+                                                    accountFromParams,
+                                                    procDeleteAccountId,
+                                                    finishMetaverseAPI ] );
+router.delete('/api/v1/account/:accountId',       [ setupMetaverseAPI,
+                                                    accountFromAuthToken,
+                                                    accountFromParams,
+                                                    procDeleteAccountId,
+                                                    finishMetaverseAPI ] );
+router.get(   '/api/v1/account/:accountId/tokens',[ setupMetaverseAPI,
+                                                    accountFromAuthToken,
+                                                    accountFromParams,
+                                                    procGetAccountTokens,
+                                                    finishMetaverseAPI ] );
+router.delete('/api/v1/account/:accountId/tokens/:tokenId', [ setupMetaverseAPI,
+                                                    accountFromAuthToken,
+                                                    accountFromParams,
+                                                    procDeleteAccountTokens,
+                                                    finishMetaverseAPI ] );
 
 export default router;

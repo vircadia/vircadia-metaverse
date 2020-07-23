@@ -15,7 +15,11 @@
 
 import Config from './config';
 
+import http from 'http';
+import https from 'https';
 import express from 'express';
+
+import { MongoClient } from 'mongodb';
 
 import Route_Debugg       from './MetaverseAPI/debugg';
 import Route_MetaverseAPI from './MetaverseAPI/apiv1';
@@ -23,12 +27,13 @@ import Route_Tokens       from './MetaverseAPI/tokens';
 import Route_Misc         from './MetaverseAPI/misc';
 import Route_Errors       from './MetaverseAPI/errors';
 
-import Route_ActivityPub  from './ActivityPub/app';
+import { apex, apexRouter }  from './ActivityPub/app';
 
 import morgan from 'morgan';
 import { Logger, morganOptions } from './Tools/Logging';
 
 Logger.setLogLevel(Config.debug.logLevel);
+Logger.debug('starting...');
 
 const expr = express();
 
@@ -45,7 +50,7 @@ expr.use(express.json());
 expr.use(Route_MetaverseAPI);
 
 // Acting as an ActivityPub server
-expr.use(Route_ActivityPub);
+expr.use(apexRouter);
 
 expr.use(Route_Tokens);
 
@@ -63,4 +68,10 @@ expr.use(Route_Errors);
 //   console.log(`New ${msg.object.type} from ${msg.actor} to ${msg.recipient}`)
 // });
 
-expr.listen( Config.server["listen-port"], Config.server["listen-host"]);
+Logger.debug('starting the listener ...');
+const server = Config.debug.devel ?
+      http.createServer(expr)
+          .listen(Config.server["listen-port"], Config.server["listen-host"])
+    :
+      https.createServer(expr)
+          .listen(Config.server["listen-port"], Config.server["listen-host"]);

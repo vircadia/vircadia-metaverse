@@ -14,7 +14,7 @@
 'use strict'
 
 export class DomainEntity {
-  public domainID: string;     // globally unique domain identifier
+  public domainId: string;     // globally unique domain identifier
   public placeName: string;    // place name
   public publicKey: string;    // DomainServers's public key
   public apiKey: string;       // Access key if a temp domain

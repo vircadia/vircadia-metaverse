@@ -28,7 +28,7 @@ export const Accounts = {
   async getAccountWithFilter( pTester: AccountTestFunction): Promise<AccountEntity> {
     return null;
   },
-  async getAccountWithAuthToken(pAuthToken: AuthToken): Promise<AccountEntity> {
+  async getAccountWithAuthToken(pAuthToken: string): Promise<AccountEntity> {
     return null;
   },
   async getAccountWithUsername(pUsername: string): Promise<AccountEntity> {

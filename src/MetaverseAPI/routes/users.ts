@@ -66,23 +66,23 @@ const procPostUserLocker: RequestHandler = (req: Request, resp: Response, next: 
 
 const router = Router();
 
-router.get(   '/users',                       procGetUsers);
-router.post(  '/users',                       procPostUsers);
-router.put(   '/user/heartbeat',              procPutUserHeartbeat);
+router.get(   '/api/v1/users',                       procGetUsers);
+router.post(  '/api/v1/users',                       procPostUsers);
+router.put(   '/api/v1/user/heartbeat',              procPutUserHeartbeat);
 
-router.put(   '/user/location',               procPutUserLocation);
-router.get(   '/users/:username/location',    procGetUserLocation);
-router.get(   '/user/profile',                procGetUserProfile);
-router.put(   '/user/public_key',             procPutUserPublicKey);
-router.get(   '/users/:username/public_key',  procGetUsersPublicKey);
+router.put(   '/api/v1/user/location',               procPutUserLocation);
+router.get(   '/api/v1/users/:username/location',    procGetUserLocation);
+router.get(   '/api/v1/user/profile',                procGetUserProfile);
+router.put(   '/api/v1/user/public_key',             procPutUserPublicKey);
+router.get(   '/api/v1/users/:username/public_key',  procGetUsersPublicKey);
 
-router.get(   '/user/friends',                procGetUserFriends);
-router.post(  '/user/friends',                procPostUserFriends);
-router.delete('/user/friends/:username',      procDeleteUserFriends);
-router.post(  '/user/connection_request',     procPostUserConnectionRequest);
-router.delete('/user/connections/:username',  procDeleteUserConnection);
+router.get(   '/api/v1/user/friends',                procGetUserFriends);
+router.post(  '/api/v1/user/friends',                procPostUserFriends);
+router.delete('/api/v1/user/friends/:username',      procDeleteUserFriends);
+router.post(  '/api/v1/user/connection_request',     procPostUserConnectionRequest);
+router.delete('/api/v1/user/connections/:username',  procDeleteUserConnection);
 
-router.get(   '/user/locker',                 procGetUserLocker);
-router.post(  '/user/locker',                 procPostUserLocker);
+router.get(   '/api/v1/user/locker',                 procGetUserLocker);
+router.post(  '/api/v1/user/locker',                 procPostUserLocker);
 
 export default router;

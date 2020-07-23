@@ -20,3 +20,12 @@ export function Clamp(pVal: number, pLow: number, pHigh: number): number {
   if (ret < pLow) ret = pLow;
   return ret;
 }
+
+// Return 'true' if the passed value is null or empty
+export function IsNullOrEmpty(pVal: any): boolean {
+  return (typeof(pVal) === 'undefined' || pVal === null);
+};
+// Return 'true' if the passed value is not null or empty
+export function IsNotNullOrEmpty(pVal: any): boolean {
+  return (typeof(pVal) !== 'undefined' && pVal !== null);
+}

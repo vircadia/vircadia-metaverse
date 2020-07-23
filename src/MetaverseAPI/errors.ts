@@ -34,6 +34,7 @@ router.use( (err: HttpError, req: Request, res: Response, next: NextFunction) =>
 
   // render the error page
   res.status(err.status || 500);
+  res.end();
 });
 
 export default router;

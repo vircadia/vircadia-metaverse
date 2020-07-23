@@ -30,11 +30,13 @@
     },
     "dependencies": {
         "@types/debug": "^4.1.5",
+        "@types/mongodb": "^3.5.25",
         "activitypub-express": "file:../activitypub-express",
         "debug": "~2.6.9",
         "express": "~4.16.1",
         "http-errors": "~1.6.3",
         "loglevel": "^1.6.8",
+        "mongodb": "^3.5.9",
         "morgan": "~1.9.1"
     },
     "devDependencies": {

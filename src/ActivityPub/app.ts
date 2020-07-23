@@ -30,15 +30,17 @@ const routes = {
   inbox: baseUrl + '/inbox/:actor',
   outbox: baseUrl + '/outbox/:actor'
 };
-const apex = ActivityPubExpress({
-  domain: 'localhost',
+export const apex = ActivityPubExpress({
+  // 'domain' is the external, permanant domain address
+  domain: Config.activitypub["external-hostname"],
+  // these are the ':' parameters in the routes
   actorParam: 'actor',
   objectParam: 'id',
   activityParam: 'id',
   routes
 });
 
-const apexRouter = Router();
+export const apexRouter = Router();
 
 apexRouter.use(express.json({ type: apex.consts.jsonldTypes }), apex);
 
@@ -53,5 +55,3 @@ apexRouter.get(routes.actor, apex.net.actor.get);
 apexRouter.get(routes.object, apex.net.object.get);
 apexRouter.get(routes.activity, apex.net.activityStream.get);
 apexRouter.get('/.well-known/webfinger', apex.net.webfinger.get);
-
-export default apexRouter;

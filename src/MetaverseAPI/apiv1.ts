@@ -25,11 +25,7 @@ import APICommerce    from './routes/commerce';
 
 const router = Router();
 
-router.use('api/v1/', APICORS);
-router.use('api/v1/', APIActivities);
-router.use('api/v1/', APIUser);
-router.use('api/v1/', APIAccounts);
-router.use('api/v1/', APIDomain);
-router.use('api/v1/', APICommerce);
+router.use( [ APICORS, APIActivities, APIUser,
+              APIAccounts, APIDomain, APICommerce ] );
 
 export default router;

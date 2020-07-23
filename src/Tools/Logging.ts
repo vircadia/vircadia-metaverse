@@ -29,30 +29,28 @@ interface ALogger {
   setLogLevel( level: string ): void
 };
 
-const localLogger = loglevel.getLogger('Iamus');
-
 export const Logger : ALogger = {
-    info: (msg: string) => {
-      localLogger.info(msg);
-    },
-    warn: (msg: string) => {
-      localLogger.warn(msg);
-    },
-    debug: (msg: string) => {
-      localLogger.debug(msg);
-    },
-    error: (msg: string) => {
-      localLogger.error(msg);
-    },
-    setLogLevel: ( level: string) => {
-      switch(level.toLowerCase()) {
-        case 'silent': localLogger.setLevel(loglevel.levels.SILENT); break;
-        case 'info': localLogger.setLevel(loglevel.levels.INFO); break;
-        case 'warn': localLogger.setLevel(loglevel.levels.WARN); break;
-        case 'debug': localLogger.setLevel(loglevel.levels.DEBUG); break;
-        case 'error': localLogger.setLevel(loglevel.levels.ERROR); break;
-      }
-    }
+  info: (msg: string) => {
+    loglevel.info(msg);
+  },
+  warn: (msg: string) => {
+    loglevel.warn(msg);
+  },
+  debug: (msg: string) => {
+    loglevel.debug(msg);
+  },
+  error: (msg: string) => {
+    loglevel.error(msg);
+  },
+  setLogLevel: ( level: string) => {
+    switch(level.toLowerCase()) {
+      case 'silent': loglevel.setLevel(loglevel.levels.SILENT); break;
+      case 'info': loglevel.setLevel(loglevel.levels.INFO); break;
+      case 'warn': loglevel.setLevel(loglevel.levels.WARN); break;
+      case 'debug': loglevel.setLevel(loglevel.levels.DEBUG); break;
+      case 'error': loglevel.setLevel(loglevel.levels.ERROR); break;
+    };
+  }
 };
 
 export const morganOptions: Options<http.IncomingMessage, http.ServerResponse> = {

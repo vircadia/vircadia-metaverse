@@ -61,9 +61,14 @@ export class AccountEntity {
   public whenAccountCreated: Date;  // date of account creation
   public timeOfLastHeartbeat: Date; // when we last heard from this user
 
-  isOnline(): boolean {
+  // getter property that is 'true' if the user has been heard from recently
+  get isOnline(): boolean {
     return this.timeOfLastHeartbeat
         && ((Date.now() - this.timeOfLastHeartbeat.getUTCMilliseconds())
               < (Config["metaverse-server"]["heartbeat-seconds-until-offline"] * 1000));
-  }
+  };
+  // getter property that is 'true' if the user is a grid administrator
+  get isAdmin(): boolean {
+    return this.administrator;
+  };
 };
