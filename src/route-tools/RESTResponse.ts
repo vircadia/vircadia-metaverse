@@ -95,7 +95,6 @@ export class RESTResponse {
   //     { 'status': 'success', 'data': this._data }
   // Extra top-level things are added if in _addtionalFields
   buildRESTResponse() : any {
-    Logger.debug('BuildRESTResponse:');
     let responseData: any;
     if (this.IsFailure) {
       // If a specific header is in the request, return errors as
@@ -113,12 +112,10 @@ export class RESTResponse {
       };
     }
     else {
-      Logger.debug('BuildRESTResponse: not failure');
       responseData = {
           'status': this.Status,
       };
       if (IsNotNullOrEmpty(this.Data)) {
-        Logger.debug('BuildRESTResponse: building body');
         responseData.data = this.Data;
       };
     }

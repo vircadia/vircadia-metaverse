@@ -28,7 +28,6 @@ import { Config } from '@Base/config';
 // The request is a standard MetaverseAPI JSON-in and JSON-out request.
 // Start by decorating the request with the building class that is used to create the response.
 export const setupMetaverseAPI: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('setupMetaverseAPI: enter');
   req.vRestResp = new RESTResponse(req, resp);
   next();
 };
@@ -37,7 +36,7 @@ export const setupMetaverseAPI: RequestHandler = async (req: Request, resp: Resp
 // Finish the API call by constructing the '{"status": "success", "data": RESPONSE }' JSON response
 // The request is terminated here by either 'resp.end()' or 'resp.json()'.
 export const finishMetaverseAPI: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('finishMetaverseAPI: enter');
+  // Logger.debug('finishMetaverseAPI: enter');
   if (req.vRestResp) {
     resp.statusCode = req.vRestResp.HTTPStatus;
     const response = req.vRestResp.buildRESTResponse();
@@ -46,15 +45,12 @@ export const finishMetaverseAPI: RequestHandler = async (req: Request, resp: Res
         Logger.debug('finishMetaverseAPI: response: ' + JSON.stringify(response));
       }
       resp.json(response);
-      resp.end();
     }
     else {
-      Logger.debug('finishMetaverseAPI: no body');
       resp.end();
     };
   }
   else {
-    Logger.debug('finishMetaverseAPI: no vRestResp');
     next();
   };
 };

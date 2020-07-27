@@ -28,6 +28,7 @@
     },
 
     "scripts": {
+        "run": "node dist/index.js",
         "build": "npm-run-all -s \"clean:dist\" \"build:iamus\"",
         "prebuild:iamus": "tslint -c tslint.json -p tsconfig.json --fix",
         "build:iamus": "tsc",

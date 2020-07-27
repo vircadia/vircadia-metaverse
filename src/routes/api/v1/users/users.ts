@@ -64,6 +64,8 @@ const procPostUserLocker: RequestHandler = (req: Request, resp: Response, next: 
   next();
 };
 
+export const name = 'users';
+
 export const router = Router();
 
 router.get(   '/api/v1/users',                       procGetUsers);

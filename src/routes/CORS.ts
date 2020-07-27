@@ -16,15 +16,19 @@
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
+import { Logger } from '@Tools/Logging';
+
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
 const procOptions: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
-  resp.header('Access-Control-Allow-Origin', '*');
-  resp.header('Access-Control-Allow-Methods', 'GET, POST, DELETE, PUT, OPTIONS');
+  resp.setHeader('Access-Control-Allow-Origin', '*');
+  resp.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, PUT, OPTIONS');
+  Logger.debug('procOptions: adding options headers');
   next();
 };
 const procVircadiaErrorHeader: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
-  resp.header('Access-Control-Allow-Headers', 'x-vircadia-error-handle');
+  resp.setHeader('Access-Control-Allow-Headers', 'x-vircadia-error-handle');
+  Logger.debug('procVircadiaErrorHandler: adding allow error headers');
   next();
 };
 

@@ -24,7 +24,6 @@ const procMetaverseInfo: RequestHandler = (req: Request, resp: Response, next: N
     'metaverse': 'is',
     'cool': 'nothing else'
   };
-  Logger.debug('procMetaverseInfo: exiting');
   next();
 };
 

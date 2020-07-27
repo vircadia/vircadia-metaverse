@@ -19,8 +19,8 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 import { Config } from '@Base/config';
 import { Logger } from '@Tools/Logging';
 
-const procAllDebug: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
-  if (Config.debug["request-detail"]) {
+const procAllDebug: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  if (Config.debug['request-detail']) {
     Logger.debug(`procAllDebug: ${req.method} ${req.url}`);
   };
   next();
@@ -28,6 +28,5 @@ const procAllDebug: RequestHandler = (req: Request, resp: Response, next: NextFu
 
 export const name = "Debug";
 
-export const router = Router();
-
-router.all( '/',     procAllDebug);
+export const router = Router()
+  .use(procAllDebug);

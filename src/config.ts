@@ -32,6 +32,7 @@ export let Config = {
     }
 };
 
+// Tweek some of the values based on environment variables
 const envLogLevel = process.env.IAMUS_LOGLEVEL;
 if (envLogLevel) Config.debug.logLevel = envLogLevel;
 

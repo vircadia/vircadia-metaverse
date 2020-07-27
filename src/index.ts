@@ -22,6 +22,8 @@ import https from 'https';
 import express from 'express';
 import { Router } from 'express';
 
+const expr = express();
+
 import { MongoClient } from 'mongodb';
 
 import { apex, apexRouter }  from './ActivityPub/app';
@@ -31,8 +33,6 @@ import morgan from 'morgan';
 import { Logger, morganOptions } from '@Tools/Logging';
 
 Logger.setLogLevel(Config.debug.logLevel);
-
-const expr = express();
 
 // Setup the logger of messages
 expr.use(morgan('dev', morganOptions));
@@ -61,8 +61,7 @@ expr.use(createAPIRouter('routes-last'));
 // });
 
 const server = Config.debug.devel ? http.createServer(expr) : https.createServer(expr)
-server.on('request', expr)
-      .on('listening', () => {
+server.on('listening', () => {
         Logger.info('Listening');
       })
       .on('error', (err) => {
@@ -73,13 +72,16 @@ server.on('request', expr)
 // Search a directory for .js files that export a 'router' property and return a
 //    new Router that routes to those exports.
 function createAPIRouter(pBaseDir: string): Router {
+  // Logger.debug('createAPIRouter: adding routes from ' + pBaseDir);
   return glob
     // find all .js files in the passed subdirectory
     .sync('**/*.js', { cwd: `${__dirname}/${pBaseDir}/` })
     // read in those files and create array of all exported objects
     .map( filename => require(`./${pBaseDir}/${filename}`))
-    // find all of those read in things that export a 'router' property
+    // filter down to those read-in-things that export a 'router' property
     .filter(router => router.hasOwnProperty('router'))
+    // print out debugging about which routers are being created
+    // .map(rr => { Logger.debug('createAPIRouter: adding ' + rr.name ?? 'UNKNOWN'); return rr; })
     // create a Router and add each found Router and end up with a Router with all found Routers
     .reduce((rootRouter, router) => rootRouter.use(router.router), Router({ mergeParams: true } ) );
 }
