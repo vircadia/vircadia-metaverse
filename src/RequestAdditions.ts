@@ -14,12 +14,13 @@
 
 'use strict';
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-
 import { RESTResponse } from './route-tools/RESTResponse';
 import { AccountEntity } from './Entities/AccountEntity';
 import { DomainEntity } from './Entities/DomainEntity';
 
+// This defintion adds our parameters to the Request type
+// Most of these are variables that are filled by processing on the request
+//      (like looking up the ':accountId' parameter and filling 'vAccount')
 declare global {
     namespace Express {
         interface Request {

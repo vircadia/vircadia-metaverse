@@ -4,10 +4,17 @@
 'use strict';
 
 export let Config = {
+    'metaverse': {
+      'metaverse-name': 'Vircadia noobie',
+      'metaverse-nick-name': 'Noobie',
+      'metaverse-server-url': '',   // if empty, set to self
+      'default-ice-server-url': ''  // if empty, set to self
+    },
     'server': {
       'listen-host': '0.0.0.0',
       'listen-port': 9400,
-      'static-base': '/static/'
+      'static-base': '/static/',
+      'server-version': '1.0.1' // Updated by package.json script
     },
     'metaverse-server': {
       'http-error-on-failure': true,  // whether to include x-vircadia error header

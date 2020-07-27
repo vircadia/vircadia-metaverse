@@ -17,12 +17,17 @@
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 
+import { Config } from '@Base/config';
+
 import { Logger } from '@Tools/Logging';
 
 const procMetaverseInfo: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
   req.vRestResp.Data = {
-    'metaverse': 'is',
-    'cool': 'nothing else'
+    'metaverse_name': Config.metaverse["metaverse-name"],
+    'metaverse_nick_name': Config.metaverse["metaverse-nick-name"],
+    'metaverse_url': Config.metaverse["metaverse-server-url"],
+    'ice_server_url': Config.metaverse["default-ice-server-url"],
+    'metaverse_server_version': Config.server["server-version"],
   };
   next();
 };

@@ -1,6 +1,6 @@
 {
     "name": "iamus-metaverse-server",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "private": true,
     "description": "metaverse-server for Vircadia using ActivityPub",
     "author": "Robert Adams <misterblue@misterblue.com>",
@@ -29,13 +29,14 @@
 
     "scripts": {
         "run": "node dist/index.js",
-        "build": "npm-run-all -s \"clean:dist\" \"build:iamus\"",
+        "build": "npm-run-all -s \"clean:dist\" \"add-version\" \"build:iamus\"",
         "prebuild:iamus": "tslint -c tslint.json -p tsconfig.json --fix",
         "build:iamus": "tsc",
         "prestart": "npm run build",
         "start": "node .",
         "clean:dist": "rm -rf dist/*",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "add-version": "sed -i -e \"s='server-version':.*$='server-version': '$npm_package_version' // Updated by package.json script=\" src/config.ts"
     },
     "dependencies": {
         "@types/debug": "^4.1.5",

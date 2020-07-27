@@ -16,6 +16,7 @@
 import 'module-alias/register';
 
 import Config from '@Base/config';
+setupConfiguration();
 
 import http from 'http';
 import https from 'https';
@@ -25,6 +26,7 @@ import { Router } from 'express';
 const expr = express();
 
 import { MongoClient } from 'mongodb';
+setupDB();
 
 import { apex, apexRouter }  from './ActivityPub/app';
 
@@ -84,4 +86,17 @@ function createAPIRouter(pBaseDir: string): Router {
     // .map(rr => { Logger.debug('createAPIRouter: adding ' + rr.name ?? 'UNKNOWN'); return rr; })
     // create a Router and add each found Router and end up with a Router with all found Routers
     .reduce((rootRouter, router) => rootRouter.use(router.router), Router({ mergeParams: true } ) );
+}
+
+// Do extra processing to setup the configuration settings for this instance.
+// This mostly involves figuring out our networking situation and setting that
+//     into the configuration parameters.
+// There is some collection of environment variables in 'config.ts'.
+function setupConfiguration(): void {
+  return;
+}
+
+// Do the setup of the database.
+function setupDB(): void {
+  return;
 }
