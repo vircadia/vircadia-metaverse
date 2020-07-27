@@ -16,15 +16,12 @@
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
-import { Logger } from '../Tools/Logging';
-
-const procAllDebug: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('procAllDebug');
+const procPostOauthToken: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
   next();
 };
 
-const router = Router();
+export const name = "oauthToken";
 
-router.all( '/',     procAllDebug);
+export const router = Router();
 
-export default router;
+router.post( '/oauth/token',      procPostOauthToken);

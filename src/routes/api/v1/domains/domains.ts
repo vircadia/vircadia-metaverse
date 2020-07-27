@@ -15,18 +15,21 @@
 'use strict';
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI } from '../Middleware';
-import { accountFromAuthToken } from '../Middleware';
-import { domainFromParams } from '../Middleware';
+import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
+import { accountFromAuthToken } from '@Route-Tools/middleware';
+import { domainFromParams } from '@Route-Tools/middleware';
 
-import { Accounts } from '../../Entities/Accounts';
-import { Domains } from '../../Entities/Domains';
-import { DomainEntity } from '../../Entities/DomainEntity';
-import { PaginationInfo } from '../../Entities/EntityFilters/PaginationInfo';
-import { AccountEntity } from '../../Entities/AccountEntity';
-import { IsNullOrEmpty } from '../../Tools/Misc';
+import multer from 'multer';
+import crypto from 'crypto';
 
-import { Logger } from '../../Tools/Logging';
+import { Accounts } from '@Entities/Accounts';
+import { Domains } from '@Entities/Domains';
+import { DomainEntity } from '@Entities/DomainEntity';
+import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
+import { AccountEntity } from '@Entities/AccountEntity';
+import { IsNullOrEmpty } from '@Tools/Misc';
+
+import { Logger } from '@Tools/Logging';
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
@@ -55,7 +58,7 @@ const procGetDomains: RequestHandler = async (req: Request, resp: Response, next
   Logger.debug('procGetDomains');
   if (req.vAuthAccount) {
     const pagination = new PaginationInfo(1,1000);
-    pagination.parametersFromRequest(req.vRestResp);
+    pagination.parametersFromRequest(req);
     const domainArray: any[] = [];
     for await (const aDomain of Domains.enumerate(pagination)) {
       domainArray.push( {
@@ -183,6 +186,9 @@ next();
 };
 
 // POST /domains/temporary
+// https://www.npmjs.com/package/unique-names-generator
+// https://github.com/andreasonny83/unique-names-generator
+
 const procPostDomainsTemporary: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   Logger.debug('procPostDomainsTemporary');
   next();
@@ -193,12 +199,13 @@ const procPutDomainsPublicKey: RequestHandler = async (req: Request, resp: Respo
   Logger.debug('procPutDomainsPublicKey');
   if (req.vDomain) {
     let apikey:string;
-    // Get 'api_key' from multipart body
-    if (req.body && req.body.domain && req.body.domain.api_key) {
-      apikey = req.body.domain.api_key;
+    if (req.body.api_key) {
+      apikey = req.body.api_key;
+
     }
     if (verifyDomainAccess(req.vDomain, req.vRestResp.getAuthToken(), apikey)) {
       Logger.debug('procPutDomainsPublicKey: domain found');
+
     };
   };
   next();
@@ -256,7 +263,9 @@ async function verifyDomainAccess(pDomain: DomainEntity, pAuthToken: string, pAP
   return ret;
 };
 
-const router = Router();
+export const name = 'domains';
+
+export const router = Router();
 
 router.get(   '/api/v1/domains/:domainId',      [ setupMetaverseAPI,
                                                   domainFromParams,
@@ -284,13 +293,15 @@ router.post(  '/api/v1/domains/temporary',      [ setupMetaverseAPI,
                                                   procPostDomainsTemporary,
                                                   finishMetaverseAPI ] );
 
+const multiStorage = multer.memoryStorage();
+const uploader = multer( { storage: multiStorage, });
+  // .fields( [ { name: 'api_key' }, { name: 'public_key' }]);
 router.put(   '/api/v1/domains/:domainId/public_key',  [ setupMetaverseAPI,
-                                                  domainFromParams,
+                                                  domainFromParams,   // vRESTResp.vDomain
+                                                  uploader.none(),           // body['api_key'], files['public_key'].buffer
                                                   procPutDomainsPublicKey,
                                                   finishMetaverseAPI ] );
 router.get(   '/api/v1/domains/:domainId/public_key',  [ setupMetaverseAPI,
                                                   domainFromParams,
                                                   procGetDomainsPublicKey,
                                                   finishMetaverseAPI ] );
-
-export default router;

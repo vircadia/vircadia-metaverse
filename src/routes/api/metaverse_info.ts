@@ -15,17 +15,26 @@
 'use strict';
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
+import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
+
+import { Logger } from '@Tools/Logging';
 
 const procMetaverseInfo: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
-  resp.send( {
+  req.vRestResp.Data = {
     'metaverse': 'is',
     'cool': 'nothing else'
-  });
+  };
+  Logger.debug('procMetaverseInfo: exiting');
+  next();
 };
 
-const router = Router();
+export const name = "metaverseInfo";
 
-router.get( '/api/metaverse_info',      procMetaverseInfo);
-router.get( '/api/v1/metaverse_info',   procMetaverseInfo);
+export const router = Router();
 
-export default router;
+router.get( '/api/metaverse_info',    [ setupMetaverseAPI,
+                                        procMetaverseInfo,
+                                        finishMetaverseAPI ] );
+router.get( '/api/v1/metaverse_info', [ setupMetaverseAPI,
+                                        procMetaverseInfo,
+                                        finishMetaverseAPI ] );

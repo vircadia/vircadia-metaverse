@@ -17,8 +17,9 @@
 import Config from '../config';
 
 import { Request, Response } from 'express';
-import { IsNotNullOrEmpty } from '../Tools/Misc';
-import { Logger } from '../Tools/Logging';
+
+import { IsNotNullOrEmpty } from '@Tools/Misc';
+import { Logger } from '@Tools/Logging';
 
 export enum HTTPStatusCode {
   OK = 200,
@@ -94,6 +95,7 @@ export class RESTResponse {
   //     { 'status': 'success', 'data': this._data }
   // Extra top-level things are added if in _addtionalFields
   buildRESTResponse() : any {
+    Logger.debug('BuildRESTResponse:');
     let responseData: any;
     if (this.IsFailure) {
       // If a specific header is in the request, return errors as
@@ -111,10 +113,12 @@ export class RESTResponse {
       };
     }
     else {
+      Logger.debug('BuildRESTResponse: not failure');
       responseData = {
           'status': this.Status,
       };
       if (IsNotNullOrEmpty(this.Data)) {
+        Logger.debug('BuildRESTResponse: building body');
         responseData.data = this.Data;
       };
     }

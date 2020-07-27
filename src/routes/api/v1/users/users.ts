@@ -64,7 +64,7 @@ const procPostUserLocker: RequestHandler = (req: Request, resp: Response, next: 
   next();
 };
 
-const router = Router();
+export const router = Router();
 
 router.get(   '/api/v1/users',                       procGetUsers);
 router.post(  '/api/v1/users',                       procPostUsers);
@@ -84,5 +84,3 @@ router.delete('/api/v1/user/connections/:username',  procDeleteUserConnection);
 
 router.get(   '/api/v1/user/locker',                 procGetUserLocker);
 router.post(  '/api/v1/user/locker',                 procPostUserLocker);
-
-export default router;

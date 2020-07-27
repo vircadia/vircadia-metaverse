@@ -22,6 +22,9 @@ export let Config = {
     'debug': {
       'logLevel': 'debug',
       'devel': true,
+      // output the received request info when received
+      'request-detail': true,
+      // output the response sent back from MetaverseAPI requests
       'metaverseapi-response-detail': true
     },
     'database': {

@@ -16,7 +16,7 @@
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
-import { RESTResponse } from './MetaverseAPI/RESTResponse';
+import { RESTResponse } from './route-tools/RESTResponse';
 import { AccountEntity } from './Entities/AccountEntity';
 import { DomainEntity } from './Entities/DomainEntity';
 

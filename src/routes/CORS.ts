@@ -16,12 +16,21 @@
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
-const procPostUserActivities: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+// metaverseServerApp.use(express.urlencoded({ extended: false }));
+
+const procOptions: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  resp.header('Access-Control-Allow-Origin', '*');
+  resp.header('Access-Control-Allow-Methods', 'GET, POST, DELETE, PUT, OPTIONS');
+  next();
+};
+const procVircadiaErrorHeader: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  resp.header('Access-Control-Allow-Headers', 'x-vircadia-error-handle');
   next();
 };
 
-const router = Router();
+export const name = 'CORS';
 
-router.post( '/user_activities',     procPostUserActivities);
+export const router = Router();
 
-export default router;
+router.all('/',                 procVircadiaErrorHeader);
+router.options('/',             procOptions);

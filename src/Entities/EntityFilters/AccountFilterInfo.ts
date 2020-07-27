@@ -13,7 +13,7 @@
 //   limitations under the License.
 'use strict'
 
-import { RESTResponse } from '../../MetaverseAPI/RESTResponse';
+import { Request } from 'express';
 import { AccountEntity } from '../AccountEntity';
 import { Logger } from '../../Tools/Logging';
 
@@ -25,12 +25,11 @@ export class AccountFilterInfo {
   public constructor() {
     return;
   }
-  public parametersFromRequest(pRequest: RESTResponse) : void {
-    const req = pRequest.getRequest();
+  public parametersFromRequest(pRequest: Request) : void {
     try {
-      this._filter = String(req.query.filter);
-      this._status = String(req.query.status);
-      this._search = String(req.query.search);
+      this._filter = String(pRequest.query.filter);
+      this._status = String(pRequest.query.status);
+      this._search = String(pRequest.query.search);
     }
     catch (e) {
       Logger.error('AccountFilterInfo: parameters from request: exception: ' + e);

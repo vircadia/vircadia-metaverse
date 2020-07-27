@@ -13,7 +13,8 @@
 //   limitations under the License.
 'use strict'
 
-import { RESTResponse } from '../../MetaverseAPI/RESTResponse';
+import { Request } from 'express';
+
 import { Clamp } from '../../Tools/Misc';
 
 export class PaginationInfo {
@@ -29,13 +30,12 @@ export class PaginationInfo {
     this._perPage = Clamp(pPerPage, 1, 1000);
   }
 
-  public parametersFromRequest(pRequest: RESTResponse) : void {
-    const req = pRequest.getRequest();
-    if (req.query.page) {
-      this._pageNum = Clamp(Number(req.query.page), 1, 1000);
+  public parametersFromRequest(pRequest: Request) : void {
+    if (pRequest.query.page) {
+      this._pageNum = Clamp(Number(pRequest.query.page), 1, 1000);
     }
-    if (req.query.per_page) {
-      this._perPage = Clamp(Number(req.query.per_page), 1, 1000);
+    if (pRequest.query.per_page) {
+      this._perPage = Clamp(Number(pRequest.query.per_page), 1, 1000);
     }
   }
 

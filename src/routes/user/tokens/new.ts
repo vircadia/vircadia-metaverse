@@ -16,21 +16,12 @@
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
-// metaverseServerApp.use(express.urlencoded({ extended: false }));
-
-const procOptions: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
-  resp.header('Access-Control-Allow-Origin', '*');
-  resp.header('Access-Control-Allow-Methods', 'GET, POST, DELETE, PUT, OPTIONS');
-  next();
-};
-const procVircadiaErrorHeader: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
-  resp.header('Access-Control-Allow-Headers', 'x-vircadia-error-handle');
+const procGetUserTokensNew: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
   next();
 };
 
-const router = Router();
+export const name = 'userTokensNew';
 
-router.all('/',                 procVircadiaErrorHeader);
-router.options('/',             procOptions);
+export const router = Router();
 
-export default router;
+router.get(  '/user/tokens/new',  procGetUserTokensNew);

@@ -15,13 +15,13 @@
 'use strict'
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI } from '../Middleware';
-import { accountFromAuthToken, accountFromParams } from '../Middleware';
-import { tokenFromParams } from '../Middleware';
+import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
+import { accountFromAuthToken, accountFromParams } from '@Route-Tools/middleware';
+import { tokenFromParams } from '@Route-Tools/middleware';
 
-import { Accounts } from '../../Entities/Accounts';
+import { Accounts } from '@Entities/Accounts';
 
-import { Logger } from '../../Tools/Logging';
+import { Logger } from '@Tools/Logging';
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
@@ -63,7 +63,9 @@ const procDeleteAccountTokens: RequestHandler = (req: Request, resp: Response, n
   next();
 };
 
-const router = Router();
+export const name = 'accounts';
+
+export const router = Router();
 
 router.get(   '/api/v1/accounts',                 [ setupMetaverseAPI,
                                                     accountFromAuthToken,   // vRestResp.vAuthAccount
@@ -91,4 +93,3 @@ router.delete('/api/v1/account/:accountId/tokens/:tokenId', [ setupMetaverseAPI,
                                                     procDeleteAccountTokens,
                                                     finishMetaverseAPI ] );
 
-export default router;

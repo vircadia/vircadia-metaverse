@@ -15,11 +15,14 @@
 'use strict';
 
 import { Router, ErrorRequestHandler, Request, Response, NextFunction } from 'express';
-import { Logger } from '../Tools/Logging';
+
+import { Logger } from '@Tools/Logging';
 
 import createError, { HttpError } from 'http-errors';
 
-const router = Router();
+export const name = "ERROR";
+
+export const router = Router();
 
 // catch 404 and forward to error handler
 router.use( (req: Request, res: Response, next: NextFunction) => {
@@ -36,5 +39,3 @@ router.use( (err: HttpError, req: Request, res: Response, next: NextFunction) =>
   res.status(err.status || 500);
   res.end();
 });
-
-export default router;

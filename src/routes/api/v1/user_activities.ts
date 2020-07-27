@@ -14,18 +14,14 @@
 
 'use strict';
 
-import { Router } from 'express';
+import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
-import APICORS        from './routes/CORS';
-import APIActivities  from './routes/user_activities';
-import APIUser        from './routes/users';
-import APIAccounts    from './routes/accounts';
-import APIDomain      from './routes/domains';
-import APICommerce    from './routes/commerce';
+const procPostUserActivities: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
+};
 
-const router = Router();
+export const name = 'userActivities';
 
-router.use( [ APICORS, APIActivities, APIUser,
-              APIAccounts, APIDomain, APICommerce ] );
+export const router = Router();
 
-export default router;
+router.post( '/api/v1/user_activities',     procPostUserActivities);

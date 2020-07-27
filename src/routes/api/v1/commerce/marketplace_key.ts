@@ -15,17 +15,23 @@
 'use strict';
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
+import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 
-const procPostOauthToken: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+// metaverseServerApp.use(express.urlencoded({ extended: false }));
+
+const procGetCommerceMarketplaceKey: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  if (req.vRestResp) {
+    req.vRestResp.Data = {
+      'public_key': 'laksdjfioasdofuoavanvowieroiawueroaijsdlkfajsdlfjalsdkfjlasdjfaklhkoiu'
+    };
+  }
   next();
 };
-const procGetUserTokensNew: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
-  next();
-};
 
-const router = Router();
+export const name = 'commerce';
 
-router.post( '/oauth/token',      procPostOauthToken);
-router.get(  '/user/tokens/new',  procGetUserTokensNew);
+export const router = Router();
 
-export default router;
+router.get('/api/v1/commerce/marketplace_key',  [ setupMetaverseAPI,
+                                                  procGetCommerceMarketplaceKey,
+                                                  finishMetaverseAPI ] );

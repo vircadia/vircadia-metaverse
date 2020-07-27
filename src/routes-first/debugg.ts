@@ -16,12 +16,18 @@
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
-const procPostTokenNew: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+import { Config } from '@Base/config';
+import { Logger } from '@Tools/Logging';
+
+const procAllDebug: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  if (Config.debug["request-detail"]) {
+    Logger.debug(`procAllDebug: ${req.method} ${req.url}`);
+  };
   next();
 };
 
-const router = Router();
+export const name = "Debug";
 
-router.post( '/token/new',     procPostTokenNew);
+export const router = Router();
 
-export default router;
+router.all( '/',     procAllDebug);

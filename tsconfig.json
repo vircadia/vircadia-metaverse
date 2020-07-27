@@ -10,9 +10,11 @@
         "outDir": "dist",
         "baseUrl": ".",
         "paths": {
-            "*": [
-                "node_modules/*"
-            ]
+            "@Entities/*": ["./src/Entities/*"],
+            "@Route-Tools/*": ["./src/route-tools/*"],
+            "@Tools/*": ["./src/Tools/*"],
+            "@Base/*": ["./src/*"],
+            "*": [ "node_modules/*" ]
         }
     },
     "include": [
