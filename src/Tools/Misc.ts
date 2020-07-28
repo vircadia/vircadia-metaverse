@@ -13,6 +13,12 @@
 //   limitations under the License.
 'use strict'
 
+import http from 'http';
+import https from 'https';
+import os from 'os';
+
+import { Logger } from '@Tools/Logging';
+
 // Clamp the passed value between a high and low
 export function Clamp(pVal: number, pLow: number, pHigh: number): number {
   let ret = pVal;
@@ -23,9 +29,78 @@ export function Clamp(pVal: number, pLow: number, pHigh: number): number {
 
 // Return 'true' if the passed value is null or empty
 export function IsNullOrEmpty(pVal: any): boolean {
-  return (typeof(pVal) === 'undefined' || pVal === null);
+  return     (typeof(pVal) === 'undefined')
+          || (pVal === null)
+          || (typeof(pVal) === 'string' && String(pVal).length === 0);
 };
 // Return 'true' if the passed value is not null or empty
 export function IsNotNullOrEmpty(pVal: any): boolean {
-  return (typeof(pVal) !== 'undefined' && pVal !== null);
-}
+  return !IsNullOrEmpty(pVal);
+};
+
+let myExternalAddr: string;
+export async function getMyExternalIPAddress(): Promise<string> {
+  if (IsNotNullOrEmpty(myExternalAddr)) {
+    return Promise.resolve(myExternalAddr);
+  };
+  return new Promise(( resolve, reject) => {
+    httpsRequest('https://api.ipify.org')
+    .then( resp => {
+      myExternalAddr = resp;
+      resolve(myExternalAddr);
+    })
+    .catch ( err => {
+      // Can't get it that way for some reason. Ask our interface
+      const networkInterfaces = os.networkInterfaces();
+      // { 'lo1': [ info, info ], 'eth0': [ info, info ]} where 'info' could be v4 and v6 addr infos
+
+      let ret = () => [].concat(...Object.values(networkInterfaces))
+          .filter(details => details.family === 'IPv4' && !details.internal)
+          .pop().address;
+      if (IsNullOrEmpty(ret)) {
+        ret = () => [].concat(...Object.values(networkInterfaces))
+            .filter(details => details.family === 'IPv6' && !details.internal)
+            .pop().address;
+      }
+      Logger.debug(`getMyExternalIPAddress: resolved interface addr = ${ret}`);
+      if (IsNullOrEmpty(ret)) {
+        reject('No address found');
+      }
+      myExternalAddr = ret.toString();
+      resolve(myExternalAddr);
+    });
+  });
+};
+
+// Do a simple http GET and return the response as a string
+export async function httpRequest(pUrl: string): Promise<string> {
+  return new Promise( ( resolve, reject) => {
+    http.get(pUrl, (resp) => {
+      let data = '';
+      resp.on('data', (chunk: string) => {
+        data += chunk;
+      });
+      resp.on('end', () => {
+        resolve(data);
+      })
+    }).on('error', (err: any) => {
+      reject(err);
+    });
+  });
+};
+// Do a simple https GET and return the response as a string
+export async function httpsRequest(pUrl: string): Promise<string> {
+  return new Promise( ( resolve, reject) => {
+    https.get(pUrl, (resp) => {
+      let data = '';
+      resp.on('data', (chunk: string) => {
+        data += chunk;
+      });
+      resp.on('end', () => {
+        resolve(data);
+      })
+    }).on('error', (err: any) => {
+      reject(err);
+    });
+  });
+};

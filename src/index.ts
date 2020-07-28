@@ -15,61 +15,62 @@
 
 import 'module-alias/register';
 
-import Config from '@Base/config';
-setupConfiguration();
+import { Config, initializeConfiguration} from '@Base/config';
 
 import http from 'http';
 import https from 'https';
 import express from 'express';
 import { Router } from 'express';
 
-const expr = express();
-
 import { MongoClient } from 'mongodb';
-setupDB();
-
-import { apex, apexRouter }  from './ActivityPub/app';
 
 import glob from 'glob';
 import morgan from 'morgan';
 import { Logger, morganOptions } from '@Tools/Logging';
 
-Logger.setLogLevel(Config.debug.logLevel);
+initializeConfiguration()
+.then( () => {
+  return setupDB();
+})
+.then( () => {
 
-// Setup the logger of messages
-expr.use(morgan('dev', morganOptions));
+  const expr = express();
 
-// Most of the requests are JSON in an out
-expr.use(express.json());
+  // Setup the logger of messages
+  expr.use(morgan('dev', morganOptions));
 
-// Early router entry to do any early debugging
-expr.use(createAPIRouter('routes-first'));
+  // Most of the requests are JSON in an out
+  expr.use(express.json());
 
-// The metaverseAPI operations
-expr.use(createAPIRouter('routes'));
+  // Early router entry to do any early debugging
+  expr.use(createAPIRouter('routes-first'));
 
-// Acting as an ActivityPub server
-expr.use(apexRouter);
+  // The metaverseAPI operations
+  expr.use(createAPIRouter('routes'));
 
-// Serving static files
-expr.use(Config.server["static-base"], express.static('static'));
+  // Acting as an ActivityPub server
+  expr.use(createAPIRouter('ActivityPub'));
 
-// If all the other routing didn't work, finally make errors
-expr.use(createAPIRouter('routes-last'));
+  // Serving static files
+  expr.use(Config.server["static-base"], express.static('static'));
 
-// custom side-effects for your app
-// expr.on('apex-create', (msg: string) => {
-//   console.log(`New ${msg.object.type} from ${msg.actor} to ${msg.recipient}`)
-// });
+  // If all the other routing didn't work, finally make errors
+  expr.use(createAPIRouter('routes-last'));
 
-const server = Config.debug.devel ? http.createServer(expr) : https.createServer(expr)
-server.on('listening', () => {
-        Logger.info('Listening');
-      })
-      .on('error', (err) => {
-        Logger.error('server exception: ' + err.message);
-      })
-      .listen(Config.server["listen-port"], Config.server["listen-host"]);
+  // custom side-effects for your app
+  // expr.on('apex-create', (msg: string) => {
+  //   console.log(`New ${msg.object.type} from ${msg.actor} to ${msg.recipient}`)
+  // });
+
+  const server = Config.debug.devel ? http.createServer(expr) : https.createServer(expr)
+  server.on('listening', () => {
+          Logger.info(`Started metaverse-server version ${Config.server["server-version"]} at ${new Date().toISOString()}`);
+        })
+        .on('error', (err) => {
+          Logger.error('server exception: ' + err.message);
+        })
+        .listen(Config.server["listen-port"], Config.server["listen-host"]);
+});
 
 // Search a directory for .js files that export a 'router' property and return a
 //    new Router that routes to those exports.
@@ -88,15 +89,7 @@ function createAPIRouter(pBaseDir: string): Router {
     .reduce((rootRouter, router) => rootRouter.use(router.router), Router({ mergeParams: true } ) );
 }
 
-// Do extra processing to setup the configuration settings for this instance.
-// This mostly involves figuring out our networking situation and setting that
-//     into the configuration parameters.
-// There is some collection of environment variables in 'config.ts'.
-function setupConfiguration(): void {
-  return;
-}
-
 // Do the setup of the database.
-function setupDB(): void {
+async function setupDB(): Promise<void> {
   return;
 }

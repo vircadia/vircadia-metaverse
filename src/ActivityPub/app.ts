@@ -14,7 +14,7 @@
 
 'use strict';
 
-import Config from '../config';
+import Config from '@Base/config';
 
 import express from 'express';
 import { Router } from 'express';
@@ -30,6 +30,7 @@ const routes = {
   inbox: baseUrl + '/inbox/:actor',
   outbox: baseUrl + '/outbox/:actor'
 };
+
 export const apex = ActivityPubExpress({
   // 'domain' is the external, permanant domain address
   domain: Config.activitypub["external-hostname"],
@@ -40,18 +41,20 @@ export const apex = ActivityPubExpress({
   routes
 });
 
-export const apexRouter = Router();
+export const name = 'ActivityPubExpress';
 
-apexRouter.use(express.json({ type: apex.consts.jsonldTypes }), apex);
+export const router = Router();
+
+router.use(express.json({ type: apex.consts.jsonldTypes }), apex);
 
 // define routes using prepacakged middleware collections
-apexRouter.route(routes.inbox)
+router.route(routes.inbox)
   .get(apex.net.inbox.get)
   .post(apex.net.inbox.post);
-apexRouter.route(routes.outbox)
+router.route(routes.outbox)
   .get(apex.net.outbox.get)
   .post(apex.net.outbox.post);
-apexRouter.get(routes.actor, apex.net.actor.get);
-apexRouter.get(routes.object, apex.net.object.get);
-apexRouter.get(routes.activity, apex.net.activityStream.get);
-apexRouter.get('/.well-known/webfinger', apex.net.webfinger.get);
+router.get(routes.actor, apex.net.actor.get);
+router.get(routes.object, apex.net.object.get);
+router.get(routes.activity, apex.net.activityStream.get);
+router.get('/.well-known/webfinger', apex.net.webfinger.get);

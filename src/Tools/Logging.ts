@@ -13,9 +13,6 @@
 //   limitations under the License.
 'use strict'
 
-import Config from '../config';
-
-// import loglevel, { getLogger, LogLevelDesc } from 'loglevel';
 import * as loglevel from 'loglevel';
 
 import { Options } from 'morgan';
@@ -43,12 +40,22 @@ export const Logger : ALogger = {
     loglevel.error(msg);
   },
   setLogLevel: ( level: string) => {
-    switch(level.toLowerCase()) {
-      case 'silent': loglevel.setLevel(loglevel.levels.SILENT); break;
-      case 'info': loglevel.setLevel(loglevel.levels.INFO); break;
-      case 'warn': loglevel.setLevel(loglevel.levels.WARN); break;
-      case 'debug': loglevel.setLevel(loglevel.levels.DEBUG); break;
-      case 'error': loglevel.setLevel(loglevel.levels.ERROR); break;
+    if (level) {
+      switch(level.toLowerCase()) {
+        case 'silent': loglevel.setLevel(loglevel.levels.SILENT); break;
+        case 'info': loglevel.setLevel(loglevel.levels.INFO); break;
+        case 'warn': loglevel.setLevel(loglevel.levels.WARN); break;
+        case 'debug': loglevel.setLevel(loglevel.levels.DEBUG); break;
+        case 'error': loglevel.setLevel(loglevel.levels.ERROR); break;
+        default:
+          Logger.error(`Logger.setLogLevel: unknown level name: ${level}`);
+          loglevel.setLevel(loglevel.levels.DEBUG);
+          break;
+      };
+    }
+    else {
+      Logger.error(`Logger.setLogLevel: false level name: ${level}`);
+      loglevel.setLevel(loglevel.levels.DEBUG);
     };
   }
 };
