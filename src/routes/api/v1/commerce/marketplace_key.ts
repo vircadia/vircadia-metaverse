@@ -28,7 +28,7 @@ const procGetCommerceMarketplaceKey: RequestHandler = (req: Request, resp: Respo
   next();
 };
 
-export const name = 'commerce';
+export const name = '/api/v1/commerce/marketplace_key';
 
 export const router = Router();
 

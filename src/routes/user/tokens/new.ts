@@ -20,7 +20,7 @@ const procGetUserTokensNew: RequestHandler = (req: Request, resp: Response, next
   next();
 };
 
-export const name = 'userTokensNew';
+export const name = '/user/tokens/new';
 
 export const router = Router();
 

@@ -32,7 +32,7 @@ const procMetaverseInfo: RequestHandler = (req: Request, resp: Response, next: N
   next();
 };
 
-export const name = "metaverseInfo";
+export const name = "/api/v1/metaverse_info";
 
 export const router = Router();
 

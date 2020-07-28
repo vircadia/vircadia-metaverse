@@ -33,26 +33,6 @@ import { Logger } from '@Tools/Logging';
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
-// GET /domains/:domainId
-// Return a small snippet if domain data for the domainId specified in the request
-const procGetDomainsDomainid: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('procGetDomainDomainid');
-  if (req.vDomain) {
-    const aDomain = req.vDomain;
-    req.vRestResp.Data = {
-      'domain': {
-        'id': aDomain.domainId,
-        'ice_server_address': aDomain.iceServerAddr,
-        'name': aDomain.placeName
-      }
-    };
-  }
-  else {
-    req.vRestResp.respondFailure(req.vDomainError);
-  };
-  next();
-};
-
 // GET /domains
 const procGetDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   Logger.debug('procGetDomains');
@@ -60,7 +40,7 @@ const procGetDomains: RequestHandler = async (req: Request, resp: Response, next
     const pagination = new PaginationInfo(1,1000);
     pagination.parametersFromRequest(req);
     const domainArray: any[] = [];
-    for await (const aDomain of Domains.enumerate(pagination)) {
+    for await (const aDomain of Domains.enumerateAsync(pagination)) {
       domainArray.push( {
         'domainid': aDomain.domainId,
         'place_name': aDomain.placeName,
@@ -97,211 +77,11 @@ const procGetDomains: RequestHandler = async (req: Request, resp: Response, next
   next();
 };
 
-// PUT /domains/:domainId
-// Set domain parameters.
-// The sender can send or not send lots of different fields so we have to be specific
-const procPutDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('procPutDomains');
-  if (req.vDomain) {
-    let apikey:string;
-    if (req.body && req.body.domain && req.body.domain.api_key) {
-      apikey = req.body.domain.api_key;
-    }
-    if (await verifyDomainAccess(req.vDomain, req.vRestResp.getAuthToken(), apikey)) {
-      const aDomain = req.vDomain;
-      const valuesToSet = req.body.domain;
-      if (valuesToSet.version) aDomain.version = valuesToSet.version;
-      if (valuesToSet.protocol_version) aDomain.protocol = valuesToSet.protocol_version;
-      if (valuesToSet.network_addr) aDomain.networkAddr = valuesToSet.network_addr;
-      if (valuesToSet.automatic_networking) aDomain.networkingMode = valuesToSet.automatic_networking;
-      if (valuesToSet.restricted) aDomain.restricted = valuesToSet.restricted;
-      if (valuesToSet.capacity) aDomain.capacity = valuesToSet.capacity;
-      if (valuesToSet.description) aDomain.description = valuesToSet.description;
-      if (valuesToSet.maturity) aDomain.maturity = valuesToSet.maturity;
-      if (valuesToSet.restriction) aDomain.restriction = valuesToSet.restriction;
-      if (valuesToSet.hosts) {
-        aDomain.hosts = CleanedStringArray(valuesToSet.hosts);
-      };
-      if (valuesToSet.tags) {
-        aDomain.tags = CleanedStringArray(valuesToSet.tags);
-      };
-      if (valuesToSet.heartbeat) {
-        if (valuesToSet.heartbeat.num_users) aDomain.numUsers = Number(valuesToSet.heartbeat.num_users);
-        if (valuesToSet.heartbeat.num_anon_users) aDomain.anonUsers = Number(valuesToSet.heartbeat.num_anon_users);
-        aDomain.totalUsers = aDomain.numUsers + aDomain.anonUsers;
-
-      };
-      aDomain.timeOfLastHeartbeat = new Date();
-    }
-    else {
-      req.vRestResp.respondFailure('Domain not authorized');
-    };
-  }
-  else {
-    req.vRestResp.respondFailure(req.vDomainError ?? 'Domain not found');
-  };
-  next();
-};
-
-// DELETE /domains/:domainId
-const procDeleteDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('procDeleteDomains');
-  if (req.vAuthAccount) {
-    if (req.vAuthAccount.isAdmin) {
-      if (req.vDomain) {
-        Domains.removeDomain(req.vDomain);
-      }
-      else {
-        req.vRestResp.respondFailure('Target domain does not exist');
-      };
-    }
-    else {
-      req.vRestResp.respondFailure('Not authorized');
-    };
-  }
-  else {
-    req.vRestResp.respondFailure('Not authorized');
-  }
-  next();
-};
-
-// PUT /domains/:domainId/ice_server_address
-const procPutDomainsIceServerAddress: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('procPutDomainsIceServerAddress');
-  if (req.vDomain) {
-      let apikey:string;
-      if (req.body && req.body.domain && req.body.domain.api_key) {
-        apikey = req.body.domain.api_key;
-      }
-    if (verifyDomainAccess(req.vDomain, req.vRestResp.getAuthToken(), apikey)) {
-      if (req.body && req.body.domain && req.body.domain.ice_server_address) {
-        req.vDomain.iceServerAddr = req.body.domain.ice_server_address;
-      };
-    }
-  }
-  else {
-    req.vRestResp.respondFailure(req.vDomainError ?? 'unauthorized');
-  };
-next();
-};
-
-// POST /domains/temporary
-// https://www.npmjs.com/package/unique-names-generator
-// https://github.com/andreasonny83/unique-names-generator
-
-const procPostDomainsTemporary: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('procPostDomainsTemporary');
-  next();
-};
-
-// PUT /domains/:domainId/public_key
-const procPutDomainsPublicKey: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('procPutDomainsPublicKey');
-  if (req.vDomain) {
-    let apikey:string;
-    if (req.body.api_key) {
-      apikey = req.body.api_key;
-
-    }
-    if (verifyDomainAccess(req.vDomain, req.vRestResp.getAuthToken(), apikey)) {
-      Logger.debug('procPutDomainsPublicKey: domain found');
-
-    };
-  };
-  next();
-};
-
-// GET /domains/:domainId/public_key
-const procGetDomainsPublicKey: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('procGetDomainsPublicKey');
-  if (req.vDomain) {
-    req.vRestResp.Data = {
-      'public_key': req.vDomain.publicKey
-    };
-  }
-  else {
-    req.vRestResp.respondFailure('No domain');
-  };
-  next();
-};
-// We are passed a thing that should be just an array of strings
-//    but make sure the caller isn't messing with us
-function CleanedStringArray(pValues: any): string[] {
-  const ret: string[] = [];
-  if (Array.isArray(pValues)) {
-    pValues.forEach( val => {
-      if (typeof val === 'string') {
-        ret.push(val);
-      };
-    });
-  };
-  return ret;
-};
-
-// Verify that the passed domain has access by either the passed authToken or the passed apikey.
-async function verifyDomainAccess(pDomain: DomainEntity, pAuthToken: string, pAPIKey: string): Promise<boolean> {
-  Logger.debug(`verifyDomainAccess: domainId: ${pDomain.domainId}, authT: ${pAuthToken}, apikey: ${pAPIKey}`);
-  let ret: boolean = false;
-  if (typeof(pAuthToken) === 'undefined' || pAuthToken === null) {
-    // Auth token not available. See if APIKey does the trick
-    if (pDomain.apiKey === pAPIKey) {
-      ret = true;
-    };
-  }
-  else {
-    const aAccount: AccountEntity = await Accounts.getAccountWithAuthToken(pAuthToken);
-    if (aAccount) {
-      if (IsNullOrEmpty(pDomain.sponserAccountID)) {
-        // If the domain doesn't have an associated account, form the link to this account
-        pDomain.sponserAccountID = aAccount.accountId;
-      };
-      if (pDomain.sponserAccountID === aAccount.accountId) {
-        ret = true;
-      };
-    };
-  };
-  return ret;
-};
-
-export const name = 'domains';
+export const name = '/api/v1/domains';
 
 export const router = Router();
 
-router.get(   '/api/v1/domains/:domainId',      [ setupMetaverseAPI,
-                                                  domainFromParams,
-                                                  procGetDomainsDomainid,
-                                                  finishMetaverseAPI ] );
 router.get(   '/api/v1/domains',                [ setupMetaverseAPI,
                                                   accountFromAuthToken,
                                                   procGetDomains,
-                                                  finishMetaverseAPI ] );
-router.put(   '/api/v1/domains/:domainId',      [ setupMetaverseAPI,
-                                                  domainFromParams,
-                                                  procPutDomains,
-                                                  finishMetaverseAPI ] );
-router.delete('/api/v1/domains/:domainId',      [ setupMetaverseAPI,
-                                                  domainFromParams,
-                                                  accountFromAuthToken,
-                                                  procDeleteDomains,
-                                                  finishMetaverseAPI ] );
-
-router.put(   '/api/v1/domains/:domainId/ice_server_address', [ setupMetaverseAPI,
-                                                  domainFromParams,
-                                                  procPutDomainsIceServerAddress,
-                                                  finishMetaverseAPI ] );
-router.post(  '/api/v1/domains/temporary',      [ setupMetaverseAPI,
-                                                  procPostDomainsTemporary,
-                                                  finishMetaverseAPI ] );
-
-const multiStorage = multer.memoryStorage();
-const uploader = multer( { storage: multiStorage, });
-  // .fields( [ { name: 'api_key' }, { name: 'public_key' }]);
-router.put(   '/api/v1/domains/:domainId/public_key',  [ setupMetaverseAPI,
-                                                  domainFromParams,   // vRESTResp.vDomain
-                                                  uploader.none(),           // body['api_key'], files['public_key'].buffer
-                                                  procPutDomainsPublicKey,
-                                                  finishMetaverseAPI ] );
-router.get(   '/api/v1/domains/:domainId/public_key',  [ setupMetaverseAPI,
-                                                  domainFromParams,
-                                                  procGetDomainsPublicKey,
                                                   finishMetaverseAPI ] );

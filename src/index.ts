@@ -84,7 +84,7 @@ function createAPIRouter(pBaseDir: string): Router {
     // filter down to those read-in-things that export a 'router' property
     .filter(router => router.hasOwnProperty('router'))
     // print out debugging about which routers are being created
-    // .map(rr => { Logger.debug('createAPIRouter: adding ' + rr.name ?? 'UNKNOWN'); return rr; })
+    .map(rr => { Logger.debug('createAPIRouter: adding ' + rr.name ?? 'UNKNOWN'); return rr; })
     // create a Router and add each found Router and end up with a Router with all found Routers
     .reduce((rootRouter, router) => rootRouter.use(router.router), Router({ mergeParams: true } ) );
 }

@@ -16,12 +16,18 @@
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
-const procPostOauthToken: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+// metaverseServerApp.use(express.urlencoded({ extended: false }));
+
+const procGetUsers: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  next();
+};
+const procPostUsers: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
   next();
 };
 
-export const name = "/oauth/token";
+export const name = '/api/v1/users';
 
 export const router = Router();
 
-router.post( '/oauth/token',      procPostOauthToken);
+router.get(   '/api/v1/users',                       procGetUsers);
+router.post(  '/api/v1/users',                       procPostUsers);

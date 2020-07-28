@@ -20,7 +20,7 @@ const procPostUserActivities: RequestHandler = (req: Request, resp: Response, ne
   next();
 };
 
-export const name = 'userActivities';
+export const name = '/api/v1/user_activities';
 
 export const router = Router();
 

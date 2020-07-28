@@ -13,9 +13,14 @@
 //   limitations under the License.
 'use strict'
 
-import { DomainEntity } from './DomainEntity';
-import { AuthToken } from './AuthToken';
-import { PaginationInfo } from './EntityFilters/PaginationInfo';
+import { DomainEntity } from '@Entities/DomainEntity';
+import { Accounts } from '@Entities/Accounts';
+import { AccountEntity } from '@Entities/AccountEntity';
+import { AuthToken } from '@Entities/AuthToken';
+import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
+
+import { Logger } from '@Tools/Logging';
+import { IsNullOrEmpty } from '@Tools/Misc';
 
 export type DomainTestFunction = (domain: DomainEntity) => boolean;
 
@@ -49,5 +54,30 @@ export const Domains = {
   },
   async *enumerateAsync(pPager: PaginationInfo): AsyncGenerator<DomainEntity> {
     return null;
+  },
+
+  // Verify that the passed domain has access by either the passed authToken or the passed apikey.
+  async verifyDomainAccess(pDomain: DomainEntity, pAuthToken: string, pAPIKey: string): Promise<boolean> {
+    Logger.debug(`verifyDomainAccess: domainId: ${pDomain.domainId}, authT: ${pAuthToken}, apikey: ${pAPIKey}`);
+    let ret: boolean = false;
+    if (typeof(pAuthToken) === 'undefined' || pAuthToken === null) {
+      // Auth token not available. See if APIKey does the trick
+      if (pDomain.apiKey === pAPIKey) {
+        ret = true;
+      };
+    }
+    else {
+      const aAccount: AccountEntity = await Accounts.getAccountWithAuthToken(pAuthToken);
+      if (aAccount) {
+        if (IsNullOrEmpty(pDomain.sponserAccountID)) {
+          // If the domain doesn't have an associated account, form the link to this account
+          pDomain.sponserAccountID = aAccount.accountId;
+        };
+        if (pDomain.sponserAccountID === aAccount.accountId) {
+          ret = true;
+        };
+      };
+    };
+    return ret;
   }
 };
