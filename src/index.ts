@@ -15,7 +15,7 @@
 
 import 'module-alias/register';
 
-import { Config, initializeConfiguration} from '@Base/config';
+import { Config, initializeConfiguration } from '@Base/config';
 
 import http from 'http';
 import https from 'https';
@@ -81,7 +81,7 @@ function createAPIRouter(pBaseDir: string): Router {
     .sync('**/*.js', { cwd: `${__dirname}/${pBaseDir}/` })
     // read in those files and create array of all exported objects
     .map( filename => require(`./${pBaseDir}/${filename}`))
-    // filter down to those read-in-things that export a 'router' property
+    // filter down to those things that export a 'router' property
     .filter(router => router.hasOwnProperty('router'))
     // print out debugging about which routers are being created
     .map(rr => { Logger.debug('createAPIRouter: adding ' + rr.name ?? 'UNKNOWN'); return rr; })

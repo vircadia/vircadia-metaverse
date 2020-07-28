@@ -15,27 +15,18 @@
 'use strict';
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { Domains } from '@Entities/Domains';
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
-import { domainFromParams } from '@Route-Tools/middleware';
+import { domainFromParams, domainAPIkeyFromBody, verifyDomainAccess } from '@Route-Tools/middleware';
 
 import { Logger } from '@Tools/Logging';
-
-// metaverseServerApp.use(express.urlencoded({ extended: false }));
 
 // PUT /domains/:domainId/ice_server_address
 const procPutDomainsIceServerAddress: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   Logger.debug('procPutDomainsIceServerAddress');
   if (req.vDomain) {
-      let apikey:string;
-      if (req.body && req.body.domain && req.body.domain.api_key) {
-        apikey = req.body.domain.api_key;
-      }
-    if (Domains.verifyDomainAccess(req.vDomain, req.vRestResp.getAuthToken(), apikey)) {
-      if (req.body && req.body.domain && req.body.domain.ice_server_address) {
-        req.vDomain.iceServerAddr = req.body.domain.ice_server_address;
-      };
-    }
+    if (req.body && req.body.domain && req.body.domain.ice_server_address) {
+      req.vDomain.iceServerAddr = req.body.domain.ice_server_address;
+    };
   }
   else {
     req.vRestResp.respondFailure(req.vDomainError ?? 'unauthorized');
@@ -49,5 +40,7 @@ export const router = Router();
 
 router.put(   '/api/v1/domains/:domainId/ice_server_address', [ setupMetaverseAPI,
                                                   domainFromParams,
+                                                  domainAPIkeyFromBody,
+                                                  verifyDomainAccess,
                                                   procPutDomainsIceServerAddress,
                                                   finishMetaverseAPI ] );

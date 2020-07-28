@@ -17,7 +17,9 @@
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
 import { Accounts } from '@Entities/Accounts';
+import { AccountEntity } from '@Entities/AccountEntity';
 import { Domains } from '@Entities/Domains';
+import { AuthToken } from '@Entities/AuthToken';
 import { RESTResponse } from './RESTResponse';
 
 import { IsNullOrEmpty } from '@Tools/Misc';
@@ -104,6 +106,58 @@ export const domainFromParams: RequestHandler = async (req: Request, resp: Respo
     req.vDomainError = 'DomainId does not match a domain';
   };
   next();
+};
+
+// Find domain apikey from JSON body and set as 'vDomainAPIKey'
+export const domainAPIkeyFromBody: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  if (req.body && req.body.domain && req.body.domain.api_key) {
+    req.vDomainAPIKey = req.body.domain.api_key;
+  };
+  next();
+};
+
+// Find domain apikey from previously parsed multi-part form body and set as 'vDomainAPIKey'
+export const domainAPIkeyFromMultipart: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  if (req.body && req.body.api_key) {
+    req.vDomainAPIKey = req.body.api_key;
+  };
+  next();
+};
+
+// Check that 'vDomain' has access. Checks 'vDomainAPIKey' and request's authtoken.
+// If the domain in 'vDomain' does not check out, null out 'vDomain'.
+export const verifyDomainAccess: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+    if (req.vRestResp && req.vDomain) {
+      let verified: boolean = false;
+
+      let authToken = req.vRestResp.getAuthToken();
+      Logger.debug(`verifyDomainAccess: domainId: ${req.vDomain.domainId}, authT: ${authToken}, apikey: ${req.vDomainAPIKey}`);
+
+      if (IsNullOrEmpty(authToken)) {
+        // Auth token not available. See if APIKey does the trick
+        if (req.vDomain.apiKey === req.vDomainAPIKey) {
+          verified = true;
+        };
+      }
+      else {
+        const aAccount: AccountEntity = await Accounts.getAccountWithAuthToken(authToken);
+        if (aAccount) {
+          if (IsNullOrEmpty(req.vDomain.sponserAccountID)) {
+            // If the domain doesn't have an associated account, form the link to this account
+            req.vDomain.sponserAccountID = aAccount.accountId;
+          };
+          if (req.vDomain.sponserAccountID === aAccount.accountId) {
+            verified = true;
+          };
+        };
+      };
+
+      if (!verified) {
+        req.vDomain = undefined;
+        req.vDomainError = 'Domain not authorized';
+      };
+    };
+    next();
 };
 
 // MetaverseAPI middleware.

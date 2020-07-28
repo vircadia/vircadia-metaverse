@@ -15,7 +15,7 @@
 'use strict';
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
+import { setupMetaverseAPI, finishMetaverseAPI, domainAPIkeyFromBody, verifyDomainAccess } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
 import { domainFromParams } from '@Route-Tools/middleware';
 
@@ -51,39 +51,30 @@ const procGetDomainsDomainid: RequestHandler = async (req: Request, resp: Respon
 const procPutDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   Logger.debug('procPutDomains');
   if (req.vDomain) {
-    let apikey:string;
-    if (req.body && req.body.domain && req.body.domain.api_key) {
-      apikey = req.body.domain.api_key;
-    }
-    if (await Domains.verifyDomainAccess(req.vDomain, req.vRestResp.getAuthToken(), apikey)) {
-      const aDomain = req.vDomain;
-      const valuesToSet = req.body.domain;
-      if (valuesToSet.version) aDomain.version = valuesToSet.version;
-      if (valuesToSet.protocol_version) aDomain.protocol = valuesToSet.protocol_version;
-      if (valuesToSet.network_addr) aDomain.networkAddr = valuesToSet.network_addr;
-      if (valuesToSet.automatic_networking) aDomain.networkingMode = valuesToSet.automatic_networking;
-      if (valuesToSet.restricted) aDomain.restricted = valuesToSet.restricted;
-      if (valuesToSet.capacity) aDomain.capacity = valuesToSet.capacity;
-      if (valuesToSet.description) aDomain.description = valuesToSet.description;
-      if (valuesToSet.maturity) aDomain.maturity = valuesToSet.maturity;
-      if (valuesToSet.restriction) aDomain.restriction = valuesToSet.restriction;
-      if (valuesToSet.hosts) {
-        aDomain.hosts = CleanedStringArray(valuesToSet.hosts);
-      };
-      if (valuesToSet.tags) {
-        aDomain.tags = CleanedStringArray(valuesToSet.tags);
-      };
-      if (valuesToSet.heartbeat) {
-        if (valuesToSet.heartbeat.num_users) aDomain.numUsers = Number(valuesToSet.heartbeat.num_users);
-        if (valuesToSet.heartbeat.num_anon_users) aDomain.anonUsers = Number(valuesToSet.heartbeat.num_anon_users);
-        aDomain.totalUsers = aDomain.numUsers + aDomain.anonUsers;
-
-      };
-      aDomain.timeOfLastHeartbeat = new Date();
-    }
-    else {
-      req.vRestResp.respondFailure('Domain not authorized');
+    const aDomain = req.vDomain;
+    const valuesToSet = req.body.domain;
+    if (valuesToSet.version) aDomain.version = valuesToSet.version;
+    if (valuesToSet.protocol_version) aDomain.protocol = valuesToSet.protocol_version;
+    if (valuesToSet.network_addr) aDomain.networkAddr = valuesToSet.network_addr;
+    if (valuesToSet.automatic_networking) aDomain.networkingMode = valuesToSet.automatic_networking;
+    if (valuesToSet.restricted) aDomain.restricted = valuesToSet.restricted;
+    if (valuesToSet.capacity) aDomain.capacity = valuesToSet.capacity;
+    if (valuesToSet.description) aDomain.description = valuesToSet.description;
+    if (valuesToSet.maturity) aDomain.maturity = valuesToSet.maturity;
+    if (valuesToSet.restriction) aDomain.restriction = valuesToSet.restriction;
+    if (valuesToSet.hosts) {
+      aDomain.hosts = CleanedStringArray(valuesToSet.hosts);
     };
+    if (valuesToSet.tags) {
+      aDomain.tags = CleanedStringArray(valuesToSet.tags);
+    };
+    if (valuesToSet.heartbeat) {
+      if (valuesToSet.heartbeat.num_users) aDomain.numUsers = Number(valuesToSet.heartbeat.num_users);
+      if (valuesToSet.heartbeat.num_anon_users) aDomain.anonUsers = Number(valuesToSet.heartbeat.num_anon_users);
+      aDomain.totalUsers = aDomain.numUsers + aDomain.anonUsers;
+
+    };
+    aDomain.timeOfLastHeartbeat = new Date();
   }
   else {
     req.vRestResp.respondFailure(req.vDomainError ?? 'Domain not found');
@@ -136,7 +127,9 @@ router.get(   '/api/v1/domains/:domainId',      [ setupMetaverseAPI,
                                                   procGetDomainsDomainid,
                                                   finishMetaverseAPI ] );
 router.put(   '/api/v1/domains/:domainId',      [ setupMetaverseAPI,
-                                                  domainFromParams,
+                                                  domainFromParams,     // set vDomain
+                                                  domainAPIkeyFromBody, // set vDomainAPIKey
+                                                  verifyDomainAccess,
                                                   procPutDomains,
                                                   finishMetaverseAPI ] );
 router.delete('/api/v1/domains/:domainId',      [ setupMetaverseAPI,
