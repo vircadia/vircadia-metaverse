@@ -21,7 +21,9 @@ import { domainFromParams } from '@Route-Tools/middleware';
 
 import { Domains } from '@Entities/Domains';
 
+import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
+import { stringify } from 'querystring';
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
@@ -49,32 +51,35 @@ const procGetDomainsDomainid: RequestHandler = async (req: Request, resp: Respon
 // Set domain parameters.
 // The sender can send or not send lots of different fields so we have to be specific
 const procPutDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('procPutDomains');
+  Logger.debug('procPutDomains. body=' + JSON.stringify(req.body));
   if (req.vDomain) {
-    const aDomain = req.vDomain;
+    const updated: VKeyedCollection = {};
     const valuesToSet = req.body.domain;
-    if (valuesToSet.version) aDomain.version = valuesToSet.version;
-    if (valuesToSet.protocol_version) aDomain.protocol = valuesToSet.protocol_version;
-    if (valuesToSet.network_addr) aDomain.networkAddr = valuesToSet.network_addr;
-    if (valuesToSet.automatic_networking) aDomain.networkingMode = valuesToSet.automatic_networking;
-    if (valuesToSet.restricted) aDomain.restricted = valuesToSet.restricted;
-    if (valuesToSet.capacity) aDomain.capacity = valuesToSet.capacity;
-    if (valuesToSet.description) aDomain.description = valuesToSet.description;
-    if (valuesToSet.maturity) aDomain.maturity = valuesToSet.maturity;
-    if (valuesToSet.restriction) aDomain.restriction = valuesToSet.restriction;
+    if (valuesToSet.version) updated.version = valuesToSet.version;
+    if (valuesToSet.protocol_version) updated.protocol = valuesToSet.protocol_version;
+    if (valuesToSet.network_addr) updated.networkAddr = valuesToSet.network_addr;
+    if (valuesToSet.automatic_networking) updated.networkingMode = valuesToSet.automatic_networking;
+    if (valuesToSet.restricted) updated.restricted = valuesToSet.restricted;
+    if (valuesToSet.capacity) updated.capacity = valuesToSet.capacity;
+    if (valuesToSet.description) updated.description = valuesToSet.description;
+    if (valuesToSet.maturity) updated.maturity = valuesToSet.maturity;
+    if (valuesToSet.restriction) updated.restriction = valuesToSet.restriction;
     if (valuesToSet.hosts) {
-      aDomain.hosts = CleanedStringArray(valuesToSet.hosts);
+      updated.hosts = CleanedStringArray(valuesToSet.hosts);
     };
     if (valuesToSet.tags) {
-      aDomain.tags = CleanedStringArray(valuesToSet.tags);
+      updated.tags = CleanedStringArray(valuesToSet.tags);
     };
     if (valuesToSet.heartbeat) {
-      if (valuesToSet.heartbeat.num_users) aDomain.numUsers = Number(valuesToSet.heartbeat.num_users);
-      if (valuesToSet.heartbeat.num_anon_users) aDomain.anonUsers = Number(valuesToSet.heartbeat.num_anon_users);
-      aDomain.totalUsers = aDomain.numUsers + aDomain.anonUsers;
+      if (valuesToSet.heartbeat.num_users) updated.numUsers = Number(valuesToSet.heartbeat.num_users);
+      if (valuesToSet.heartbeat.num_anon_users) updated.anonUsers = Number(valuesToSet.heartbeat.num_anon_users);
+      updated.totalUsers = updated.numUsers + updated.anonUsers;
 
     };
-    aDomain.timeOfLastHeartbeat = new Date();
+    updated.timeOfLastHeartbeat = new Date();
+
+    Logger.debug('procPutDomains. updating=' + JSON.stringify(updated));
+    Domains.updateEntityFields(req.vDomain, updated);
   }
   else {
     req.vRestResp.respondFailure(req.vDomainError ?? 'Domain not found');

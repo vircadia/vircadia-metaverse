@@ -17,22 +17,48 @@
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 
-import { Accounts } from '@Entities/Accounts';
 import { Domains } from '@Entities/Domains';
 import { DomainEntity } from '@Entities/DomainEntity';
-import { AccountEntity } from '@Entities/AccountEntity';
-import { IsNullOrEmpty } from '@Tools/Misc';
 
+import { uniqueNamesGenerator, Config, adjectives, colors, animals } from 'unique-names-generator';
+
+import { GenUUID } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
-// POST /domains/temporary
 // https://www.npmjs.com/package/unique-names-generator
 // https://github.com/andreasonny83/unique-names-generator
 
+// POST /domains/temporary
 const procPostDomainsTemporary: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   Logger.debug('procPostDomainsTemporary');
+
+  const customConfig: Config = {
+    dictionaries: [ adjectives, colors, animals ],
+    separator: '-',
+    length: 3
+  };
+  const generatedPlacename: string = uniqueNamesGenerator(customConfig);
+
+  const generatedAPIkey: string = GenUUID();
+
+  const newDomain = new DomainEntity();
+  newDomain.placeName = generatedPlacename;
+  newDomain.domainId = GenUUID();
+  newDomain.apiKey = generatedAPIkey;
+  if (req.vSenderKey) {
+    newDomain.iPAddrOfFirstContact = req.vSenderKey;
+  };
+  Domains.addDomain(newDomain);
+
+  req.vRestResp.Data = {
+    'domain': {
+      'id': newDomain.domainId,
+      'name': newDomain.placeName,
+      'api_key': newDomain.apiKey
+    }
+  };
   next();
 };
 

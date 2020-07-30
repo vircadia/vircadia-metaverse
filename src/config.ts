@@ -5,6 +5,8 @@
 
 import fs from 'fs';
 
+import deepmerge from 'deepmerge';
+
 import { IsNullOrEmpty, IsNotNullOrEmpty, getMyExternalIPAddress } from '@Tools/Misc';
 import { httpRequest, httpsRequest } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
@@ -42,7 +44,12 @@ export let Config = {
       'metaverseapi-response-detail': false
     },
     'database': {
-
+      'db-host': 'localhost',
+      'db-port': 27017,
+      'db': 'tester',
+      'db-user': 'metaverse',
+      'db-pw': 'nooneknowsit',
+      'db-authdb': 'admin',
     }
 };
 
@@ -90,7 +97,7 @@ export async function initializeConfiguration(): Promise<void> {
     if (IsNotNullOrEmpty(userConfigBody)) {
       const userConfig = JSON.parse(userConfigBody);
       // this overlays all the Config values with values from the user's file
-      Object.assign(Config, userConfig);
+      Config = deepmerge(Config, userConfig);
       Logger.setLogLevel(Config.debug.loglevel);  // it could have changed the logLevel
       Logger.debug(`initializeConfiguration: processed configuration file ${userConfigFile}`);
     }

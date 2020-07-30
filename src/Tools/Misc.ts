@@ -16,6 +16,7 @@
 import http from 'http';
 import https from 'https';
 import os from 'os';
+import { v4 as uuidv4 } from 'uuid';
 
 import { Logger } from '@Tools/Logging';
 
@@ -37,6 +38,10 @@ export function IsNullOrEmpty(pVal: any): boolean {
 export function IsNotNullOrEmpty(pVal: any): boolean {
   return !IsNullOrEmpty(pVal);
 };
+
+export function GenUUID(): string {
+  return uuidv4();
+}
 
 let myExternalAddr: string;
 export async function getMyExternalIPAddress(): Promise<string> {

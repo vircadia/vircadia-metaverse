@@ -22,18 +22,25 @@ import https from 'https';
 import express from 'express';
 import { Router } from 'express';
 
-import { MongoClient } from 'mongodb';
+import { setupDB } from '@Tools/Db';
 
 import glob from 'glob';
 import morgan from 'morgan';
 import { Logger, morganOptions } from '@Tools/Logging';
+import { IsNotNullOrEmpty } from '@Tools/Misc';
 
 initializeConfiguration()
+.catch ( err => {
+  Logger.error('main: failured configuration: ' + err);
+})
 .then( () => {
   return setupDB();
 })
+.catch( err => {
+  Logger.error('main: failure opening database: ' + err);
+})
 .then( () => {
-
+  // Initialize and start ExpressJS
   const expr = express();
 
   // Setup the logger of messages
@@ -49,7 +56,7 @@ initializeConfiguration()
   expr.use(createAPIRouter('routes'));
 
   // Acting as an ActivityPub server
-  expr.use(createAPIRouter('ActivityPub'));
+  // expr.use(createAPIRouter('ActivityPub'));
 
   // Serving static files
   expr.use(Config.server["static-base"], express.static('static'));
@@ -70,6 +77,9 @@ initializeConfiguration()
           Logger.error('server exception: ' + err.message);
         })
         .listen(Config.server["listen-port"], Config.server["listen-host"]);
+})
+.catch( err => {
+  Logger.error('main: bad failure: ' + err);
 });
 
 // Search a directory for .js files that export a 'router' property and return a
@@ -87,9 +97,4 @@ function createAPIRouter(pBaseDir: string): Router {
     .map(rr => { Logger.debug('createAPIRouter: adding ' + rr.name ?? 'UNKNOWN'); return rr; })
     // create a Router and add each found Router and end up with a Router with all found Routers
     .reduce((rootRouter, router) => rootRouter.use(router.router), Router({ mergeParams: true } ) );
-}
-
-// Do the setup of the database.
-async function setupDB(): Promise<void> {
-  return;
 }

@@ -18,24 +18,24 @@ import { Request } from 'express';
 import { Clamp } from '../../Tools/Misc';
 
 export class PaginationInfo {
-  private _pageNum: number = 1;
-  private _perPage: number = 20;
+  public PageNum: number = 1;
+  public PerPage: number = 20;
 
   // results from as filter operation
   private _currentPage: number = 1;
   private _currentItem: number = 1;
 
   public constructor(pPageNum: number, pPerPage: number) {
-    this._pageNum = Clamp(pPageNum, 1, 1000);
-    this._perPage = Clamp(pPerPage, 1, 1000);
+    this.PageNum = Clamp(pPageNum, 1, 1000);
+    this.PerPage = Clamp(pPerPage, 1, 1000);
   }
 
   public parametersFromRequest(pRequest: Request) : void {
     if (pRequest.query.page) {
-      this._pageNum = Clamp(Number(pRequest.query.page), 1, 1000);
+      this.PageNum = Clamp(Number(pRequest.query.page), 1, 1000);
     }
     if (pRequest.query.per_page) {
-      this._perPage = Clamp(Number(pRequest.query.per_page), 1, 1000);
+      this.PerPage = Clamp(Number(pRequest.query.per_page), 1, 1000);
     }
   }
 
@@ -43,12 +43,12 @@ export class PaginationInfo {
     this._currentPage = 1;
     this._currentItem = 1;
     for (const item of pToFilter) {
-      if (this._pageNum === this._currentPage) {
+      if (this.PageNum === this._currentPage) {
         yield item;
       }
-      if (++this._currentItem > this._perPage) {
+      if (++this._currentItem > this.PerPage) {
         this._currentItem = 1;
-        if (++this._currentPage > this._pageNum)
+        if (++this._currentPage > this.PageNum)
         {
           break;
         };
@@ -60,12 +60,12 @@ export class PaginationInfo {
     this._currentPage = 1;
     this._currentItem = 1;
     for await (const item of pToFilter) {
-      if (this._pageNum === this._currentPage) {
+      if (this.PageNum === this._currentPage) {
         yield item;
       }
-      if (++this._currentItem > this._perPage) {
+      if (++this._currentItem > this.PerPage) {
         this._currentItem = 1;
-        if (++this._currentPage > this._pageNum)
+        if (++this._currentPage > this.PageNum)
         {
           break;
         };

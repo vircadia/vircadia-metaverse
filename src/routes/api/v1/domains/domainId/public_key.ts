@@ -15,27 +15,30 @@
 'use strict';
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
+import { Domains } from '@Entities/Domains';
+
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { domainFromParams, domainAPIkeyFromMultipart, verifyDomainAccess } from '@Route-Tools/middleware';
 
 import multer from 'multer';
-import crypto from 'crypto';
-
-import { Accounts } from '@Entities/Accounts';
-import { Domains } from '@Entities/Domains';
-import { DomainEntity } from '@Entities/DomainEntity';
-import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
-import { AccountEntity } from '@Entities/AccountEntity';
-import { IsNullOrEmpty } from '@Tools/Misc';
+import { createPublicKey } from 'crypto';
 
 import { Logger } from '@Tools/Logging';
+import { deflateRaw } from 'zlib';
 
 // GET /domains/:domainId/public_key
+// For backward-compatibility, the PEM formatted public key is returned by this
+//     request as a single line string without the BEGIN and END texts.
 const procGetDomainsPublicKey: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   Logger.debug('procGetDomainsPublicKey');
   if (req.vDomain) {
+    const keyLines = req.vDomain.publicKey.split('\n');
+    keyLines.shift(); // Remove the "BEGIN" forst line
+    keyLines.pop();   // Remove the "END" last line
+    const packedPublicKey = keyLines.join('');    // Combine all lines into one long string
+    // Response is a simple public_key field
     req.vRestResp.Data = {
-      'public_key': req.vDomain.publicKey
+      'public_key': packedPublicKey
     };
   }
   else {
@@ -45,9 +48,40 @@ const procGetDomainsPublicKey: RequestHandler = async (req: Request, resp: Respo
 };
 
 // PUT /domains/:domainId/public_key
+// The api_key and public_key are POSTed as entities in a multi-part-form mime type.
+// The public_key is sent as a binary (DER) form of a PKCS1 key.
+// To keep backward compatibility, we convert the PKCS1 key into a SPKI key in PEM format
+//      ("PEM" format is "Privacy Enhanced Mail" format and has the "BEGIN" and "END" text included).
 const procPutDomainsPublicKey: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   Logger.debug('procPutDomainsPublicKey');
   if (req.vDomain) {
+    if (req.files) {
+      try {
+        // The public key is a binary 'file' that should be in multer memory storage
+        const publicKeyBin: Buffer = (req.files as any).public_key[0].buffer;
+        // Convert the passed binary into a crypto.KeyObject
+        const publicKey = createPublicKey( {
+          key: publicKeyBin,
+          format: 'der',
+          type: 'pkcs1'
+        });
+        // Convert the public key to 'SubjectPublicKeyInfo' (SPKI) format as a PEM string
+        const convertedKey = publicKey.export({ type: 'spki', format: 'pem' });
+
+        const fieldsToUpdate = {
+          'publicKey': convertedKey as string
+        };
+        await Domains.updateEntityFields(req.vDomain, fieldsToUpdate);
+      }
+      catch (e) {
+        Logger.error('procPutDomainsPublicKey: exception converting: ' + e);
+        req.vRestResp.respondFailure('exception converting public key');
+      }
+    }
+    else {
+      Logger.error('procPutDomainsPublicKey: no files part of body');
+      req.vRestResp.respondFailure('no public key supplied');
+    }
   };
   next();
 };
@@ -65,10 +99,10 @@ router.get(   '/api/v1/domains/:domainId/public_key',  [ setupMetaverseAPI,
 // This creates an unpacker to catch fields 'api_key' and 'public_key'
 const multiStorage = multer.memoryStorage();
 const uploader = multer( { storage: multiStorage, });
-  // .fields( [ { name: 'api_key' }, { name: 'public_key' }]);
+const multiParser = uploader.fields( [ { name: 'api_key' }, { name: 'public_key' }]);
 router.put(   '/api/v1/domains/:domainId/public_key',  [ setupMetaverseAPI,
                                                   domainFromParams,           // vRESTResp.vDomain
-                                                  uploader.none(),    // body['api_key'], files['public_key'].buffer
+                                                  multiParser,    // body['api_key'], files['public_key'].buffer
                                                   domainAPIkeyFromMultipart,  // vRestRest.vDomainAPIKey
                                                   verifyDomainAccess,
                                                   procPutDomainsPublicKey,

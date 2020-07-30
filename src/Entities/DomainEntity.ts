@@ -13,10 +13,13 @@
 //   limitations under the License.
 'use strict'
 
+import { Domains } from "@Entities/Domains";
+import { VKeyedCollection } from '@Tools/vTypes';
+
 export class DomainEntity {
   public domainId: string;     // globally unique domain identifier
   public placeName: string;    // place name
-  public publicKey: string;    // DomainServers's public key
+  public publicKey: string;    // DomainServers's public key in multi-line PEM format
   public apiKey: string;       // Access key if a temp domain
   public sponserAccountID: string; // The account that gave this domain an access key
   public iceServerAddr: string;// IP address of ICE server being used by this domain
@@ -45,5 +48,6 @@ export class DomainEntity {
   public whenDomainEntryCreated: Date; // What the variable name says
   public timeOfLastHeartbeat: Date;    // time of last heartbeat
   public lastSenderKey: string;        // a key identifying the sender
+
 };
 

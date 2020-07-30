@@ -31,6 +31,9 @@ import { Config } from '@Base/config';
 // Start by decorating the request with the building class that is used to create the response.
 export const setupMetaverseAPI: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   req.vRestResp = new RESTResponse(req, resp);
+  if (req.socket) {
+    req.vSenderKey = `${req.socket.remoteAddress}:${req.socket.remotePort}`;
+  };
   next();
 };
 
@@ -130,7 +133,7 @@ export const verifyDomainAccess: RequestHandler = async (req: Request, resp: Res
     if (req.vRestResp && req.vDomain) {
       let verified: boolean = false;
 
-      let authToken = req.vRestResp.getAuthToken();
+      const authToken = req.vRestResp.getAuthToken();
       Logger.debug(`verifyDomainAccess: domainId: ${req.vDomain.domainId}, authT: ${authToken}, apikey: ${req.vDomainAPIKey}`);
 
       if (IsNullOrEmpty(authToken)) {
