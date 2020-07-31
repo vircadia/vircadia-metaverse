@@ -13,6 +13,29 @@
 //   limitations under the License.
 'use strict'
 
+import { Request } from 'express';
+import { AccountEntity } from '../AccountEntity';
+import { Logger } from '../../Tools/Logging';
+
 export class AccountScopeFilter {
-  public something: string;
+  private _asAdmin = false;
+
+  public constructor(pRequestorAccount: AccountEntity) {
+    return;
+  }
+  public parametersFromRequest(pRequest: Request) : void {
+    try {
+      if (pRequest.query.asAdmin) {
+        this._asAdmin = true;
+      }
+    }
+    catch (e) {
+      Logger.error('AccountScopeFilter: parameters from request: exception: ' + e);
+    }
+  }
+
+  // TODO: add some filtering
+  async *filter(pToFilter: AsyncGenerator<AccountEntity>) : AsyncGenerator<AccountEntity> {
+    return pToFilter;
+  };
 };

@@ -13,11 +13,13 @@
 //   limitations under the License.
 'use strict'
 
+// NOTE: these cannot have functions in them as they are just JSON to and from the database
 export class AuthToken {
   public tokenId: string;
   public token: string;
   public refreshToken: string;
+  public scope: string;           // one of 'owner', 'domain'
+  public accountId: string;       // AccountId of associated account
   public tokenCreationTime: Date;
   public tokenExpirationTime: Date;
-  public extraParams: string;
 };

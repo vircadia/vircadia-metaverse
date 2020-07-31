@@ -30,6 +30,7 @@ import { AccountEntity } from '@Entities/AccountEntity';
 import { IsNullOrEmpty } from '@Tools/Misc';
 
 import { Logger } from '@Tools/Logging';
+import { createSimplifiedPublicKey } from '@Route-Tools/Util';
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
@@ -44,7 +45,7 @@ const procGetDomains: RequestHandler = async (req: Request, resp: Response, next
       domainArray.push( {
         'domainid': aDomain.domainId,
         'place_name': aDomain.placeName,
-        'public_key': aDomain.publicKey,
+        'public_key': createSimplifiedPublicKey(aDomain.publicKey),
         'sponser_accountid': aDomain.sponserAccountID,
         'ice_server': aDomain.iceServerAddr,
         'version': aDomain.version,

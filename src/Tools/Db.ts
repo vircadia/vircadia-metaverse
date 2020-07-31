@@ -18,6 +18,7 @@ import { Config } from '@Base/config';
 import { MongoClient, Db } from 'mongodb';
 import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
+import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 
 // The initial MongoClient
 export let BaseClient: MongoClient;
@@ -109,11 +110,17 @@ export async function updateObjectFields(pCollection: string, pCriteria: any, pF
 // Low level generator to a stream of objects fitting a criteria.
 // Page number starts at 1.
 // Throws exception if anything wrong with the fetch.
-export async function *getObjects(pCollection: string, pCriteria: any, pPage: number, pPageSize: number): AsyncGenerator<any> {
+export async function *getObjects(pCollection: string, pCriteria: any, pPager?: PaginationInfo): AsyncGenerator<any> {
+  let numSkip = 0;
+  let numLimit = 1000;
+  if (pPager) {
+    numLimit = pPager.PerPage;
+    numSkip = (pPager.PageNum - 1) * numLimit;
+  }
   const cursor = Datab.collection(pCollection)
     .find(pCriteria)
-    .skip((pPage-1)*pPageSize)
-    .limit(pPageSize);
+    .skip(numSkip)
+    .limit(numLimit);
   while (cursor.hasNext()) {
     yield cursor.next();
   };

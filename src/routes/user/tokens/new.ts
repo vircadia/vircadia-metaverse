@@ -15,13 +15,27 @@
 'use strict';
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
+import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
+import { accountFromAuthToken } from '@Route-Tools/middleware';
 
-const procGetUserTokensNew: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
-  next();
+import { Tokens } from '@Entities/Tokens';
+
+const procGetUserTokensNew: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  if (req.vRestResp && req.vAuthAccount) {
+    const forDomainServer = req.query.for_domain_server;
+    const scope = forDomainServer ? 'domain' : 'owner';
+    const tokenInfo = await Tokens.createToken(req.vAuthAccount.accountId, scope, 1000);
+
+    const body = `<center><h2>Your domain's access token is ${tokenInfo.token}</h2></center>`;
+    resp.setHeader('content-type', 'text/html');
+    resp.send(body);
+  }
 };
 
 export const name = '/user/tokens/new';
 
 export const router = Router();
 
-router.get(  '/user/tokens/new',  procGetUserTokensNew);
+router.get(  '/user/tokens/new',  setupMetaverseAPI,
+                                  accountFromAuthToken,
+                                  procGetUserTokensNew);

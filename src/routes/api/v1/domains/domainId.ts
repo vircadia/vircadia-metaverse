@@ -20,10 +20,10 @@ import { accountFromAuthToken } from '@Route-Tools/middleware';
 import { domainFromParams } from '@Route-Tools/middleware';
 
 import { Domains } from '@Entities/Domains';
+import { Accounts } from '@Entities/Accounts';
 
 import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
-import { stringify } from 'querystring';
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
@@ -56,7 +56,7 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
     const updated: VKeyedCollection = {};
     const valuesToSet = req.body.domain;
     if (valuesToSet.version) updated.version = valuesToSet.version;
-    if (valuesToSet.protocol_version) updated.protocol = valuesToSet.protocol_version;
+    if (valuesToSet.protocol) updated.protocol = valuesToSet.protocol;
     if (valuesToSet.network_addr) updated.networkAddr = valuesToSet.network_addr;
     if (valuesToSet.automatic_networking) updated.networkingMode = valuesToSet.automatic_networking;
     if (valuesToSet.restricted) updated.restricted = valuesToSet.restricted;
@@ -91,7 +91,7 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
 const procDeleteDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   Logger.debug('procDeleteDomains');
   if (req.vAuthAccount) {
-    if (req.vAuthAccount.isAdmin) {
+    if (Accounts.isAdmin(req.vAuthAccount)) {
       if (req.vDomain) {
         Domains.removeDomain(req.vDomain);
       }

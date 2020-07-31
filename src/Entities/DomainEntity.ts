@@ -16,6 +16,7 @@
 import { Domains } from "@Entities/Domains";
 import { VKeyedCollection } from '@Tools/vTypes';
 
+// NOTE: this class cannot have functions in them as they are just JSON to and from the database
 export class DomainEntity {
   public domainId: string;     // globally unique domain identifier
   public placeName: string;    // place name

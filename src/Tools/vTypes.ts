@@ -20,3 +20,6 @@
 export interface VKeyedCollection {
   [ key: string]: any
 };
+export interface VKeyValue {
+  [ key: string]: string
+};

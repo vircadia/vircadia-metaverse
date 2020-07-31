@@ -24,6 +24,7 @@ export enum Availability {
   all
 };
 
+// NOTE: this class cannot have functions in them as they are just JSON to and from the database
 export class AccountEntity {
   public accountId: string;
   public username: string;
@@ -60,15 +61,4 @@ export class AccountEntity {
   public IPAddrOfCreator: string;   // IP address that created this account
   public whenAccountCreated: Date;  // date of account creation
   public timeOfLastHeartbeat: Date; // when we last heard from this user
-
-  // getter property that is 'true' if the user has been heard from recently
-  get isOnline(): boolean {
-    return this.timeOfLastHeartbeat
-        && ((Date.now() - this.timeOfLastHeartbeat.getUTCMilliseconds())
-              < (Config["metaverse-server"]["heartbeat-seconds-until-offline"] * 1000));
-  };
-  // getter property that is 'true' if the user is a grid administrator
-  get isAdmin(): boolean {
-    return this.administrator;
-  };
 };

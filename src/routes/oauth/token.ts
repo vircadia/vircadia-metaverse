@@ -14,14 +14,105 @@
 
 'use strict';
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
+import Config from '@Base/config';
 
-const procPostOauthToken: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
-  next();
+import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
+import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
+
+import { buildOAuthResponseBody } from '@Route-Tools/Util';
+
+import { Accounts } from '@Entities/Accounts';
+import { Tokens } from '@Entities/Tokens';
+
+import { ParseQueryString } from '@Tools/Misc';
+import { VKeyedCollection } from '@Tools/vTypes';
+
+
+import { Logger } from '@Tools/Logging';
+
+// Do a 'login' and return an initial access token for a user
+// Request comes as a 'application/x-www-form-urlencoded' body
+const procPostOauthToken: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  let respBody: VKeyedCollection;
+  try {
+    const reqArgs = ParseQueryString(req.body);
+    const accessGrantType = reqArgs.get('grant_type');
+    switch (accessGrantType) {
+      case 'password': {
+        // There are several types of "password"s passed by Interface:
+        // PLAIN PASSWORD
+        const userName = reqArgs.get('username');
+        const userPassword = reqArgs.get('password');
+
+        // STEAM
+        // string userPassword = reqArgs["steam_auth_ticket"];
+
+        // OCULUS
+        // string userPassword = reqArgs["oculus_nonce"];
+        // string userPassword = reqArgs["oculus_id"];
+
+        const userScope = reqArgs.get('scope') ?? 'owner';
+
+        const aAccount = await Accounts.getAccountWithUsername(userName);
+        if (aAccount) {
+          if (Accounts.validatePassword(aAccount, userPassword)) {
+            Logger.debug(`procPostOAuthToken: login of user ${userName}`);
+            const tokenInfo = await Tokens.createToken(aAccount.accountId, userScope);
+            respBody = buildOAuthResponseBody(aAccount, tokenInfo);
+          }
+          else {
+            respBody = buildOAuthErrorBody('Invalid password');
+          };
+        }
+        else{
+          respBody = buildOAuthErrorBody('Unknown user');
+        };
+        break;
+      };
+      case 'authorization_code': {
+        respBody = buildOAuthErrorBody('Do not know what to do with an authorization_code');
+        break;
+      };
+      case 'refresh_token': {
+        const refreshingToken = reqArgs.get('refresh_token');
+        const userScope = reqArgs.has('scope') ?? 'owner';
+        const targetToken = await Tokens.getTokenWithToken(req.vRestResp.getAuthToken());
+        if (refreshingToken === targetToken.refreshToken) {
+          const updates = {
+            'tokenExpirationTime': new Date(targetToken.tokenExpirationTime.valueOf()
+                  + Config.auth["auth-token-expire-days"] * 1000*60*60*24 )
+          }
+          await Tokens.updateTokenFields(targetToken, updates);
+          const aAccount = await Accounts.getAccountWithId(targetToken.accountId);
+          respBody = buildOAuthResponseBody(aAccount, targetToken);
+        }
+        else {
+          respBody = buildOAuthErrorBody('refresh token does not match');
+        }
+        break;
+      };
+      default: {
+        respBody = buildOAuthErrorBody('Unknown grant_type: ' + accessGrantType);
+        break;
+      };
+    };
+  }
+  catch (err) {
+    respBody = buildOAuthErrorBody('Exception: ' + err);
+  };
+
+  resp.json(respBody);
+};
+
+function buildOAuthErrorBody(pMsg: string): VKeyedCollection {
+  return {
+    'error': pMsg
+  };
 };
 
 export const name = "/oauth/token";
 
 export const router = Router();
 
-router.post( '/oauth/token',      procPostOauthToken);
+router.post( '/oauth/token',      setupMetaverseAPI,
+                                  procPostOauthToken);

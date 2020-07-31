@@ -14,15 +14,17 @@
 'use strict'
 
 import { DomainEntity } from '@Entities/DomainEntity';
+import { Tokens } from '@Entities/Tokens';
+import { AuthToken } from '@Entities/AuthToken';
 import { Accounts } from '@Entities/Accounts';
 import { AccountEntity } from '@Entities/AccountEntity';
-import { AuthToken } from '@Entities/AuthToken';
+
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 
 import { createObject, getObject, getObjects, updateObjectFields } from '@Tools/Db';
 
 import { Logger } from '@Tools/Logging';
-import { IsNullOrEmpty } from '@Tools/Misc';
+import { GenUUID } from '@Tools/Misc';
 import { VKeyedCollection } from '@Tools/vTypes';
 
 export type DomainTestFunction = (domain: DomainEntity) => boolean;
@@ -33,29 +35,25 @@ export const Domains = {
   async getDomainWithId(pDomainId: string): Promise<DomainEntity> {
     return getObject(domainCollection, { 'domainId': pDomainId });
   },
-  async getDomainWithAuthToken(pAuthToken: string): Promise<DomainEntity> {
-    return null;
-  },
   async getDomainWithAPIKey(pApiKey: string): Promise<DomainEntity> {
     return getObject(domainCollection, { 'apiKey': pApiKey });
-  },
-  async getDomainWithFilter( pTester: DomainTestFunction): Promise<DomainEntity> {
-    return null;
   },
   async getDomainWithSenderKey(pSenderKey: string): Promise<DomainEntity> {
     return getObject(domainCollection, { 'lastSenderKey': pSenderKey });
   },
-  async addDomain(pDomainEntity: DomainEntity) : Promise<any> {
+  async addDomain(pDomainEntity: DomainEntity) : Promise<DomainEntity> {
     return createObject(domainCollection, pDomainEntity);
+  },
+  createDomain(): DomainEntity {
+    const newDomain = new DomainEntity();
+    newDomain.domainId = GenUUID();
+    return newDomain;
   },
   removeDomain(pAccountEntity: DomainEntity) : boolean {
     return false;
   },
-  enumerate(pPager: PaginationInfo): Iterable<DomainEntity> {
-    return null;
-  },
   async *enumerateAsync(pCriteria: any, pPager: PaginationInfo): AsyncGenerator<DomainEntity> {
-    return getObjects(domainCollection, pCriteria, pPager.PageNum, pPager.PerPage);
+    return getObjects(domainCollection, pCriteria, pPager);
   },
   // The contents of this entity have been updated
   async updateEntityFields(pEntity: DomainEntity, pFields: VKeyedCollection): Promise<DomainEntity> {

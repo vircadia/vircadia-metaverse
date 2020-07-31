@@ -21,10 +21,9 @@ import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { domainFromParams, domainAPIkeyFromMultipart, verifyDomainAccess } from '@Route-Tools/middleware';
 
 import multer from 'multer';
-import { createPublicKey } from 'crypto';
 
 import { Logger } from '@Tools/Logging';
-import { deflateRaw } from 'zlib';
+import { createSimplifiedPublicKey, convertBinKeyToPEM } from '@Route-Tools/Util';
 
 // GET /domains/:domainId/public_key
 // For backward-compatibility, the PEM formatted public key is returned by this
@@ -32,13 +31,9 @@ import { deflateRaw } from 'zlib';
 const procGetDomainsPublicKey: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   Logger.debug('procGetDomainsPublicKey');
   if (req.vDomain) {
-    const keyLines = req.vDomain.publicKey.split('\n');
-    keyLines.shift(); // Remove the "BEGIN" forst line
-    keyLines.pop();   // Remove the "END" last line
-    const packedPublicKey = keyLines.join('');    // Combine all lines into one long string
     // Response is a simple public_key field
     req.vRestResp.Data = {
-      'public_key': packedPublicKey
+      'public_key': createSimplifiedPublicKey(req.vDomain.publicKey)
     };
   }
   else {
@@ -59,17 +54,9 @@ const procPutDomainsPublicKey: RequestHandler = async (req: Request, resp: Respo
       try {
         // The public key is a binary 'file' that should be in multer memory storage
         const publicKeyBin: Buffer = (req.files as any).public_key[0].buffer;
-        // Convert the passed binary into a crypto.KeyObject
-        const publicKey = createPublicKey( {
-          key: publicKeyBin,
-          format: 'der',
-          type: 'pkcs1'
-        });
-        // Convert the public key to 'SubjectPublicKeyInfo' (SPKI) format as a PEM string
-        const convertedKey = publicKey.export({ type: 'spki', format: 'pem' });
 
         const fieldsToUpdate = {
-          'publicKey': convertedKey as string
+          'publicKey': convertBinKeyToPEM(publicKeyBin)
         };
         await Domains.updateEntityFields(req.vDomain, fieldsToUpdate);
       }

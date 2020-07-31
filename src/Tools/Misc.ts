@@ -19,6 +19,7 @@ import os from 'os';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Logger } from '@Tools/Logging';
+import { VKeyValue } from '@Tools/vTypes';
 
 // Clamp the passed value between a high and low
 export function Clamp(pVal: number, pLow: number, pHigh: number): number {
@@ -39,9 +40,27 @@ export function IsNotNullOrEmpty(pVal: any): boolean {
   return !IsNullOrEmpty(pVal);
 };
 
+// Take apart an URL query string and return an object of key/value pairs
+export function ParseQueryString(pQuery: string): Map<string,string> {
+  const ret = new Map();
+  const args = decodeURI(pQuery).split('&');
+  args.forEach( arg => {
+    const argPieces = arg.split('=');
+    switch (argPieces.length) {
+      case 1:
+        ret.set(argPieces[0], null); break;
+      case 2:
+        ret.set(argPieces[0], argPieces[1]); break;
+      default:
+        break;  // doesn't make sense so ignore it
+    };
+  })
+  return ret;
+};
+
 export function GenUUID(): string {
   return uuidv4();
-}
+};
 
 let myExternalAddr: string;
 export async function getMyExternalIPAddress(): Promise<string> {

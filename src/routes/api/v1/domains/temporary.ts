@@ -43,9 +43,8 @@ const procPostDomainsTemporary: RequestHandler = async (req: Request, resp: Resp
 
   const generatedAPIkey: string = GenUUID();
 
-  const newDomain = new DomainEntity();
+  const newDomain = Domains.createDomain();
   newDomain.placeName = generatedPlacename;
-  newDomain.domainId = GenUUID();
   newDomain.apiKey = generatedAPIkey;
   if (req.vSenderKey) {
     newDomain.iPAddrOfFirstContact = req.vSenderKey;

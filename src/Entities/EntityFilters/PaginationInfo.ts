@@ -25,7 +25,7 @@ export class PaginationInfo {
   private _currentPage: number = 1;
   private _currentItem: number = 1;
 
-  public constructor(pPageNum: number, pPerPage: number) {
+  public constructor(pPageNum: number = 1, pPerPage: number = 1000) {
     this.PageNum = Clamp(pPageNum, 1, 1000);
     this.PerPage = Clamp(pPerPage, 1, 1000);
   }

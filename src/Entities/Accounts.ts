@@ -13,32 +13,42 @@
 //   limitations under the License.
 'use strict'
 
-import { AccountEntity } from './AccountEntity';
-import { AuthToken } from './AuthToken';
-import { PaginationInfo } from './EntityFilters/PaginationInfo';
-import { AccountFilterInfo } from './EntityFilters/AccountFilterInfo';
-import { AccountScopeFilter } from './EntityFilters/AccountScopeFilter';
+import { Config } from '@Base/config';
 
-export type AccountTestFunction = (acct: AccountEntity) => boolean;
+import { AccountEntity } from '@Entities/AccountEntity';
+import { Tokens } from '@Entities/Tokens';
+import { AuthToken } from '@Entities/AuthToken';
+import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
+import { AccountFilterInfo } from '@Entities/EntityFilters/AccountFilterInfo';
+import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
+
+import { createObject, getObject, getObjects, updateObjectFields } from '@Tools/Db';
+
+export let accountCollection = 'accounts';
 
 export const Accounts = {
   async getAccountWithId(pAccountId: string): Promise<AccountEntity> {
-    return null;
-  },
-  async getAccountWithFilter( pTester: AccountTestFunction): Promise<AccountEntity> {
-    return null;
+    return getObject(accountCollection, { 'accountId': pAccountId });
   },
   async getAccountWithAuthToken(pAuthToken: string): Promise<AccountEntity> {
+    try {
+      const tokenInfo = await Tokens.getTokenWithToken(pAuthToken);
+      return Accounts.getAccountWithId(tokenInfo.accountId);
+    }
+    catch (err) {
+      throw err;
+    };
     return null;
   },
   async getAccountWithUsername(pUsername: string): Promise<AccountEntity> {
-    return null;
+    return getObject(accountCollection, { 'username': pUsername });
   },
   async getAccountWithNodeId(pNodeId: string): Promise<AccountEntity> {
+    return getObject(accountCollection, { 'location.nodeid': pNodeId });
     return null;
   },
-  addAccount(pAccountEntity: AccountEntity) : boolean {
-    return false;
+  async addAccount(pAccountEntity: AccountEntity) : Promise<AccountEntity> {
+    return createObject(accountCollection, pAccountEntity);
   },
   async createAccount(pUsername: string, pPassword: string, pEmail: string): Promise<void> {
     return;
@@ -46,7 +56,21 @@ export const Accounts = {
   validatePassword(pAcct: AccountEntity, pPassword: string): boolean {
     return false;
   },
-  enumerate(pPager: PaginationInfo, pAccter: AccountFilterInfo, pScoper: AccountScopeFilter): IteratorResult<AccountEntity> {
-    return null;
+  // TODO: add scope (admin) and filter criteria filtering
+  //    It's push down to this routine so we could possibly use DB magic for the queries
+  async *enumerateAsync(pCriteria: any, pPager: PaginationInfo,
+              pInfoer: AccountFilterInfo, pScoper: AccountScopeFilter): AsyncGenerator<AccountEntity> {
+    return getObjects(accountCollection, pCriteria, pPager);
+  },
+
+  // getter property that is 'true' if the user has been heard from recently
+  isOnline(pAcct: AccountEntity): boolean {
+    return pAcct.timeOfLastHeartbeat
+        && ((Date.now() - pAcct.timeOfLastHeartbeat.getUTCMilliseconds())
+              < (Config["metaverse-server"]["heartbeat-seconds-until-offline"] * 1000));
+  },
+  // getter property that is 'true' if the user is a grid administrator
+  isAdmin(pAcct: AccountEntity): boolean {
+    return pAcct.administrator;
   }
 };

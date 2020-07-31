@@ -25,6 +25,9 @@ export let Config = {
       'user-config-file': './iamus.json',
       'server-version': '1.0.1' // Updated by package.json script
     },
+    'auth': {
+      'auth-token-expire-days': 10
+    },
     'metaverse-server': {
       'http-error-on-failure': true,  // whether to include x-vircadia error header
       'error-header': 'x-vircadia-error-handle',

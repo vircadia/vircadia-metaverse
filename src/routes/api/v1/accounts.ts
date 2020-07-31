@@ -17,28 +17,45 @@
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken, accountFromParams } from '@Route-Tools/middleware';
-import { tokenFromParams } from '@Route-Tools/middleware';
 
 import { Accounts } from '@Entities/Accounts';
 
 import { Logger } from '@Tools/Logging';
+import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
+import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
+import { AccountFilterInfo } from '@Entities/EntityFilters/AccountFilterInfo';
 
-// metaverseServerApp.use(express.urlencoded({ extended: false }));
+import { createSimplifiedPublicKey } from '@Route-Tools/Util';
 
-const procGetAccounts: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procGetAccounts: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   Logger.debug('procGetAccounts');
   if (req.vAuthAccount) {
+    let pager = new PaginationInfo();
+    let scoper = new AccountScopeFilter(req.vAuthAccount);
+    let infoer = new AccountFilterInfo();
+    pager.parametersFromRequest(req);
+    infoer.parametersFromRequest(req);
+
+    // Loop through all the filtered accounts and create array of info
+    let accts: any[] = [];
+    for await (let acct of Accounts.enumerateAsync({}, pager, infoer, scoper)) {
+      accts.push( {
+        'accountId': acct.accountId,
+        'username': acct.username,
+        'email': acct.email,
+        'public_key': createSimplifiedPublicKey(acct.publicKey),
+        'images': acct.images,
+        'location': acct.location,
+        'friends': acct.friends,
+        'connections': acct.connections,
+        'administrator': acct.administrator,
+        'when_account_created': acct.whenAccountCreated.toISOString(),
+        'time_of_last_heartbeat': acct.timeOfLastHeartbeat.toISOString()
+      });
+    };
+
     req.vRestResp.Data = {
-      accounts: [
-        {
-          'username': 'fred',
-          'accountId': 'lksjdlfaeoiraskjdlkhz832ad',
-        },
-        {
-          'username': 'wilma',
-          'accountId': 'a89s798sduhfiuwhqfohohawev',
-        }
-      ]
+      accounts: accts
     };
   }
   else {

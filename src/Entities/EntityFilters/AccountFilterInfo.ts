@@ -36,10 +36,8 @@ export class AccountFilterInfo {
     }
   }
 
-  public *filter(pToFilter: Generator<AccountEntity>) : Generator<AccountEntity> {
-    return {
-      'value': null,
-      'done': true
-    };
+  // TODO: add some filtering
+  async *filter(pToFilter: AsyncGenerator<AccountEntity>) : AsyncGenerator<AccountEntity> {
+    return pToFilter;
   };
 };
