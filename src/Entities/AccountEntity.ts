@@ -31,7 +31,6 @@ export class AccountEntity {
   public email: string;
   public passwordHash: string;
   public publicKey: string;
-  public authTokens: Set<AuthToken>;
   public accountSettings: string; // JSON of client settings
   public images: {
     hero: string;

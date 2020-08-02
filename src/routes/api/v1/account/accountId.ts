@@ -26,6 +26,9 @@ import { Logger } from '@Tools/Logging';
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
 const procPostAccountId: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  if (req.vRestResp && req.vAuthAccount && req.vAccount) {
+    const thing = 5;
+  };
   next();
 };
 

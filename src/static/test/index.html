@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+      integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+      crossorigin="anonymous">
+    <title>Iamus Testing</title>
+    <style>
+      /* the Vircadia logo is a gradient from #01BDFF to #8C1AFF with text color of ?? */
+      body {
+        font-family: serif;
+        background-color: #e2eef2;
+        color: #002733;
+        margin: 10px;
+      }
+      .v-errorText {
+          color: #f00;
+          font-weight: bold;
+      }
+      .v-td-label {
+          text-align: right;
+      }
+      .button {
+          display: inline;
+          margin: 4px;
+          padding: 2px;
+          text-align: center;
+          border: 3px solid #003849;
+          border-radius: 5px;
+          -moz-border-radius: 5px;
+          color: #c1eefc;
+          background: #0082aa;
+          opacity: 100;
+          width: 12em;
+          height: 2em;
+      }
+      #v-token-results {
+          font-size: larger;
+          text-align: center;
+          margin: 2em;
+      }
+      #DEBUGG {
+          font-size: smaller;
+          color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Iamus Testing</h2>
+      <table class="v-table">
+        <tr>
+          <td class='v-td-label'> Metaverse Server URL: </td>
+          <td class='v-td-input'> <input id="v-server-url" type="url" size="50" maxlength="120" value="http://192.168.86.56:9400"/> </td>
+        </tr>
+      </table>
+      <ul class="nav nav-tabs">
+        <li class="nav-item active"><a href="#tabLogin" data-toggle="tab">Login</a></li>
+        <li class="nav-item"><a href="#tabAccounts" data-toggle="tab">Accounts</a></li>
+        <li class="nav-item"><a href="#tabDomains" data-toggle="tab">Domains</a></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane active" id="tabLogin">
+          <fieldset>
+            <legend>Logged In Account</legend>
+            <table class="v-table">
+              <tr>
+                <td class='v-td-label'> Username: </td>
+                <td class='v-td-data'> <span id="v-loggedin-username"></span></td>
+              </tr>
+              <tr>
+                <td class='v-td-label'> AuthToken: </td>
+                <td class='v-td-data'> <span id="v-loggedin-authtoken"></span></td>
+              </tr>
+            </table>
+          </fieldset>
+          <fieldset>
+            <legend>Login To Account</legend>
+            <table class="v-table">
+              <tr>
+                <td class='v-td-label'> Username: </td>
+                <td class='v-td-input'> <input id="v-login-username" type="text" size="50" maxlength="120"/> </td>
+              </tr>
+              <tr>
+                <td class='v-td-label'> Password: </td>
+                <td class='v-td-input'> <input id="v-login-password" type="password" size="40" maxlength="140"/> </td>
+              </tr>
+            </table>
+            <button type="button" class="button clickable" op="OpLogin">Login</button>
+          </fieldset>
+          <fieldset>
+            <legend>Create Account</legend>
+            <table class="v-table">
+              <tr>
+                <td class='v-td-label'> Username: </td>
+                <td class='v-td-input'> <input id="v-new-username" type="text" size="50" maxlength="120"/> </td>
+              </tr>
+              <tr>
+                <td class='v-td-label'> Password: </td>
+                <td class='v-td-input'> <input id="v-new-password" type="password" size="40" maxlength="140"/> </td>
+              </tr>
+              <tr>
+                <td class='v-td-label'> Email: </td>
+                <td class='v-td-input'> <input id="v-new-email" type="text" size="100" maxlength="140"/> </td>
+              </tr>
+            </table>
+            <button type="button" class="button clickable" op="OpCreateAccount">Create Account</button>
+          </fieldset>
+        </div>
+        <div class="tab-pane" id="tabAccounts">
+          <h1>I'm in second tab</h1>
+        </div>
+        <div class="tab-pane" id="tabDomains">
+          <h1>I'm in third tab</h1>
+        </div>
+      </div>
+    </div>
+    <div id="DEBUGG"></div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+      integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+      integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+      crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+      integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+      crossorigin="anonymous"></script>
+    <script src="./IamusTest.js"></script>
+  </body>
+  <!-- vim: ts=2 sw=2 ai et -->
+</html>

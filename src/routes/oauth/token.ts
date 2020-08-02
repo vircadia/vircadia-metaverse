@@ -16,6 +16,8 @@
 
 import Config from '@Base/config';
 
+import bodyParser from 'express';
+
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 
@@ -24,9 +26,7 @@ import { buildOAuthResponseBody } from '@Route-Tools/Util';
 import { Accounts } from '@Entities/Accounts';
 import { Tokens } from '@Entities/Tokens';
 
-import { ParseQueryString } from '@Tools/Misc';
 import { VKeyedCollection } from '@Tools/vTypes';
-
 
 import { Logger } from '@Tools/Logging';
 
@@ -35,29 +35,29 @@ import { Logger } from '@Tools/Logging';
 const procPostOauthToken: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   let respBody: VKeyedCollection;
   try {
-    const reqArgs = ParseQueryString(req.body);
-    const accessGrantType = reqArgs.get('grant_type');
+    const accessGrantType = req.body.grant_type;
     switch (accessGrantType) {
       case 'password': {
         // There are several types of "password"s passed by Interface:
         // PLAIN PASSWORD
-        const userName = reqArgs.get('username');
-        const userPassword = reqArgs.get('password');
+        const userName = req.body.username;
+        const userPassword = req.body.password;
 
         // STEAM
-        // string userPassword = reqArgs["steam_auth_ticket"];
+        // string userPassword = req.body.steam_auth_ticket;
 
         // OCULUS
-        // string userPassword = reqArgs["oculus_nonce"];
-        // string userPassword = reqArgs["oculus_id"];
+        // string userPassword = req.body.oculus_nonce;
+        // string userPassword = req.body.oculus_id;
 
-        const userScope = reqArgs.get('scope') ?? 'owner';
+        const userScope = req.body.scope ?? 'owner';
 
         const aAccount = await Accounts.getAccountWithUsername(userName);
         if (aAccount) {
           if (Accounts.validatePassword(aAccount, userPassword)) {
             Logger.debug(`procPostOAuthToken: login of user ${userName}`);
             const tokenInfo = await Tokens.createToken(aAccount.accountId, userScope);
+            await Tokens.addToken(tokenInfo);
             respBody = buildOAuthResponseBody(aAccount, tokenInfo);
           }
           else {
@@ -74,8 +74,8 @@ const procPostOauthToken: RequestHandler = async (req: Request, resp: Response, 
         break;
       };
       case 'refresh_token': {
-        const refreshingToken = reqArgs.get('refresh_token');
-        const userScope = reqArgs.has('scope') ?? 'owner';
+        const refreshingToken = req.body.refresh_token;
+        const userScope = req.body.scope ?? 'owner';
         const targetToken = await Tokens.getTokenWithToken(req.vRestResp.getAuthToken());
         if (refreshingToken === targetToken.refreshToken) {
           const updates = {
@@ -101,6 +101,9 @@ const procPostOauthToken: RequestHandler = async (req: Request, resp: Response, 
     respBody = buildOAuthErrorBody('Exception: ' + err);
   };
 
+  if (Config.debug["metaverseapi-response-detail"]) {
+    Logger.debug('oauth/token: response: ' + JSON.stringify(respBody));
+  };
   resp.json(respBody);
 };
 
@@ -115,4 +118,5 @@ export const name = "/oauth/token";
 export const router = Router();
 
 router.post( '/oauth/token',      setupMetaverseAPI,
+                                  bodyParser.urlencoded(),
                                   procPostOauthToken);

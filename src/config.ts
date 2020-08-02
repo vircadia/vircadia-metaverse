@@ -1,6 +1,11 @@
 // Configuration
 // Just returns an object that has all the parameters
 // Someday integrate with 'command-line-args' or 'dotenv'
+
+// This includes all the parameters used by the server and the default values.
+// Do no change this file but instead create a 'server.user-config-file' (default
+// name of "iamus.json") whos values overlay these default values.
+
 'use strict';
 
 import fs from 'fs';
@@ -21,7 +26,7 @@ export let Config = {
     'server': {
       'listen-host': '0.0.0.0',
       'listen-port': 9400,
-      'static-base': '/static/',
+      'static-base': '/static',
       'user-config-file': './iamus.json',
       'server-version': '1.0.1' // Updated by package.json script
     },
@@ -43,6 +48,8 @@ export let Config = {
       'devel': false,
       // output the received request info when received
       'request-detail': false,
+      // output the received request body when received
+      'request-body': false,
       // output the response sent back from MetaverseAPI requests
       'metaverseapi-response-detail': false
     },
@@ -56,6 +63,8 @@ export let Config = {
     }
 };
 
+// Check environment variables and read in the user configuration file
+//   and overlay the default values above.
 export async function initializeConfiguration(): Promise<void> {
 
   // Tweek some of the values based on environment variables

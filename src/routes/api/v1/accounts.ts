@@ -30,24 +30,24 @@ import { createSimplifiedPublicKey } from '@Route-Tools/Util';
 const procGetAccounts: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   Logger.debug('procGetAccounts');
   if (req.vAuthAccount) {
-    let pager = new PaginationInfo();
-    let scoper = new AccountScopeFilter(req.vAuthAccount);
-    let infoer = new AccountFilterInfo();
+    const pager = new PaginationInfo();
+    const scoper = new AccountScopeFilter(req.vAuthAccount);
+    const infoer = new AccountFilterInfo();
     pager.parametersFromRequest(req);
     infoer.parametersFromRequest(req);
 
     // Loop through all the filtered accounts and create array of info
-    let accts: any[] = [];
-    for await (let acct of Accounts.enumerateAsync({}, pager, infoer, scoper)) {
+    const accts: any[] = [];
+    for await (const acct of Accounts.enumerateAsync({}, pager, infoer, scoper)) {
       accts.push( {
         'accountId': acct.accountId,
         'username': acct.username,
         'email': acct.email,
         'public_key': createSimplifiedPublicKey(acct.publicKey),
-        'images': acct.images,
-        'location': acct.location,
-        'friends': acct.friends,
-        'connections': acct.connections,
+        'images': acct.images ?? undefined,
+        'location': acct.location ?? undefined,
+        'friends': acct.friends ?? undefined,
+        'connections': acct.connections ?? undefined,
         'administrator': acct.administrator,
         'when_account_created': acct.whenAccountCreated.toISOString(),
         'time_of_last_heartbeat': acct.timeOfLastHeartbeat.toISOString()

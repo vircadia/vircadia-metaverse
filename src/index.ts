@@ -19,6 +19,7 @@ import { Config, initializeConfiguration } from '@Base/config';
 
 import http from 'http';
 import https from 'https';
+import path from 'path';
 import express from 'express';
 import { Router } from 'express';
 
@@ -59,7 +60,7 @@ initializeConfiguration()
   // expr.use(createAPIRouter('ActivityPub'));
 
   // Serving static files
-  expr.use(Config.server["static-base"], express.static('static'));
+  expr.use(Config.server["static-base"] ?? '/static', express.static(path.join(__dirname, 'static')));
 
   // If all the other routing didn't work, finally make errors
   expr.use(createAPIRouter('routes-last'));

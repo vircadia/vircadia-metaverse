@@ -17,6 +17,7 @@ import http from 'http';
 import https from 'https';
 import os from 'os';
 import { v4 as uuidv4 } from 'uuid';
+import crypto from 'crypto';
 
 import { Logger } from '@Tools/Logging';
 import { VKeyValue } from '@Tools/vTypes';
@@ -60,6 +61,13 @@ export function ParseQueryString(pQuery: string): Map<string,string> {
 
 export function GenUUID(): string {
   return uuidv4();
+};
+
+// Return a string of random hex numbers of the specified length
+export function genRandomString(pLen: number) : string {
+  return crypto.randomBytes(Math.ceil(pLen/2))
+    .toString('hex')
+    .slice(0, pLen);
 };
 
 let myExternalAddr: string;

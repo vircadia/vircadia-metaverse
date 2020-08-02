@@ -31,6 +31,7 @@ export const Tokens = {
     const expirationDays = pExpireDays > 0 ? pExpireDays : Config.auth["auth-token-expire-days"];
     const aToken = new AuthToken();
     aToken.tokenId = GenUUID();
+    aToken.token = GenUUID();
     aToken.refreshToken = GenUUID();
     aToken.tokenCreationTime = new Date();
     aToken.tokenExpirationTime = new Date(aToken.tokenCreationTime.valueOf() + expirationDays * 1000*60*60*24);

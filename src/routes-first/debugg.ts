@@ -23,6 +23,9 @@ const procAllDebug: RequestHandler = async (req: Request, resp: Response, next: 
   if (Config.debug['request-detail']) {
     Logger.debug(`procAllDebug: ${req.method} ${req.url}`);
   };
+  if (Config.debug['request-body']) {
+    Logger.debug(`procAllDebug: body: ` + JSON.stringify(req.body));
+  };
   next();
 };
 

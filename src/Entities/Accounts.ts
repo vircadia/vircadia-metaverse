@@ -23,8 +23,16 @@ import { AccountFilterInfo } from '@Entities/EntityFilters/AccountFilterInfo';
 import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
 
 import { createObject, getObject, getObjects, updateObjectFields } from '@Tools/Db';
+import { GenUUID, IsNullOrEmpty } from '@Tools/Misc';
+import { Shadows } from './Shadows';
+import { ShadowEntity } from './ShadowEntity';
 
 export let accountCollection = 'accounts';
+
+export interface ShadowedAccount {
+  Acct: AccountEntity,
+  Shadow: ShadowEntity
+};
 
 export const Accounts = {
   async getAccountWithId(pAccountId: string): Promise<AccountEntity> {
@@ -50,11 +58,34 @@ export const Accounts = {
   async addAccount(pAccountEntity: AccountEntity) : Promise<AccountEntity> {
     return createObject(accountCollection, pAccountEntity);
   },
-  async createAccount(pUsername: string, pPassword: string, pEmail: string): Promise<void> {
-    return;
+  createAccount(pUsername: string, pPassword: string, pEmail: string): ShadowedAccount {
+    const newAcct = new AccountEntity();
+    newAcct.accountId= GenUUID();
+    newAcct.username = pUsername;
+    newAcct.email = pEmail;
+    newAcct.administrator = false;
+    newAcct.whenAccountCreated = new Date();
+
+    // Create the account shadow to hold stuff that is not public
+    const acctShadow = Shadows.createShadow()
+    acctShadow.accountId = newAcct.accountId;
+    Shadows.storePassword(acctShadow, pPassword);
+
+    // Return the account and shadow information for any additions.
+    // NOTE: that the AccountEntity and ShadowEntity are not stored so that needs to be done.
+    const shadowAcct: ShadowedAccount = {
+      Acct: newAcct,
+      Shadow: acctShadow
+    };
+    return shadowAcct;
   },
-  validatePassword(pAcct: AccountEntity, pPassword: string): boolean {
-    return false;
+  async validatePassword(pAcct: AccountEntity, pPassword: string, pShadow?: ShadowEntity): Promise<boolean> {
+    let shadow = pShadow;
+    if (IsNullOrEmpty(shadow)) {
+      // If the caller didn't pass the shadow, fetch it
+      shadow = await Shadows.getShadowWithAccountId(pAcct.accountId);
+    };
+    return Shadows.hashPassword(pPassword, shadow.passwordSalt) === shadow.passwordHash;
   },
   // TODO: add scope (admin) and filter criteria filtering
   //    It's push down to this routine so we could possibly use DB magic for the queries
