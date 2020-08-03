@@ -15,6 +15,16 @@
         color: #002733;
         margin: 10px;
       }
+      .v-fieldset {
+        border: solid 2px #acbbbf;
+        margin: 30px 0px;
+        padding: 0 10px 10px 10px;
+      }
+      .v-fieldset legend {
+        width: auto;
+        border-bottom: none;
+        padding: 0px 10px;
+      }
       .v-errorText {
           color: #f00;
           font-weight: bold;
@@ -56,15 +66,15 @@
           <td class='v-td-input'> <input id="v-server-url" type="url" size="50" maxlength="120" value="http://192.168.86.56:9400"/> </td>
         </tr>
       </table>
-      <ul class="nav nav-tabs">
-        <li class="nav-item active"><a href="#tabLogin" data-toggle="tab">Login</a></li>
-        <li class="nav-item"><a href="#tabAccounts" data-toggle="tab">Accounts</a></li>
-        <li class="nav-item"><a href="#tabDomains" data-toggle="tab">Domains</a></li>
-        <li class="nav-item"><a href="#tabTokens" data-toggle="tab">Tokens</a></li>
+      <ul class="nav nav-pills">
+        <li class="nav-item active"><a href="#tabLogin" class="nav-link active" data-toggle="tab">Login</a></li>
+        <li class="nav-item"><a href="#tabAccounts" class="nav-link" data-toggle="tab">Accounts</a></li>
+        <li class="nav-item"><a href="#tabDomains" class="nav-link" data-toggle="tab">Domains</a></li>
+        <li class="nav-item"><a href="#tabTokens" class="nav-link" data-toggle="tab">Tokens</a></li>
       </ul>
       <div class="tab-content">
-        <div class="tab-pane active" id="tabLogin">
-          <fieldset>
+        <div class="tab-pane fade show active" id="tabLogin">
+          <fieldset class="v-fieldset">
             <legend>Logged In Account</legend>
             <table class="v-table">
               <tr>
@@ -77,7 +87,7 @@
               </tr>
             </table>
           </fieldset>
-          <fieldset>
+          <fieldset class="v-fieldset">
             <legend>Login To Account</legend>
             <table class="v-table">
               <tr>
@@ -91,7 +101,7 @@
             </table>
             <button type="button" class="v-button clickable" op="OpLogin">Login</button>
           </fieldset>
-          <fieldset>
+          <fieldset class="v-fieldset">
             <legend>Create Account</legend>
             <table class="v-table">
               <tr>
@@ -104,17 +114,20 @@
               </tr>
               <tr>
                 <td class='v-td-label'> Email: </td>
-                <td class='v-td-input'> <input id="v-new-email" type="text" size="100" maxlength="140"/> </td>
+                <td class='v-td-input'> <input id="v-new-email" type="text" size="50" maxlength="140"/> </td>
               </tr>
             </table>
             <button type="button" class="v-button clickable" op="OpCreateAccount">Create Account</button>
           </fieldset>
         </div>
-        <div class="tab-pane" id="tabAccounts">
-          <h1>I'm in second tab</h1>
+        <div class="tab-pane fade" id="tabAccounts">
+          <h1>I'm in Accounts tab</h1>
         </div>
-        <div class="tab-pane" id="tabDomains">
-          <h1>I'm in third tab</h1>
+        <div class="tab-pane fade" id="tabDomains">
+          <h1>I'm in Domains tab</h1>
+        </div>
+        <div class="tab-pane fade" id="tabTokens">
+          <h1>I'm in Tokens tab</h1>
         </div>
       </div>
     </div>
