@@ -22,7 +22,7 @@ import { AccountFilterInfo } from '@Entities/EntityFilters/AccountFilterInfo';
 import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
 
 import { createObject, getObject, getObjects, updateObjectFields } from '@Tools/Db';
-import { GenUUID, IsNullOrEmpty } from '@Tools/Misc';
+import { GenUUID, IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 import { Shadows } from '@Entities/Shadows';
 import { ShadowEntity } from '@Entities/ShadowEntity';
 
@@ -37,24 +37,27 @@ export interface ShadowedAccount {
 
 export const Accounts = {
   async getAccountWithId(pAccountId: string): Promise<AccountEntity> {
-    return getObject(accountCollection, { 'accountId': pAccountId });
+    return IsNullOrEmpty(pAccountId) ? null : getObject(accountCollection, { 'accountId': pAccountId });
   },
   async getAccountWithAuthToken(pAuthToken: string): Promise<AccountEntity> {
-    try {
-      const tokenInfo = await Tokens.getTokenWithToken(pAuthToken);
-      return Accounts.getAccountWithId(tokenInfo.accountId);
-    }
-    catch (err) {
-      throw err;
+    if (IsNotNullOrEmpty(pAuthToken)) {
+      try {
+        const tokenInfo = await Tokens.getTokenWithToken(pAuthToken);
+        if (IsNotNullOrEmpty(tokenInfo)) {
+          return Accounts.getAccountWithId(tokenInfo.accountId);
+        };
+      }
+      catch (err) {
+        throw err;
+      };
     };
     return null;
   },
   async getAccountWithUsername(pUsername: string): Promise<AccountEntity> {
-    return getObject(accountCollection, { 'username': pUsername });
+    return IsNullOrEmpty(pUsername) ? null : getObject(accountCollection, { 'username': pUsername });
   },
   async getAccountWithNodeId(pNodeId: string): Promise<AccountEntity> {
-    return getObject(accountCollection, { 'location.nodeid': pNodeId });
-    return null;
+    return IsNullOrEmpty(pNodeId) ? null : getObject(accountCollection, { 'location.nodeid': pNodeId });
   },
   async addAccount(pAccountEntity: AccountEntity) : Promise<AccountEntity> {
     return createObject(accountCollection, pAccountEntity);
@@ -96,7 +99,10 @@ export const Accounts = {
   //    It's push down to this routine so we could possibly use DB magic for the queries
   async *enumerateAsync(pCriteria: any, pPager: PaginationInfo,
               pInfoer: AccountFilterInfo, pScoper: AccountScopeFilter): AsyncGenerator<AccountEntity> {
-    return getObjects(accountCollection, pCriteria, pPager);
+    for await (const acct of getObjects(accountCollection, pCriteria, pPager)) {
+      yield acct;
+    };
+    // return getObjects(accountCollection, pCriteria, pPager);
   },
 
   // getter property that is 'true' if the user has been heard from recently

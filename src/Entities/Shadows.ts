@@ -23,7 +23,7 @@ import { createObject, getObject, getObjects, updateObjectFields } from '@Tools/
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 
 import { VKeyedCollection } from '@Tools/vTypes';
-import { GenUUID, genRandomString } from '@Tools/Misc';
+import { GenUUID, genRandomString, IsNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
 
 export let shadowCollection = 'shadows';
@@ -39,10 +39,10 @@ export const Shadows = {
     return aShadow;
   },
   async getShadowWithShadowId(pShadowId: string): Promise<ShadowEntity> {
-    return getObject(shadowCollection, { 'shadowId': pShadowId });
+    return IsNullOrEmpty(pShadowId) ? null : getObject(shadowCollection, { 'shadowId': pShadowId });
   },
   async getShadowWithAccountId(pAccountId: string): Promise<ShadowEntity> {
-    return getObject(shadowCollection, { 'accountId': pAccountId });
+    return IsNullOrEmpty(pAccountId) ? null : getObject(shadowCollection, { 'accountId': pAccountId });
   },
   async addShadow(pShadowEntity: ShadowEntity) : Promise<ShadowEntity> {
     return createObject(shadowCollection, pShadowEntity);
@@ -51,7 +51,10 @@ export const Shadows = {
     return updateObjectFields(shadowCollection, { shadowId: pEntity.shadowId }, pFields);
   },
   async *enumerateAsync(pCriteria: any, pPager?: PaginationInfo): AsyncGenerator<ShadowEntity> {
-    return getObjects(shadowCollection, pCriteria, pPager);
+    for await (const shad of getObjects(shadowCollection, pCriteria, pPager)) {
+      yield shad;
+    };
+    // return getObjects(shadowCollection, pCriteria, pPager);
   },
   storePassword(pEntity: ShadowEntity, pPassword: string) {
       pEntity.passwordSalt = genRandomString(16);

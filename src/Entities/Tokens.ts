@@ -52,13 +52,13 @@ export const Tokens = {
     return aToken;
   },
   async getTokenWithTokenId(pTokenId: string): Promise<AuthToken> {
-    return getObject(tokenCollection, { 'tokenId': pTokenId });
+    return IsNullOrEmpty(pTokenId) ? null : getObject(tokenCollection, { 'tokenId': pTokenId });
   },
   async getTokenWithToken(pToken: string): Promise<AuthToken> {
-    return getObject(tokenCollection, { 'token': pToken });
+    return IsNullOrEmpty(pToken) ? null : getObject(tokenCollection, { 'token': pToken });
   },
   async *getTokensForOwner(pOwnerId: string, pPager?: PaginationInfo): AsyncGenerator<AuthToken> {
-    return getObjects(tokenCollection, { 'tokenOwnerId': pOwnerId }, pPager);
+    return IsNullOrEmpty(pOwnerId) ? null : getObjects(tokenCollection, { 'tokenOwnerId': pOwnerId }, pPager);
   },
   async addToken(pAuthToken: AuthToken) : Promise<AuthToken> {
     return createObject(tokenCollection, pAuthToken);
@@ -67,7 +67,10 @@ export const Tokens = {
     return updateObjectFields(tokenCollection, { tokenId: pEntity.tokenId }, pFields);
   },
   async *enumerateAsync(pCriteria: any, pPager?: PaginationInfo): AsyncGenerator<AuthToken> {
-    return getObjects(tokenCollection, pCriteria, pPager);
+    for await (const tok of getObjects(tokenCollection, pCriteria, pPager)) {
+      yield tok;
+    };
+    // return getObjects(tokenCollection, pCriteria, pPager);
   }
 
 };

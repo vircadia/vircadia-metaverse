@@ -14,50 +14,56 @@
 
 'use strict';
 
-let API_ACCOUNT_LOGIN = '/oauth/token';
-let API_ACCOUNT_CREATE = '/api/v1/users';
-let API_GET_TOKEN = '/api/v1/token/new';
+const API_ACCOUNT_LOGIN = '/oauth/token';
+const API_ACCOUNT_CREATE = '/api/v1/users';
+const API_GET_TOKEN = '/api/v1/token/new';
+const API_GET_ACCOUNTS = '/api/v1/accounts';
 
-// The html 'id' of the currently selected tab
-let activeTabId = "tabLogin";
+type AuthToken = string;
+interface AuthTokenInfo {
+    token: string,
+    token_type: string,
+    scope: string,
+    refresh_token: string
+};
+
 // Information on current user
 let gLoginUser = '';
-let gLoginTokenInfo = {};
-let gDomainToken = {};
+let gLoginTokenInfo: AuthTokenInfo = {} as AuthTokenInfo;
+let gDomainToken: AuthToken = {} as AuthToken;
+let gAccountInfo: any[];
 
 document.addEventListener('DOMContentLoaded', ev => {
     // Make all 'class=clickable' page items create events
     Array.from(document.getElementsByClassName('clickable')).forEach( nn => {
         nn.addEventListener('click', DoOnClickable);
     });
-
-    // Keep track of the active tab
-    $('a[data-toggle="tab"]').on('shown.bs.tab', evnt => {
-        activeTabId = evnt.target.getAttribute('id');
-    });
 });
 // Event from a 'clickable' class'ed element.
 // If it has an 'op' attriute, call that named function
-function DoOnClickable(evnt) {
-    let buttonOp = evnt.target.getAttribute('op');
+function DoOnClickable(evnt: Event): void {
+    const buttonOp = (evnt.target as HTMLElement).getAttribute('op');
     if (buttonOp) {
-        let buttonFunc = window[buttonOp];
+        DebugLog('DoOnClickable: click op ' + buttonOp);
+        // @ts-ignore
+        const buttonFunc = window[buttonOp];
         if (typeof(buttonFunc) === 'function') {
             buttonFunc(evnt);
         };
     };
-}
+};
 // Global debug information printout.
-let logToConsole = false;
-function LogMessage(msg, classs) {
+const logToConsole = false;
+function LogMessage(msg: string , classs?: string ): void {
     if (logToConsole) {
+        // tslint:disable-next-line:no-console
         console.log(msg);
     }
     else {
         // Adds a text line to a div and scroll the area
-        let debugg = document.getElementById('DEBUGG');
+        const debugg = document.getElementById('DEBUGG');
         if (debugg) {
-            let newLine = document.createElement('div');
+            const newLine = document.createElement('div');
             newLine.appendChild(document.createTextNode(msg));
             if (classs) {
                 newLine.setAttribute('class', classs);
@@ -69,35 +75,36 @@ function LogMessage(msg, classs) {
         };
     };
 };
-function DebugLog(msg) {
+function DebugLog(msg: string): void {
     LogMessage(msg, undefined);
 };
-function ErrorLog(msg) {
+function ErrorLog(msg: string): void {
     LogMessage(msg, 'v-errorText');
 };
 
-function GetElementValue(elementId) {
-    return document.getElementById(elementId).value.trim();
+function GetElementValue(elementId: string): string {
+    const el = document.getElementById(elementId) as HTMLTextAreaElement
+    return el.value.trim();
 };
-function GetSelectedValue(elementId) {
-    let selection = document.getElementById(elementId);
-    let selectionValue = selection.options[selection.selectedIndex].value.trim();
+function GetSelectedValue(elementId: string): string {
+    const selection = document.getElementById(elementId) as HTMLSelectElement;
+    const selectionValue = selection.options[selection.selectedIndex].value.trim();
     return selectionValue;
 };
-function SetTextInElement(elementId, theText) {
-    let textNode = document.createTextNode(theText);
-    let theElement = document.getElementById(elementId);
+function SetTextInElement(elementId: string, theText: string): void {
+    const textNode = document.createTextNode(theText);
+    const theElement = document.getElementById(elementId);
     theElement.innerHTML = '';
     theElement.appendChild(textNode);
 };
-function ServerURL() {
+function ServerURL(): string {
     return GetElementValue('v-server-url');
 };
 
-function OpCreateAccount(evnt) {
-    let username = GetElementValue('v-new-username');
-    let passwd = GetElementValue('v-new-password');
-    let useremail = GetElementValue('v-new-email');
+function OpCreateAccount(evnt: Event): void {
+    const username = GetElementValue('v-new-username');
+    const passwd = GetElementValue('v-new-password');
+    const useremail = GetElementValue('v-new-email');
     DebugLog('username=' + username + ', email=' + useremail);
 
     if (username.length < 1 || passwd.length < 2 || useremail.length < 5) {
@@ -120,9 +127,9 @@ function OpCreateAccount(evnt) {
     });
 };
 // The user is asking to login
-function OpLogin(evnt) {
-    let username = GetElementValue('v-login-username');
-    let passwd = GetElementValue('v-login-password');
+function OpLogin(evnt: Event): void {
+    const username = GetElementValue('v-login-username');
+    const passwd = GetElementValue('v-login-password');
     DebugLog('Start login for ' + username);
     if (username.length < 1 || passwd.length < 2) {
         ErrorLog('You must specify a value for both username and password');
@@ -136,9 +143,9 @@ function OpLogin(evnt) {
         ErrorLog('Failed login: ' + err);
     });
 };
-function OpGetDomainToken(evnt) {
-    let username = GetElementValue('v-username');
-    let passwd = GetElementValue('v-password');
+function OpGetDomainToken(evnt: Event): void {
+    const username = GetElementValue('v-username');
+    const passwd = GetElementValue('v-password');
 
     if (username.length < 1 || passwd.length < 2) {
         ErrorLog('You must specify a value for both username and password');
@@ -153,8 +160,21 @@ function OpGetDomainToken(evnt) {
         ErrorLog('Could not fetch domain token: ' + err);
     });
 };
+function OpAccountList(evnt: Event): void {
+    DebugLog('OpAccountList:');
+    RefreshAccountList()
+    .then( acctList => {
+        DebugLog('OpAccountList: accounts fetched: ' + acctList.length);
+        gAccountInfo = acctList;
+        DisplayAccounts();
+    })
+    .catch( err => {
+        ErrorLog('Could not fetch accounts: ' + err);
+    });
+};
+// ============================================================================
 // Use account information to get account token and use that to get domain token
-function GetDomainTokenWithAccount(pUsername, pPassword) {
+function GetDomainTokenWithAccount(pUsername: string, pPassword: string): Promise<AuthToken> {
     return new Promise( (resolve, reject) => {
         GetUserAccessToken(pUsername, pPassword)
         .then( accountTokenInfo => {
@@ -174,20 +194,20 @@ function GetDomainTokenWithAccount(pUsername, pPassword) {
 };
 // Return a Promise that returns an access token for the specified account.
 // The returned 'token' has multiple fields describing the token, it's type, ...
-function GetUserAccessToken(pUsername, pPassword) {
+function GetUserAccessToken(pUsername: string, pPassword: string): Promise<AuthTokenInfo> {
     return new Promise( (resolve , reject) => {
-        let queries = [];
+        const queries = [];
         queries.push(encodeURIComponent('grant_type') + '=' + encodeURIComponent('password'));
         queries.push(encodeURIComponent('username') + '=' + encodeURIComponent(pUsername));
         queries.push(encodeURIComponent('password') + '=' + encodeURIComponent(pPassword));
         queries.push(encodeURIComponent('scope') + '=' + encodeURIComponent('owner'));
-        let queryData = queries.join('&').replace(/%20/g, '+');
+        const queryData = queries.join('&').replace(/%20/g, '+');
 
-        let request = new XMLHttpRequest();
+        const request = new XMLHttpRequest();
         request.onreadystatechange = function() {
             if (this.readyState === XMLHttpRequest.DONE) {
                 if (this.status === 200) {
-                    let response = JSON.parse(request.responseText);
+                    const response = JSON.parse(request.responseText);
                     DebugLog("Login response = " + request.responseText);
                     if (response.error) {
                         // There was an error logging in
@@ -201,7 +221,7 @@ function GetUserAccessToken(pUsername, pPassword) {
                             'token_type': response.token_type,
                             'scope': response.scope,
                             'refresh_token': response.refresh_token
-                        });
+                        } as AuthTokenInfo );
                     };
                 }
                 else {
@@ -217,17 +237,17 @@ function GetUserAccessToken(pUsername, pPassword) {
     });
 };
 // Return a Promise that returns an access token for a domain
-function GetDomainToken(pAccountTokenInfo) {
+function GetDomainToken(pAccountTokenInfo: AuthTokenInfo): Promise<AuthToken> {
     return new Promise( (resolve, reject) => {
-        let request = new XMLHttpRequest();
+        const request = new XMLHttpRequest();
         request.onreadystatechange = function() {
             if (this.readyState === XMLHttpRequest.DONE) {
                 if (this.status === 200) {
-                    let response = JSON.parse(request.responseText);
+                    const response = JSON.parse(request.responseText);
                     if (response.status && response.status === 'success') {
                         // Successful fetch of new domain token using account token
                         DebugLog('Successful fetch of domain token');
-                        resolve(response.data.domain_token);
+                        resolve(response.data.domain_token as AuthToken);
                     }
                     else {
                         reject('Fetch of domain token failed: ' + JSON.stringify(response));
@@ -246,21 +266,21 @@ function GetDomainToken(pAccountTokenInfo) {
     });
 };
 // Create a new user account. Does not return anything
-function CreateUserAccount(pUsername, pPassword, pEmail) {
+function CreateUserAccount(pUsername: string, pPassword: string, pEmail: string): Promise<void> {
     return new Promise( (resolve , reject) => {
         DebugLog('Starting account creation request for ' + pUsername);
-        let requestData = JSON.stringify({
+        const requestData = JSON.stringify({
             'user': {
                 'username': pUsername,
                 'password': pPassword,
                 'email': pEmail
             }
         });
-        let request = new XMLHttpRequest();
+        const request = new XMLHttpRequest();
         request.onreadystatechange = function() {
             if (this.readyState === XMLHttpRequest.DONE) {
                 if (this.status === 200) {
-                    let response = JSON.parse(request.responseText);
+                    const response = JSON.parse(request.responseText);
                     if (response.status && response.status === 'success') {
                         // Successful account creation
                         DebugLog('Successful account creation');
@@ -282,16 +302,129 @@ function CreateUserAccount(pUsername, pPassword, pEmail) {
         request.send(requestData);
     });
 };
-function DisplaySuccessfulLogin(username, tokenInfo) {
+function RefreshAccountList(): Promise<any[]> {
+    return new Promise( (resolve, reject) => {
+        const request = new XMLHttpRequest();
+        request.onreadystatechange = function() {
+            if (this.readyState === XMLHttpRequest.DONE) {
+                if (this.status === 200) {
+                    const response = JSON.parse(request.responseText);
+                    if (response.status !== 'success') {
+                        reject(request.responseText);
+                    }
+                    else {
+                        DebugLog('Successful fetch of accounts');
+                        resolve(response.data.accounts);
+                    };
+                }
+                else {
+                    reject(`Failure fetching accounts: response code=${this.status}`);
+                };
+            };
+        };
+        request.open("GET", ServerURL() + API_GET_ACCOUNTS);
+        request.setRequestHeader('Authorization', `${gLoginTokenInfo.token_type} ${gLoginTokenInfo.token}`);
+        request.send();
+    });
+};
+// ===========================================================================
+function DisplaySuccessfulLogin(username: string, tokenInfo: AuthTokenInfo): void {
     DebugLog('Login successful for ' + username);
     gLoginUser = username;
     gLoginTokenInfo = tokenInfo;
     SetTextInElement('v-loggedin-username', username);
     SetTextInElement('v-loggedin-authtoken', tokenInfo.token);
 };
-function DisplayDomainToken(domainToken) {
+function DisplayDomainToken(domainToken: AuthToken): void {
     gDomainToken = domainToken;
-    SetTextInElement('v-domain-token', tokenInfo.token);
+    SetTextInElement('v-domain-token', gDomainToken);
+};
+function DisplayAccounts() {
+    // Column defintions are [columnHeader, fieldInAccount, classForDataEntry]
+    const columns = [
+        ['id', 'accountId', 'v-acct-id'],
+        ['name', 'username', 'v-acct-name'],
+        ['email', 'email', 'v-acct-email'],
+        ['admin', 'administrator', 'v-acct-admin'],
+        ['whenCreated', 'when_account_created', 'v-acct-created']
+    ];
+    const rows: HTMLElement[] = [];
+    // Add row of headers
+    rows.push(makeRow(columns.map(col => {
+        return makeHeader(col[0]);
+    }) ) );
+    // Add rows for each of the returned accounts
+    if (gAccountInfo) {
+        gAccountInfo.forEach( acct => {
+            rows.push( makeRow(columns.map( col => {
+                return makeData(acct[col[1]], col[2]);
+            })));
+        });
+    };
+    const tablePlace = document.getElementById('v-account-list');
+    tablePlace.innerHTML = '';
+    tablePlace.appendChild(makeTable(rows, 'v-table v-acct-table v-info-table'));
+};
+
+function makeTable(contents: any, aClass?: string): HTMLElement {
+    return makeElement('table', contents, aClass);
+};
+function makeRow(contents: any, aClass?: string): HTMLElement {
+    return makeElement('tr', contents, aClass);
+};
+function makeHeader(contents: any, aClass?: string): HTMLElement {
+    return makeElement('th', contents, aClass);
+};
+function makeData(contents: any, aClass?: string): HTMLElement {
+    return makeElement('td', contents, aClass);
+};
+function makeDiv(contents: any, aClass?: string): HTMLElement {
+    return makeElement('div', contents, aClass);
+};
+function makeImage(src: string, aClass?: string): HTMLElement {
+    const img = makeElement('img', undefined, aClass);
+    img.setAttribute('src', src);
+    return img;
+};
+function makeText(contents?: any): Text {
+    const tex = document.createTextNode(contents);
+    return tex;
+};
+// Make a DOM element of 'type'.
+// If 'contents' is:
+//       undefined: don't add any contents to the created element
+//       an array: append multiple children
+//       a string: append a DOM text element containing the string
+//       otherwise: append 'contents' as a child
+// If 'aClass' is defined, add a 'class' attribute to the created DOM element
+function makeElement(type: string, contents?: any, aClass?: string): HTMLElement {
+    const elem = document.createElement(type);
+    if (aClass) {
+        elem.setAttribute('class', aClass);
+    }
+    if (contents) {
+        if (Array.isArray(contents)) {
+            contents.forEach(ent => {
+                if (typeof(ent) !== 'undefined') {
+                    if (typeof(contents) === 'string') {
+                        elem.appendChild(makeText(contents));
+                    }
+                    else {
+                        elem.appendChild(ent);
+                    }
+                }
+            });
+        }
+        else {
+            if (typeof(contents) === 'string') {
+                elem.appendChild(makeText(contents));
+            }
+            else {
+                elem.appendChild(contents);
+            };
+        };
+    };
+    return elem;
 };
 
 // vim: set tabstop=4 shiftwidth=4 autoindent expandtab

@@ -29,8 +29,18 @@
           color: #f00;
           font-weight: bold;
       }
-      .v-td-label {
-          text-align: right;
+      .v-info-table {
+        border-collapse: collapse;
+      }
+      .v-info-table th {
+        text-align: center;
+      }
+      .v-info-table td, th {
+        border: solid 2px #acbbbf;
+        padding: 2px 3px 1px 3px;
+      }
+      .v-acct-id {
+        font-size: smaller;
       }
       .v-button {
           display: inline;
@@ -43,17 +53,11 @@
           color: #c1eefc;
           background: #0082aa;
           opacity: 100;
-          width: 12em;
-          height: 2em;
-      }
-      #v-token-results {
-          font-size: larger;
-          text-align: center;
-          margin: 2em;
       }
       #DEBUGG {
+          margin-top: 10px;
           font-size: smaller;
-          color: #666;
+          color: #555;
       }
     </style>
   </head>
@@ -121,7 +125,8 @@
           </fieldset>
         </div>
         <div class="tab-pane fade" id="tabAccounts">
-          <h1>I'm in Accounts tab</h1>
+          <button type="button" class="v-button clickable" op="OpAccountList">Update Accounts</button>
+          <div id="v-account-list"></div>
         </div>
         <div class="tab-pane fade" id="tabDomains">
           <h1>I'm in Domains tab</h1>

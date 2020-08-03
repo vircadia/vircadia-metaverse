@@ -34,7 +34,7 @@
         "start": "node .",
         "clean:dist": "rm -rf dist/*",
         "add-version": "sed -i -e \"s='server-version':.*$='server-version': '$npm_package_version' // Updated by package.json script=\" src/config.ts",
-        "copy-static": "cp -r src/static dist",
+        "copy-static": "cp -r src/static dist; rm dist/static/*/*.ts",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "dependencies": {
@@ -46,7 +46,7 @@
         "http-errors": "~1.6.3",
         "loglevel": "^1.6.8",
         "module-alias": "^2.2.2",
-        "mongodb": "^3.5.9",
+        "mongodb": "^3.6.0",
         "morgan": "~1.9.1",
         "multer": "^1.4.2",
         "unique-names-generator": "^4.3.0",
@@ -64,7 +64,7 @@
         "@types/node": "^14.0.27",
         "@types/uuid": "^8.0.0",
         "npm-run-all": "^4.1.5",
-        "tslint": "^6.1.2",
+        "tslint": "^6.1.3",
         "typescript": "^3.9.7"
     }
 }

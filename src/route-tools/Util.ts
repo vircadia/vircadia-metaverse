@@ -57,8 +57,11 @@ export function convertBinKeyToPEM(pBinKey: Buffer): string {
 };
 
 export function createSimplifiedPublicKey(pPubKey: string): string {
-    const keyLines = pPubKey.split('\n');
-    keyLines.shift(); // Remove the "BEGIN" first line
-    keyLines.pop();   // Remove the "END" last line
+    let keyLines: string[] = [];
+    if (pPubKey) {
+      keyLines = pPubKey.split('\n');
+      keyLines.shift(); // Remove the "BEGIN" first line
+      keyLines.pop();   // Remove the "END" last line
+    }
     return keyLines.join('');    // Combine all lines into one long string
 };

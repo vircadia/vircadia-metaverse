@@ -39,19 +39,22 @@ const procGetAccounts: RequestHandler = async (req: Request, resp: Response, nex
     // Loop through all the filtered accounts and create array of info
     const accts: any[] = [];
     for await (const acct of Accounts.enumerateAsync({}, pager, infoer, scoper)) {
-      accts.push( {
+      const entry: any = {
         'accountId': acct.accountId,
         'username': acct.username,
         'email': acct.email,
-        'public_key': createSimplifiedPublicKey(acct.publicKey),
-        'images': acct.images ?? undefined,
-        'location': acct.location ?? undefined,
-        'friends': acct.friends ?? undefined,
-        'connections': acct.connections ?? undefined,
-        'administrator': acct.administrator,
-        'when_account_created': acct.whenAccountCreated.toISOString(),
-        'time_of_last_heartbeat': acct.timeOfLastHeartbeat.toISOString()
-      });
+      };
+      if (acct.administrator) entry.administrator = acct.administrator;
+      if (acct.publicKey)   entry.public_key = createSimplifiedPublicKey(acct.publicKey);
+      if (acct.images)      entry.images = acct.images;
+      if (acct.location)    entry.location = acct.location;
+      if (acct.friends)     entry.friends = acct.friends;
+      if (acct.connections) entry.connections = acct.connections;
+      if (acct.connections) entry.connections = acct.connections;
+      if (acct.whenAccountCreated) entry.when_account_created = acct.whenAccountCreated.toISOString();
+      if (acct.timeOfLastHeartbeat) entry.time_of_last_heartbeat = acct.timeOfLastHeartbeat.toISOString();
+
+      accts.push(entry);
     };
 
     req.vRestResp.Data = {

@@ -119,6 +119,7 @@ export async function deleteOne(pCollection: string, pCriteria: any): Promise<De
 // Page number starts at 1.
 // Throws exception if anything wrong with the fetch.
 export async function *getObjects(pCollection: string, pCriteria: any, pPager?: PaginationInfo): AsyncGenerator<any> {
+  Logger.debug(`getObjects: collection: ${pCollection}, criteria: ${JSON.stringify(pCriteria)}`);
   let numSkip = 0;
   let numLimit = 1000;
   if (pPager) {
@@ -129,7 +130,7 @@ export async function *getObjects(pCollection: string, pCriteria: any, pPager?: 
     .find(pCriteria)
     .skip(numSkip)
     .limit(numLimit);
-  while (cursor.hasNext()) {
+  while (await cursor.hasNext()) {
     yield cursor.next();
   };
 };

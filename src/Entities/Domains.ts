@@ -24,7 +24,7 @@ import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 import { createObject, getObject, getObjects, updateObjectFields } from '@Tools/Db';
 
 import { Logger } from '@Tools/Logging';
-import { GenUUID } from '@Tools/Misc';
+import { GenUUID, IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 import { VKeyedCollection } from '@Tools/vTypes';
 
 export type DomainTestFunction = (domain: DomainEntity) => boolean;
@@ -33,16 +33,16 @@ export let domainCollection = 'domains';
 
 export const Domains = {
   async getDomainWithId(pDomainId: string): Promise<DomainEntity> {
-    return getObject(domainCollection, { 'domainId': pDomainId });
+    return IsNullOrEmpty(pDomainId) ? null : getObject(domainCollection, { 'domainId': pDomainId });
   },
   async getDomainWithAPIKey(pApiKey: string): Promise<DomainEntity> {
-    return getObject(domainCollection, { 'apiKey': pApiKey });
+    return IsNullOrEmpty(pApiKey) ? null : getObject(domainCollection, { 'apiKey': pApiKey });
   },
   async getDomainWithSenderKey(pSenderKey: string): Promise<DomainEntity> {
-    return getObject(domainCollection, { 'lastSenderKey': pSenderKey });
+    return IsNullOrEmpty(pSenderKey) ? null : getObject(domainCollection, { 'lastSenderKey': pSenderKey });
   },
   async addDomain(pDomainEntity: DomainEntity) : Promise<DomainEntity> {
-    return createObject(domainCollection, pDomainEntity);
+    return IsNullOrEmpty(pDomainEntity) ? null : createObject(domainCollection, pDomainEntity);
   },
   createDomain(): DomainEntity {
     const newDomain = new DomainEntity();
@@ -53,7 +53,10 @@ export const Domains = {
     return false;
   },
   async *enumerateAsync(pCriteria: any, pPager: PaginationInfo): AsyncGenerator<DomainEntity> {
-    return getObjects(domainCollection, pCriteria, pPager);
+    for await (const domain of getObjects(domainCollection, pCriteria, pPager)) {
+      yield domain;
+    };
+    // return getObjects(domainCollection, pCriteria, pPager); // not sure why this doesn't work
   },
   // The contents of this entity have been updated
   async updateEntityFields(pEntity: DomainEntity, pFields: VKeyedCollection): Promise<DomainEntity> {
