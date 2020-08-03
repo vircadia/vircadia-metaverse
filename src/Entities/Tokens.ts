@@ -16,14 +16,27 @@
 import { Config } from '@Base/config';
 
 import { AuthToken } from '@Entities/AuthToken';
-import { createObject, getObject, getObjects, updateObjectFields } from '@Tools/Db';
+import { createObject, getObject, getObjects, updateObjectFields, deleteMany } from '@Tools/Db';
 
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 
 import { VKeyedCollection } from '@Tools/vTypes';
 import { GenUUID, IsNullOrEmpty } from '@Tools/Misc';
+import { Logger } from '@Tools/Logging';
 
 export let tokenCollection = 'tokens';
+
+// Initialize token management.
+// Mostly starts a periodic function that deletes expired tokens.
+export function initTokens(): void {
+  // Expire tokens that have pased their prime
+  setInterval( async () => {
+    const nowtime = new Date();
+    const deleteInfo = await deleteMany(tokenCollection, { tokenExpirationTime: { $lt: nowtime } } );
+    Logger.debug(`Tokens.Expiration: expired ${deleteInfo.deletedCount} tokens`);
+  }, 1000 * 60 * 5 );
+
+};
 
 export const Tokens = {
   // Create a new AuthToken.

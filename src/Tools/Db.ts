@@ -15,7 +15,7 @@
 
 import { Config } from '@Base/config';
 
-import { MongoClient, Db } from 'mongodb';
+import { MongoClient, Db, DeleteWriteOpResultObject } from 'mongodb';
 import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
@@ -105,6 +105,14 @@ export async function updateObjectFields(pCollection: string, pCriteria: any, pF
        returnOriginal: false    // return the updated entity
       }
     );
+};
+
+export async function deleteMany(pCollection: string, pCriteria: any): Promise<DeleteWriteOpResultObject> {
+  return Datab.collection(pCollection).deleteMany(pCriteria);
+};
+
+export async function deleteOne(pCollection: string, pCriteria: any): Promise<DeleteWriteOpResultObject> {
+  return Datab.collection(pCollection).deleteOne(pCriteria);
 };
 
 // Low level generator to a stream of objects fitting a criteria.

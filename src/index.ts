@@ -29,6 +29,7 @@ import glob from 'glob';
 import morgan from 'morgan';
 import { Logger, morganOptions } from '@Tools/Logging';
 import { IsNotNullOrEmpty } from '@Tools/Misc';
+import { initTokens } from '@Entities/Tokens';
 
 initializeConfiguration()
 .catch ( err => {
@@ -39,6 +40,9 @@ initializeConfiguration()
 })
 .catch( err => {
   Logger.error('main: failure opening database: ' + err);
+})
+.then( () => {
+  return initTokens();
 })
 .then( () => {
   // Initialize and start ExpressJS
