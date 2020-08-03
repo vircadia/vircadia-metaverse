@@ -24,6 +24,7 @@ import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 
 import { VKeyedCollection } from '@Tools/vTypes';
 import { GenUUID, genRandomString } from '@Tools/Misc';
+import { Logger } from '@Tools/Logging';
 
 export let shadowCollection = 'shadows';
 

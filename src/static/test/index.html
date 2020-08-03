@@ -22,7 +22,7 @@
       .v-td-label {
           text-align: right;
       }
-      .button {
+      .v-button {
           display: inline;
           margin: 4px;
           padding: 2px;
@@ -60,6 +60,7 @@
         <li class="nav-item active"><a href="#tabLogin" data-toggle="tab">Login</a></li>
         <li class="nav-item"><a href="#tabAccounts" data-toggle="tab">Accounts</a></li>
         <li class="nav-item"><a href="#tabDomains" data-toggle="tab">Domains</a></li>
+        <li class="nav-item"><a href="#tabTokens" data-toggle="tab">Tokens</a></li>
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" id="tabLogin">
@@ -88,7 +89,7 @@
                 <td class='v-td-input'> <input id="v-login-password" type="password" size="40" maxlength="140"/> </td>
               </tr>
             </table>
-            <button type="button" class="button clickable" op="OpLogin">Login</button>
+            <button type="button" class="v-button clickable" op="OpLogin">Login</button>
           </fieldset>
           <fieldset>
             <legend>Create Account</legend>
@@ -106,7 +107,7 @@
                 <td class='v-td-input'> <input id="v-new-email" type="text" size="100" maxlength="140"/> </td>
               </tr>
             </table>
-            <button type="button" class="button clickable" op="OpCreateAccount">Create Account</button>
+            <button type="button" class="v-button clickable" op="OpCreateAccount">Create Account</button>
           </fieldset>
         </div>
         <div class="tab-pane" id="tabAccounts">

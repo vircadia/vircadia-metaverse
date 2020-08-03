@@ -17,15 +17,16 @@ import { Config } from '@Base/config';
 
 import { AccountEntity } from '@Entities/AccountEntity';
 import { Tokens } from '@Entities/Tokens';
-import { AuthToken } from '@Entities/AuthToken';
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 import { AccountFilterInfo } from '@Entities/EntityFilters/AccountFilterInfo';
 import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
 
 import { createObject, getObject, getObjects, updateObjectFields } from '@Tools/Db';
 import { GenUUID, IsNullOrEmpty } from '@Tools/Misc';
-import { Shadows } from './Shadows';
-import { ShadowEntity } from './ShadowEntity';
+import { Shadows } from '@Entities/Shadows';
+import { ShadowEntity } from '@Entities/ShadowEntity';
+
+import { Logger } from '@Tools/Logging';
 
 export let accountCollection = 'accounts';
 
@@ -84,6 +85,10 @@ export const Accounts = {
     if (IsNullOrEmpty(shadow)) {
       // If the caller didn't pass the shadow, fetch it
       shadow = await Shadows.getShadowWithAccountId(pAcct.accountId);
+      if (IsNullOrEmpty(shadow)) {
+        Logger.error(`Accounts.validatePassword: could not fetch shadow for accountId ${pAcct.accountId}`);
+        return false;
+      };
     };
     return Shadows.hashPassword(pPassword, shadow.passwordSalt) === shadow.passwordHash;
   },

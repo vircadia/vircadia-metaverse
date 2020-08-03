@@ -73,7 +73,7 @@ function DebugLog(msg) {
     LogMessage(msg, undefined);
 };
 function ErrorLog(msg) {
-    LogMessage(msg, 'errorMsg');
+    LogMessage(msg, 'v-errorText');
 };
 
 function GetElementValue(elementId) {
@@ -187,13 +187,14 @@ function GetUserAccessToken(pUsername, pPassword) {
         request.onreadystatechange = function() {
             if (this.readyState === XMLHttpRequest.DONE) {
                 if (this.status === 200) {
-                    DebugLog("Successful fetch of user access token");
                     let response = JSON.parse(request.responseText);
+                    DebugLog("Login response = " + request.responseText);
                     if (response.error) {
                         // There was an error logging in
                         reject(response.error);
                     }
                     else {
+                        DebugLog("Successful fetch of user access token");
                         // Successful account access. Token in the returned JSON body.
                         resolve( {
                             'token': response.access_token,
