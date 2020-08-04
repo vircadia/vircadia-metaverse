@@ -43,9 +43,9 @@ const procGetDomains: RequestHandler = async (req: Request, resp: Response, next
     const domainArray: any[] = [];
     for await (const aDomain of Domains.enumerateAsync({}, pagination)) {
       domainArray.push( {
-        'domainid': aDomain.domainId,
+        'domainId': aDomain.domainId,
         'place_name': aDomain.placeName,
-        'public_key': createSimplifiedPublicKey(aDomain.publicKey),
+        'public_key': aDomain.publicKey ? createSimplifiedPublicKey(aDomain.publicKey) : undefined,
         'sponser_accountid': aDomain.sponserAccountID,
         'ice_server': aDomain.iceServerAddr,
         'version': aDomain.version,
@@ -60,12 +60,12 @@ const procGetDomains: RequestHandler = async (req: Request, resp: Response, next
         'description': aDomain.description,
         'maturity': aDomain.maturity,
         'restriction': aDomain.restriction,
-        '[] hosts': aDomain.hosts,
-        '[] tags': aDomain.tags,
-        'time_of_last_heartbeat': aDomain.timeOfLastHeartbeat.toISOString(),
+        'hosts': aDomain.hosts,
+        'tags': aDomain.tags,
+        'time_of_last_heartbeat': aDomain.timeOfLastHeartbeat ? aDomain.timeOfLastHeartbeat.toISOString() : undefined,
         'last_sender_key': aDomain.lastSenderKey,
         'addr_of_first_contact': aDomain.iPAddrOfFirstContact,
-        'when_domain_entry_created': aDomain.whenDomainEntryCreated.toISOString()
+        'when_domain_entry_created': aDomain.whenDomainEntryCreated ? aDomain.whenDomainEntryCreated.toISOString() : undefined
       });
     };
     req.vRestResp.Data = {

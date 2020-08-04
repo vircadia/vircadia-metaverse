@@ -29,12 +29,12 @@
         "run": "node dist/index.js",
         "build": "npm-run-all -s \"clean:dist\" \"add-version\" \"copy-static\" \"build:iamus\"",
         "prebuild:iamus": "tslint -c tslint.json -p tsconfig.json --fix",
-        "build:iamus": "tsc",
+        "build:iamus": "tsc -p tsconfig.json",
         "prestart": "npm run build",
-        "start": "node .",
+        "start": "node dist/index.js",
         "clean:dist": "rm -rf dist/*",
         "add-version": "sed -i -e \"s='server-version':.*$='server-version': '$npm_package_version' // Updated by package.json script=\" src/config.ts",
-        "copy-static": "cp -r src/static dist; rm dist/static/*/*.ts",
+        "copy-static": "cp -r src/static dist",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "dependencies": {

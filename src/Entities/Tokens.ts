@@ -23,6 +23,7 @@ import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 import { VKeyedCollection } from '@Tools/vTypes';
 import { GenUUID, IsNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
+import { AccountScopeFilter } from './EntityFilters/AccountScopeFilter';
 
 export let tokenCollection = 'tokens';
 
@@ -46,6 +47,7 @@ export const Tokens = {
     aToken.tokenId = GenUUID();
     aToken.token = GenUUID();
     aToken.refreshToken = GenUUID();
+    aToken.scope = 'owner';
     aToken.tokenCreationTime = new Date();
     aToken.tokenExpirationTime = new Date(aToken.tokenCreationTime.valueOf() + expirationDays * 1000*60*60*24);
     aToken.accountId = pAccountId;
@@ -66,7 +68,7 @@ export const Tokens = {
   async updateTokenFields(pEntity: AuthToken, pFields: VKeyedCollection): Promise<AuthToken> {
     return updateObjectFields(tokenCollection, { tokenId: pEntity.tokenId }, pFields);
   },
-  async *enumerateAsync(pCriteria: any, pPager?: PaginationInfo): AsyncGenerator<AuthToken> {
+  async *enumerateAsync(pCriteria: any, pPager?: PaginationInfo, pScoper?: AccountScopeFilter): AsyncGenerator<AuthToken> {
     for await (const tok of getObjects(tokenCollection, pCriteria, pPager)) {
       yield tok;
     };

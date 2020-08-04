@@ -61,7 +61,10 @@ export function createSimplifiedPublicKey(pPubKey: string): string {
     if (pPubKey) {
       keyLines = pPubKey.split('\n');
       keyLines.shift(); // Remove the "BEGIN" first line
-      keyLines.pop();   // Remove the "END" last line
+      while (keyLines.length > 1
+              && ( keyLines[keyLines.length-1].length < 1 || keyLines[keyLines.length-1].includes('END PUBLIC KEY') ) ) {
+        keyLines.pop();   // Remove the "END" last line
+      };
     }
     return keyLines.join('');    // Combine all lines into one long string
 };

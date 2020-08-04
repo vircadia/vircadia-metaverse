@@ -71,10 +71,9 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
       updated.tags = CleanedStringArray(valuesToSet.tags);
     };
     if (valuesToSet.heartbeat) {
-      if (valuesToSet.heartbeat.num_users) updated.numUsers = Number(valuesToSet.heartbeat.num_users);
-      if (valuesToSet.heartbeat.num_anon_users) updated.anonUsers = Number(valuesToSet.heartbeat.num_anon_users);
+      updated.numUsers = Number(valuesToSet.heartbeat.num_users);
+      updated.anonUsers = Number(valuesToSet.heartbeat.num_anon_users);
       updated.totalUsers = updated.numUsers + updated.anonUsers;
-
     };
     updated.timeOfLastHeartbeat = new Date();
 
