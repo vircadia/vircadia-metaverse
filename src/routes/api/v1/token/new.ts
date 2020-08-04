@@ -28,12 +28,12 @@ const procPostTokenNew: RequestHandler = async (req: Request, resp: Response, ne
   if (req.vRestResp && req.vAuthAccount) {
     let scope = req.query.scope as string;
     if (IsNullOrEmpty(scope)) {
-        scope = 'owner';
+      scope = 'owner';
     };
     if ([ 'owner', 'domain' ].includes(scope)) {
-        const tokenInfo = await Tokens.createToken(req.vAuthAccount.accountId, scope, 1000);
-        await Tokens.addToken(tokenInfo);
-        req.vRestResp.Data = buildOAuthResponseBody(req.vAuthAccount, tokenInfo);
+      const tokenInfo = await Tokens.createToken(req.vAuthAccount.accountId, scope);
+      await Tokens.addToken(tokenInfo);
+      req.vRestResp.Data = buildOAuthResponseBody(req.vAuthAccount, tokenInfo);
     }
     else {
       req.vRestResp.respondFailure('incorrect scope');

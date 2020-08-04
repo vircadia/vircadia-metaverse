@@ -31,7 +31,8 @@ export let Config = {
       'server-version': '1.0.1' // Updated by package.json script
     },
     'auth': {
-      'auth-token-expire-days': 10
+      'domain-token-expire-hours': 8760,  // one year
+      'owner-token-expire-hours': 12
     },
     'metaverse-server': {
       'http-error-on-failure': true,  // whether to include x-vircadia error header

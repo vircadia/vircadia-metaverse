@@ -80,8 +80,10 @@ const procPostOauthToken: RequestHandler = async (req: Request, resp: Response, 
         if (refreshingToken === targetToken.refreshToken) {
           const updates = {
             'tokenExpirationTime': new Date(targetToken.tokenExpirationTime.valueOf()
-                  + Config.auth["auth-token-expire-days"] * 1000*60*60*24 )
-          }
+                  + ( userScope === 'domain' ? Config.auth["domain-token-expire-hours"] * 1000*60*60
+                      : Config.auth["owner-token-expire-hours"] * 1000*60*60 )
+                      )
+          };
           await Tokens.updateTokenFields(targetToken, updates);
           const aAccount = await Accounts.getAccountWithId(targetToken.accountId);
           respBody = buildOAuthResponseBody(aAccount, targetToken);

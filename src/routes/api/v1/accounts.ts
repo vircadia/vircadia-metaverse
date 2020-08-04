@@ -50,7 +50,6 @@ const procGetAccounts: RequestHandler = async (req: Request, resp: Response, nex
       if (acct.location)    entry.location = acct.location;
       if (acct.friends)     entry.friends = acct.friends;
       if (acct.connections) entry.connections = acct.connections;
-      if (acct.connections) entry.connections = acct.connections;
       if (acct.whenAccountCreated) entry.when_account_created = acct.whenAccountCreated.toISOString();
       if (acct.timeOfLastHeartbeat) entry.time_of_last_heartbeat = acct.timeOfLastHeartbeat.toISOString();
 

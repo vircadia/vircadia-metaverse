@@ -41,15 +41,16 @@ export function initTokens(): void {
 
 export const Tokens = {
   // Create a new AuthToken.
-  async createToken(pAccountId: string, pScope: string, pExpireDays: number = 0): Promise<AuthToken> {
-    const expirationDays = pExpireDays > 0 ? pExpireDays : Config.auth["auth-token-expire-days"];
+  async createToken(pAccountId: string, pScope: string, pExpireHours: number = 0): Promise<AuthToken> {
+    const expirationHours = pExpireHours > 0 ? pExpireHours
+        : (pScope === 'domain' ? Config.auth["domain-token-expire-hours"] : Config.auth["owner-token-expire-hours"]);
     const aToken = new AuthToken();
     aToken.tokenId = GenUUID();
     aToken.token = GenUUID();
     aToken.refreshToken = GenUUID();
     aToken.scope = 'owner';
     aToken.tokenCreationTime = new Date();
-    aToken.tokenExpirationTime = new Date(aToken.tokenCreationTime.valueOf() + expirationDays * 1000*60*60*24);
+    aToken.tokenExpirationTime = new Date(aToken.tokenCreationTime.valueOf() + expirationHours * 1000*60*60);
     aToken.accountId = pAccountId;
     return aToken;
   },
