@@ -16,9 +16,11 @@
 import { Config } from '@Base/config';
 
 import { MongoClient, Db, DeleteWriteOpResultObject } from 'mongodb';
+import deepmerge from 'deepmerge';
+
 import { VKeyedCollection } from '@Tools/vTypes';
+import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 import { Logger } from '@Tools/Logging';
-import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 
 // The initial MongoClient
 export let BaseClient: MongoClient;
@@ -118,19 +120,31 @@ export async function deleteOne(pCollection: string, pCriteria: any): Promise<De
 // Low level generator to a stream of objects fitting a criteria.
 // Page number starts at 1.
 // Throws exception if anything wrong with the fetch.
-export async function *getObjects(pCollection: string, pCriteria: any, pPager?: PaginationInfo): AsyncGenerator<any> {
-  Logger.debug(`getObjects: collection: ${pCollection}, criteria: ${JSON.stringify(pCriteria)}`);
-  let numSkip = 0;
-  let numLimit = 1000;
+export async function *getObjects(pCollection: string, pPager?: CriteriaFilter,
+             pInfoer?: CriteriaFilter, pScoper?: CriteriaFilter): AsyncGenerator<any> {
+
+  // If a paging filter is passed, incorporate it's search criteria
+  let criteria:any = {};
   if (pPager) {
-    numLimit = pPager.PerPage;
-    numSkip = (pPager.PageNum - 1) * numLimit;
-  }
-  const cursor = Datab.collection(pCollection)
-    .find(pCriteria)
-    .skip(numSkip)
-    .limit(numLimit);
+    criteria = deepmerge(criteria, pPager.criteriaParameters);
+  };
+  if (pInfoer) {
+    criteria = deepmerge(criteria, pPager.criteriaParameters);
+  };
+  if (pScoper) {
+    criteria = deepmerge(criteria, pPager.criteriaParameters);
+  };
+
+  // Logger.debug(`Db.getObjects: collection=${pCollection}, criteria=${JSON.stringify(criteria)}`)
+  const cursor = Datab.collection(pCollection).find(criteria);
+
   while (await cursor.hasNext()) {
-    yield cursor.next();
+    const nextItem = await cursor.next();
+    if (     ( pPager ? pPager.criteriaTest(nextItem) : true)
+          && ( pInfoer ? pInfoer.criteriaTest(nextItem) : true)
+          && ( pScoper ? pScoper.criteriaTest(nextItem) : true)
+        ) {
+      yield nextItem;
+    };
   };
 };

@@ -52,8 +52,8 @@ export const Domains = {
   removeDomain(pAccountEntity: DomainEntity) : boolean {
     return false;
   },
-  async *enumerateAsync(pCriteria: any, pPager: PaginationInfo): AsyncGenerator<DomainEntity> {
-    for await (const domain of getObjects(domainCollection, pCriteria, pPager)) {
+  async *enumerateAsync(pPager: PaginationInfo): AsyncGenerator<DomainEntity> {
+    for await (const domain of getObjects(domainCollection, pPager)) {
       yield domain;
     };
     // return getObjects(domainCollection, pCriteria, pPager); // not sure why this doesn't work

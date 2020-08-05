@@ -18,7 +18,8 @@ import { Config } from '@Base/config';
 import { AuthToken } from '@Entities/AuthToken';
 import { createObject, getObject, getObjects, updateObjectFields, deleteMany } from '@Tools/Db';
 
-import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
+import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
+import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 
 import { VKeyedCollection } from '@Tools/vTypes';
 import { GenUUID, IsNullOrEmpty } from '@Tools/Misc';
@@ -60,8 +61,9 @@ export const Tokens = {
   async getTokenWithToken(pToken: string): Promise<AuthToken> {
     return IsNullOrEmpty(pToken) ? null : getObject(tokenCollection, { 'token': pToken });
   },
-  async *getTokensForOwner(pOwnerId: string, pPager?: PaginationInfo): AsyncGenerator<AuthToken> {
-    return IsNullOrEmpty(pOwnerId) ? null : getObjects(tokenCollection, { 'tokenOwnerId': pOwnerId }, pPager);
+  async *getTokensForOwner(pOwnerId: string, pPager?: CriteriaFilter): AsyncGenerator<AuthToken> {
+    return IsNullOrEmpty(pOwnerId) ? null : getObjects(tokenCollection,
+               new GenericFilter({ 'tokenOwnerId': pOwnerId }), pPager);
   },
   async addToken(pAuthToken: AuthToken) : Promise<AuthToken> {
     return createObject(tokenCollection, pAuthToken);
@@ -69,8 +71,8 @@ export const Tokens = {
   async updateTokenFields(pEntity: AuthToken, pFields: VKeyedCollection): Promise<AuthToken> {
     return updateObjectFields(tokenCollection, { tokenId: pEntity.tokenId }, pFields);
   },
-  async *enumerateAsync(pCriteria: any, pPager?: PaginationInfo, pScoper?: AccountScopeFilter): AsyncGenerator<AuthToken> {
-    for await (const tok of getObjects(tokenCollection, pCriteria, pPager)) {
+  async *enumerateAsync(pPager?: CriteriaFilter, pScoper?: AccountScopeFilter): AsyncGenerator<AuthToken> {
+    for await (const tok of getObjects(tokenCollection, pPager, pScoper)) {
       yield tok;
     };
     // return getObjects(tokenCollection, pCriteria, pPager);

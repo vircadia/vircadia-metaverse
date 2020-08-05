@@ -15,9 +15,10 @@
 
 import { Request } from 'express';
 
-import { Clamp } from '../../Tools/Misc';
+import { Clamp } from '@Tools/Misc';
+import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 
-export class PaginationInfo {
+export class PaginationInfo extends CriteriaFilter {
   public PageNum: number = 1;
   public PerPage: number = 20;
 
@@ -25,7 +26,11 @@ export class PaginationInfo {
   private _currentPage: number = 1;
   private _currentItem: number = 1;
 
+  // Set to 'true' if the pagination was passed in the criteria query parameters
+  private _doingQuery: boolean = false;
+
   public constructor(pPageNum: number = 1, pPerPage: number = 1000) {
+    super();
     this.PageNum = Clamp(pPageNum, 1, 1000);
     this.PerPage = Clamp(pPerPage, 1, 1000);
   }
@@ -38,6 +43,25 @@ export class PaginationInfo {
       this.PerPage = Clamp(Number(pRequest.query.per_page), 1, 1000);
     }
   }
+
+  public criteriaTest(pThingy: any): boolean {
+    if (! this._doingQuery) {
+      if (++this._currentItem > this.PerPage) {
+        this._currentItem = 1;
+        ++this._currentPage;
+      }
+      return this.PageNum === this._currentPage;
+    };
+    return true;
+  };
+
+  public criteriaParameters(): any {
+    this._doingQuery = true;
+    return {
+      '$skip': (this.PageNum - 1) * this.PerPage,
+      '$limit': this.PerPage
+    };
+  };
 
   public *filter<T>(pToFilter: Generator<T>) : Generator<T> {
     this._currentPage = 1;

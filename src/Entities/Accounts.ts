@@ -17,9 +17,7 @@ import { Config } from '@Base/config';
 
 import { AccountEntity } from '@Entities/AccountEntity';
 import { Tokens } from '@Entities/Tokens';
-import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
-import { AccountFilterInfo } from '@Entities/EntityFilters/AccountFilterInfo';
-import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
+import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 
 import { createObject, getObject, getObjects, updateObjectFields } from '@Tools/Db';
 import { GenUUID, IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
@@ -97,9 +95,9 @@ export const Accounts = {
   },
   // TODO: add scope (admin) and filter criteria filtering
   //    It's push down to this routine so we could possibly use DB magic for the queries
-  async *enumerateAsync(pCriteria: any, pPager: PaginationInfo,
-              pInfoer: AccountFilterInfo, pScoper: AccountScopeFilter): AsyncGenerator<AccountEntity> {
-    for await (const acct of getObjects(accountCollection, pCriteria, pPager)) {
+  async *enumerateAsync(pPager: CriteriaFilter,
+              pInfoer: CriteriaFilter, pScoper: CriteriaFilter): AsyncGenerator<AccountEntity> {
+    for await (const acct of getObjects(accountCollection, pPager, pInfoer, pScoper)) {
       yield acct;
     };
     // return getObjects(accountCollection, pCriteria, pPager);

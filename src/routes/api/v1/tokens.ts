@@ -34,7 +34,7 @@ const procGetTokens: RequestHandler = async (req: Request, resp: Response, next:
 
     // Loop through all the filtered accounts and create array of info
     const toks: any[] = [];
-    for await (const tok of Tokens.enumerateAsync({}, pager, scoper)) {
+    for await (const tok of Tokens.enumerateAsync(pager, scoper)) {
       toks.push({
         'tokenId': tok.tokenId,
         'token': tok.token,

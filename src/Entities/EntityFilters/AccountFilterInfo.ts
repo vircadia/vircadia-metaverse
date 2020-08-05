@@ -14,17 +14,24 @@
 'use strict'
 
 import { Request } from 'express';
+import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 import { AccountEntity } from '../AccountEntity';
+
 import { Logger } from '../../Tools/Logging';
 
-export class AccountFilterInfo {
+export class AccountFilterInfo extends CriteriaFilter {
   private _filter: string;
   private _status: string;
   private _search: string;
 
+  // Set to 'true' if the pagination was passed in the criteria query parameters
+  private _doingQuery: boolean = false;
+
   public constructor() {
+    super();
     return;
   }
+
   public parametersFromRequest(pRequest: Request) : void {
     try {
       this._filter = String(pRequest.query.filter);
@@ -34,7 +41,16 @@ export class AccountFilterInfo {
     catch (e) {
       Logger.error('AccountFilterInfo: parameters from request: exception: ' + e);
     }
-  }
+  };
+
+  public criteriaTest(pThingy: any): boolean {
+    return true;
+  };
+
+  public criteriaParameters(): any {
+    return {
+    };
+  };
 
   // TODO: add some filtering
   async *filter(pToFilter: AsyncGenerator<AccountEntity>) : AsyncGenerator<AccountEntity> {

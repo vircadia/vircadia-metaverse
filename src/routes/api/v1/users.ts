@@ -40,7 +40,7 @@ const procGetUsers: RequestHandler = async (req: Request, resp: Response, next: 
 
     // Loop through all the filtered accounts and create array of info
     const accts: any[] = [];
-    for await (const acct of Accounts.enumerateAsync({}, pager, infoer, scoper)) {
+    for await (const acct of Accounts.enumerateAsync(pager, infoer, scoper)) {
       accts.push( {
         'accountId': acct.accountId,
         'username': acct.username,

@@ -41,7 +41,7 @@ const procGetDomains: RequestHandler = async (req: Request, resp: Response, next
     const pagination = new PaginationInfo(1,1000);
     pagination.parametersFromRequest(req);
     const domainArray: any[] = [];
-    for await (const aDomain of Domains.enumerateAsync({}, pagination)) {
+    for await (const aDomain of Domains.enumerateAsync(pagination)) {
       domainArray.push( {
         'domainId': aDomain.domainId,
         'place_name': aDomain.placeName,

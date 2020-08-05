@@ -50,8 +50,8 @@ export const Shadows = {
   async updateShadowFields(pEntity: ShadowEntity, pFields: VKeyedCollection): Promise<ShadowEntity> {
     return updateObjectFields(shadowCollection, { shadowId: pEntity.shadowId }, pFields);
   },
-  async *enumerateAsync(pCriteria: any, pPager?: PaginationInfo): AsyncGenerator<ShadowEntity> {
-    for await (const shad of getObjects(shadowCollection, pCriteria, pPager)) {
+  async *enumerateAsync(pPager?: PaginationInfo): AsyncGenerator<ShadowEntity> {
+    for await (const shad of getObjects(shadowCollection, pPager)) {
       yield shad;
     };
     // return getObjects(shadowCollection, pCriteria, pPager);
