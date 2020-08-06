@@ -15,8 +15,9 @@
 
 import { Request } from 'express';
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
-import { AccountEntity } from '../AccountEntity';
-import { Logger } from '../../Tools/Logging';
+import { Accounts } from '@Entities/Accounts';
+import { AccountEntity } from '@Entities/AccountEntity';
+import { Logger } from '@Tools/Logging';
 
 export class AccountScopeFilter extends CriteriaFilter {
   private _asAdmin = false;
@@ -34,7 +35,7 @@ export class AccountScopeFilter extends CriteriaFilter {
   public parametersFromRequest(pRequest: Request) : void {
     try {
       if (pRequest.query.asAdmin) {
-        if (this._accessingAcct.administrator) {
+        if (Accounts.isAdmin(this._accessingAcct)) {
           this._asAdmin = true;
         };
       };
@@ -73,11 +74,5 @@ export class AccountScopeFilter extends CriteriaFilter {
       criteria.accountId = this._targetAcct
     }
     return criteria;
-  };
-
-
-  // TODO: add some filtering
-  async *filter(pToFilter: AsyncGenerator<AccountEntity>) : AsyncGenerator<AccountEntity> {
-    return pToFilter;
   };
 };

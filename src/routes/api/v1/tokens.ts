@@ -19,6 +19,7 @@ import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
 
 import { Tokens } from '@Entities/Tokens';
+import { Scope } from '@Entities/Scope';
 
 import { Logger } from '@Tools/Logging';
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
@@ -40,7 +41,7 @@ const procGetTokens: RequestHandler = async (req: Request, resp: Response, next:
         'token': tok.token,
         'accountId': tok.accountId,
         'refresh_token': tok.refreshToken,
-        'scope': tok.scope,
+        'scope': Scope.MakeScopeString(tok.scope),
         'creation_time': tok.tokenCreationTime ? tok.tokenCreationTime.toISOString() : undefined,
         'expiration_time': tok.tokenExpirationTime ? tok.tokenExpirationTime.toISOString() : undefined,
       });

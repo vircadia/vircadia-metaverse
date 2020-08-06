@@ -1,6 +1,6 @@
 {
     "name": "iamus-metaverse-server",
-    "version": "1.0.1",
+    "version": "1.1.1",
     "private": true,
     "description": "metaverse-server for Vircadia using ActivityPub",
     "author": "Robert Adams <misterblue@misterblue.com>",

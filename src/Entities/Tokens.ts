@@ -16,15 +16,16 @@
 import { Config } from '@Base/config';
 
 import { AuthToken } from '@Entities/AuthToken';
+import { Scope } from '@Entities/Scope';
 import { createObject, getObject, getObjects, updateObjectFields, deleteMany } from '@Tools/Db';
 
 import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
+import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
 
 import { VKeyedCollection } from '@Tools/vTypes';
 import { GenUUID, IsNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
-import { AccountScopeFilter } from './EntityFilters/AccountScopeFilter';
 
 export let tokenCollection = 'tokens';
 
@@ -43,15 +44,13 @@ export function initTokens(): void {
 export const Tokens = {
   // Create a new AuthToken.
   async createToken(pAccountId: string, pScope: string, pExpireHours: number = 0): Promise<AuthToken> {
-    const expirationHours = pExpireHours > 0 ? pExpireHours
-        : (pScope === 'domain' ? Config.auth["domain-token-expire-hours"] : Config.auth["owner-token-expire-hours"]);
     const aToken = new AuthToken();
     aToken.tokenId = GenUUID();
     aToken.token = GenUUID();
     aToken.refreshToken = GenUUID();
-    aToken.scope = 'owner';
+    aToken.scope = Scope.KnownScope(pScope) ? [ pScope ] : [ Scope.OWNER ];
     aToken.tokenCreationTime = new Date();
-    aToken.tokenExpirationTime = new Date(aToken.tokenCreationTime.valueOf() + expirationHours * 1000*60*60);
+    aToken.tokenExpirationTime = Tokens.computeDefaultExpiration(aToken.scope, aToken.tokenCreationTime);
     aToken.accountId = pAccountId;
     return aToken;
   },
@@ -76,6 +75,12 @@ export const Tokens = {
       yield tok;
     };
     // return getObjects(tokenCollection, pCriteria, pPager);
+  },
+  // Return an expiration date for the token depending on its scope
+  computeDefaultExpiration(pScopes: string[], pBaseDate?: Date): Date {
+    return new Date((pBaseDate ? pBaseDate.valueOf() : new Date().valueOf())
+          + ( Scope.HasScope(pScopes, Scope.DOMAIN) ? Config.auth["domain-token-expire-hours"] * 1000*60*60
+                   : Config.auth["owner-token-expire-hours"] * 1000*60*60 )
+    );
   }
-
 };

@@ -30,7 +30,7 @@ export class AccountEntity {
   public username: string;
   public email: string;
   public passwordHash: string;
-  public publicKey: string;
+  public sessionPublicKey: string;
   public accountSettings: string; // JSON of client settings
   public images: {
     hero: string;
@@ -56,7 +56,8 @@ export class AccountEntity {
   public walletId: string;
 
   // Admin stuff
-  public administrator: boolean;
+  // ALWAYS USE functions in Roles class to manipulate this list of roles
+  public roles: string[];           // account roles (like 'admin')
   public IPAddrOfCreator: string;   // IP address that created this account
   public whenAccountCreated: Date;  // date of account creation
   public timeOfLastHeartbeat: Date; // when we last heard from this user

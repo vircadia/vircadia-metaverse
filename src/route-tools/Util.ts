@@ -15,8 +15,9 @@
 'use strict';
 
 import { AccountEntity } from '@Entities/AccountEntity';
-import { Domains } from '@Entities/Domains';
+import { Roles } from '@Entities/Roles';
 import { AuthToken } from '@Entities/AuthToken';
+import { Scope } from '@Entities/Scope';
 
 import { createPublicKey } from 'crypto';
 
@@ -30,13 +31,13 @@ export function buildOAuthResponseBody(pAcct: AccountEntity, pToken: AuthToken):
     'token_type': 'Bearer',
     'expires_in': pToken.tokenExpirationTime.valueOf()/1000 - pToken.tokenCreationTime.valueOf()/1000,
     'refresh_token': pToken.refreshToken,
-    'scope': pToken.scope,
+    'scope': Scope.MakeScopeString(pToken.scope),
     'created_at': pToken.tokenCreationTime.valueOf() / 1000,
   };
   if (pAcct) {
     body.account_id = pAcct.accountId,
     body.account_name = pAcct.username,
-    body.account_type = pAcct.administrator ? 'admin' : 'user'
+    body.account_roles = Roles.MakeRoleString(pAcct.roles);
   };
   return body;
 };

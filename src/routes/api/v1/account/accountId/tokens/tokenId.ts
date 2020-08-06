@@ -19,13 +19,21 @@ import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken, accountFromParams } from '@Route-Tools/middleware';
 import { tokenFromParams } from '@Route-Tools/middleware';
 
-import { Accounts } from '@Entities/Accounts';
+import { Tokens } from '@Entities/Tokens';
+import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
 
 import { Logger } from '@Tools/Logging';
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
+// Delete a token
+// The requestor account has to have authorization to access the toke so
+//    either 'vAuthAccount' is an admin or is the same as 'vAccount'.
 const procDeleteToken: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  if (req.vRestResp && req.vAuthAccount && req.vAccount && req.vTokenId) {
+    const scoper = new AccountScopeFilter(req.vAuthAccount);
+    scoper.parametersFromRequest(req);
+  };
   next();
 };
 
@@ -34,9 +42,9 @@ export const name = '/api/v1/account/:accoundId/tokens/:tokenId';
 export const router = Router();
 
 router.delete('/api/v1/account/:accountId/tokens/:tokenId', [ setupMetaverseAPI,
-                                                    accountFromAuthToken,   // vRestResp.vAuthAccount
-                                                    accountFromParams,      // vRestResp.vAccount
-                                                    tokenFromParams,        // vRestResp.vToken
+                                                    accountFromAuthToken,   // req.vAuthAccount
+                                                    accountFromParams,      // req.vAccount
+                                                    tokenFromParams,        // req.vToken
                                                     procDeleteToken,
                                                     finishMetaverseAPI ] );
 

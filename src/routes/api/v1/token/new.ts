@@ -20,17 +20,20 @@ import { accountFromAuthToken } from '@Route-Tools/middleware';
 import { buildOAuthResponseBody } from '@Route-Tools/Util';
 
 import { Tokens } from '@Entities/Tokens';
+import { Scope } from '@Entities/Scope';
 import { IsNullOrEmpty } from '@Tools/Misc';
 
 // Request that creates a token for the passed account.
 // Query parameter of 'scope' can say wether token is for 'owner' or 'domain'.
 const procPostTokenNew: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vRestResp && req.vAuthAccount) {
+
+    // The user passes the scope but make sure we know it's one we know
     let scope = req.query.scope as string;
     if (IsNullOrEmpty(scope)) {
-      scope = 'owner';
+      scope = Scope.OWNER;
     };
-    if ([ 'owner', 'domain' ].includes(scope)) {
+    if (Scope.KnownScope(scope)) {
       const tokenInfo = await Tokens.createToken(req.vAuthAccount.accountId, scope);
       await Tokens.addToken(tokenInfo);
       req.vRestResp.Data = buildOAuthResponseBody(req.vAuthAccount, tokenInfo);

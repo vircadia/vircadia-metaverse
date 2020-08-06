@@ -16,7 +16,7 @@
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
-import { accountFromAuthToken, accountFromParams } from '@Route-Tools/middleware';
+import { accountFromAuthToken } from '@Route-Tools/middleware';
 
 import { Accounts } from '@Entities/Accounts';
 
@@ -27,6 +27,8 @@ import { AccountFilterInfo } from '@Entities/EntityFilters/AccountFilterInfo';
 
 import { createSimplifiedPublicKey } from '@Route-Tools/Util';
 
+// Return account information
+// The accounts returned depend on the scope (whether admin) and the search criteria (infoer)
 const procGetAccounts: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   Logger.debug('procGetAccounts');
   if (req.vAuthAccount) {
@@ -44,8 +46,8 @@ const procGetAccounts: RequestHandler = async (req: Request, resp: Response, nex
         'username': acct.username,
         'email': acct.email,
       };
-      if (acct.administrator) entry.administrator = acct.administrator;
-      if (acct.publicKey)   entry.public_key = createSimplifiedPublicKey(acct.publicKey);
+      if (Accounts.isAdmin(acct)) entry.administrator = Accounts.isAdmin(acct);
+      if (acct.sessionPublicKey)   entry.public_key = createSimplifiedPublicKey(acct.sessionPublicKey);
       if (acct.images)      entry.images = acct.images;
       if (acct.location)    entry.location = acct.location;
       if (acct.friends)     entry.friends = acct.friends;

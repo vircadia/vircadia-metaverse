@@ -25,6 +25,7 @@ import { buildOAuthResponseBody } from '@Route-Tools/Util';
 
 import { Accounts } from '@Entities/Accounts';
 import { Tokens } from '@Entities/Tokens';
+import { Scope } from '@Entities/Scope';
 
 import { VKeyedCollection } from '@Tools/vTypes';
 
@@ -50,22 +51,26 @@ const procPostOauthToken: RequestHandler = async (req: Request, resp: Response, 
         // string userPassword = req.body.oculus_nonce;
         // string userPassword = req.body.oculus_id;
 
-        const userScope = req.body.scope ?? 'owner';
-
-        const aAccount = await Accounts.getAccountWithUsername(userName);
-        if (aAccount) {
-          if (await Accounts.validatePassword(aAccount, userPassword)) {
-            Logger.debug(`procPostOAuthToken: login of user ${userName}`);
-            const tokenInfo = await Tokens.createToken(aAccount.accountId, userScope);
-            await Tokens.addToken(tokenInfo);
-            respBody = buildOAuthResponseBody(aAccount, tokenInfo);
+        const userScope = req.body.scope ?? Scope.OWNER;
+        if (Scope.KnownScope(userScope)) {
+          const aAccount = await Accounts.getAccountWithUsername(userName);
+          if (aAccount) {
+            if (await Accounts.validatePassword(aAccount, userPassword)) {
+              Logger.debug(`procPostOAuthToken: login of user ${userName}`);
+              const tokenInfo = await Tokens.createToken(aAccount.accountId, userScope);
+              await Tokens.addToken(tokenInfo);
+              respBody = buildOAuthResponseBody(aAccount, tokenInfo);
+            }
+            else {
+              respBody = buildOAuthErrorBody('Invalid password');
+            };
           }
-          else {
-            respBody = buildOAuthErrorBody('Invalid password');
+          else{
+            respBody = buildOAuthErrorBody('Unknown user');
           };
         }
-        else{
-          respBody = buildOAuthErrorBody('Unknown user');
+        else {
+          respBody = buildOAuthErrorBody('Invalid scope');
         };
         break;
       };
@@ -75,14 +80,10 @@ const procPostOauthToken: RequestHandler = async (req: Request, resp: Response, 
       };
       case 'refresh_token': {
         const refreshingToken = req.body.refresh_token;
-        const userScope = req.body.scope ?? 'owner';
         const targetToken = await Tokens.getTokenWithToken(req.vRestResp.getAuthToken());
         if (refreshingToken === targetToken.refreshToken) {
           const updates = {
-            'tokenExpirationTime': new Date(targetToken.tokenExpirationTime.valueOf()
-                  + ( userScope === 'domain' ? Config.auth["domain-token-expire-hours"] * 1000*60*60
-                      : Config.auth["owner-token-expire-hours"] * 1000*60*60 )
-                      )
+            'tokenExpirationTime': Tokens.computeDefaultExpiration(targetToken.scope)
           };
           await Tokens.updateTokenFields(targetToken, updates);
           const aAccount = await Accounts.getAccountWithId(targetToken.accountId);

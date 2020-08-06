@@ -16,6 +16,7 @@
 import { Config } from '@Base/config';
 
 import { AccountEntity } from '@Entities/AccountEntity';
+import { Roles } from '@Entities/Roles';
 import { Tokens } from '@Entities/Tokens';
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 
@@ -65,7 +66,7 @@ export const Accounts = {
     newAcct.accountId= GenUUID();
     newAcct.username = pUsername;
     newAcct.email = pEmail;
-    newAcct.administrator = false;
+    newAcct.roles = [Roles.USER];
     newAcct.whenAccountCreated = new Date();
 
     // Create the account shadow to hold stuff that is not public
@@ -111,6 +112,6 @@ export const Accounts = {
   },
   // getter property that is 'true' if the user is a grid administrator
   isAdmin(pAcct: AccountEntity): boolean {
-    return pAcct.administrator;
+    return Roles.HasRole(pAcct.roles, Roles.ADMIN);
   }
 };
