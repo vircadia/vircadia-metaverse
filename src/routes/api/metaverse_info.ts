@@ -17,18 +17,30 @@
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 
-import { Config } from '@Base/config';
+import { Config, readInJSON } from '@Base/config';
 
 import { Logger } from '@Tools/Logging';
+import { IsNotNullOrEmpty } from '@Tools/Misc';
 
-const procMetaverseInfo: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
-  req.vRestResp.Data = {
+import deepmerge from 'deepmerge';
+
+const procMetaverseInfo: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  let data:any = {
     'metaverse_name': Config.metaverse["metaverse-name"],
     'metaverse_nick_name': Config.metaverse["metaverse-nick-name"],
     'metaverse_url': Config.metaverse["metaverse-server-url"],
     'ice_server_url': Config.metaverse["default-ice-server-url"],
     'metaverse_server_version': Config.server["server-version"],
   };
+  const additionUrl: string = Config["metaverse-server"]["metaverse-info-addition-file"];
+  if (IsNotNullOrEmpty(additionUrl)) {
+    const additional = await readInJSON(additionUrl);
+    if (IsNotNullOrEmpty(additional)) {
+      data = deepmerge(data, additional);
+    }
+
+  }
+  req.vRestResp.Data = data;
   next();
 };
 

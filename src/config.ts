@@ -37,7 +37,8 @@ export let Config = {
     'metaverse-server': {
       'http-error-on-failure': true,  // whether to include x-vircadia error header
       'error-header': 'x-vircadia-error-handle',
-      'heartbeat-seconds-until-offline': 120
+      'heartbeat-seconds-until-offline': 120,
+      'metaverse-info-addition-file': './metaverse_info.json'
     },
     'activitypub': {
       // NOTE: there shouldn't be a trailing slash
@@ -86,29 +87,9 @@ export async function initializeConfiguration(): Promise<void> {
   if (IsNotNullOrEmpty(envConfigFile)) Config.server["user-config-file"] = envConfigFile;
 
   try {
-    let userConfigBody;
     const userConfigFile = Config.server["user-config-file"];
-    if (userConfigFile.startsWith('http:')) {
-      Logger.debug(`initializeConfiguration: fetching with http ${userConfigFile}`);
-      userConfigBody = await httpRequest(userConfigFile);
-    }
-    else {
-      if (userConfigFile.startsWith('https:')) {
-        Logger.debug(`initializeConfiguration: fetching with https ${userConfigFile}`);
-        userConfigBody = await httpsRequest(userConfigFile);
-      }
-      else {
-        try {
-          Logger.debug(`initializeConfiguration: reading configuration file ${userConfigFile}`);
-          userConfigBody = fs.readFileSync(userConfigFile, 'utf-8');
-        }
-        catch {
-          Logger.debug(`initializedConfiguration: failed read of user config file ${userConfigFile}`);
-        };
-      };
-    };
-    if (IsNotNullOrEmpty(userConfigBody)) {
-      const userConfig = JSON.parse(userConfigBody);
+    const userConfig = await readInJSON(userConfigFile);
+    if (IsNotNullOrEmpty(userConfig)) {
       // this overlays all the Config values with values from the user's file
       Config = deepmerge(Config, userConfig);
       Logger.setLogLevel(Config.debug.loglevel);  // it could have changed the logLevel
@@ -133,6 +114,33 @@ export async function initializeConfiguration(): Promise<void> {
     Config.metaverse["metaverse-server-url"] = newUrl;
   }
   return;
+};
+
+export async function readInJSON(pFilenameOrURL: string): Promise<any> {
+  let configBody: string;
+  if (pFilenameOrURL.startsWith('http:')) {
+    Logger.debug(`initializeConfiguration: fetching with http ${pFilenameOrURL}`);
+    configBody = await httpRequest(pFilenameOrURL);
+  }
+  else {
+    if (pFilenameOrURL.startsWith('https:')) {
+      Logger.debug(`initializeConfiguration: fetching with https ${pFilenameOrURL}`);
+      configBody = await httpsRequest(pFilenameOrURL);
+    }
+    else {
+      try {
+        Logger.debug(`initializeConfiguration: reading configuration file ${pFilenameOrURL}`);
+        configBody = fs.readFileSync(pFilenameOrURL, 'utf-8');
+      }
+      catch {
+        Logger.debug(`initializedConfiguration: failed read of user config file ${pFilenameOrURL}`);
+      };
+    };
+  };
+  if (IsNotNullOrEmpty(configBody)) {
+    return JSON.parse(configBody);
+  };
+  return undefined;
 };
 
 export default Config;
