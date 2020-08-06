@@ -49,6 +49,11 @@ export class AccountScopeFilter extends CriteriaFilter {
     };
   };
 
+  // Return if we've found admin enabling parameters
+  public AsAdmin(): boolean {
+    return this._asAdmin;
+  };
+
   public criteriaTest(pThingy: any): boolean {
     if (! this._doingQuery) {
       if (this._asAdmin) {

@@ -41,12 +41,14 @@ variables added to the Request object.
 As an example:
 
 ```javascript
-router.delete('/api/v1/account/:accountId/tokens/:tokenId', [ setupMetaverseAPI, // req.vRestReq
-                                                    accountFromAuthToken,   // req.vAuthAccount
-                                                    accountFromParams,      // req.vAccount
-                                                    tokenFromParams,        // req.vToken
-                                                    procDeleteToken,
-                                                    finishMetaverseAPI ] );
+router.delete('/api/v1/account/:accountId/tokens/:tokenId',
+                    [ setupMetaverseAPI,      // req.vRestReq
+                      accountFromAuthToken,   // req.vAuthAccount
+                      accountFromParams,      // req.vAccount
+                      tokenFromParams,        // req.vToken
+                      procDeleteToken,
+                      finishMetaverseAPI
+                    ] );
 ```
 
 For this request, `setupMetaverseAPI` sets up the passed `Request` with initial

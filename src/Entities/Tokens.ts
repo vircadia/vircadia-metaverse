@@ -17,7 +17,7 @@ import { Config } from '@Base/config';
 
 import { AuthToken } from '@Entities/AuthToken';
 import { Scope } from '@Entities/Scope';
-import { createObject, getObject, getObjects, updateObjectFields, deleteMany } from '@Tools/Db';
+import { createObject, getObject, getObjects, updateObjectFields, deleteMany, deleteOne } from '@Tools/Db';
 
 import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
@@ -26,6 +26,7 @@ import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
 import { VKeyedCollection } from '@Tools/vTypes';
 import { GenUUID, IsNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
+import { DeleteWriteOpResultObject } from 'mongodb';
 
 export let tokenCollection = 'tokens';
 
@@ -66,6 +67,9 @@ export const Tokens = {
   },
   async addToken(pAuthToken: AuthToken) : Promise<AuthToken> {
     return createObject(tokenCollection, pAuthToken);
+  },
+  async removeToken(pAuthToken: AuthToken) : Promise<DeleteWriteOpResultObject> {
+    return deleteOne(tokenCollection, pAuthToken.tokenId);
   },
   async updateTokenFields(pEntity: AuthToken, pFields: VKeyedCollection): Promise<AuthToken> {
     return updateObjectFields(tokenCollection, { tokenId: pEntity.tokenId }, pFields);

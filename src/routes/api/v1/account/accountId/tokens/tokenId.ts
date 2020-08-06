@@ -23,16 +23,36 @@ import { Tokens } from '@Entities/Tokens';
 import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
 
 import { Logger } from '@Tools/Logging';
+import { Accounts } from '@Entities/Accounts';
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
 // Delete a token
 // The requestor account has to have authorization to access the toke so
 //    either 'vAuthAccount' is an admin or is the same as 'vAccount'.
-const procDeleteToken: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procDeleteToken: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vRestResp && req.vAuthAccount && req.vAccount && req.vTokenId) {
     const scoper = new AccountScopeFilter(req.vAuthAccount);
     scoper.parametersFromRequest(req);
+
+    let tok = await Tokens.getTokenWithTokenId(req.vTokenId);
+    if (tok) {
+      if ( scoper.AsAdmin() && Accounts.isAdmin(req.vAuthAccount)
+            || req.vAuthAccount.accountId === tok.accountId) {
+        if (req.vAccount.accountId === tok.accountId) {
+          await Tokens.removeToken(tok);
+        }
+        else {
+          req.vRestResp.respondFailure('Token account does not match requested account');
+        };
+      }
+      else {
+        req.vRestResp.respondFailure('Unauthorized');
+      };
+    }
+    else {
+      req.vRestResp.respondFailure('Token not found');
+    }
   };
   next();
 };

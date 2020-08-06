@@ -113,8 +113,8 @@ export async function deleteMany(pCollection: string, pCriteria: any): Promise<D
   return Datab.collection(pCollection).deleteMany(pCriteria);
 };
 
-export async function deleteOne(pCollection: string, pCriteria: any): Promise<DeleteWriteOpResultObject> {
-  return Datab.collection(pCollection).deleteOne(pCriteria);
+export async function deleteOne(pCollection: string, pTokenId: string): Promise<DeleteWriteOpResultObject> {
+  return Datab.collection(pCollection).deleteOne( { 'tokenId': pTokenId });
 };
 
 // Low level generator to a stream of objects fitting a criteria.
