@@ -20,12 +20,13 @@ import { Roles } from '@Entities/Roles';
 import { Tokens } from '@Entities/Tokens';
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 
-import { createObject, getObject, getObjects, updateObjectFields } from '@Tools/Db';
+import { createObject, getObject, getObjects, updateObjectFields, deleteOne } from '@Tools/Db';
 import { GenUUID, IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 import { Shadows } from '@Entities/Shadows';
 import { ShadowEntity } from '@Entities/ShadowEntity';
 
 import { Logger } from '@Tools/Logging';
+import { VKeyedCollection } from '@Tools/vTypes';
 
 export let accountCollection = 'accounts';
 
@@ -60,6 +61,14 @@ export const Accounts = {
   },
   async addAccount(pAccountEntity: AccountEntity) : Promise<AccountEntity> {
     return createObject(accountCollection, pAccountEntity);
+  },
+  async removeAccount(pAccountEntity: AccountEntity) : Promise<any> {
+    await Shadows.removeShadowsForAccount(pAccountEntity.accountId);
+    return deleteOne(accountCollection, { 'accountId': pAccountEntity.accountId } );
+  },
+  // The contents of this entity have been updated
+  async updateEntityFields(pEntity: AccountEntity, pFields: VKeyedCollection): Promise<AccountEntity> {
+    return updateObjectFields(accountCollection, { 'accountId': pEntity.accountId }, pFields);
   },
   createAccount(pUsername: string, pPassword: string, pEmail: string): ShadowedAccount {
     const newAcct = new AccountEntity();

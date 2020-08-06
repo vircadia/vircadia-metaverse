@@ -21,18 +21,55 @@ import { tokenFromParams } from '@Route-Tools/middleware';
 
 import { Accounts } from '@Entities/Accounts';
 
+import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
-const procPostAccountId: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vRestResp && req.vAuthAccount && req.vAccount) {
-    const thing = 5;
+// Set changable values on an account.
+// The setter must be either an admin account or the account itself
+const procPostAccountId: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  if (req.vRestResp) {
+    if (req.vAuthAccount && req.vAccount) {
+      if ( Accounts.isAdmin(req.vAuthAccount)
+            || req.vAuthAccount.accountId === req.vAccount.accountId) {
+        const updated: VKeyedCollection = {};
+        if (req.body.accounts) {
+          const valuesToSet = req.body.accounts;
+          if (valuesToSet.username) updated.username = valuesToSet.username;
+          if (valuesToSet.email) updated.email = valuesToSet.email;
+          if (valuesToSet.public_key) updated.sessionPublicKey = valuesToSet.public_key;
+          if (valuesToSet.images) {
+            updated.images = {};
+            if (valuesToSet.images.hero) updated.images.hero = valuesToSet.images.hero;
+            if (valuesToSet.images.thumbnail) updated.images.hero = valuesToSet.images.thumbnail;
+            if (valuesToSet.images.tiny) updated.images.hero = valuesToSet.images.tiny;
+          };
+          await Accounts.updateEntityFields(req.vAuthAccount, updated);
+        };
+      }
+      else {
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Unauthorized');
+      };
+    }
+    else {
+      req.vRestResp.respondFailure(req.vAccountError ?? 'Accounts not specified');
+    };
   };
   next();
 };
 
-const procDeleteAccountId: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+// Delete an account.
+// The setter must be an admin account.
+const procDeleteAccountId: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  if (req.vRestResp) {
+    if (req.vAuthAccount && req.vAccount) {
+      if (Accounts.isAdmin(req.vAuthAccount)
+                && req.vAuthAccount.accountId !== req.vAuthAccount.accountId) {
+        await Accounts.removeAccount(req.vAccount);
+      };
+    };
+  };
   next();
 };
 

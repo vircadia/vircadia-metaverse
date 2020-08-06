@@ -78,7 +78,7 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
     updated.timeOfLastHeartbeat = new Date();
 
     Logger.debug('procPutDomains. updating=' + JSON.stringify(updated));
-    Domains.updateEntityFields(req.vDomain, updated);
+    await Domains.updateEntityFields(req.vDomain, updated);
   }
   else {
     req.vRestResp.respondFailure(req.vDomainError ?? 'Domain not found');

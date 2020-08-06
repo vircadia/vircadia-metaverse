@@ -67,8 +67,8 @@ export const Tokens = {
   async addToken(pAuthToken: AuthToken) : Promise<AuthToken> {
     return createObject(tokenCollection, pAuthToken);
   },
-  async removeToken(pAuthToken: AuthToken) : Promise<DeleteWriteOpResultObject> {
-    return deleteOne(tokenCollection, pAuthToken.tokenId);
+  async removeToken(pAuthToken: AuthToken) : Promise<any> {
+    return deleteOne(tokenCollection, { 'tokenId': pAuthToken.tokenId });
   },
   async updateTokenFields(pEntity: AuthToken, pFields: VKeyedCollection): Promise<AuthToken> {
     return updateObjectFields(tokenCollection, { tokenId: pEntity.tokenId }, pFields);

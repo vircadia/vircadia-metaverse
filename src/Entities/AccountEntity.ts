@@ -29,7 +29,6 @@ export class AccountEntity {
   public accountId: string;
   public username: string;
   public email: string;
-  public passwordHash: string;
   public sessionPublicKey: string;
   public accountSettings: string; // JSON of client settings
   public images: {

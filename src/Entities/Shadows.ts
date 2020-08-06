@@ -18,7 +18,7 @@ import { Config } from '@Base/config';
 import crypto from 'crypto';
 
 import { ShadowEntity } from '@Entities/ShadowEntity';
-import { createObject, getObject, getObjects, updateObjectFields } from '@Tools/Db';
+import { createObject, getObject, getObjects, deleteOne, deleteMany, updateObjectFields } from '@Tools/Db';
 
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 
@@ -46,6 +46,12 @@ export const Shadows = {
   },
   async addShadow(pShadowEntity: ShadowEntity) : Promise<ShadowEntity> {
     return createObject(shadowCollection, pShadowEntity);
+  },
+  async removeShadow(pShadowEntity: ShadowEntity) : Promise<any> {
+    return deleteOne(shadowCollection, { 'shadowId': pShadowEntity.shadowId} );
+  },
+  async removeShadowsForAccount(pAccountId: string) : Promise<any> {
+    return deleteMany(shadowCollection, { 'accountId': pAccountId } );
   },
   async updateShadowFields(pEntity: ShadowEntity, pFields: VKeyedCollection): Promise<ShadowEntity> {
     return updateObjectFields(shadowCollection, { shadowId: pEntity.shadowId }, pFields);
