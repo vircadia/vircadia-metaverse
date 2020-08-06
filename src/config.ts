@@ -28,7 +28,7 @@ export let Config = {
       'listen-port': 9400,
       'static-base': '/static',
       'user-config-file': './iamus.json',
-      'server-version': '1.0.1' // Updated by package.json script
+      'server-version': '1.1.1' // Updated by package.json script
     },
     'auth': {
       'domain-token-expire-hours': 8760,  // one year

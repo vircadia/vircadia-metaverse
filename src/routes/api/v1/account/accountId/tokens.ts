@@ -20,11 +20,33 @@ import { accountFromAuthToken, accountFromParams } from '@Route-Tools/middleware
 
 import { Accounts } from '@Entities/Accounts';
 
+import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
+import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
+import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
+
 import { Logger } from '@Tools/Logging';
+import { Tokens } from '@Entities/Tokens';
+import { AuthToken } from '@Entities/AuthToken';
 
-// metaverseServerApp.use(express.urlencoded({ extended: false }));
+// Return the tokens for the specified account.
+// One needs to be an admin in order to see other than one's own tokens
+const procGetAccountTokens: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  if (req.vRestResp && req.vAuthAccount && req.vAccount) {
+    const pager = new PaginationInfo();
+    const scoper = new AccountScopeFilter(req.vAuthAccount);
+    pager.parametersFromRequest(req);
+    scoper.parametersFromRequest(req);
+    const acctFilter = new GenericFilter( { 'accountId': req.vAccount.accountId } );
 
-const procGetAccountTokens: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+    const toks: AuthToken[] = [];
+    for await (const tok of Tokens.enumerateAsync(acctFilter, pager, scoper)) {
+      toks.push(tok);
+    };
+    req.vRestResp.Data = {
+      'tokens': toks
+    };
+  };
+  next();
   next();
 };
 

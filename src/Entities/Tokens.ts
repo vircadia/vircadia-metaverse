@@ -21,7 +21,6 @@ import { createObject, getObject, getObjects, updateObjectFields, deleteMany, de
 
 import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
-import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
 
 import { VKeyedCollection } from '@Tools/vTypes';
 import { GenUUID, IsNullOrEmpty } from '@Tools/Misc';
@@ -63,7 +62,7 @@ export const Tokens = {
   },
   async *getTokensForOwner(pOwnerId: string, pPager?: CriteriaFilter): AsyncGenerator<AuthToken> {
     return IsNullOrEmpty(pOwnerId) ? null : getObjects(tokenCollection,
-               new GenericFilter({ 'tokenOwnerId': pOwnerId }), pPager);
+               new GenericFilter({ 'accountId': pOwnerId }), pPager);
   },
   async addToken(pAuthToken: AuthToken) : Promise<AuthToken> {
     return createObject(tokenCollection, pAuthToken);
@@ -74,8 +73,8 @@ export const Tokens = {
   async updateTokenFields(pEntity: AuthToken, pFields: VKeyedCollection): Promise<AuthToken> {
     return updateObjectFields(tokenCollection, { tokenId: pEntity.tokenId }, pFields);
   },
-  async *enumerateAsync(pPager?: CriteriaFilter, pScoper?: AccountScopeFilter): AsyncGenerator<AuthToken> {
-    for await (const tok of getObjects(tokenCollection, pPager, pScoper)) {
+  async *enumerateAsync(pFilter?: CriteriaFilter, pPager?: CriteriaFilter, pScoper?: CriteriaFilter): AsyncGenerator<AuthToken> {
+    for await (const tok of getObjects(tokenCollection, pFilter, pPager, pScoper)) {
       yield tok;
     };
     // return getObjects(tokenCollection, pCriteria, pPager);

@@ -35,7 +35,7 @@ const procDeleteToken: RequestHandler = async (req: Request, resp: Response, nex
     const scoper = new AccountScopeFilter(req.vAuthAccount);
     scoper.parametersFromRequest(req);
 
-    let tok = await Tokens.getTokenWithTokenId(req.vTokenId);
+    const tok = await Tokens.getTokenWithTokenId(req.vTokenId);
     if (tok) {
       if ( scoper.AsAdmin() && Accounts.isAdmin(req.vAuthAccount)
             || req.vAuthAccount.accountId === tok.accountId) {
