@@ -16,9 +16,24 @@
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
+import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
+
+import { Accounts } from '@Entities/Accounts';
+import { accountFromParams } from '@Route-Tools/middleware';
+
+import { Logger } from '@Tools/Logging';
+import { createSimplifiedPublicKey, convertBinKeyToPEM } from '@Route-Tools/Util';
+
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
-const procGetUsersPublicKey: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procGetUsersPublicKey: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  if (req.vRestResp && req.vAccount) {
+    req.vRestResp.Data = {
+      'public_key': createSimplifiedPublicKey(req.vAccount.sessionPublicKey),
+      'username': req.vAccount.username,
+      'accountid': req.vAccount.accountId
+    };
+  };
   next();
 };
 
@@ -26,4 +41,7 @@ export const name = '/api/v1/users/:username/public_key';
 
 export const router = Router();
 
-router.get(   '/api/v1/users/:username/public_key',  procGetUsersPublicKey);
+router.get(   '/api/v1/users/:username/public_key', [ setupMetaverseAPI,
+                                                      accountFromParams,  // vRESTResp.vAccount
+                                                      procGetUsersPublicKey,
+                                                      finishMetaverseAPI ] );
