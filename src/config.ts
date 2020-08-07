@@ -39,7 +39,8 @@ export let Config = {
       'error-header': 'x-vircadia-error-handle',
       'heartbeat-seconds-until-offline': 120,
       'metaverse-info-addition-file': './metaverse_info.json',
-      'session-timeout-minutes': 5
+      'session-timeout-minutes': 5,
+      'tokengen_url': '/static/DomainTokenLogin.html'
     },
     'activitypub': {
       // NOTE: there shouldn't be a trailing slash

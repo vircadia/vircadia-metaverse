@@ -22,11 +22,12 @@ import { buildOAuthResponseBody } from '@Route-Tools/Util';
 import { Tokens } from '@Entities/Tokens';
 import { Scope } from '@Entities/Scope';
 import { IsNullOrEmpty } from '@Tools/Misc';
+import { Logger } from '@Tools/Logging';
 
 // Request that creates a token for the passed account.
 // Query parameter of 'scope' can say wether token is for 'owner' or 'domain'.
 const procPostTokenNew: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vRestResp && req.vAuthAccount) {
+  if (req.vAuthAccount) {
 
     // The user passes the scope but make sure we know it's one we know
     let scope = req.query.scope as string;
@@ -36,12 +37,24 @@ const procPostTokenNew: RequestHandler = async (req: Request, resp: Response, ne
     if (Scope.KnownScope(scope)) {
       const tokenInfo = await Tokens.createToken(req.vAuthAccount.accountId, scope);
       await Tokens.addToken(tokenInfo);
-      req.vRestResp.Data = buildOAuthResponseBody(req.vAuthAccount, tokenInfo);
+      req.vRestResp.Data = {
+        'token': tokenInfo.token,
+        'token_id': tokenInfo.tokenId,
+        'refresh_token': tokenInfo.refreshToken,
+        'token_expiration_seconds': (tokenInfo.tokenExpirationTime.valueOf() - tokenInfo.tokenCreationTime.valueOf()) / 1000,
+        'account_name': req.vAuthAccount.username,
+        'account_type': req.vAuthAccount.roles,
+        'account_id': req.vAuthAccount.accountId
+      };
     }
     else {
       req.vRestResp.respondFailure('incorrect scope');
-    }
+    };
   }
+  else {
+    req.vRestResp.respondFailure('account not found');
+  };
+  next();
 };
 
 export const name = '/api/v1/token/new';

@@ -36,14 +36,14 @@ const procPostAccountId: RequestHandler = async (req: Request, resp: Response, n
         const updated: VKeyedCollection = {};
         if (req.body.accounts) {
           const valuesToSet = req.body.accounts;
-          if (valuesToSet.username) updated.username = valuesToSet.username;
-          if (valuesToSet.email) updated.email = valuesToSet.email;
-          if (valuesToSet.public_key) updated.sessionPublicKey = valuesToSet.public_key;
-          if (valuesToSet.images) {
+          if (valuesToSet.hasOwnProperty('username')) updated.username = valuesToSet.username;
+          if (valuesToSet.hasOwnProperty('email')) updated.email = valuesToSet.email;
+          if (valuesToSet.hasOwnProperty('public_key')) updated.sessionPublicKey = valuesToSet.public_key;
+          if (valuesToSet.hasOwnProperty('images')) {
             updated.images = {};
-            if (valuesToSet.images.hero) updated.images.hero = valuesToSet.images.hero;
-            if (valuesToSet.images.thumbnail) updated.images.hero = valuesToSet.images.thumbnail;
-            if (valuesToSet.images.tiny) updated.images.hero = valuesToSet.images.tiny;
+            if (valuesToSet.images.hasOwnProperty('hero')) updated.images.hero = valuesToSet.images.hero;
+            if (valuesToSet.images.hasOwnProperty('thumbnail')) updated.images.hero = valuesToSet.images.thumbnail;
+            if (valuesToSet.images.hasOwnProperty('tiny')) updated.images.hero = valuesToSet.images.tiny;
           };
           await Accounts.updateEntityFields(req.vAuthAccount, updated);
         };

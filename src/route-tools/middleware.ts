@@ -60,15 +60,12 @@ export const finishMetaverseAPI: RequestHandler = async (req: Request, resp: Res
     if (response) {
       if (Config.debug["metaverseapi-response-detail"]) {
         Logger.debug('finishMetaverseAPI: response: ' + JSON.stringify(response));
-      }
+      };
       resp.json(response);
     }
     else {
       resp.end();
     };
-  }
-  else {
-    next();
   };
 };
 
@@ -77,12 +74,12 @@ export const finishMetaverseAPI: RequestHandler = async (req: Request, resp: Res
 // Decorate passed Request with 'vAuthAccount' which points to an AccountEntity.
 // If account cannot be found, sets 'vAuthAccount' to undefined.
 export const accountFromAuthToken: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('accountFromAuthToken');
   if (req.vRestResp) {
     req.vAuthAccount = await Accounts.getAccountWithAuthToken(req.vRestResp.getAuthToken());
   };
   if (IsNullOrEmpty(req.vAuthAccount)) {
     req.vAccountError = 'No account found for authorization';
+    Logger.debug('accountFromAuthToken: account lookup fail: authToken=' + req.vRestResp.getAuthToken());
   };
   next();
 };
@@ -92,7 +89,7 @@ export const accountFromAuthToken: RequestHandler = async (req: Request, resp: R
 // Decorate the passed Request with 'vAccount' which points to a AccountEntity.
 // If account cannot be found or verified, 'vAccountError' is set with text explaining the error.
 export const accountFromParams: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('accountFromParams');
+  // Logger.debug('accountFromParams');
   if (req.vRestResp) {
     const accountId = req.params.accountId;
     if (accountId) {
@@ -116,7 +113,7 @@ export const accountFromParams: RequestHandler = async (req: Request, resp: Resp
 // Decorate the passed Request with 'vDoamin' which points to a DomainEntity.
 // If domain cannot be found or verified, 'vDomainError' is set with text explaining the error.
 export const domainFromParams: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('domainFromParams');
+  // Logger.debug('domainFromParams');
   if (req.vRestResp) {
     const domainId = req.params.domainId;
     if (domainId) {
@@ -152,7 +149,7 @@ export const verifyDomainAccess: RequestHandler = async (req: Request, resp: Res
       let verified: boolean = false;
 
       const authToken = req.vRestResp.getAuthToken();
-      Logger.debug(`verifyDomainAccess: domainId: ${req.vDomain.domainId}, authT: ${authToken}, apikey: ${req.vDomainAPIKey}`);
+      // Logger.debug(`verifyDomainAccess: domainId: ${req.vDomain.domainId}, authT: ${authToken}, apikey: ${req.vDomainAPIKey}`);
 
       if (IsNullOrEmpty(authToken)) {
         // Auth token not available. See if APIKey does the trick

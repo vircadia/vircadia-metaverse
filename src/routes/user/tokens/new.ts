@@ -20,9 +20,12 @@ import { accountFromAuthToken } from '@Route-Tools/middleware';
 
 import { Tokens } from '@Entities/Tokens';
 import { Scope } from '@Entities/Scope';
+import { HTTPStatusCode } from '@Route-Tools/RESTResponse';
+
+import { Config } from '@Base/config';
 
 const procGetUserTokensNew: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vRestResp && req.vAuthAccount) {
+  if (req.vAuthAccount) {
     const forDomainServer = req.query.for_domain_server;
     const scope = forDomainServer ? Scope.DOMAIN : Scope.OWNER;
     const tokenInfo = await Tokens.createToken(req.vAuthAccount.accountId, scope);
@@ -31,6 +34,13 @@ const procGetUserTokensNew: RequestHandler = async (req: Request, resp: Response
     resp.setHeader('content-type', 'text/html');
     resp.send(body);
   }
+  else {
+    // if the user is not logged in, go to a page to login and set things up
+    resp.statusCode = HTTPStatusCode.OK;
+    resp.setHeader('Location', Config["metaverse-server"].tokengen_url),
+    resp.setHeader('content-type', 'text/html');
+    resp.send();
+  };
 };
 
 export const name = '/user/tokens/new';

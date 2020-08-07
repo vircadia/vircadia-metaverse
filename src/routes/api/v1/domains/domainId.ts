@@ -51,26 +51,25 @@ const procGetDomainsDomainid: RequestHandler = async (req: Request, resp: Respon
 // Set domain parameters.
 // The sender can send or not send lots of different fields so we have to be specific
 const procPutDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('procPutDomains. body=' + JSON.stringify(req.body));
   if (req.vDomain) {
     const updated: VKeyedCollection = {};
     const valuesToSet = req.body.domain;
-    if (valuesToSet.version) updated.version = valuesToSet.version;
-    if (valuesToSet.protocol) updated.protocol = valuesToSet.protocol;
-    if (valuesToSet.network_addr) updated.networkAddr = valuesToSet.network_addr;
-    if (valuesToSet.automatic_networking) updated.networkingMode = valuesToSet.automatic_networking;
-    if (valuesToSet.restricted) updated.restricted = valuesToSet.restricted;
-    if (valuesToSet.capacity) updated.capacity = valuesToSet.capacity;
-    if (valuesToSet.description) updated.description = valuesToSet.description;
-    if (valuesToSet.maturity) updated.maturity = valuesToSet.maturity;
-    if (valuesToSet.restriction) updated.restriction = valuesToSet.restriction;
-    if (valuesToSet.hosts) {
+    if (valuesToSet.hasOwnProperty('version')) updated.version = valuesToSet.version;
+    if (valuesToSet.hasOwnProperty('protocol')) updated.protocol = valuesToSet.protocol;
+    if (valuesToSet.hasOwnProperty('network_addr')) updated.networkAddr = valuesToSet.network_addr;
+    if (valuesToSet.hasOwnProperty('automatic_networking')) updated.networkingMode = valuesToSet.automatic_networking;
+    if (valuesToSet.hasOwnProperty('restricted')) updated.restricted = valuesToSet.restricted;
+    if (valuesToSet.hasOwnProperty('capacity')) updated.capacity = valuesToSet.capacity;
+    if (valuesToSet.hasOwnProperty('description')) updated.description = valuesToSet.description;
+    if (valuesToSet.hasOwnProperty('maturity')) updated.maturity = valuesToSet.maturity;
+    if (valuesToSet.hasOwnProperty('restriction')) updated.restriction = valuesToSet.restriction;
+    if (valuesToSet.hasOwnProperty('hosts')) {
       updated.hosts = CleanedStringArray(valuesToSet.hosts);
     };
-    if (valuesToSet.tags) {
+    if (valuesToSet.hasOwnProperty('tags')) {
       updated.tags = CleanedStringArray(valuesToSet.tags);
     };
-    if (valuesToSet.heartbeat) {
+    if (valuesToSet.hasOwnProperty('heartbeat')) {
       updated.numUsers = Number(valuesToSet.heartbeat.num_users);
       updated.anonUsers = Number(valuesToSet.heartbeat.num_anon_users);
       updated.totalUsers = updated.numUsers + updated.anonUsers;
