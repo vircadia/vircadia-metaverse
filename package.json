@@ -27,7 +27,7 @@
     },
     "scripts": {
         "run": "node dist/index.js",
-        "build": "npm-run-all -s \"clean-dist\" \"add-version\" \"copy-static\" \"build:iamus\" \"link-tester\"",
+        "build": "npm-run-all -s \"clean-dist\" \"add-version\" \"copy-static\" \"build:iamus\"",
         "prebuild:iamus": "tslint -c tslint.json -p tsconfig.json --fix",
         "build:iamus": "tsc",
         "prestart": "npm run build",
@@ -35,7 +35,6 @@
         "clean-dist": "rm -rf dist/*",
         "add-version": "sed -i -e \"s='server-version':.*$='server-version': '$npm_package_version' // Updated by package.json script=\" src/config.ts",
         "copy-static": "cp -r src/static dist",
-        "link-tester": "ln -s '../../../Iamus-Browser/dist' 'dist/static/test'",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "dependencies": {
