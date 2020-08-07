@@ -84,11 +84,17 @@ export const accountFromParams: RequestHandler = async (req: Request, resp: Resp
   if (req.vRestResp) {
     const accountId = req.params.accountId;
     if (accountId) {
-      req.vAccount = await Accounts.getAccountWithId(accountId);
+      // Most of the account references are by username
+      req.vAccount = await Accounts.getAccountWithUsername(accountId);
+      if (IsNullOrEmpty(req.vAccount)) {
+        // If username didn't work, try by the accountId
+        req.vAccount = await Accounts.getAccountWithId(accountId);
+      };
+
     };
   };
   if (IsNullOrEmpty(req.vAccount)) {
-    req.vAccountError = 'AccountId does not match a domain';
+    req.vAccountError = 'AccountId does not match an account';
   };
   next();
 };
