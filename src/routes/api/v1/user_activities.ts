@@ -15,8 +15,23 @@
 'use strict';
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
+import { accountFromAuthToken } from '@Route-Tools/middleware';
+import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
+
+import { Logger } from '@Tools/Logging';
 
 const procPostUserActivities: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  if (req.vRestResp) {
+    if (req.body.action_name) {
+      const activity = req.body.action_name;
+      if (req.vAuthAccount) {
+        Logger.debug(`procPostUserActivities: Received user activity "${activity}" from ${req.vAuthAccount.username}`);
+      }
+      else {
+        Logger.debug(`procPostUserActivities: Received user activity "${activity}" from unknown user`);
+      };
+    };
+  };
   next();
 };
 
@@ -24,4 +39,7 @@ export const name = '/api/v1/user_activities';
 
 export const router = Router();
 
-router.post( '/api/v1/user_activities',     procPostUserActivities);
+router.post( '/api/v1/user_activities', [ setupMetaverseAPI,
+                                          accountFromAuthToken,
+                                          procPostUserActivities,
+                                          finishMetaverseAPI ] );
