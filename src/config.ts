@@ -38,7 +38,8 @@ export let Config = {
       'http-error-on-failure': true,  // whether to include x-vircadia error header
       'error-header': 'x-vircadia-error-handle',
       'heartbeat-seconds-until-offline': 120,
-      'metaverse-info-addition-file': './metaverse_info.json'
+      'metaverse-info-addition-file': './metaverse_info.json',
+      'session-timeout-minutes': 5
     },
     'activitypub': {
       // NOTE: there shouldn't be a trailing slash

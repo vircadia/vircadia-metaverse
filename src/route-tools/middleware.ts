@@ -19,20 +19,32 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 import { Accounts } from '@Entities/Accounts';
 import { AccountEntity } from '@Entities/AccountEntity';
 import { Domains } from '@Entities/Domains';
-import { AuthToken } from '@Entities/AuthToken';
+import { Sessions } from '@Entities/Sessions';
 import { RESTResponse } from './RESTResponse';
 
 import { IsNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
 import { Config } from '@Base/config';
+import { SessionEntity } from '@Entities/SessionEntity';
 
 // MetaverseAPI middleware.
 // The request is a standard MetaverseAPI JSON-in and JSON-out request.
-// Start by decorating the request with the building class that is used to create the response.
+// Start by decorating the request with the building class that is used to create the response
+//     and setup the session.
 export const setupMetaverseAPI: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   req.vRestResp = new RESTResponse(req, resp);
   if (req.socket) {
     req.vSenderKey = `${req.socket.remoteAddress}:${req.socket.remotePort}`;
+    req.vSession = Sessions.getSessionWithSenderKey(req.vSenderKey);
+    if (req.vSession) {
+      SessionEntity.TouchSession(req.vSession);
+    }
+    else {
+      // No existing session for this request
+      req.vSession = Sessions.createSession(req.vSenderKey);
+      Sessions.addSession(req.vSession);
+      Logger.debug('setupMetaverseAPI: created new session for ' + req.vSenderKey);
+    };
   };
   next();
 };

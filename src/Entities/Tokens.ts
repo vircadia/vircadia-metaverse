@@ -38,7 +38,6 @@ export function initTokens(): void {
     const deleteInfo = await deleteMany(tokenCollection, { tokenExpirationTime: { $lt: nowtime } } );
     Logger.debug(`Tokens.Expiration: expired ${deleteInfo.deletedCount} tokens`);
   }, 1000 * 60 * 5 );
-
 };
 
 export const Tokens = {

@@ -17,7 +17,7 @@
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
-import { accountFromAuthToken, domainAPIkeyFromMultipart, verifyDomainAccess } from '@Route-Tools/middleware';
+import { accountFromAuthToken } from '@Route-Tools/middleware';
 
 import multer from 'multer';
 

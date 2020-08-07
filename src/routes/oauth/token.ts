@@ -32,7 +32,10 @@ import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
 
 // Do a 'login' and return an initial access token for a user
-// Request comes as a 'application/x-www-form-urlencoded' body
+// Request comes as a 'application/x-www-form-urlencoded' body.
+// Note that the response is not a standard MetaverseAPI response since it
+//    is trying to mimic a standard /oauth/token request. So this
+//    code builds a response and finishes the request.
 const procPostOauthToken: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   let respBody: VKeyedCollection;
   try {
