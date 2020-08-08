@@ -108,6 +108,14 @@ export const accountFromParams: RequestHandler = async (req: Request, resp: Resp
   next();
 };
 
+// Find domain apikey from JSON body and set as 'vDomainAPIKey'
+export const usernameFromParams: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  if (req.vRestResp) {
+    req.vUsername = req.params.username;
+  };
+  next();
+};
+
 // MetaverseAPI middleware.
 // The request has a :domainId label that needs to be looked up and verified.
 // Decorate the passed Request with 'vDoamin' which points to a DomainEntity.

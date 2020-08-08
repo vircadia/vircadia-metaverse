@@ -16,7 +16,7 @@
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
-// metaverseServerApp.use(express.urlencoded({ extended: false }));
+import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 
 const procGetUserProfile: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
   next();

@@ -27,9 +27,10 @@ declare global {
         interface Request {
             vRestResp?: RESTResponse;   // structure used to process the MetaverseAPI input and output JSON
             vSession?: SessionEntity;   // The session for this request
-            vAuthAccount?: AccountEntity;   // pointer to verified AccountEntity
-            vAccount?: AccountEntity;   // pointer to account found in Params
+            vAuthAccount?: AccountEntity;   // pointer to verified AccountEntity from authToken
+            vAccount?: AccountEntity;   // pointer to account found in ':accountId'
             vAccountError?: string;     // if vAccount is not set, the reason why
+            vUsername?: string;         // parameter ':username'
             vDomain?: DomainEntity;     // pointer to verified DomainEntity
             vDomainError?: string;      // if vDomain is not set, the reason why
             vDomainAPIKey?: string;     // if domain APIkey supplied in the request, it is passed here
