@@ -19,6 +19,7 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken, usernameFromParams } from '@Route-Tools/middleware';
 import { Accounts } from '@Entities/Accounts';
+
 import { VKeyedCollection } from '@Tools/vTypes';
 
 // Get the friends of the logged in account
