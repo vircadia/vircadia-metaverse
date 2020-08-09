@@ -15,25 +15,20 @@
 
 import { Config } from '@Base/config';
 
+import crypto from 'crypto';
+
 import { AccountEntity } from '@Entities/AccountEntity';
 import { Roles } from '@Entities/Roles';
 import { Tokens } from '@Entities/Tokens';
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 
 import { createObject, getObject, getObjects, updateObjectFields, deleteOne } from '@Tools/Db';
-import { GenUUID, IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
-import { Shadows } from '@Entities/Shadows';
-import { ShadowEntity } from '@Entities/ShadowEntity';
+import { GenUUID, genRandomString, IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 
 import { Logger } from '@Tools/Logging';
 import { VKeyedCollection } from '@Tools/vTypes';
 
 export let accountCollection = 'accounts';
-
-export interface ShadowedAccount {
-  Acct: AccountEntity,
-  Shadow: ShadowEntity
-};
 
 export const Accounts = {
   async getAccountWithId(pAccountId: string): Promise<AccountEntity> {
@@ -63,14 +58,13 @@ export const Accounts = {
     return createObject(accountCollection, pAccountEntity);
   },
   async removeAccount(pAccountEntity: AccountEntity) : Promise<any> {
-    await Shadows.removeShadowsForAccount(pAccountEntity.accountId);
     return deleteOne(accountCollection, { 'accountId': pAccountEntity.accountId } );
   },
   // The contents of this entity have been updated
   async updateEntityFields(pEntity: AccountEntity, pFields: VKeyedCollection): Promise<AccountEntity> {
     return updateObjectFields(accountCollection, { 'accountId': pEntity.accountId }, pFields);
   },
-  createAccount(pUsername: string, pPassword: string, pEmail: string): ShadowedAccount {
+  createAccount(pUsername: string, pPassword: string, pEmail: string): AccountEntity {
     const newAcct = new AccountEntity();
     newAcct.accountId= GenUUID();
     newAcct.username = pUsername;
@@ -78,30 +72,12 @@ export const Accounts = {
     newAcct.roles = [Roles.USER];
     newAcct.whenAccountCreated = new Date();
 
-    // Create the account shadow to hold stuff that is not public
-    const acctShadow = Shadows.createShadow()
-    acctShadow.accountId = newAcct.accountId;
-    Shadows.storePassword(acctShadow, pPassword);
+    Accounts.storePassword(newAcct, pPassword);
 
-    // Return the account and shadow information for any additions.
-    // NOTE: that the AccountEntity and ShadowEntity are not stored so that needs to be done.
-    const shadowAcct: ShadowedAccount = {
-      Acct: newAcct,
-      Shadow: acctShadow
-    };
-    return shadowAcct;
+    return newAcct;
   },
-  async validatePassword(pAcct: AccountEntity, pPassword: string, pShadow?: ShadowEntity): Promise<boolean> {
-    let shadow = pShadow;
-    if (IsNullOrEmpty(shadow)) {
-      // If the caller didn't pass the shadow, fetch it
-      shadow = await Shadows.getShadowWithAccountId(pAcct.accountId);
-      if (IsNullOrEmpty(shadow)) {
-        Logger.error(`Accounts.validatePassword: could not fetch shadow for accountId ${pAcct.accountId}`);
-        return false;
-      };
-    };
-    return Shadows.hashPassword(pPassword, shadow.passwordSalt) === shadow.passwordHash;
+  async validatePassword(pAcct: AccountEntity, pPassword: string): Promise<boolean> {
+    return Accounts.hashPassword(pPassword, pAcct.passwordSalt) === pAcct.passwordHash;
   },
   // TODO: add scope (admin) and filter criteria filtering
   //    It's push down to this routine so we could possibly use DB magic for the queries
@@ -111,6 +87,17 @@ export const Accounts = {
       yield acct;
     };
     // return getObjects(accountCollection, pCriteria, pPager);
+  },
+
+  storePassword(pEntity: AccountEntity, pPassword: string) {
+      pEntity.passwordSalt = genRandomString(16);
+      pEntity.passwordHash = Accounts.hashPassword(pPassword, pEntity.passwordSalt);
+  },
+  hashPassword(pPassword: string, pSalt: string): string {
+      const hash = crypto.createHmac('sha512', pSalt);
+      hash.update(pPassword);
+      const val = hash.digest('hex');
+      return val;
   },
 
   // getter property that is 'true' if the user has been heard from recently

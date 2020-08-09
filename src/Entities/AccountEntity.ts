@@ -42,6 +42,9 @@ export class AccountEntity {
   public connections: string[];
   public friends: string[];
 
+  public passwordHash: string;
+  public passwordSalt: string;
+
   // Old stuff
   public xmppPassword: string;
   public discourseApiKey: string;

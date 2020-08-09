@@ -41,8 +41,8 @@ const procPutUserLocation: RequestHandler = async (req: Request, resp: Response,
         if (loc.hasOwnProperty('network_port'))    newLoc.networkPort = loc.network_port;
         if (loc.hasOwnProperty('node_id'))         newLoc.nodeId = loc.node_id;
         if (loc.hasOwnProperty('discoverability')) {
-          if (! setDiscoverability(req.vAuthAccount, loc['discoverability'])) {
-            const disc = loc['discoverability'];
+          if (! setDiscoverability(req.vAuthAccount, loc.discoverability)) {
+            const disc = loc.discoverability;
             Logger.debug(`procPutUserLocation: defaulting discoverability to "none" because passed odd value ${disc} by ${req.vAuthAccount.username}`);
             setDiscoverability(req.vAuthAccount, 'none');
           };

@@ -25,7 +25,6 @@ import { AccountFilterInfo } from '@Entities/EntityFilters/AccountFilterInfo';
 import { Logger } from '@Tools/Logging';
 import { AccountEntity } from '@Entities/AccountEntity';
 import { IsNullOrEmpty } from '@Tools/Misc';
-import { Shadows } from '@Entities/Shadows';
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
@@ -85,9 +84,8 @@ const procPostUsers: RequestHandler = async (req: Request, resp: Response, next:
             const newAcct = await Accounts.createAccount(userName, userPassword, userEmail);
             if (newAcct) {
               try {
-                newAcct.Shadow.IPAddrOfCreator = req.vSenderKey;
-                await Accounts.addAccount(newAcct.Acct);
-                await Shadows.addShadow(newAcct.Shadow);
+                newAcct.IPAddrOfCreator = req.vSenderKey;
+                await Accounts.addAccount(newAcct);
               }
               catch (err) {
                 Logger.error('procPostUsers: exception adding user: ' + err);

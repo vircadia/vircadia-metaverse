@@ -18,7 +18,6 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
-import { Shadows } from '@Entities/Shadows';
 
 import { IsNotNullOrEmpty } from '@Tools/Misc';
 
@@ -26,20 +25,14 @@ import { IsNotNullOrEmpty } from '@Tools/Misc';
 // This request will get greatly expanded.
 const procGetUserProfile: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
-    const shadow = await Shadows.getShadowWithAccountId(req.vAuthAccount.accountId);
-    if (IsNotNullOrEmpty(shadow)) {
-      req.vRestResp.Data = {
-        'user': {
-          'username': req.vAuthAccount.username,
-          'accountid': req.vAuthAccount.accountId,
-          'xmpp_password': shadow.xmppPassword,
-          'discourse_api_key': shadow.discourseApiKey,
-          'wallet_id': shadow.walletId
-        }
-      };
-    }
-    else {
-      req.vRestResp.respondFailure('failure fetching account shadow');
+    req.vRestResp.Data = {
+      'user': {
+        'username': req.vAuthAccount.username,
+        'accountid': req.vAuthAccount.accountId,
+        'xmpp_password': req.vAuthAccount.xmppPassword,
+        'discourse_api_key': req.vAuthAccount.discourseApiKey,
+        'wallet_id': req.vAuthAccount.walletId
+      }
     };
   }
   else {
