@@ -189,6 +189,7 @@
                     }
                 };
                 request.open('POST', API_ACCOUNT_CREATE);
+                request.setRequestHeader('Content-type', 'application/json');
                 request.send(requestData);
             });
         };
