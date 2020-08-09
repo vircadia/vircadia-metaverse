@@ -16,9 +16,66 @@
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
-// metaverseServerApp.use(express.urlencoded({ extended: false }));
+import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
+import { accountFromAuthToken, usernameFromParams } from '@Route-Tools/middleware';
+import { Logger } from '@Tools/Logging';
 
 const procPostUserConnectionRequest: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  if (req.vAuthAccount) {
+    // The client script looks for two types of 'connection' responses.
+    // If is sees data.connection == "pending", it trys again and eventually times out
+    // If data.connection has an object, it uses 'new_connection' and 'username'
+
+    if (req.body.user_connection_request) {
+      const thisNode = req.body.user_connection_request.node_id;
+      const otherNode = req.body.user_connection_request.proposed_node_id;
+
+      // BEGIN sanity check DEBUG DEBUG
+
+      // Connections use node id's to identify the two avatars, I guess because, the
+      //    world does not have access to the account identity.
+      // This debugging code prints out whether the passed nodeIds match the loction
+      //    nodeIds that we have to verify that the connection nodeIds are really the
+      //    same ones as passed in the location.
+      // All this debugging output can go away once nodeId usage is understood.
+      if (req.vAuthAccount.location) {
+        if (req.vAuthAccount.location.nodeId) {
+          if (req.vAuthAccount.location.nodeId === thisNode) {
+            Logger.debug(`procPostUserConnectionRequest: request from ${req.vAuthAccount.username} and location.nodeid matches main node`);
+          }
+          else {
+            if (req.vAuthAccount.location.nodeId === otherNode) {
+              Logger.debug(`procPostUserConnectionRequest: request from ${req.vAuthAccount.username} and location.nodeid matches proposed node`);
+            }
+            else {
+              Logger.debug(`procPostUserConnectionRequest: request from ${req.vAuthAccount.username} and location.nodeid does not match either node`);
+            };
+          };
+        }
+        else {
+          Logger.debug(`procPostUserConnectionRequest: request from ${req.vAuthAccount.username} and no nodeID info`);
+        };
+      }
+      else {
+        Logger.debug(`procPostUserConnectionRequest: request from ${req.vAuthAccount.username} and no location info`);
+      };
+
+      // END sanity check DEBUG DEBUG
+
+      // TODO: somewhere record the request and wait for both sides to accept.
+
+      // For the moment, just say 'pending' and let the client time out
+      req.vRestResp.Data = {
+        'connection': 'pending'
+      };
+    }
+    else {
+      req.vRestResp.respondFailure('badly formed request');
+    };
+  }
+  else {
+    req.vRestResp.respondFailure('unauthorized');
+  };
   next();
 };
 
@@ -26,4 +83,7 @@ export const name = '/api/v1/user/connection_request';
 
 export const router = Router();
 
-router.post(  '/api/v1/user/connection_request',     procPostUserConnectionRequest);
+router.post(  '/api/v1/user/connection_request', [ setupMetaverseAPI,
+                                                  accountFromAuthToken,
+                                                  procPostUserConnectionRequest,
+                                                  finishMetaverseAPI ] );

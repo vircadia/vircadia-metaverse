@@ -46,7 +46,7 @@ const procGetDomains: RequestHandler = async (req: Request, resp: Response, next
         'domainId': aDomain.domainId,
         'place_name': aDomain.placeName,
         'public_key': aDomain.publicKey ? createSimplifiedPublicKey(aDomain.publicKey) : undefined,
-        'sponser_accountid': aDomain.sponserAccountID,
+        'sponser_accountid': aDomain.sponserAccountId,
         'ice_server': aDomain.iceServerAddr,
         'version': aDomain.version,
         'protocol_version': aDomain.protocol,

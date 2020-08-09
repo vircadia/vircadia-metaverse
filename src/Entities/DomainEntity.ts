@@ -22,7 +22,7 @@ export class DomainEntity {
   public placeName: string;    // place name
   public publicKey: string;    // DomainServers's public key in multi-line PEM format
   public apiKey: string;       // Access key if a temp domain
-  public sponserAccountID: string; // The account that gave this domain an access key
+  public sponserAccountId: string; // The account that gave this domain an access key
   public iceServerAddr: string;// IP address of ICE server being used by this domain
 
   // Information that comes in via heartbeat

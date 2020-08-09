@@ -89,7 +89,6 @@ export const accountFromAuthToken: RequestHandler = async (req: Request, resp: R
 // Decorate the passed Request with 'vAccount' which points to a AccountEntity.
 // If account cannot be found or verified, 'vAccountError' is set with text explaining the error.
 export const accountFromParams: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  // Logger.debug('accountFromParams');
   if (req.vRestResp) {
     const accountId = req.params.accountId;
     if (accountId) {
@@ -121,7 +120,6 @@ export const usernameFromParams: RequestHandler = async (req: Request, resp: Res
 // Decorate the passed Request with 'vDoamin' which points to a DomainEntity.
 // If domain cannot be found or verified, 'vDomainError' is set with text explaining the error.
 export const domainFromParams: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  // Logger.debug('domainFromParams');
   if (req.vRestResp) {
     const domainId = req.params.domainId;
     if (domainId) {
@@ -168,11 +166,11 @@ export const verifyDomainAccess: RequestHandler = async (req: Request, resp: Res
       else {
         const aAccount: AccountEntity = await Accounts.getAccountWithAuthToken(authToken);
         if (aAccount) {
-          if (IsNullOrEmpty(req.vDomain.sponserAccountID)) {
+          if (IsNullOrEmpty(req.vDomain.sponserAccountId)) {
             // If the domain doesn't have an associated account, form the link to this account
-            req.vDomain.sponserAccountID = aAccount.accountId;
+            await Domains.updateEntityFields(req.vDomain, { 'sponserAccountId': aAccount.accountId } );
           };
-          if (req.vDomain.sponserAccountID === aAccount.accountId) {
+          if (req.vDomain.sponserAccountId === aAccount.accountId) {
             verified = true;
           };
         };
@@ -189,7 +187,6 @@ export const verifyDomainAccess: RequestHandler = async (req: Request, resp: Res
 // MetaverseAPI middleware.
 // The request has a :tokenId label that is returned in 'vTokenId'.
 export const tokenFromParams: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('tokenFromParams');
   if (req.vRestResp) {
     req.vTokenId = req.params.tokenId;
   };
