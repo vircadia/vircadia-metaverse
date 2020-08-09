@@ -20,12 +20,14 @@ import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
 import { Shadows } from '@Entities/Shadows';
 
+import { IsNotNullOrEmpty } from '@Tools/Misc';
+
 // Get old profile information.
 // This request will get greatly expanded.
 const procGetUserProfile: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
     const shadow = await Shadows.getShadowWithAccountId(req.vAuthAccount.accountId);
-    if (shadow) {
+    if (IsNotNullOrEmpty(shadow)) {
       req.vRestResp.Data = {
         'user': {
           'username': req.vAuthAccount.username,

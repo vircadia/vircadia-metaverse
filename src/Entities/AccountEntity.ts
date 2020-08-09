@@ -17,13 +17,6 @@ import Config from '../config';
 
 import { AuthToken } from './AuthToken';
 
-export enum Availability {
-  none = 0,
-  friends,
-  connections,
-  all
-};
-
 // NOTE: this class cannot have functions in them as they are just JSON to and from the database
 export class AccountEntity {
   public accountId: string;
@@ -44,7 +37,7 @@ export class AccountEntity {
     networkAddress: string;
     networkPort: number;
     nodeId: string;     // sessionId
-    discoverability: Availability
+    discoverability: string;  // one of 'none', 'friends', 'connections', 'all'
   };
   public connections: string[];
   public friends: string[];
@@ -61,3 +54,15 @@ export class AccountEntity {
   public whenAccountCreated: Date;  // date of account creation
   public timeOfLastHeartbeat: Date; // when we last heard from this user
 };
+
+// Helper function that checks to make sure 'discoverability' is the right value.
+// Returns 'true' if discoverability was set.
+export function setDiscoverability(pAccount: AccountEntity, pDiscoverability: string): boolean {
+  let ret = false;
+  const disc = pDiscoverability.toLowerCase();
+  if (['none', 'all', 'friends', 'connections'].includes(disc)) {
+    pAccount.location.discoverability = disc;
+    ret = true;
+  };
+  return ret;
+}

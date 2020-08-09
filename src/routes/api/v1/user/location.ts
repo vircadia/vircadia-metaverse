@@ -16,9 +16,49 @@
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
-// metaverseServerApp.use(express.urlencoded({ extended: false }));
+import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
+import { accountFromAuthToken } from '@Route-Tools/middleware';
 
-const procPutUserLocation: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+import { VKeyedCollection } from '@Tools/vTypes';
+import { IsNotNullOrEmpty } from '@Tools/Misc';
+import { Logger } from '@Tools/Logging';
+import { Accounts } from '@Entities/Accounts';
+
+const procPutUserLocation: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  if (req.vAuthAccount) {
+    if (req.body.location) {
+      try {
+        // build location from what is in the account already
+        const newLoc: VKeyedCollection = IsNotNullOrEmpty(req.vAuthAccount.location) ? req.vAuthAccount.location : {};
+        const loc = req.body.location;
+        if (loc.hasOwnProperty('connected'))       newLoc.connected = loc.connected;
+        if (loc.hasOwnProperty('place'))           newLoc.place = loc.place;
+        if (loc.hasOwnProperty('place_id'))        newLoc.placeId = loc.place_id;
+        if (loc.hasOwnProperty('domain_id'))       newLoc.domainId = loc.domain_id;
+        if (loc.hasOwnProperty('network_address')) newLoc.networkAddress = loc.network_address;
+        if (loc.hasOwnProperty('network_port'))    newLoc.networkPort = loc.network_port;
+        if (loc.hasOwnProperty('node_id'))         newLoc.nodeId = loc.node_id;
+        if (loc.hasOwnProperty('discoverability')) {
+          const disc = (loc.discoverability as string).toLowerCase();
+          if (['none', 'all', 'friends', 'connections'].includes(disc)) {
+            newLoc.discoverability = disc;
+          }
+          else {
+            Logger.debug(`procPutUserLocation: defaulting discoverability to "none" because passed odd value ${disc} by ${req.vAuthAccount.username}`);
+            newLoc.discoverability = 'none';
+          };
+        };
+        await Accounts.updateEntityFields(req.vAuthAccount, { 'location': newLoc });
+      }
+      catch ( err ) {
+        Logger.error(`procPutUserLocation: exception parsing put from ${req.vAuthAccount.username}: ${err}`);
+        req.vRestResp.respondFailure(`exception parsing request: ${err}`);
+      };
+    };
+  }
+  else {
+    req.vRestResp.respondFailure('auth token did not work');
+  };
   next();
 };
 
@@ -26,4 +66,8 @@ export const name = '/api/v1/user/location';
 
 export const router = Router();
 
-router.put(   '/api/v1/user/location',               procPutUserLocation);
+router.put( '/api/v1/user/location',  [ setupMetaverseAPI,
+                                        accountFromAuthToken,
+                                        procPutUserLocation,
+                                        finishMetaverseAPI
+                                      ] );
