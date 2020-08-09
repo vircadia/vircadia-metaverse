@@ -22,7 +22,6 @@ export class AccountEntity {
   public accountId: string;
   public username: string;
   public email: string;
-  public sessionPublicKey: string;
   public accountSettings: string; // JSON of client settings
   public images: {
     hero: string;
@@ -41,9 +40,12 @@ export class AccountEntity {
   };
   public connections: string[];
   public friends: string[];
+  public locker: string;      // JSON blob stored for user from server
 
+  // User authentication
   public passwordHash: string;
   public passwordSalt: string;
+  public sessionPublicKey: string;  // PEM public key generated for this session
 
   // Old stuff
   public xmppPassword: string;

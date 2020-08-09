@@ -16,12 +16,28 @@
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
+import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
+import { accountFromAuthToken } from '@Route-Tools/middleware';
+
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
 const procGetUserLocker: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  if (req.vAuthAccount) {
+    req.vRestResp.Data = req.vAuthAccount.locker;
+  }
+  else {
+    req.vRestResp.respondFailure('unauthorized');
+  };
+
   next();
 };
 const procPostUserLocker: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  if (req.vAuthAccount) {
+    req.vAuthAccount.locker = req.body;
+  }
+  else {
+    req.vRestResp.respondFailure('unauthorized');
+  };
   next();
 };
 
@@ -29,5 +45,11 @@ export const name = '/api/v1/user/locker';
 
 export const router = Router();
 
-router.get(   '/api/v1/user/locker',                 procGetUserLocker);
-router.post(  '/api/v1/user/locker',                 procPostUserLocker);
+router.get(   '/api/v1/user/locker', [ setupMetaverseAPI,
+                                      accountFromAuthToken,
+                                      procGetUserLocker,
+                                      finishMetaverseAPI ] );
+router.post(  '/api/v1/user/locker', [ setupMetaverseAPI,
+                                      accountFromAuthToken,
+                                      procPostUserLocker,
+                                      finishMetaverseAPI ] );

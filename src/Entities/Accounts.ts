@@ -72,12 +72,10 @@ export const Accounts = {
     newAcct.roles = [Roles.USER];
     newAcct.whenAccountCreated = new Date();
 
+    // Remember the password
     Accounts.storePassword(newAcct, pPassword);
 
     return newAcct;
-  },
-  async validatePassword(pAcct: AccountEntity, pPassword: string): Promise<boolean> {
-    return Accounts.hashPassword(pPassword, pAcct.passwordSalt) === pAcct.passwordHash;
   },
   // TODO: add scope (admin) and filter criteria filtering
   //    It's push down to this routine so we could possibly use DB magic for the queries
@@ -92,6 +90,9 @@ export const Accounts = {
   storePassword(pEntity: AccountEntity, pPassword: string) {
       pEntity.passwordSalt = genRandomString(16);
       pEntity.passwordHash = Accounts.hashPassword(pPassword, pEntity.passwordSalt);
+  },
+  async validatePassword(pAcct: AccountEntity, pPassword: string): Promise<boolean> {
+    return Accounts.hashPassword(pPassword, pAcct.passwordSalt) === pAcct.passwordHash;
   },
   hashPassword(pPassword: string, pSalt: string): string {
       const hash = crypto.createHmac('sha512', pSalt);
