@@ -14,7 +14,12 @@
 
 'use strict';
 
+import { Request } from 'express';
 import { createPublicKey } from 'crypto';
+import { checkDiscoverability } from '@Entities/AccountEntity';
+import { VKeyedCollection } from '@Tools/vTypes';
+import { IsNotNullOrEmpty } from '@Tools/Misc';
+import { Logger } from '@Tools/Logging';
 
 // The public_key is sent as a binary (DER) form of a PKCS1 key.
 // To keep backward compatibility, we convert the PKCS1 key into a SPKI key in PEM format
@@ -46,3 +51,37 @@ export function createSimplifiedPublicKey(pPubKey: string): string {
     }
     return keyLines.join('');    // Combine all lines into one long string
 };
+
+// Returns a set of fields for 'location' that should be updated.
+// Returns undefined if there was an error
+export function getAccountLocationIfSpecified(pReq: Request): any {
+  let newLoc: VKeyedCollection = IsNotNullOrEmpty(pReq.vAuthAccount.location) ? pReq.vAuthAccount.location : {};
+  if (pReq.body.location) {
+    try {
+      // build location from what is in the account already
+      const loc = pReq.body.location;
+      if (loc.hasOwnProperty('connected'))       newLoc.connected = loc.connected;
+      if (loc.hasOwnProperty('place'))           newLoc.place = loc.place;
+      if (loc.hasOwnProperty('place_id'))        newLoc.placeId = loc.place_id;
+      if (loc.hasOwnProperty('domain_id'))       newLoc.domainId = loc.domain_id;
+      if (loc.hasOwnProperty('network_address')) newLoc.networkAddress = loc.network_address;
+      if (loc.hasOwnProperty('network_port'))    newLoc.networkPort = loc.network_port;
+      if (loc.hasOwnProperty('node_id'))         newLoc.nodeId = loc.node_id;
+      if (loc.hasOwnProperty('discoverability')) {
+        if (checkDiscoverability(loc.discoverability)) {
+          newLoc.discoverability = loc.discoverability;
+        }
+        else {
+          Logger.debug(`procPutUserLocation: defaulting discoverability to "none" because passed odd value ${loc.discoverability} by ${pReq.vAuthAccount.username}`);
+          newLoc.discoverability = 'none';
+        };
+      };
+    }
+    catch ( err ) {
+      Logger.error(`procPutUserLocation: exception parsing put from ${pReq.vAuthAccount.username}: ${err}`);
+      pReq.vRestResp.respondFailure(`exception parsing request: ${err}`);
+      newLoc = undefined;
+    };
+  };
+  return newLoc;
+}

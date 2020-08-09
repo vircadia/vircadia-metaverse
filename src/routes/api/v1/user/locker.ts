@@ -18,12 +18,19 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
+import { IsNullOrEmpty } from '@Tools/Misc';
+import { Accounts } from '@Entities/Accounts';
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
-const procGetUserLocker: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procGetUserLocker: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
-    req.vRestResp.Data = req.vAuthAccount.locker;
+    if (IsNullOrEmpty(req.vAuthAccount.locker)) {
+      req.vRestResp.Data = {};  // legacy code wants something back
+    }
+    else {
+      req.vRestResp.Data = req.vAuthAccount.locker;
+    };
   }
   else {
     req.vRestResp.respondFailure('unauthorized');
@@ -31,9 +38,9 @@ const procGetUserLocker: RequestHandler = (req: Request, resp: Response, next: N
 
   next();
 };
-const procPostUserLocker: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procPostUserLocker: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
-    req.vAuthAccount.locker = req.body;
+    await Accounts.updateEntityFields(req.vAuthAccount, { 'locker': req.body } );
   }
   else {
     req.vRestResp.respondFailure('unauthorized');

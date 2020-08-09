@@ -24,8 +24,7 @@ import multer from 'multer';
 import { Logger } from '@Tools/Logging';
 import { convertBinKeyToPEM } from '@Route-Tools/Util';
 import { Accounts } from '@Entities/Accounts';
-
-// metaverseServerApp.use(express.urlencoded({ extended: false }));
+import { IsNotNullOrEmpty } from '@Tools/Misc';
 
 // PUT /api/v1/user/public_key
 // The api_key and public_key are POSTed as entities in a multi-part-form mime type.
@@ -39,10 +38,15 @@ const procPutUserPublicKey: RequestHandler = async (req: Request, resp: Response
         // The public key is a binary 'file' that should be in multer memory storage
         const publicKeyBin: Buffer = (req.files as any).public_key[0].buffer;
 
-        const fieldsToUpdate = {
-          'sessionPublicKey': convertBinKeyToPEM(publicKeyBin)
+        if (IsNotNullOrEmpty(publicKeyBin)) {
+          const fieldsToUpdate = {
+            'sessionPublicKey': convertBinKeyToPEM(publicKeyBin)
+          };
+          await Accounts.updateEntityFields(req.vAuthAccount, fieldsToUpdate);
+        }
+        else {
+          req.vRestResp.respondFailure('badly formed public key');
         };
-        await Accounts.updateEntityFields(req.vAuthAccount, fieldsToUpdate);
       }
       catch (e) {
         Logger.error('procPutUserPublicKey: exception converting: ' + e);
@@ -63,8 +67,6 @@ const procPutUserPublicKey: RequestHandler = async (req: Request, resp: Response
 export const name = '/api/v1/user/public_key';
 
 export const router = Router();
-
-router.put(   '/api/v1/user/public_key',             procPutUserPublicKey);
 
 // The public key is sent in binary in a multipart-form.
 // This creates an unpacker to catch fields 'api_key' and 'public_key'

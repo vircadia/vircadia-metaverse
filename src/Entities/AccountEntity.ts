@@ -61,13 +61,7 @@ export class AccountEntity {
 };
 
 // Helper function that checks to make sure 'discoverability' is the right value.
-// Returns 'true' if discoverability was set.
-export function setDiscoverability(pAccount: AccountEntity, pDiscoverability: string): boolean {
-  let ret = false;
-  const disc = pDiscoverability.toLowerCase();
-  if (['none', 'all', 'friends', 'connections'].includes(disc)) {
-    pAccount.location.discoverability = disc;
-    ret = true;
-  };
-  return ret;
+// Returns 'true' if discoverability is legal
+export function checkDiscoverability(pDiscoverability: string): boolean {
+  return ['none', 'all', 'friends', 'connections'].includes(pDiscoverability);
 }
