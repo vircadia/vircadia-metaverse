@@ -19,10 +19,12 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
 
+import { Accounts } from '@Entities/Accounts';
+import { setDiscoverability } from '@Entities/AccountEntity';
+
 import { VKeyedCollection } from '@Tools/vTypes';
 import { IsNotNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
-import { Accounts } from '@Entities/Accounts';
 
 const procPutUserLocation: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
@@ -39,13 +41,10 @@ const procPutUserLocation: RequestHandler = async (req: Request, resp: Response,
         if (loc.hasOwnProperty('network_port'))    newLoc.networkPort = loc.network_port;
         if (loc.hasOwnProperty('node_id'))         newLoc.nodeId = loc.node_id;
         if (loc.hasOwnProperty('discoverability')) {
-          const disc = (loc.discoverability as string).toLowerCase();
-          if (['none', 'all', 'friends', 'connections'].includes(disc)) {
-            newLoc.discoverability = disc;
-          }
-          else {
+          if (! setDiscoverability(req.vAuthAccount, loc['discoverability'])) {
+            const disc = loc['discoverability'];
             Logger.debug(`procPutUserLocation: defaulting discoverability to "none" because passed odd value ${disc} by ${req.vAuthAccount.username}`);
-            newLoc.discoverability = 'none';
+            setDiscoverability(req.vAuthAccount, 'none');
           };
         };
         await Accounts.updateEntityFields(req.vAuthAccount, { 'location': newLoc });

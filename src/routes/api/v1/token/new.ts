@@ -17,7 +17,6 @@
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
-import { buildOAuthResponseBody } from '@Route-Tools/Util';
 
 import { Tokens } from '@Entities/Tokens';
 import { Scope } from '@Entities/Scope';

@@ -21,9 +21,10 @@ import bodyParser from 'express';
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 
-import { buildOAuthResponseBody } from '@Route-Tools/Util';
-
+import { AccountEntity } from '@Entities/AccountEntity';
 import { Accounts } from '@Entities/Accounts';
+import { Roles } from '@Entities/Roles';
+import { AuthToken } from '@Entities/AuthToken';
 import { Tokens } from '@Entities/Tokens';
 import { Scope } from '@Entities/Scope';
 
@@ -112,6 +113,26 @@ const procPostOauthToken: RequestHandler = async (req: Request, resp: Response, 
   };
   resp.json(respBody);
 };
+
+// The response to /oauth/token is special since it tries to mimic an official interface.
+// This is also used by /api/v1/token/new to return the created token.
+export function buildOAuthResponseBody(pAcct: AccountEntity, pToken: AuthToken): VKeyedCollection {
+  const body: VKeyedCollection = {
+    'access_token': pToken.token,
+    'token_type': 'Bearer',
+    'expires_in': pToken.tokenExpirationTime.valueOf()/1000 - pToken.tokenCreationTime.valueOf()/1000,
+    'refresh_token': pToken.refreshToken,
+    'scope': Scope.MakeScopeString(pToken.scope),
+    'created_at': pToken.tokenCreationTime.valueOf() / 1000,
+  };
+  if (pAcct) {
+    body.account_id = pAcct.accountId,
+    body.account_name = pAcct.username,
+    body.account_roles = Roles.MakeRoleString(pAcct.roles);
+  };
+  return body;
+};
+
 
 function buildOAuthErrorBody(pMsg: string): VKeyedCollection {
   return {

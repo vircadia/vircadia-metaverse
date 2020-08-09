@@ -14,33 +14,7 @@
 
 'use strict';
 
-import { AccountEntity } from '@Entities/AccountEntity';
-import { Roles } from '@Entities/Roles';
-import { AuthToken } from '@Entities/AuthToken';
-import { Scope } from '@Entities/Scope';
-
 import { createPublicKey } from 'crypto';
-
-import { VKeyedCollection } from '@Tools/vTypes';
-
-// The response to /oauth/token is special since it tries to mimic an official interface.
-// This is also used by /api/v1/token/new to return the created token.
-export function buildOAuthResponseBody(pAcct: AccountEntity, pToken: AuthToken): VKeyedCollection {
-  const body: VKeyedCollection = {
-    'access_token': pToken.token,
-    'token_type': 'Bearer',
-    'expires_in': pToken.tokenExpirationTime.valueOf()/1000 - pToken.tokenCreationTime.valueOf()/1000,
-    'refresh_token': pToken.refreshToken,
-    'scope': Scope.MakeScopeString(pToken.scope),
-    'created_at': pToken.tokenCreationTime.valueOf() / 1000,
-  };
-  if (pAcct) {
-    body.account_id = pAcct.accountId,
-    body.account_name = pAcct.username,
-    body.account_roles = Roles.MakeRoleString(pAcct.roles);
-  };
-  return body;
-};
 
 // The public_key is sent as a binary (DER) form of a PKCS1 key.
 // To keep backward compatibility, we convert the PKCS1 key into a SPKI key in PEM format
@@ -57,6 +31,9 @@ export function convertBinKeyToPEM(pBinKey: Buffer): string {
   return convertedKey as string;
 };
 
+// The legacy interface returns public keys as a stripped PEM key.
+// "stripped" in that the bounding "BEGIN" and "END" lines have been removed.
+// This routine returns a stripped key string from a properly PEM formatted public key string.
 export function createSimplifiedPublicKey(pPubKey: string): string {
     let keyLines: string[] = [];
     if (pPubKey) {
