@@ -47,6 +47,7 @@ const procGetAccounts: RequestHandler = async (req: Request, resp: Response, nex
         'email': acct.email,
       };
       if (Accounts.isAdmin(acct)) entry.administrator = Accounts.isAdmin(acct);
+      if (acct.roles) entry.roles = acct.roles;
       if (acct.sessionPublicKey)   entry.public_key = createSimplifiedPublicKey(acct.sessionPublicKey);
       if (acct.images)      entry.images = acct.images;
       if (acct.location)    entry.location = acct.location;
