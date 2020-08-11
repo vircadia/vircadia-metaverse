@@ -16,7 +16,7 @@
 
 import { Request } from 'express';
 import { createPublicKey } from 'crypto';
-import { checkDiscoverability } from '@Entities/AccountEntity';
+import { checkAvailability } from '@Entities/AccountEntity';
 import { VKeyedCollection } from '@Tools/vTypes';
 import { IsNotNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
@@ -61,19 +61,19 @@ export function getAccountLocationIfSpecified(pReq: Request): any {
       // build location from what is in the account already
       const loc = pReq.body.location;
       if (loc.hasOwnProperty('connected'))       newLoc.connected = loc.connected;
-      if (loc.hasOwnProperty('place'))           newLoc.place = loc.place;
+      if (loc.hasOwnProperty('path'))            newLoc.path = loc.path;
       if (loc.hasOwnProperty('place_id'))        newLoc.placeId = loc.place_id;
       if (loc.hasOwnProperty('domain_id'))       newLoc.domainId = loc.domain_id;
       if (loc.hasOwnProperty('network_address')) newLoc.networkAddress = loc.network_address;
       if (loc.hasOwnProperty('network_port'))    newLoc.networkPort = loc.network_port;
       if (loc.hasOwnProperty('node_id'))         newLoc.nodeId = loc.node_id;
-      if (loc.hasOwnProperty('discoverability')) {
-        if (checkDiscoverability(loc.discoverability)) {
-          newLoc.discoverability = loc.discoverability;
+      if (loc.hasOwnProperty('availablity')) {
+        if (checkAvailability(loc.availablity)) {
+          newLoc.availablity = loc.availablity;
         }
         else {
-          Logger.debug(`procPutUserLocation: defaulting discoverability to "none" because passed odd value ${loc.discoverability} by ${pReq.vAuthAccount.username}`);
-          newLoc.discoverability = 'none';
+          Logger.debug(`procPutUserLocation: defaulting availability to "none" because passed odd value ${loc.availablity} by ${pReq.vAuthAccount.username}`);
+          newLoc.availablity = 'none';
         };
       };
     }

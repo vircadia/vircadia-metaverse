@@ -36,7 +36,7 @@ export class AccountEntity {
     networkAddress: string;
     networkPort: number;
     nodeId: string;     // sessionId
-    discoverability: string;  // one of 'none', 'friends', 'connections', 'all'
+    availability: string;  // one of 'none', 'friends', 'connections', 'all'
   };
   public connections: string[];
   public friends: string[];
@@ -60,8 +60,8 @@ export class AccountEntity {
   public timeOfLastHeartbeat: Date; // when we last heard from this user
 };
 
-// Helper function that checks to make sure 'discoverability' is the right value.
-// Returns 'true' if discoverability is legal
-export function checkDiscoverability(pDiscoverability: string): boolean {
-  return ['none', 'all', 'friends', 'connections'].includes(pDiscoverability);
+// Helper function that checks to make sure 'availability' is the right value.
+// Returns 'true' if availability is legal
+export function checkAvailability(pAvailability: string): boolean {
+  return ['none', 'all', 'friends', 'connections'].includes(pAvailability);
 }
