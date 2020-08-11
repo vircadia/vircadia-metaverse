@@ -37,9 +37,8 @@ const procMetaverseInfo: RequestHandler = async (req: Request, resp: Response, n
     const additional = await readInJSON(additionUrl);
     if (IsNotNullOrEmpty(additional)) {
       data = deepmerge(data, additional);
-    }
-
-  }
+    };
+  };
   req.vRestResp.Data = data;
   next();
 };

@@ -1,1 +1,1 @@
-declare module 'activitypub-express';
+// declare module 'activitypub-express';

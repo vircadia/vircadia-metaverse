@@ -38,7 +38,6 @@
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "dependencies": {
-        "activitypub-express": "file:../activitypub-express",
         "debug": "~2.6.9",
         "deepmerge": "^4.2.2",
         "express": "~4.16.1",

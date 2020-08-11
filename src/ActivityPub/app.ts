@@ -16,6 +16,7 @@
 
 import Config from '@Base/config';
 
+/*
 import express from 'express';
 import { Router } from 'express';
 
@@ -58,3 +59,4 @@ router.get(routes.actor, apex.net.actor.get);
 router.get(routes.object, apex.net.object.get);
 router.get(routes.activity, apex.net.activityStream.get);
 router.get('/.well-known/webfinger', apex.net.webfinger.get);
+*/
