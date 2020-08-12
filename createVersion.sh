@@ -3,6 +3,7 @@
 # The output is a JSON file with various version things in it.
 
 VERSIONFILE="dist/VERSION.json"
+mkdir -p $(dirname ${VERSIONFILE})
 
 PACKAGEVER="$npm_package_version"
 DATE=$(date "+%Y%m%d")
