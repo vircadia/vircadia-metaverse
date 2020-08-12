@@ -1,0 +1,469 @@
+<html>
+<head>
+    <!-- <link rel="stylesheet" type="text/css" href="tokenlogin.css"> -->
+    <title>MetaverseAPI Request Status</title>
+    <style>
+        body {
+            font-family: Veranda,Arial,Helvetica,sans-serif;
+            font-size: 12px;
+            color: #111;
+            background: #fff;
+            padding: 5em;
+            margin: 10px;
+        }
+        table {
+            font-size: 12px;
+            border: 1px solid;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        td {
+            border: 1px solid;
+            padding: 2px 10px 10px 5px;
+        }
+        th {
+            border: 1px solid;
+        }
+        .good {
+            background: #dfd;
+        }
+        .maybe {
+            background: #ffd;
+        }
+        .bad {
+            background: #fdd;
+        }
+        .v-tab-desc div:first-child {
+            font-weight: bold;
+            background: #eef
+        }
+        .v-tab-desc div:first-child + div {
+            margin-left: 5em;
+        }
+        .v-tab-row td:first-child {
+            width: 70%;
+        }
+        .v-tab-row td:nth-child(2) {
+            text-align: center;
+        }
+        .v-tab-row td:nth-child(3) {
+            text-align: center;
+        }
+        .v-tab-row td:nth-child(4) {
+            text-align: center;
+        }
+        .v-tab-row td:nth-child(5) {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<h1>Project Apollo MetaverseAPI Implementation State</h1>
+<p>
+    This lists each of the MetaverseAPI requests, a short description, and
+    their implmentation and testing state.
+</p>
+<p>
+    Eventually there will be an OpenAPI (Swagger) definition for each request along
+    with a detailed description of its operation. Pointers to these will eventually
+    appear in the "Reference" column.
+</p>
+<h2>Domain Registration and Control</h2>
+<table>
+    <thead>
+        <tr class="v-tab-row">
+            <th>Description</th>
+            <th>Implemented</th>
+            <th>Tested</th>
+            <th>Verified</th>
+            <th>Reference</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>GET /api/v1/domains/{domainID}</div>
+                <div>Returns the ID, name, and ice-server address for a domain. Optionally the APIkey.</div>
+            </td>
+            <td class="good">&#10004;</td>
+            <td class="good">&#10004;</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>PUT /api/v1/domains/{domainID}</div>
+                <div>Sets domain specific parameters.
+                Considered the domain heartbeat and sent every 15 seconds.</div>
+            </td>
+            <td class="good">&#10004;</td>
+            <td class="good">&#10004;</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>PUT /api/v1/domains/{domainID}/ice_server_address</div>
+                <div>Tells the metaverse-server which ICE server the domain is using.</div>
+            </td>
+            <td class="good">&#10004;</td>
+            <td class="good">&#10004;</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>POST /api/v1/domains/temporary</div>
+                <div>Used by a new domain to get a temporary domain name and access APIkey</div>
+            </td>
+            <td class="good">&#10004;</td>
+            <td class="good">&#10004;</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>GET /api/v1/domains/{domainID}/public_key</div>
+                <div>Fetch a domain's public key.</div>
+            </td>
+            <td class="good">&#10004;</td>
+            <td class="good">&#10004;</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>PUT /api/v1/domains/{domainID}/public_key</div>
+                <div>Sets a domain's public key.</div>
+            </td>
+            <td class="good">&#10004;</td>
+            <td class="good">&#10004;</td>
+            <td></td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Access Token Fetch and Update</h2>
+<table>
+    <thead>
+        <tr class="v-tab-row">
+            <th>Description</th>
+            <th>Implemented</th>
+            <th>Tested</th>
+            <th>Verified</th>
+            <th>Reference</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>POST /oauth/token</div>
+                <div>"Login" a user and return an access token. Only "password" grant type supported</div>
+            </td>
+            <td class="good">&#10004;</td>
+            <td class="good">&#10004;</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>GET /user/tokens/new</div>
+                <div>Return a text HTML field showing a new token allocated to the logged in account.
+                    Only "for_domain_server" query accepted.</div>
+            </td>
+            <td class="good">&#10004;</td>
+            <td class="good">&#10004;</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>GET /api/v1/token/new?scope=SCOPE</div>
+                <div>Return a new access token for the logged in account with the specified SCOPE.
+                Scopes supported are "owner" and "domain".</div>
+            </td>
+            <td class="good">&#10004;</td>
+            <td class="good">&#10004;</td>
+            <td></td>
+            <td></td>
+        </tr>
+</table>
+
+<h2>User Information</h2>
+<table>
+    <thead>
+        <tr class="v-tab-row">
+            <th>Description</th>
+            <th>Implemented</th>
+            <th>Tested</th>
+            <th>Verified</th>
+            <th>Reference</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>PUT /api/v1/user/heartbeat</div>
+                <div>
+                    Message sent to metaverse-server every 15 seconds for an active
+                    user/avatar. Contains user's location.
+                </div>
+            </td>
+            <td class="good">&#10004;</td>
+            <td class="good">&#10004;</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>GET /api/v1/users?status=S&amp;per_page=N&amp;page=N&amp;filter=F&amp;search=S</div>
+                <div>
+                    Fetch information on one or more users.
+                </div>
+            </td>
+            <td class="good">&#10004;</td>
+            <td class="maybe">&#10004;</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>POST /api/v1/users</div>
+                <div>
+                    Used by Interface to create a user account
+                </div>
+            </td>
+            <td class="good">&#10004;</td>
+            <td class="good">&#10004;</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>GET /api/v1/user/locker</div>
+                <div>
+                    Fetches the contents of a user's "locker".
+                </div>
+            </td>
+            <td class="good">&#10004;</td>
+            <td class="maybe">&#10004;</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>POST /api/v1/user/locker</div>
+                <div>
+                    Sets the contents of a user's "locker".
+                </div>
+            </td>
+            <td class="good">&#10004;</td>
+            <td class="maybe">&#10004;</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>GET /api/v1/user/friends</div>
+                <div>
+                    Get the list of a user's friends.
+                </div>
+            </td>
+            <td class="bad"></td>
+            <td class="bad"></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>POST /api/v1/user/friends/{friendName}</div>
+                <div>
+                    Add a friend to a user's account.
+                </div>
+            </td>
+            <td class="bad"></td>
+            <td class="bad"></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>DELETE /api/v1/user/friends/{friendName}</div>
+                <div>
+                    Removes a friend from a user's account.
+                </div>
+            </td>
+            <td class="bad"></td>
+            <td class="bad"></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>GET /api/v1/user/connections</div>
+                <div>
+                    Get the list of a user's connections.
+                </div>
+            </td>
+            <td class="bad"></td>
+            <td class="bad"></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>POST /api/v1/user/connections/{connection}</div>
+                <div>
+                    Add a connection to a user's account.
+                </div>
+            </td>
+            <td class="bad"></td>
+            <td class="bad"></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>DELETE /api/v1/user/connections/{connection}</div>
+                <div>
+                    Removes a connection from a user's account.
+                </div>
+            </td>
+            <td class="bad"></td>
+            <td class="bad"></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>GET /api/v1/users/{user}/location</div>
+                <div>
+                    Get a user's location information.
+                </div>
+            </td>
+            <td class="maybe">&#10004;</td>
+            <td class="bad"></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>PUT /api/v1/user/location</div>
+                <div>
+                    Update a user's location information.
+                </div>
+            </td>
+            <td class="maybe">&#10004;</td>
+            <td class="bad"></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>GET /api/v1/user/profile</div>
+                <div>
+                    Get a user's profile info
+                </div>
+            </td>
+            <td class="maybe">&#10004;</td>
+            <td class="bad"></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>PUT /api/v1/user/public_key</div>
+                <div>
+                    Set a logged in user's public key
+                </div>
+            </td>
+            <td class="maybe">&#10004;</td>
+            <td class="bad"></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>GET /api/v1/users/{accountID}/public_key</div>
+                <div>
+                    Get some user's public key.
+                </div>
+            </td>
+            <td class="maybe">&#10004;</td>
+            <td class="bad"></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Misc</h2>
+<table>
+    <thead>
+        <tr class="v-tab-row">
+            <th>Description</th>
+            <th>Implemented</th>
+            <th>Tested</th>
+            <th>Verified</th>
+            <th>Reference</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>POST /api/v1/user_activities</div>
+                <div>
+                    Tell server about some user activity.
+                    Currently only knows "quit" but doesn't do anything with it.
+                </div>
+            </td>
+            <td class="maybe">&#10004;</td>
+            <td class="maybe"></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>GET /api/metaverse_info</div>
+                <div>Returns a JSON object describing this metaverse and the URLs
+                    related to the metaverse's operation.
+                </div>
+            </td>
+            <td class="good">&#10004;</td>
+            <td class="maybe"></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Commerce</h2>
+<table>
+    <thead>
+        <tr class="v-tab-row">
+            <th>Description</th>
+            <th>Implemented</th>
+            <th>Tested</th>
+            <th>Verified</th>
+            <th>Reference</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="v-tab-row">
+            <td class="v-tab-desc">
+                <div>GET /api/v1/commerce/public_key</div>
+                <div>Return the marketplace public key.
+                    Used by some scripts to do marketplace actions.
+                    Currently returns nonsense key.
+                </div>
+            </td>
+            <td class="maybe">&#10004;</td>
+            <td class="maybe"></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>
+</body>
+</html>
