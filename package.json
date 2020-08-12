@@ -1,6 +1,6 @@
 {
     "name": "iamus-metaverse-server",
-    "version": "1.1.1",
+    "version": "1.1.3",
     "private": true,
     "description": "metaverse-server for Vircadia using ActivityPub",
     "author": "Robert Adams <misterblue@misterblue.com>",
@@ -27,13 +27,13 @@
     },
     "scripts": {
         "run": "node dist/index.js",
-        "build": "npm-run-all -s \"clean-dist\" \"add-version\" \"copy-static\" \"build:iamus\"",
+        "build": "npm-run-all -s \"clean-dist\" \"create-version\" \"copy-static\" \"build:iamus\"",
         "prebuild:iamus": "tslint -c tslint.json -p tsconfig.json --fix",
         "build:iamus": "tsc",
         "prestart": "npm run build",
         "start": "node dist/index.js",
         "clean-dist": "rm -rf dist/*",
-        "add-version": "sed -i -e \"s='server-version':.*$='server-version': '$npm_package_version' // Updated by package.json script=\" src/config.ts",
+        "create-version": "./createVersion.sh",
         "copy-static": "cp -r src/static dist",
         "test": "echo \"Error: no test specified\" && exit 1"
     },

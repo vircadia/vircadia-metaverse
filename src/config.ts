@@ -15,6 +15,7 @@ import deepmerge from 'deepmerge';
 import { IsNullOrEmpty, IsNotNullOrEmpty, getMyExternalIPAddress } from '@Tools/Misc';
 import { httpRequest, httpsRequest } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
+import { table } from 'console';
 
 export let Config = {
     'metaverse': {
@@ -28,7 +29,9 @@ export let Config = {
       'listen-port': 9400,
       'static-base': '/static',
       'user-config-file': './iamus.json',
-      'server-version': '1.1.1' // Updated by package.json script
+      'server-version': {
+        'version-tag': '1.1.1-20200101-abcdefg'
+      }
     },
     'auth': {
       'domain-token-expire-hours': 8760,  // one year
@@ -90,6 +93,7 @@ export async function initializeConfiguration(): Promise<void> {
 
   try {
     const userConfigFile = Config.server["user-config-file"];
+    Logger.debug(`initializeConfiguration: reading configuration file ${userConfigFile}`);
     const userConfig = await readInJSON(userConfigFile);
     if (IsNotNullOrEmpty(userConfig)) {
       // this overlays all the Config values with values from the user's file
@@ -101,6 +105,26 @@ export async function initializeConfiguration(): Promise<void> {
   catch (e) {
     Logger.error('initializeConfiguration: exception adding user config: ' + e);
   }
+
+  // Read in version info from distribution version file
+  try {
+    let versionInfo: any;
+    for (const versionFile of [ './VERSION.json' , './dist/VERSION.json' ]) {
+      if (fs.existsSync(versionFile)) {
+        versionInfo = await readInJSON(versionFile);
+        break;
+      };
+    };
+    if (IsNullOrEmpty(versionInfo)) {
+      versionInfo = {
+        'version-tab': 'unknown'
+      };
+    };
+    Config.server["server-version"] = versionInfo;
+  }
+  catch (e) {
+    Logger.error('initializeConfiguration: exception reading version info: ' + e);
+  };
 
   // If no ice server address is specified, assume ours
   if (IsNullOrEmpty(Config.metaverse["default-ice-server-url"])) {
@@ -121,21 +145,18 @@ export async function initializeConfiguration(): Promise<void> {
 export async function readInJSON(pFilenameOrURL: string): Promise<any> {
   let configBody: string;
   if (pFilenameOrURL.startsWith('http:')) {
-    Logger.debug(`initializeConfiguration: fetching with http ${pFilenameOrURL}`);
     configBody = await httpRequest(pFilenameOrURL);
   }
   else {
     if (pFilenameOrURL.startsWith('https:')) {
-      Logger.debug(`initializeConfiguration: fetching with https ${pFilenameOrURL}`);
       configBody = await httpsRequest(pFilenameOrURL);
     }
     else {
       try {
-        Logger.debug(`initializeConfiguration: reading configuration file ${pFilenameOrURL}`);
         configBody = fs.readFileSync(pFilenameOrURL, 'utf-8');
       }
       catch {
-        Logger.debug(`initializedConfiguration: failed read of user config file ${pFilenameOrURL}`);
+        Logger.debug(`readInJSON: failed read of user config file ${pFilenameOrURL}`);
       };
     };
   };

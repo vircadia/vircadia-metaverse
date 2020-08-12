@@ -75,7 +75,7 @@ initializeConfiguration()
 
   const server = Config.debug.devel ? http.createServer(expr) : https.createServer(expr)
   server.on('listening', () => {
-          Logger.info(`Started metaverse-server version ${Config.server["server-version"]} at ${new Date().toISOString()}`);
+          Logger.info(`Started metaverse-server version ${Config.server["server-version"]['version-tag']} at ${new Date().toISOString()}`);
         })
         .on('error', (err) => {
           Logger.error('server exception: ' + err.message);
