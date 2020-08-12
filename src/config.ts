@@ -27,6 +27,8 @@ export let Config = {
     'server': {
       'listen-host': '0.0.0.0',
       'listen-port': 9400,
+      'key-file': '',  // if supplied, do https
+      'cert-file': '',
       'static-base': '/static',
       'user-config-file': './iamus.json',
       'server-version': {
@@ -67,6 +69,7 @@ export let Config = {
       'db-user': 'metaverse',
       'db-pw': 'nooneknowsit',
       'db-authdb': 'admin',
+      'db-connection': ''   // connection string replaces above if supplied
     }
 };
 

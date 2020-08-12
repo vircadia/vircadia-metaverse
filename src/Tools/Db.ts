@@ -21,6 +21,8 @@ import deepmerge from 'deepmerge';
 import { VKeyedCollection } from '@Tools/vTypes';
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 import { Logger } from '@Tools/Logging';
+import { IsNotNullOrEmpty } from './Misc';
+import { createConnection } from 'net';
 
 // The initial MongoClient
 export let BaseClient: MongoClient;
@@ -34,14 +36,22 @@ export let Datab: Db;
 //     Config.database.db).
 export async function setupDB(): Promise<void> {
   // Connection URL docs: https://docs.mongodb.com/manual/reference/connection-string/
-  const userSpec = `${Config.database["db-user"]}:${Config.database["db-pw"]}`;
-  const hostSpec = `${Config.database["db-host"]}:${Config.database["db-port"]}`;
-  let optionsSpec = '';
-  if (Config.database["db-authdb"] !== 'admin') {
-    optionsSpec += `?authSource=${Config.database["db-authdb"]}`;
+  let connectUrl: string;
+  if (IsNotNullOrEmpty(Config.database["db-connection"])) {
+    // if user supplied a connection string, just use that
+    connectUrl = Config.database["db-connection"];
+    Logger.debug(`setupDb: using user supplied connection string`);
+  }
+  else {
+    const userSpec = `${Config.database["db-user"]}:${Config.database["db-pw"]}`;
+    const hostSpec = `${Config.database["db-host"]}:${Config.database["db-port"]}`;
+    let optionsSpec = '';
+    if (Config.database["db-authdb"] !== 'admin') {
+      optionsSpec += `?authSource=${Config.database["db-authdb"]}`;
+    };
+    connectUrl = `mongodb://${userSpec}@${hostSpec}/${optionsSpec}`;
+    Logger.debug(`setupDb: connecting to DB at: mongodb://USER@${hostSpec}/${optionsSpec}`);
   };
-  const connectUrl = `mongodb://${userSpec}@${hostSpec}/${optionsSpec}`;
-  Logger.debug(`setupDb: connecting to DB at: mongodb://USER@${hostSpec}/${optionsSpec}`);
 
   // Connect to the client and then get a database handle to the database to use for this app
   // This app returns the base client and keeps it in the exported global variable.

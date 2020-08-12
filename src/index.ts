@@ -21,6 +21,7 @@ import http from 'http';
 import https from 'https';
 import path from 'path';
 import express from 'express';
+import fs from 'fs';
 import { Router } from 'express';
 
 import { setupDB } from '@Tools/Db';
@@ -30,6 +31,7 @@ import morgan from 'morgan';
 import { Logger, morganOptions } from '@Tools/Logging';
 import { initTokens } from '@Entities/Tokens';
 import { initSessions } from '@Entities/Sessions';
+import { IsNotNullOrEmpty } from '@Tools/Misc';
 
 initializeConfiguration()
 .catch ( err => {
@@ -73,7 +75,27 @@ initializeConfiguration()
   //   console.log(`New ${msg.object.type} from ${msg.actor} to ${msg.recipient}`)
   // });
 
-  const server = Config.debug.devel ? http.createServer(expr) : https.createServer(expr)
+  // Build server to listen for requests
+  // If certificates are provided, create an https server
+  let server: http.Server | https.Server;
+  if (IsNotNullOrEmpty(Config.server["key-file"])
+        && IsNotNullOrEmpty(Config.server["cert-file"]) ) {
+    try {
+      const httpsOptions = {
+        key: fs.readFileSync(Config.server["key-file"]),
+        cert: fs.readFileSync(Config.server["cert-file"])
+      };
+      server = https.createServer(httpsOptions, expr);
+    }
+    catch (err) {
+      Logger.error(`main: exception initializing https: ${err}`);
+    };
+  }
+  else {
+    server = http.createServer(expr);
+  };
+
+  // When the server is ready, start listening
   server.on('listening', () => {
           Logger.info(`Started metaverse-server version ${Config.server["server-version"]['version-tag']} at ${new Date().toISOString()}`);
         })
