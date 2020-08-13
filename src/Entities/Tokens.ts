@@ -23,9 +23,8 @@ import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 
 import { VKeyedCollection } from '@Tools/vTypes';
-import { GenUUID, IsNullOrEmpty } from '@Tools/Misc';
+import { GenUUID, IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
-import { DeleteWriteOpResultObject } from 'mongodb';
 
 export let tokenCollection = 'tokens';
 
@@ -36,7 +35,10 @@ export function initTokens(): void {
   setInterval( async () => {
     const nowtime = new Date();
     const deleteInfo = await deleteMany(tokenCollection, { tokenExpirationTime: { $lt: nowtime } } );
-    Logger.debug(`Tokens.Expiration: expired ${deleteInfo.deletedCount} tokens`);
+    let deletedTokens = deleteInfo.deletedCount;
+    if (typeof(deletedTokens) === 'number' && deletedTokens > 0) {
+      Logger.debug(`Tokens.Expiration: expired ${deletedTokens} tokens`);
+    };
   }, 1000 * 60 * 5 );
 };
 
