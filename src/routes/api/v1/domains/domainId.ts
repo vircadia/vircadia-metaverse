@@ -45,7 +45,7 @@ const procGetDomainsDomainid: RequestHandler = async (req: Request, resp: Respon
   else {
     req.vRestResp.respondFailure(req.vDomainError ?? 'Domain not found');
     // HTTP error will force domain renegotation
-    req.vRestResp.HTTPStatus = HTTPStatusCode.NotFound;
+    req.vRestResp.HTTPStatus = HTTPStatusCode.Unauthorized;
   };
   next();
 };
