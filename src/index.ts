@@ -44,6 +44,7 @@ initializeConfiguration()
 })
 .catch( err => {
   Logger.error('main: failure opening database: ' + err);
+  return;
 })
 .then( () => {
   // Initialize and start ExpressJS
