@@ -21,9 +21,8 @@ constants which need changing to run a different metaverse-server instance.
 
 ## Metaverse-Server
 
-I do my development of the metaverse-server on a Windows10 box running
-Visual Studio 2019.
-This gets me hands-on with the source for modification and debugging.
+I do my development of the metaverse-server on a Linux box
+using NodeJS version 14.
 If I am running the server as a separate service, I build a [Docker] image
 and run it in a [DigitalOcean] droplet.
 Refer to [Running Docker Image] for the latter case. What follows is

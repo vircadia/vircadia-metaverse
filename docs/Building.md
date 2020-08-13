@@ -1,33 +1,18 @@
-# Building and Configuring Project Apollo
+# Building and Configuring Iamus
 
-This document describes building and configuring the Project Apollo
+This document describes building and configuring the Iamus
 metaverse-server. There are other documents on setting up
 and running the server. For that, refer to
 [Notes On Development] and [Running Docker Image].
 
 ## Build Instructions
 
-```
-dotnet restore
-dotnet build
-```
-
-## Pre-Requisites
-
-Other than dotnet-core, the pre-requisite packages are all NuGet
-packages which are installed with the "dotnet restore":
+The application is a [NodeJS]/[ExpressJS]/[TypeScript] application so the
+build steps are: 
 
 ```
-dotnet-core 3.1
-Newtonsoft.Json
-RandomNameGeneratorLibrary
-HttpMultipartParser
-Microsoft.IO.RecyclableMemoryStream
-BCrypt.Net-Next
-Nerdbank.GitVersioning
-Microsoft.NET.Test.SDK
-NUnit
-NUnit3TestAdaptor
+npm install
+npm run build
 ```
 
 ## Running
@@ -39,6 +24,7 @@ metaverse server. This is accomplished by setting the `HIFI_METAVERSE_URL`:
 export HIFI_METAVERSE_URL=http://HOSTADDRESS:9400
 ./run_domain-server
 ```
+
 If you are modifying domain-server sources, the default server address is in
 `NetworkingConstants.h`:
 
@@ -51,82 +37,44 @@ If you are modifying domain-server sources, the default server address is in
 
 ## Versioning and Development
 
-This server uses [Nerdbank.GitVersioning] to add versioning information to
-the build. The file `version.json` specifies the version of the build. The
-Git 'height' is added to the longer version number to uniquify the builds.
+The server has a package version specified in `package.json`. The build
+process creates the file `VERSION.json` which contains tags for the
+current package and build version. The format of the file is:
 
-The Git branch `master` is used for development and it is updated with the
-latest, untested sources and pull requests. Branches are created for the
-stable releases. For instance, there will be a branch named `v1.1` that is
-created to hold the distributed version 1.1 release.
-This release branch will get fixes before release and will receive the post-release patches.
-
-The complete, uniquifying version number (including version, release status, and Git
-commit number) is printed on the console and in the log file.
-
-## Configuration
-
-The application reads a configuration file and accepts command line parameters.
-Each of the parameters listed below can be in the JSON format configuration file
-or specified on the command line (prepended with a double-dash or prepended with "--no" to complement booleans)
-
-| Parameter | Description | Type | Default |
-| --------- | ----------- | ---- | ------- |
-| Quiet         | Quiet console output | bool | false |
-| Verbose       | Excessive console output | bool | false |
-| ConsoleLog    | Also log to the console | bool | true |
-| ConfigFile    | Per site configuration file | string | "config.json" |
-| DefaultIceServer | IP address of ice server. If empty, set to self. | string | "" |
-| Listener.Host | HttpListener host | string | "+" |
-| Listener.Port | HttpListener port | int | 9400 |
-| Listener.Response.Header.Server | What to return as 'Server: header field | string | "1.5" |
-| Storage.Dir   | Root of entity storage | string | "Entities" |
-| Storage.StaticDir | Directory of static pages served for users | string | "Static" |
-| Commerce.MarketplaceKey | Public key for Marketplace access. This is a placeholder. | string | "lksjdlkjskldjflsd" |
-| LogLevel       | One of 'warn', 'info', 'debug' | string | "Debug" |
-| Logger.RotateMins | Minutes to write to log file before starting next | int | 60 |
-| Logger.ForceFlush | Force a flush after each log write | bool | true |
-| Logger.LogDirectory | Directory to put logs into | string | "Logs" |
-| Debug.Processing | Whether to print each API request processing | bool | false |
-
-A configuration file that changes the listening port looks like:
-
-```json
+```
 {
-    "Listener.Port": 19400
+  "npm-package-version": "2.1.1",
+  "git-commit": "02fac7f918f5137a6538965e55a219e85619b845",
+  "version-tag": "2.1.1-20200812-02fac7f"
 }
 ```
 
-While a command line doing the same:
+`version-tag` combines the NPM package version, the date of build, and
+the GIT commit version and is used to tag the Docker image.
 
-`./ProjectApollo.exe --Listener.Port=19400`
+## Configuration
 
-The default console logging can be suppressed with the command line:
+The server parameters are all specified in `config.ts`. These default
+values are overlayed with environment variables and then overlayed with
+the contents of a configuration file.
 
-`./ProjectApollo.exe --noConsoleLog`
+The environment variables are:
 
-The configuration file and storage directories default to the application's run directory but
-can be placed anywhere by specifying the `ConfigFile` or `Storage.Dir` parameters.
+- IAMUS_LOGLEVEL: logging level. One of 'error', 'info', 'warn', 'debug'. Default 'info'.
+- IAMUS_LISTEN_HOST: host to listen for requests on. Default '0.0.0.0'.
+- IAMUS_LISTEN_PORT: port to listen for requests on. Default 9400.
+- IAMUS_EXTERNAL_HOSTNAME: hostname to report as referencing back to this server. This is mostly used by ActivityPub for links to users. Default 'localhost'. This value MUST be set for proper metavserse-server operation.
+- IAMUS_CONFIG_FILE: filename or URL of a JSON formatted configuration file that over-rides the values. Default "./imus.json".
+
+The configuration file, if it exists, is read and its values overlay
+the other configuration values. This is the preferred method of configuring the
+server: use the IAMUS_CONFIG_FILE environment variable to point at a configuration
+file that sets the values for the metaverse-server instance.
 
 ## Troubleshooting
 
-### Windows
-
-Much of the development and operation was done on Windows 10 with Visual Studio 2019.
-
-If building from command line,
-make sure you have dotnet core 3.1 SDK installed. Most of the development and 
-building should be possible from the command line, just by executing the bat files.
-Builds are located in `bin/`.
-
-On Windows10, you must add the listening URL to the HTTP ACL:
-
-     `netsh http add urlacl url=http://+:9400/ user=everyone`
-
-### Mac & Linux
-
-Install dotnet core 3.1 from https://dotnet.microsoft.com/download/dotnet-core/3.1
-
 [Running Docker Image]: ./RunningDockerImage.md
 [Notes On Development]: ./NotesOnDevelopment.md
-[Nerdbank.GitVersioning]: https://github.com/dotnet/Nerdbank.GitVersioning
+[NodeJS]: https://nodejs.org/
+[ExpressJS]: https://expressjs.com/
+[TypeScript]: https://www.typescriptlang.org/

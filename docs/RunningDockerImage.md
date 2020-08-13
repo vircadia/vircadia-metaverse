@@ -3,20 +3,20 @@
 ## Docker Image
 
 A Docker image is made of the latest release.
-As of 20200611, the Docker image is stored at
+As of 20200813, the Docker image is stored at
 hub.docker.com with the name "misterblue/vircadia-metaverse-server".
 Someday CI will be integrated with this project and then the image may move.
 
-As of 20200616, there is an instance of the Docker image running
+As of 20200813, there is an instance of the Docker image running
 at `metaverse.bluestuff.org`. For a description of that instance,
 refer to the [test setup] document.
 
 To create your own Docker image, the process is:
 
 ```sh
-git clone https://github.com/kasenvr/project-apollo.git
-cd project-apollo/docker
-docker build -t vircadiamvsrv .
+git clone https://github.com/kasenvr/Iamus.git
+cd Iamus/docker
+docker build -t iamus .
 ```
 
 I have been running the Docker image in a [DigitalOcean] droplet.
@@ -58,20 +58,28 @@ chown -R mvsrv:mvsrv /home/mvsrv/.ssh
 chmod 700 /home/mvsrv/.ssh
 ```
 
-## Create Directories for Persistant Data and Create Configuration File
+## Add MongoDB to the Droplet
+
+TODO: write something here
+    create database
+    add user for server
+
+## Create Directories and Create Configuration File
 
 ```sh
-mkdir -p content/Config
-cat > content/Config/config.json << EOFFF
+mkdir -p config
+cat > config/iamus.json << EOFFF
 {
-    "Storage.Dir": "/var/vircadia/content/Entries",
-    "Logger.LogDirectory": "/var/vircadia/content/Logs",
-    "DefaultIceServer": THE_ADDRESS_OF_ICE_SERVER,
-
-    "LogLevel": "Debug",
-    "Logger.ForceFlush": true,
-    "ConsoleLog": false,
-    "Debug.Processing": true
+    "metaverse": {
+        "metaverse-server-url": "EXTERNAL_URL",
+        "default-ice-server-url": "ADDRESS_OF_ICE_SERVER"
+    },
+    "database": {
+        "db": "DB_NAME",
+        "db-host": "LOCAL_HOST_NAME",
+        "db-user": "MONGO_USER",
+        "db-pw": "MONGO_USER_PASSWORD"
+    }
 }
 EOFFF
 ```
@@ -84,22 +92,18 @@ and let all logging go to the `content/Logs` directory.
 The `THE_ADDRESS_OF_ICE_SERVER` must be replaced with the IP address
 or domain name of the ice-server.
 
-The last three lines says "Debug" level logging, flush write each
-log file entry (this helps make sure information is in the log file
-if the application crashes), and to output a debug log line when
-any API call is received.
-
 ## Run the Metaverse-Server Docker Image
 
 I use a script to run the docker image:
 
 ```sh
 #! /bin/bash
-
 docker run -d \
+        --name=metaverseserver \
         --restart=unless-stopped \
         -p 9400:9400 \
-        --volume /home/mvsrv/content/:/var/vircadia/content \
+        -e IAMUS_CONFIG_FILE=/home/cadia/config/iamus.json \
+        --volume ${BASE}/config:/home/cadia/config \
         misterblue/vircadia-metaverse-server
 ```
 
