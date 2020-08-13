@@ -30,15 +30,23 @@ const procMetaverseInfo: RequestHandler = async (req: Request, resp: Response, n
     'metaverse_nick_name': Config.metaverse["metaverse-nick-name"],
     'metaverse_url': Config.metaverse["metaverse-server-url"],
     'ice_server_url': Config.metaverse["default-ice-server-url"],
-    'metaverse_server_version': Config.server["server-version"],
+    'metaverse_server_version': JSON.stringify(Config.server["server-version"]),
   };
+
+  // If the additional information file exists, read and include the contents
   const additionUrl: string = Config["metaverse-server"]["metaverse-info-addition-file"];
-  if (IsNotNullOrEmpty(additionUrl)) {
-    const additional = await readInJSON(additionUrl);
-    if (IsNotNullOrEmpty(additional)) {
-      data = deepmerge(data, additional);
+  try {
+    if (IsNotNullOrEmpty(additionUrl)) {
+      const additional = await readInJSON(additionUrl);
+      if (IsNotNullOrEmpty(additional)) {
+        data = deepmerge(data, additional);
+      };
     };
+  }
+  catch (err) {
+    Logger.error(`procMetaverseInfo: exception reading additional info file: ${err}`);
   };
+
   req.vRestResp.Data = data;
   next();
 };
