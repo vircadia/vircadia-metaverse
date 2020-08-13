@@ -28,6 +28,7 @@ import { DomainEntity } from '@Entities/DomainEntity';
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 import { AccountEntity } from '@Entities/AccountEntity';
 import { IsNullOrEmpty } from '@Tools/Misc';
+import { HTTPStatusCode } from '@Route-Tools/RESTResponse';
 
 import { Logger } from '@Tools/Logging';
 import { createSimplifiedPublicKey } from '@Route-Tools/Util';
@@ -74,6 +75,7 @@ const procGetDomains: RequestHandler = async (req: Request, resp: Response, next
   }
   else {
     req.vRestResp.respondFailure("Unauthorized");
+    req.vRestResp.HTTPStatus = HTTPStatusCode.Unauthorized;
   };
   next();
 };

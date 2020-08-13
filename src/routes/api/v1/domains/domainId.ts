@@ -85,7 +85,7 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
   else {
     req.vRestResp.respondFailure(req.vDomainError ?? 'Domain not found');
     // HTTP error will force domain renegotation
-    req.vRestResp.HTTPStatus = HTTPStatusCode.NotFound;
+    req.vRestResp.HTTPStatus = HTTPStatusCode.Unauthorized;
   };
   next();
 };

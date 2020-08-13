@@ -35,7 +35,7 @@ export function initTokens(): void {
   setInterval( async () => {
     const nowtime = new Date();
     const deleteInfo = await deleteMany(tokenCollection, { tokenExpirationTime: { $lt: nowtime } } );
-    let deletedTokens = deleteInfo.deletedCount;
+    const deletedTokens = deleteInfo.deletedCount;
     if (typeof(deletedTokens) === 'number' && deletedTokens > 0) {
       Logger.debug(`Tokens.Expiration: expired ${deletedTokens} tokens`);
     };

@@ -24,6 +24,7 @@ import multer from 'multer';
 
 import { Logger } from '@Tools/Logging';
 import { createSimplifiedPublicKey, convertBinKeyToPEM } from '@Route-Tools/Util';
+import { HTTPStatusCode } from '@Route-Tools/RESTResponse';
 
 // GET /domains/:domainId/public_key
 // For backward-compatibility, the PEM formatted public key is returned by this
@@ -37,6 +38,7 @@ const procGetDomainsPublicKey: RequestHandler = async (req: Request, resp: Respo
     };
   }
   else {
+    req.vRestResp.HTTPStatus = HTTPStatusCode.Unauthorized;
     req.vRestResp.respondFailure('No domain');
   };
   next();
@@ -68,7 +70,10 @@ const procPutDomainsPublicKey: RequestHandler = async (req: Request, resp: Respo
     else {
       Logger.error('procPutDomainsPublicKey: no files part of body');
       req.vRestResp.respondFailure('no public key supplied');
-    }
+    };
+  }
+  else {
+    req.vRestResp.HTTPStatus = HTTPStatusCode.Unauthorized;
   };
   next();
 };
