@@ -103,7 +103,8 @@ export async function initializeConfiguration(): Promise<void> {
       Config = deepmerge(Config, userConfig);
       Logger.setLogLevel(Config.debug.loglevel);  // it could have changed the logLevel
       Logger.debug(`initializeConfiguration: processed configuration file ${userConfigFile}`);
-    }
+      Logger.debug(`initializeConfiguration: debug setting: ${JSON.stringify(Config.debug)}`);
+    };
   }
   catch (e) {
     Logger.error('initializeConfiguration: exception adding user config: ' + e);
@@ -124,6 +125,7 @@ export async function initializeConfiguration(): Promise<void> {
       };
     };
     Config.server["server-version"] = versionInfo;
+      Logger.debug(`initializeConfiguration: version info: ${JSON.stringify(versionInfo)}`);
   }
   catch (e) {
     Logger.error('initializeConfiguration: exception reading version info: ' + e);

@@ -108,6 +108,7 @@ const procPostOauthToken: RequestHandler = async (req: Request, resp: Response, 
     respBody = buildOAuthErrorBody('Exception: ' + err);
   };
 
+  Logger.debug('oauth/token: response: ' + JSON.stringify(respBody));
   if (Config.debug["metaverseapi-response-detail"]) {
     Logger.debug('oauth/token: response: ' + JSON.stringify(respBody));
   };
@@ -135,6 +136,7 @@ export function buildOAuthResponseBody(pAcct: AccountEntity, pToken: AuthToken):
 
 
 function buildOAuthErrorBody(pMsg: string): VKeyedCollection {
+  Logger.error(`procPostOauthToken: returning error body: ${pMsg}`);
   return {
     'error': pMsg
   };
