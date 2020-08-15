@@ -21,6 +21,7 @@ import http from 'http';
 import https from 'https';
 import path from 'path';
 import express from 'express';
+import cors from 'cors';
 import fs from 'fs';
 import { Router } from 'express';
 
@@ -52,6 +53,12 @@ initializeConfiguration()
 
   // Setup the logger of messages
   expr.use(morgan('dev', morganOptions));
+
+  // Set up the CORS allows headers and option handshakes
+  expr.use(cors({
+    'allowedHeaders': [ 'x-vircadia-error-handle' ],
+    'credentials': true
+  } ));
 
   // Most of the requests are JSON in an out
   expr.use(express.json());
