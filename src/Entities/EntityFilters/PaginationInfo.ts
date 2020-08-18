@@ -59,11 +59,10 @@ export class PaginationInfo extends CriteriaFilter {
   };
 
   public criteriaParameters(): any {
-    // For the moment, do all the testing with 'criteriaTest' but still limit fetch.
     // this._doingQuery = true;
     return {
       // '$skip': (this.PageNum - 1) * this.PerPage,
-      '$limit': this.PerPage
+      // '$limit': this.PerPage
     };
   };
 
