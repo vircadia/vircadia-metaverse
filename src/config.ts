@@ -105,7 +105,6 @@ export async function initializeConfiguration(): Promise<void> {
       Config = deepmerge(Config, userConfig);
       Logger.setLogLevel(Config.debug.loglevel);  // it could have changed the logLevel
       Logger.debug(`initializeConfiguration: processed configuration file ${userConfigFile}`);
-      Logger.debug(`initializeConfiguration: debug setting: ${JSON.stringify(Config.debug)}`);
     };
   }
   catch (e) {
@@ -146,6 +145,8 @@ export async function initializeConfiguration(): Promise<void> {
     Logger.debug(`initializeConfiguration: built metaverse url of ${newUrl}`);
     Config.metaverse["metaverse-server-url"] = newUrl;
   }
+
+  Logger.debug(`initializeConfiguration: debug setting: ${JSON.stringify(Config.debug)}`);
   return;
 };
 

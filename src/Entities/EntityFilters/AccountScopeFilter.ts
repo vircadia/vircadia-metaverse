@@ -56,17 +56,17 @@ export class AccountScopeFilter extends CriteriaFilter {
     return this._asAdmin;
   };
 
-  public criteriaTest(pThingy: any): boolean {
+  public criteriaTest(pToTest: any): boolean {
     if (! this._doingQuery) {
       if (this._asAdmin) {
         if (this._targetAcct) {
-          return typeof(pThingy.accountId) !== 'undefined'
-                && pThingy.accountId === this._targetAcct;
+          return typeof(pToTest.accountId) !== 'undefined'
+                && pToTest.accountId === this._targetAcct;
         }
         return true;
       };
-      return typeof(pThingy.accountId) !== 'undefined'
-              && pThingy.accountId === this._accessingAcct.accountId;
+      return typeof(pToTest.accountId) !== 'undefined'
+              && pToTest.accountId === this._accessingAcct.accountId;
     }
     return true;
   };
