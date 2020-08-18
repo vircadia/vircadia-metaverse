@@ -26,7 +26,7 @@ const procPutDomainsIceServerAddress: RequestHandler = async (req: Request, resp
   Logger.debug('procPutDomainsIceServerAddress');
   if (req.vDomain) {
     if (req.body && req.body.domain && req.body.domain.ice_server_address) {
-      let updates: any = {
+      const updates: any = {
         'iceServerAddr': req.body.domain.ice_server_address
       };
       Domains.updateEntityFields(req.vDomain, updates);

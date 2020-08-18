@@ -36,6 +36,7 @@ const procGetAccounts: RequestHandler = async (req: Request, resp: Response, nex
     const scoper = new AccountScopeFilter(req.vAuthAccount);
     const infoer = new AccountFilterInfo();
     pager.parametersFromRequest(req);
+    scoper.parametersFromRequest(req);
     infoer.parametersFromRequest(req);
 
     // Loop through all the filtered accounts and create array of info
