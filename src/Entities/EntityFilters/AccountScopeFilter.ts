@@ -37,6 +37,7 @@ export class AccountScopeFilter extends CriteriaFilter {
       if (pRequest.query.asAdmin) {
         if (Accounts.isAdmin(this._accessingAcct)) {
           this._asAdmin = true;
+          Logger.debug(`AccountScopeFilter: accepting asAdmin for ${this._accessingAcct.username}`);
         };
       };
       // The administrator can specify an account to limit requests to
@@ -74,6 +75,10 @@ export class AccountScopeFilter extends CriteriaFilter {
     const criteria: any = {};
     if (! this._asAdmin) {
       criteria.accountId = this._accessingAcct.accountId;
+      Logger.debug(`AccountScopeFilter.criteriaParameters: not admin so limiting to account ${this._accessingAcct.username}`);
+    }
+    else {
+      Logger.debug(`AccountScopeFilter.criteriaParameters: admin so not limiting accounts`);
     };
     if (this._asAdmin && typeof(this._targetAcct) !== 'undefined') {
       criteria.accountId = this._targetAcct
