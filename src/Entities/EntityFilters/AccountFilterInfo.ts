@@ -48,7 +48,7 @@ export class AccountFilterInfo extends CriteriaFilter {
   };
 
   public criteriaParameters(): any {
-    Logger.debug(`AccountFilterInfo.criteriaParameters: `);
+    // Logger.debug(`AccountFilterInfo.criteriaParameters: `);
     return {
     };
   };

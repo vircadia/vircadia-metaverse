@@ -30,7 +30,6 @@ export class AccountScopeFilter extends CriteriaFilter {
   public constructor(pRequestorAccount: AccountEntity) {
     super();
     this._accessingAcct = pRequestorAccount;
-    Logger.debug(`AccountScopeFilter: account scope for ${this._accessingAcct.username}`);
     return;
   }
   public parametersFromRequest(pRequest: Request) : void {
@@ -38,7 +37,6 @@ export class AccountScopeFilter extends CriteriaFilter {
       if (pRequest.query.hasOwnProperty('asAdmin')) {
         if (Accounts.isAdmin(this._accessingAcct)) {
           this._asAdmin = true;
-          Logger.debug(`AccountScopeFilter: accepting asAdmin for ${this._accessingAcct.username}`);
         };
       };
       // The administrator can specify an account to limit requests to
@@ -72,15 +70,11 @@ export class AccountScopeFilter extends CriteriaFilter {
   };
 
   public criteriaParameters(): any {
-    Logger.debug(`AccountScopeFilter.criteriaParameters: `);
     this._doingQuery = true;
     const criteria: any = {};
     if (! this._asAdmin) {
       criteria.accountId = this._accessingAcct.accountId;
-      Logger.debug(`AccountScopeFilter.criteriaParameters: not admin so limiting to account ${this._accessingAcct.username}`);
-    }
-    else {
-      Logger.debug(`AccountScopeFilter.criteriaParameters: admin so not limiting accounts`);
+      // Logger.debug(`AccountScopeFilter.criteriaParameters: not admin so limiting to account ${this._accessingAcct.username}`);
     };
     if (this._asAdmin && typeof(this._targetAcct) !== 'undefined') {
       criteria.accountId = this._targetAcct

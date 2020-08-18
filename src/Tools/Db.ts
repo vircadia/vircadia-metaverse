@@ -137,21 +137,12 @@ export async function *getObjects(pCollection: string,
   let criteria:any = {};
   if (pPager) {
     criteria = deepmerge(criteria, pPager.criteriaParameters());
-    if (Config.debug["db-query-detail"]) {
-      Logger.debug(`db.getObjects: have pPager. ${JSON.stringify(criteria)}`);
-    };
   };
   if (pInfoer) {
     criteria = deepmerge(criteria, pInfoer.criteriaParameters());
-    if (Config.debug["db-query-detail"]) {
-      Logger.debug(`db.getObjects: have pInfoer. ${JSON.stringify(criteria)}`);
-    };
   };
   if (pScoper) {
     criteria = deepmerge(criteria, pScoper.criteriaParameters());
-    if (Config.debug["db-query-detail"]) {
-      Logger.debug(`db.getObjects: have pScoper. ${JSON.stringify(criteria)}`);
-    };
   };
 
   if (Config.debug["db-query-detail"]) {
