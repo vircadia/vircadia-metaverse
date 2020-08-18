@@ -72,17 +72,18 @@ export class AccountScopeFilter extends CriteriaFilter {
   };
 
   public criteriaParameters(): any {
+    Logger.debug(`AccountScopeFilter.criteriaParameters: `);
     this._doingQuery = true;
     const criteria: any = {};
     if (! this._asAdmin) {
-      criteria.accountId = this._accessingAcct.accountId;
-      // Logger.debug(`AccountScopeFilter.criteriaParameters: not admin so limiting to account ${this._accessingAcct.username}`);
+      criteria['accountId'] = this._accessingAcct.accountId;
+      Logger.debug(`AccountScopeFilter.criteriaParameters: not admin so limiting to account ${this._accessingAcct.username}`);
     }
     else {
-      // Logger.debug(`AccountScopeFilter.criteriaParameters: admin so not limiting accounts`);
+      Logger.debug(`AccountScopeFilter.criteriaParameters: admin so not limiting accounts`);
     };
     if (this._asAdmin && typeof(this._targetAcct) !== 'undefined') {
-      criteria.accountId = this._targetAcct
+      criteria['accountId'] = this._targetAcct
     }
     return criteria;
   };

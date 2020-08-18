@@ -19,13 +19,17 @@ import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { domainFromParams, domainAPIkeyFromBody, verifyDomainAccess } from '@Route-Tools/middleware';
 
 import { Logger } from '@Tools/Logging';
+import { Domains } from '@Entities/Domains';
 
 // PUT /domains/:domainId/ice_server_address
 const procPutDomainsIceServerAddress: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   Logger.debug('procPutDomainsIceServerAddress');
   if (req.vDomain) {
     if (req.body && req.body.domain && req.body.domain.ice_server_address) {
-      req.vDomain.iceServerAddr = req.body.domain.ice_server_address;
+      let updates: any = {
+        'iceServerAddr': req.body.domain.ice_server_address
+      };
+      Domains.updateEntityFields(req.vDomain, updates);
     };
   }
   else {
