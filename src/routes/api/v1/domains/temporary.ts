@@ -35,7 +35,8 @@ const procPostDomainsTemporary: RequestHandler = async (req: Request, resp: Resp
   Logger.debug('procPostDomainsTemporary');
 
   const customConfig: Config = {
-    dictionaries: [ adjectives, colors, animals ],
+    // dictionaries: [ adjectives, colors, animals ],
+    dictionaries: [ adjectives, animals ],
     separator: '-',
     length: 3
   };
