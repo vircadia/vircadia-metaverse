@@ -37,11 +37,11 @@ const procGetUsersPublicKey: RequestHandler = async (req: Request, resp: Respons
   next();
 };
 
-export const name = '/api/v1/users/:username/public_key';
+export const name = '/api/v1/users/:accoundId/public_key';
 
 export const router = Router();
 
-router.get(   '/api/v1/users/:username/public_key', [ setupMetaverseAPI,
+router.get(   '/api/v1/users/:accoundId/public_key', [ setupMetaverseAPI,
                                                       accountFromParams,  // vRESTResp.vAccount
                                                       procGetUsersPublicKey,
                                                       finishMetaverseAPI ] );

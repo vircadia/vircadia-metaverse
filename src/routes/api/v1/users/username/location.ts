@@ -89,11 +89,11 @@ async function buildLocationInfo(pReq: Request): Promise<any> {
 
 }
 
-export const name = '/api/v1/users/:username/location';
+export const name = '/api/v1/users/:accountId/location';
 
 export const router = Router();
 
-router.get(   '/api/v1/users/:username/location', [ setupMetaverseAPI,    // req.vRESTReq
+router.get(   '/api/v1/users/:accountId/location', [ setupMetaverseAPI,   // req.vRESTReq
                                                     accountFromAuthToken, // req.vAuthAccount
                                                     accountFromParams,    // req.vAccount
                                                     procGetUserLocation,
