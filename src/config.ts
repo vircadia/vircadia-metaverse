@@ -160,8 +160,8 @@ export async function readInJSON(pFilenameOrURL: string): Promise<any> {
       try {
         configBody = fs.readFileSync(pFilenameOrURL, 'utf-8');
       }
-      catch {
-        Logger.debug(`readInJSON: failed read of user config file ${pFilenameOrURL}`);
+      catch (err) {
+        Logger.debug(`readInJSON: failed read of user config file ${pFilenameOrURL}: ${err}`);
       };
     };
   };

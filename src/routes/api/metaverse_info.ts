@@ -30,7 +30,7 @@ const procMetaverseInfo: RequestHandler = async (req: Request, resp: Response, n
     'metaverse_nick_name': Config.metaverse["metaverse-nick-name"],
     'metaverse_url': Config.metaverse["metaverse-server-url"],
     'ice_server_url': Config.metaverse["default-ice-server-url"],
-    'metaverse_server_version': JSON.stringify(Config.server["server-version"]),
+    'metaverse_server_version': Config.server["server-version"],
   };
 
   // If the additional information file exists, read and include the contents
