@@ -15,9 +15,9 @@
 
 import { Request } from 'express';
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
-import { AccountEntity } from '../AccountEntity';
+import { AccountEntity } from '@Entities/AccountEntity';
 
-import { Logger } from '../../Tools/Logging';
+import { Logger } from '@Tools/Logging';
 
 export class AccountFilterInfo extends CriteriaFilter {
   private _filter: string;
@@ -48,6 +48,7 @@ export class AccountFilterInfo extends CriteriaFilter {
   };
 
   public criteriaParameters(): any {
+    Logger.debug(`AccountFilterInfo.criteriaParameters: `);
     return {
     };
   };

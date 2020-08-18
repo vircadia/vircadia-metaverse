@@ -15,8 +15,10 @@
 
 import { Request } from 'express';
 
-import { Clamp } from '@Tools/Misc';
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
+
+import { Clamp } from '@Tools/Misc';
+import { Logger } from '@Tools/Logging';
 
 export class PaginationInfo extends CriteriaFilter {
   public PageNum: number = 1;
@@ -38,10 +40,11 @@ export class PaginationInfo extends CriteriaFilter {
   public parametersFromRequest(pRequest: Request) : void {
     if (pRequest.query.page) {
       this.PageNum = Clamp(Number(pRequest.query.page), 1, 1000);
-    }
+    };
     if (pRequest.query.per_page) {
       this.PerPage = Clamp(Number(pRequest.query.per_page), 1, 1000);
-    }
+    };
+    Logger.debug(`PaginstationInfo: pageNum=${this.PageNum}, perPage=${this.PerPage}`);
   }
 
   public criteriaTest(pThingy: any): boolean {
@@ -56,6 +59,7 @@ export class PaginationInfo extends CriteriaFilter {
   };
 
   public criteriaParameters(): any {
+    Logger.debug(`PaginationInfo.criteriaParameters: `);
     this._doingQuery = true;
     return {
       '$skip': (this.PageNum - 1) * this.PerPage,
