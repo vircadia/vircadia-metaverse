@@ -41,7 +41,7 @@ export const name = '/api/v1/users/:accoundId/public_key';
 
 export const router = Router();
 
-router.get(   '/api/v1/users/:accoundId/public_key', [ setupMetaverseAPI,
+router.get(   '/api/v1/users/:accountId/public_key', [ setupMetaverseAPI,
                                                       accountFromParams,  // vRESTResp.vAccount
                                                       procGetUsersPublicKey,
                                                       finishMetaverseAPI ] );
