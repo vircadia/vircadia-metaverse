@@ -30,15 +30,19 @@ export class AccountScopeFilter extends CriteriaFilter {
   public constructor(pRequestorAccount: AccountEntity) {
     super();
     this._accessingAcct = pRequestorAccount;
+    Logger.debug(`AccountScopeFilter: account scope for ${this._accessingAcct.username}`);
     return;
   }
   public parametersFromRequest(pRequest: Request) : void {
     try {
-      if (pRequest.query.asAdmin) {
+      if (pRequest.query.hasOwnProperty('asAdmin')) {
         if (Accounts.isAdmin(this._accessingAcct)) {
           this._asAdmin = true;
           Logger.debug(`AccountScopeFilter: accepting asAdmin for ${this._accessingAcct.username}`);
         };
+      }
+      else {
+        Logger.debug(`AccountScopeFilter: no asAdmin query`);
       };
       // The administrator can specify an account to limit requests to
       if (pRequest.query.acct) {
