@@ -86,6 +86,7 @@ export const accountFromAuthToken: RequestHandler = async (req: Request, resp: R
 
 // MetaverseAPI middleware.
 // The request has a :accountId label that needs to be looked up and verified.
+// We check if the accountId is either an account username or the accountId.
 // Decorate the passed Request with 'vAccount' which points to a AccountEntity.
 // If account cannot be found or verified, 'vAccountError' is set with text explaining the error.
 export const accountFromParams: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
