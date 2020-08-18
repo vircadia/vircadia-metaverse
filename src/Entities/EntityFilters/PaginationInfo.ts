@@ -44,7 +44,7 @@ export class PaginationInfo extends CriteriaFilter {
     if (pRequest.query.per_page) {
       this.PerPage = Clamp(Number(pRequest.query.per_page), 1, 1000);
     };
-    Logger.debug(`PaginstationInfo: pageNum=${this.PageNum}, perPage=${this.PerPage}`);
+    // Logger.debug(`PaginstationInfo: pageNum=${this.PageNum}, perPage=${this.PerPage}`);
   }
 
   public criteriaTest(pThingy: any): boolean {
@@ -59,14 +59,12 @@ export class PaginationInfo extends CriteriaFilter {
   };
 
   public criteriaParameters(): any {
-    /*  $skip and $limit are not how to select just a few documents
-    this._doingQuery = true;
+    // For the moment, do all the testing with 'criteriaTest' but still limit fetch.
+    // this._doingQuery = true;
     return {
-      '$skip': (this.PageNum - 1) * this.PerPage,
+      // '$skip': (this.PageNum - 1) * this.PerPage,
       '$limit': this.PerPage
     };
-    */
-    return {};
   };
 
   public *filter<T>(pToFilter: Generator<T>) : Generator<T> {

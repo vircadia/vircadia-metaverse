@@ -36,7 +36,7 @@ const procMaintRaw: RequestHandler = async (req: Request, resp: Response, next: 
         const value = req.vParam3;
         const criteria: any = {};
         criteria[field] = value;
-        req.vRestResp.Data = getObject(collection, criteria);
+        req.vRestResp.Data = await getObject(collection, criteria);
       }
       else {
         req.vRestResp.respondFailure('parameters missing');
