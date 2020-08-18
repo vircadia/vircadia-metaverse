@@ -59,12 +59,13 @@ export class PaginationInfo extends CriteriaFilter {
   };
 
   public criteriaParameters(): any {
-    Logger.debug(`PaginationInfo.criteriaParameters: `);
+    /*  $skip and $limit are not how to select just a few documents
     this._doingQuery = true;
     return {
       '$skip': (this.PageNum - 1) * this.PerPage,
       '$limit': this.PerPage
     };
+    */
   };
 
   public *filter<T>(pToFilter: Generator<T>) : Generator<T> {
