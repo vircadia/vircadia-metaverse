@@ -23,3 +23,21 @@ export interface VKeyedCollection {
 export interface VKeyValue {
   [ key: string]: string
 };
+
+export interface SArray extends Array<string>{};
+export function sArrayAdd(pArray: SArray, pAdd: string): SArray {
+  if (! sArrayHas(pArray, pAdd)) {
+    pArray.push(pAdd);
+  }
+  return pArray;
+};
+export function sArrayRemove(pArray: SArray, pRemove: string): SArray {
+  const idx = pArray.indexOf(pRemove);
+  if (idx >= 0) {
+    pArray.splice(idx, 1);
+  }
+  return pArray;
+};
+export function sArrayHas(pArray: SArray, pCheck: string): boolean {
+  return pArray.includes(pCheck);
+};

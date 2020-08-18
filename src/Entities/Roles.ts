@@ -27,14 +27,17 @@ export class Roles {
   };
 
   static HasRole(pRoles: string[], pCheck:string): boolean {
-    return pRoles.includes(pCheck);
+    return pRoles.includes(pCheck.toLowerCase());
   };
 
   // Add a role to a list of roles.
   static AddRole(pRoles: string[], pRole: string): boolean {
     let ret = false
-    if (! pRoles.includes(pRole)) {
-      pRoles.push(pRole);
+    const role = pRole.toLowerCase();
+    if (Roles.KnownRole(role)) {
+      if (! pRoles.includes(role)) {
+        pRoles.push(role);
+      };
       ret = true;
     };
     return ret;
@@ -42,7 +45,8 @@ export class Roles {
 
   static RemoveRole(pRoles: string[], pRole: string): boolean {
     let ret = false;
-    const index: number = pRoles.indexOf(pRole);
+    const role = pRole.toLowerCase();
+    const index: number = pRoles.indexOf(role);
     if (index >= 0) {
       pRoles.splice(index, 1);
       ret = true;
