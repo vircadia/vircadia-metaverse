@@ -36,6 +36,9 @@ declare global {
             vDomainAPIKey?: string;     // if domain APIkey supplied in the request, it is passed here
             vTokenId?: string;          // value from :tokenId
             vSenderKey?: string;        // ip:port of sender to uniquely identify same
+            vParam1?: string;           // Used by maint for parameters
+            vParam2?: string;           // Used by maint for parameters
+            vParam3?: string;           // Used by maint for parameters
         }
     }
 };

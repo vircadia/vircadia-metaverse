@@ -192,3 +192,27 @@ export const tokenFromParams: RequestHandler = async (req: Request, resp: Respon
   };
   next();
 };
+// MetaverseAPI middleware.
+// The request has a :tokenId label that is returned in 'vTokenId'.
+export const param1FromParams: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  if (req.vRestResp) {
+    req.vParam1 = req.params.param1;
+  };
+  next();
+};
+// MetaverseAPI middleware.
+// The request has a :tokenId label that is returned in 'vTokenId'.
+export const param2FromParams: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  if (req.vRestResp) {
+    req.vParam2 = req.params.param2;
+  };
+  next();
+};
+// MetaverseAPI middleware.
+// The request has a :tokenId label that is returned in 'vTokenId'.
+export const param3FromParams: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  if (req.vRestResp) {
+    req.vParam3 = req.params.param3;
+  };
+  next();
+};
