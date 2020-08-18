@@ -38,7 +38,7 @@ const procPostDomainsTemporary: RequestHandler = async (req: Request, resp: Resp
     // dictionaries: [ adjectives, colors, animals ],
     dictionaries: [ colors, animals ],
     separator: '-',
-    length: 3
+    length: 2
   };
   const generatedPlacename: string = uniqueNamesGenerator(customConfig);
 
