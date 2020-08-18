@@ -145,7 +145,9 @@ export async function *getObjects(pCollection: string, pPager?: CriteriaFilter,
     criteria = deepmerge(criteria, pPager.criteriaParameters);
   };
 
-  // Logger.debug(`Db.getObjects: collection=${pCollection}, criteria=${JSON.stringify(criteria)}`)
+  if (Config.debug["db-query-detail"]) {
+    Logger.debug(`Db.getObjects: collection=${pCollection}, criteria=${JSON.stringify(criteria)}`)
+  };
   const cursor = Datab.collection(pCollection).find(criteria);
 
   while (await cursor.hasNext()) {

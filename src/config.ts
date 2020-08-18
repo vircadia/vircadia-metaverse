@@ -60,7 +60,9 @@ export let Config = {
       // output the received request body when received
       'request-body': false,
       // output the response sent back from MetaverseAPI requests
-      'metaverseapi-response-detail': false
+      'metaverseapi-response-detail': false,
+      // outputs details about DB queries
+      'db-query-detail': false
     },
     'database': {
       'db-host': 'localhost',
