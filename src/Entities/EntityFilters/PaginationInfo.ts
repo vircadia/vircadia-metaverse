@@ -66,6 +66,7 @@ export class PaginationInfo extends CriteriaFilter {
       '$limit': this.PerPage
     };
     */
+    return {};
   };
 
   public *filter<T>(pToFilter: Generator<T>) : Generator<T> {
