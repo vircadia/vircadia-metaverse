@@ -45,22 +45,19 @@ GET /api/metaverse_info
 
 ```
     {
-        "status": "success",
-        "data": {
-            "metaverse_name": "BlueStuff Test Metaverse",
-            "metaverse_nick_name": "BlueStuff",
-            "metaverse_url": "http://metaverse.bluestuff.org:9400",
-            "ice_server_url": "ice.bluestuff.org:7337",
-            "metaverse_server_version": {
-                "npm-package-version":"2.2.1",
-                "git-commit":"ef6394bf8c4600dd5640c607476fa617eaca683f",
-                "version-tag":"2.2.1-20200818-ef6394b"
-            }
+        "metaverse_name": "BlueStuff Test Metaverse",
+        "metaverse_nick_name": "BlueStuff",
+        "metaverse_url": "http://metaverse.bluestuff.org:9400",
+        "ice_server_url": "ice.bluestuff.org:7337",
+        "metaverse_server_version": {
+            "npm-package-version":"2.2.1",
+            "git-commit":"ef6394bf8c4600dd5640c607476fa617eaca683f",
+            "version-tag":"2.2.1-20200818-ef6394b"
         }
     }
 ```
 
-Any key/value information can be included in the response by a particular metaverse-server
+Any additional information can be included in the response by a particular metaverse-server
 but these are the default items returned.
 
 ## Operations

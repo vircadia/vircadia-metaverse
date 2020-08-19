@@ -15,7 +15,7 @@
 'use strict';
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
+import { setupMetaverseAPI, finishMetaverseAPI, finishReturnData } from '@Route-Tools/middleware';
 
 import { Config, readInJSON } from '@Base/config';
 
@@ -57,7 +57,7 @@ export const router = Router();
 
 router.get( '/api/metaverse_info',    [ setupMetaverseAPI,
                                         procMetaverseInfo,
-                                        finishMetaverseAPI ] );
+                                        finishReturnData ] );
 router.get( '/api/v1/metaverse_info', [ setupMetaverseAPI,
                                         procMetaverseInfo,
-                                        finishMetaverseAPI ] );
+                                        finishReturnData ] );

@@ -69,6 +69,27 @@ export const finishMetaverseAPI: RequestHandler = async (req: Request, resp: Res
   };
 };
 
+// Like 'finishMetaverseAPI' but doesn't return the status/data JSON object but only
+//    returns the data body as the JSON response.
+// This is needed for some of the API requests (eg. /oauth/token) who's response is
+//    just JSON data.
+// The request is terminated here by either 'resp.end()' or 'resp.json()'.
+export const finishReturnData: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  if (req.vRestResp) {
+    resp.statusCode = req.vRestResp.HTTPStatus;
+    const response = req.vRestResp.buildRESTResponse();
+    if (response && response.data) {
+      if (Config.debug["metaverseapi-response-detail"]) {
+        Logger.debug('finishReturnData: response: ' + JSON.stringify(response.data));
+      };
+      resp.json(response.data);
+    }
+    else {
+      resp.end();
+    };
+  };
+};
+
 // MetaverseAPI middleware.
 // Check for account specified by request 'Authorization:' token.
 // Decorate passed Request with 'vAuthAccount' which points to an AccountEntity.

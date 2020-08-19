@@ -19,7 +19,7 @@ import Config from '@Base/config';
 import bodyParser from 'express';
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
+import { setupMetaverseAPI, finishMetaverseAPI, finishReturnData } from '@Route-Tools/middleware';
 
 import { AccountEntity } from '@Entities/AccountEntity';
 import { Accounts } from '@Entities/Accounts';
@@ -108,11 +108,8 @@ const procPostOauthToken: RequestHandler = async (req: Request, resp: Response, 
     respBody = buildOAuthErrorBody('Exception: ' + err);
   };
 
-  Logger.debug('oauth/token: response: ' + JSON.stringify(respBody));
-  if (Config.debug["metaverseapi-response-detail"]) {
-    Logger.debug('oauth/token: response: ' + JSON.stringify(respBody));
-  };
-  resp.json(respBody);
+  req.vRestResp.Data = respBody;
+  next();
 };
 
 // The response to /oauth/token is special since it tries to mimic an official interface.
@@ -146,6 +143,7 @@ export const name = "/oauth/token";
 
 export const router = Router();
 
-router.post( '/oauth/token',      setupMetaverseAPI,
-                                  bodyParser.urlencoded({extended: true}),
-                                  procPostOauthToken);
+router.post( '/oauth/token',  [ setupMetaverseAPI,        // req.vRestResp
+                                bodyParser.urlencoded({extended: true}), // req.body
+                                procPostOauthToken,
+                                finishReturnData ]);
