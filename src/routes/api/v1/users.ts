@@ -18,13 +18,16 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 
 import { Accounts } from '@Entities/Accounts';
+import { Domains } from '@Entities/Domains';
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
 import { AccountFilterInfo } from '@Entities/EntityFilters/AccountFilterInfo';
 
+import { buildLocationInfo } from '@Route-Tools/Util';
+
 import { Logger } from '@Tools/Logging';
 import { AccountEntity } from '@Entities/AccountEntity';
-import { IsNullOrEmpty } from '@Tools/Misc';
+import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
@@ -44,7 +47,7 @@ const procGetUsers: RequestHandler = async (req: Request, resp: Response, next: 
         'accountId': acct.accountId,
         'username': acct.username,
         'images': acct.images,
-        'location': buildLocationInfo(acct),
+        'location': await buildLocationInfo(req, acct),
       });
     };
 
@@ -53,17 +56,6 @@ const procGetUsers: RequestHandler = async (req: Request, resp: Response, next: 
     };
   }
   next();
-};
-
-function buildLocationInfo(pAcct: AccountEntity): any {
-  const locInfo: any = {};
-  if (IsNullOrEmpty(pAcct.location)) {
-    const thing = 5;  // make tslint happy for the moment
-  }
-  else {
-    const thing = 5;  // make tslint happy for the moment
-  }
-
 };
 
 // Create a user account using the username and password passed

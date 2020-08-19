@@ -15,8 +15,11 @@
 'use strict';
 
 import { Request } from 'express';
+import { Accounts } from '@Entities/Accounts';
+import { Domains } from '@Entities/Domains';
+import { checkAvailability, AccountEntity } from '@Entities/AccountEntity';
+
 import { createPublicKey } from 'crypto';
-import { checkAvailability } from '@Entities/AccountEntity';
 import { VKeyedCollection } from '@Tools/vTypes';
 import { IsNotNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
@@ -84,4 +87,48 @@ export function getAccountLocationIfSpecified(pReq: Request): any {
     };
   };
   return newLoc;
-}
+};
+
+// The returned location info has many options depending on whether
+//    the account has set location and/or has an associated domain.
+// Return a structure that represents the target account's domain
+export async function buildLocationInfo(pReq: Request, pAcct: AccountEntity): Promise<any> {
+  const ret: any = {};
+  if (IsNotNullOrEmpty(pAcct.location)) {
+    if (pAcct.location.domainId) {
+      const aDomain = await Domains.getDomainWithId(pAcct.location.domainId);
+      if (IsNotNullOrEmpty(aDomain)) {
+        return {
+          'node_id': pReq.vSession.sessionId,
+          'root': {
+            'domain': {
+              'id': aDomain.domainId,
+              'name': aDomain.placeName,
+              'network_address': aDomain.networkAddr,
+              'ice_server_address': aDomain.iceServerAddr
+            },
+            'name': aDomain.placeName
+          },
+          'path': pAcct.location.path,
+          'online': Accounts.isOnline(pReq.vAccount)
+        };
+      }
+      else {
+        // The domain doesn't have an ID
+        return {
+          'node_id': pReq.vSession.sessionId,
+          'online': Accounts.isOnline(pReq.vAccount),
+          'root': {
+            'domain': {
+              'network_address': pAcct.location.networkAddress,
+              'network_port': pAcct.location.networkPort
+            }
+          }
+        };
+      };
+    };
+  };
+  ret.node_id = pReq.vSession.sessionId,
+  ret.online = Accounts.isOnline(pReq.vAccount)
+  return ret;
+};

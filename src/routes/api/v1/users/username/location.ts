@@ -17,17 +17,16 @@
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken, accountFromParams } from '@Route-Tools/middleware';
-import { AccountEntity } from '@Entities/AccountEntity';
-import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
+import { buildLocationInfo } from '@Route-Tools/Util';
+
 import { Accounts } from '@Entities/Accounts';
-import { Domains } from '@Entities/Domains';
 
 const procGetUserLocation: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
     if (req.vAccount) {
       if (Accounts.CanAccess(req.vAuthAccount, req.vAccount)) {
         req.vRestResp.Data = {
-          'location': await buildLocationInfo(req)
+          'location': await buildLocationInfo(req, req.vAccount)
         };
       }
       else {
@@ -44,55 +43,11 @@ const procGetUserLocation: RequestHandler = async (req: Request, resp: Response,
   next();
 };
 
-// The returned location info has many options depending on whether
-//    the account has set location and/or has an associated domain.
-// Return a structure that represents the target account's domain
-async function buildLocationInfo(pReq: Request): Promise<any> {
-  const ret: any = {};
-  if (IsNotNullOrEmpty(pReq.vAccount.location)) {
-    if (pReq.vAccount.location.domainId) {
-      const aDomain = await Domains.getDomainWithId(pReq.vAccount.location.domainId);
-      if (IsNotNullOrEmpty(aDomain)) {
-        return {
-          'node_id': pReq.vSession.sessionId,
-          'root': {
-            'domain': {
-              'id': aDomain.domainId,
-              'name': aDomain.placeName,
-              'network_address': aDomain.networkAddr,
-              'ice_server_address': aDomain.iceServerAddr
-            },
-            'name': aDomain.placeName
-          },
-          'path': pReq.vAuthAccount.location.path,
-          'online': Accounts.isOnline(pReq.vAccount)
-        };
-      }
-      else {
-        // The domain doesn't have an ID
-        return {
-          'node_id': pReq.vSession.sessionId,
-          'online': Accounts.isOnline(pReq.vAccount),
-          'root': {
-            'domain': {
-              'network_address': pReq.vAccount.location.networkAddress,
-              'network_port': pReq.vAccount.location.networkPort
-            }
-          }
-        };
-      };
-    };
-  };
-  ret.node_id = pReq.vSession.sessionId,
-  ret.online = Accounts.isOnline(pReq.vAccount)
-  return ret;
-
-}
-
 export const name = '/api/v1/users/:accountId/location';
 
 export const router = Router();
 
+// Note the user of :accountId which looks up the username
 router.get(   '/api/v1/users/:accountId/location', [ setupMetaverseAPI,   // req.vRESTReq
                                                     accountFromAuthToken, // req.vAuthAccount
                                                     accountFromParams,    // req.vAccount
