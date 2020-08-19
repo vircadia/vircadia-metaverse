@@ -129,7 +129,7 @@ export function buildOAuthResponseBody(pAcct: AccountEntity, pToken: AuthToken):
   if (pAcct) {
     body.account_id = pAcct.accountId,
     body.account_name = pAcct.username,
-    body.account_roles = Roles.MakeRoleString(pAcct.roles);
+    body.account_roles = pAcct.roles;
   };
   return body;
 };
