@@ -52,6 +52,10 @@ current package and build version. The format of the file is:
 `version-tag` combines the NPM package version, the date of build, and
 the GIT commit version and is used to tag the Docker image.
 
+The version information is also read and added to the configuration
+data structure (for use by the application) and added to the
+`metaverse_info` API requests for reading by external applications.
+
 ## Configuration
 
 The server parameters are all specified in `config.ts`. These default

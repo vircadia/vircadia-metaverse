@@ -61,7 +61,7 @@ run-ice-server.sh:
 ```sh
 #! /bin/bash
 cd ~/Vircadia/install_master
-export HIFI_METAVERSE_URL=http://192.168.86.41:9400
+export HIFI_METAVERSE_URL=http://192.168.86.56:9400
 ./run_ice-server --url ${HIFI_METAVERSE_URL}
 ```
 
@@ -72,14 +72,20 @@ run-domain-server.sh:
 cd ~/Vircadia/install_master
 
 FORCETEMPNAME=--get-temp-name
-export HIFI_METAVERSE_URL=http://192.168.86.41:9400
-./run_domain-server -i 192.168.86.56:7337 ${FORCETEMPNAME}
+export HIFI_METAVERSE_URL=http://192.168.86.56:9400
+export ICE_SERVER=192.168.86.56:7337
+./run_domain-server -i ${ICE_SERVER} ${FORCETEMPNAME}
 ```
 
 The IP addresses above are for my development environment: 192.168.86.41 is
-the Windows10 box running the metaverse-server and Interface, and
+the Linux box running the metaverse-server and Interface, and
 192.168.86.56 is my Linux box running the ice-server and domain-server.
 Be sure to change these for your network setup.
+
+The `--get-temp-name` parameter is required to start a domain-server
+as it instructs it to fetch a temporary domain name if it is not
+configured from a previous run. The configuration of the
+domain-server ends up in `.local/share/Vircadia/domain-server`.
 
 Note that the ice-server and the domain-server get an environment variable
 that points them at the new metaverse-server. This setting works for most of
@@ -95,28 +101,21 @@ Once everything is built, the process is:
 
 ## Modifications
 
-As of 20200614 (June 14, 2020), there are several pull requests ("PR"s) that have not
-yet been applied to the [Project Athena] sources. These are 
-[Move metaverse server URL info into central files for easier updating](https://github.com/kasenvr/project-athena/pull/411)
-(which centralizes some of the URL references scattered in [Project Athena])
+As of 20200819 (August 19, 2020), the Vircadia sources have HighFidelity
+URLs embedded in them. To run a domain-server and Interface that point to
+another metaverse-server, the sources must be modified. The notes above
+describe how to build for these changes.
+
+The two known places that need modification are
+`libraries/networking/src/NetworkingConstants.h`
 and
-[Bug: ice-server uses the wrong RSA private key decoder](https://github.com/kasenvr/project-athena/pull/400)
-(which fixes an ice-server public-key encoding problem).
+`domain-server/resources/web/js/shared.js`.
 
-These two PRs must be applied to the sources. They will be accepted someday so,
-when you're reading this, you might not need to make the above changes.
-If, after starting the ice-server and domain-server, the domain-server continuiously
-outputs messages about recreating its public/private key, the ice-server PR has not been applied.
-
-With the above PRs applied, you modify `libraries/networking/src/NetworkingConstants.h` so
-that all references are to your metaverse-server.
-That file also points to several High Fidelity locations and they do not need changing yet --
-someday they will all point to Vircadia content.
-
-You need to modify `domain-server/resources/web/js/shared.js` so `METAVERSE_URL` points
-to your metaverse-server.
-
-## Interface
+There is a PR that incorporates these changes for the **BlueStuff** test
+metaverse. This pull request has a build of the domain-server and
+Interface with pointers to the test domain.
+See [PR472](https://github.com/kasenvr/project-athena/pull/472)
+for built images.
 
 [Project Athena]: https://github.com/kasenvr/project-athena
 [vircadia-builder]: https://github.com/kasenvr/vircadia-builder

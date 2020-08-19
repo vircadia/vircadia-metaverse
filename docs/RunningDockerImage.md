@@ -3,11 +3,11 @@
 ## Docker Image
 
 A Docker image is made of the latest release.
-As of 20200813, the Docker image is stored at
+As of 20200819, the Docker image is stored at
 hub.docker.com with the name "misterblue/vircadia-metaverse-server".
 Someday CI will be integrated with this project and then the image may move.
 
-As of 20200813, there is an instance of the Docker image running
+As of 20200819, there is an instance of the Docker image running
 at `metaverse.bluestuff.org`. For a description of that instance,
 refer to the [test setup] document.
 
@@ -51,18 +51,54 @@ I copy the SSH key from the root
 account to this new account so the SSH login is the same.
 
 ```sh
-adduser --disabled-password --gecos "Vircadia Metaverse Server User" mvsrv
-mkdir /home/mvsrv/.ssh
-cp /home/root/.ssh/authorized_keys /home/mvsrv/.ssh
-chown -R mvsrv:mvsrv /home/mvsrv/.ssh
-chmod 700 /home/mvsrv/.ssh
+adduser --disabled-password --gecos "Vircadia Metaverse Server User" cadia
+mkdir /home/cadia/.ssh
+cp /home/root/.ssh/authorized_keys /home/cadia/.ssh
+chown -R cadia:cadia /home/cadia/.ssh
+chmod 700 /home/cadia/.ssh
 ```
 
 ## Add MongoDB to the Droplet
 
-TODO: write something here
-    create database
-    add user for server
+Install MongoDb following the instructions at https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/ :
+
+```sh
+wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+sudo apt-get update
+sudo apt-get install -y mongodb-org
+sudo systemctl start mongod       # start server
+sudo systemctl status mongod     # check that it is running
+sudo systemctl enable mongod    # enable startup at boot
+mongo
+db.disableFreeMonitoring()
+```
+
+Turn on authentication and create some users for our instance:
+
+```sh
+mongo
+use admin
+db.createUser({user:"adminer", pwd: "LONGPASSWORD1", roles: [ "root" ]})
+use admin
+db.createUser({user:"backuper", pwd: "LONGPASSWORD2", roles: [ "backup" ]})
+use admin
+db.createUser({user:"cadiauser", pwd: "LONGPASSWORD3", roles: [{ role: "readWrite", db: "domainstore" }]})
+```
+
+Where, if course, "LONGPASSWORD*" is a collection of random letter and numbers.
+This creates account "adminer" for DB administration, "backuper" for doing backups
+and "cadiauser" to be the database user for the domain-server.
+The database is "domainstore".
+
+After doing the above creation steps, edit `/etc/mongod.conf` and add:
+
+```
+security:
+    authorization: enabled
+```
+
+then do `sudo systemctl restart mongod`.
 
 ## Create Directories and Create Configuration File
 
