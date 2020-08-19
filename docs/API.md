@@ -45,11 +45,18 @@ GET /api/metaverse_info
 
 ```
     {
-        "metaverse_name": "BlueStuff Test Metaverse",
-        "metaverse_nick_name": "BlueStuff",
-        "metaverse_url": "http://metaverse.bluestuff.org:9400",
-        "ice_server_url": "ice.blueplace.org:7337",
-        "metaverse_server_version": "1.1.58-alpha+71ea34fac0",
+        "status": "success",
+        "data": {
+            "metaverse_name": "BlueStuff Test Metaverse",
+            "metaverse_nick_name": "BlueStuff",
+            "metaverse_url": "http://metaverse.bluestuff.org:9400",
+            "ice_server_url": "ice.bluestuff.org:7337",
+            "metaverse_server_version": {
+                "npm-package-version":"2.2.1",
+                "git-commit":"ef6394bf8c4600dd5640c607476fa617eaca683f",
+                "version-tag":"2.2.1-20200818-ef6394b"
+            }
+        }
     }
 ```
 
@@ -82,6 +89,12 @@ With the access token, requests are made for information on
 [Users](./API-Users.md),
 and
 [Tokens](./API-Tokens.md)
+
+The [/oauth/token](./API-Tokens.md#post-oauthtoken)
+request mimics the [OAuth2] request format and thus the response conforms to that
+specification rather than following the usual response format (status/data).
+Also refer to that requests documentation for other [OAuth2] format
+requests.
 
 ## Account Creation
 
@@ -127,4 +140,6 @@ This hack is enabled when the request has a specific header:
 
 If this header is in the API request, errors, that would have normally been returned with
 an HTTP "200 OK" will be returned with a "400 Bad Request". All other operation is unchanged.
+
+[OAuth2]: https://oauth.net/2/
 

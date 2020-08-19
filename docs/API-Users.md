@@ -42,7 +42,6 @@ The response body is an "applicaton/json" structure that contains an array of us
                 {
                     "username": username,
                     "accountid": stringAccountId,
-                    "connection": bool,
                     "images": {
                         "Hero": heroImageURL,
                         "Thumbnail": thumbnailImageURL,

@@ -30,7 +30,7 @@ are returned (limited by pagination).
                     "accountid": "uniqueAccountId",
                     "username: "username",
                     "email": "email",
-                    "public_key": "usersPublicKey",
+                    "public_key": "usersPublicKey",     // stripped PEM public key
                     "images": {
                         "hero": stringUrlToImage,
                         "thumbnail": stringUrlToImage,
@@ -45,7 +45,8 @@ are returned (limited by pagination).
                     },
                     "friends": [ "friendName", "friendName", ... ],
                     "connections": [ "connectionName", "connectionName", ...],
-                    "administator": false,
+                    "administator": false,              // 'true' if has "admin" role
+                    "roles": [ "role", "role", ... ],   // roles of "user", "admin", ...
                     "when_account_created": "YYYY-MM-DDTHH:MM:SS.MMMZ",
                     "time_of_last_heartbeat": "YYYY-MM-DDTHH:MM:SS.MMMZ"
                 },
@@ -132,7 +133,7 @@ be an administrative account.
                     "refresh_token": stringTokenForRefreshingToken,
                     "token_creation_time": "YYYY-MM-DDTHH:MM:SS.MMMZ",
                     "token_expiration_time": "YYYY-MM-DDTHH:MM:SS.MMMZ",
-                    "scope": stringScope    // one of "any", "owner", "domain", "web"
+                    "scope": [ "scope1", "scope2", ... ]  // one of "any", "owner", "domain", "web"
                 },
                 ...
             ]

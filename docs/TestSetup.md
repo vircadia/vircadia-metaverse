@@ -1,13 +1,14 @@
-# Project Apollo Test Setup
+# Iamus Test Setup
 
-**TL:DR version**: a test metaverse using the latest Project Apollo
+**TL:DR version**: a test metaverse using the latest
+Iamus and Project Athena
 sources (metaverse-server and ice-server) has been created.
 Do testing by running domain-servers
-and Interfaces created in [Project Athena] pull request #458 ([PR #472]).
+and Interfaces created in [Project Athena] pull request #472 ([PR #472]).
 
 Long version:
 
-An instance of the Project Apollo metaverse-server Docker image
+An instance of the Iamus metaverse-server Docker image
 is running in a [DigitalOcean] droplet.
 This, along with an ice-server instance,
 provides a test setup that is updated frequently with the
@@ -53,7 +54,6 @@ The ice-server is addressed at `http://ice.bluestuff.org:7337`.
 
 As of 20200616, https has not yet been set up for these servers so
 the links must be `http:`.
-
 
 [Project Athena]: https://github.com/kasenvr/project-athena
 [vircadia-builder]: https://github.com/kasenvr/vircadia-builder

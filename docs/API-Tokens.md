@@ -64,7 +64,10 @@ body formatted:
         "expires_in": integerSecondsUntilTokenExpiration,
         "refresh_token": tokenToUseToRefreshThisToken,
         "scope": scopeOfTokenUse,
-        "created_at": integerUnixTimeSeconds
+        "created_at": integerUnixTimeSeconds,
+        "account_name": accountNameString,
+        "account_roles": [ roles ],
+        "account_id": accountIdString
     }
 ```
 
@@ -123,7 +126,9 @@ The POST request returns an "application/json" body:
             "token_id": tokenIdentifierString,
             "refresh_token": tokenToUseToRefreshThisToken,
             "token_expiration_seconds": integerOfSecondsUntilExpiration,
-            "account_name": accountNameString
+            "account_name": accountNameString,
+            "account_roles": [ roles ],
+            "account_id": accountIdString
         }
     }
 ```
