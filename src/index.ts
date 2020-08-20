@@ -87,11 +87,13 @@ initializeConfiguration()
   // If certificates are provided, create an https server
   let server: http.Server | https.Server;
   if (IsNotNullOrEmpty(Config.server["key-file"])
-        && IsNotNullOrEmpty(Config.server["cert-file"]) ) {
+        && IsNotNullOrEmpty(Config.server["cert-file"])
+        && IsNotNullOrEmpty(Config.server["chain-file"]) ) {
     try {
       const httpsOptions = {
         key: fs.readFileSync(Config.server["key-file"]),
-        cert: fs.readFileSync(Config.server["cert-file"])
+        cert: fs.readFileSync(Config.server["cert-file"]),
+        ca: fs.readFileSync(Config.server["chain-file"])
       };
       server = https.createServer(httpsOptions, expr);
     }

@@ -29,6 +29,7 @@ export let Config = {
       'listen-port': 9400,
       'key-file': '',  // if supplied, do https
       'cert-file': '',
+      'chain-file': '',
       'static-base': '/static',
       'user-config-file': './iamus.json',
       'server-version': {
