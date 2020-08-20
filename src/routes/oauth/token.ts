@@ -55,13 +55,13 @@ const procPostOauthToken: RequestHandler = async (req: Request, resp: Response, 
         // string userPassword = req.body.oculus_nonce;
         // string userPassword = req.body.oculus_id;
 
-        const userScope = req.body.scope ?? Scope.OWNER;
+        const userScope: string = req.body.scope ?? Scope.OWNER;
         if (Scope.KnownScope(userScope)) {
           const aAccount = await Accounts.getAccountWithUsername(userName);
           if (aAccount) {
             if (await Accounts.validatePassword(aAccount, userPassword)) {
               Logger.debug(`procPostOAuthToken: login of user ${userName}`);
-              const tokenInfo = await Tokens.createToken(aAccount.accountId, userScope);
+              const tokenInfo = await Tokens.createToken(aAccount.accountId, [ userScope ]);
               await Tokens.addToken(tokenInfo);
               respBody = buildOAuthResponseBody(aAccount, tokenInfo);
             }
