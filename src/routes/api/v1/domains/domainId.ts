@@ -57,6 +57,9 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
   if (req.vDomain) {
     const updated: VKeyedCollection = {};
     const valuesToSet = req.body.domain;
+    // 'valuesToSet' are the values sent to use in the request.
+    // Collect the specific values set. Cannot just accept all because the
+    //     requestor could do things like set the password hash or other bad things.
     if (valuesToSet.hasOwnProperty('version')) updated.version = valuesToSet.version;
     if (valuesToSet.hasOwnProperty('protocol')) updated.protocol = valuesToSet.protocol;
     if (valuesToSet.hasOwnProperty('network_addr')) updated.networkAddr = valuesToSet.network_addr;
@@ -80,7 +83,7 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
     updated.timeOfLastHeartbeat = new Date();
 
     Logger.debug('procPutDomains. updating=' + JSON.stringify(updated));
-    await Domains.updateEntityFields(req.vDomain, updated);
+    Domains.updateEntityFields(req.vDomain, updated);
   }
   else {
     req.vRestResp.respondFailure(req.vDomainError ?? 'Domain not found');

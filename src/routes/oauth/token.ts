@@ -84,17 +84,21 @@ const procPostOauthToken: RequestHandler = async (req: Request, resp: Response, 
       };
       case 'refresh_token': {
         const refreshingToken = req.body.refresh_token;
-        const targetToken = await Tokens.getTokenWithToken(req.vRestResp.getAuthToken());
-        if (refreshingToken === targetToken.refreshToken) {
-          const updates = {
-            'tokenExpirationTime': Tokens.computeDefaultExpiration(targetToken.scope)
+        const refreshToken = await Tokens.getTokenWithRefreshToken(refreshingToken);
+        if (Tokens.hasNotExpired(refreshToken)) {
+          const requestingAccount = await Accounts.getAccountWithAuthToken(req.vRestResp.getAuthToken());
+          if (requestingAccount && refreshToken.accountId === requestingAccount.accountId) {
+            // refresh token has not expired and requestor is owner of the token so make new
+            const newToken = await Tokens.createToken(req.vAuthAccount.accountId, refreshToken.scope);
+            Tokens.addToken(newToken);
+            respBody = buildOAuthResponseBody(requestingAccount, newToken);
+          }
+          else {
+            respBody = buildOAuthErrorBody('refresh token not owned by accessing account');
           };
-          await Tokens.updateTokenFields(targetToken, updates);
-          const aAccount = await Accounts.getAccountWithId(targetToken.accountId);
-          respBody = buildOAuthResponseBody(aAccount, targetToken);
         }
         else {
-          respBody = buildOAuthErrorBody('refresh token does not match');
+          respBody = buildOAuthErrorBody('refresh token expired');
         }
         break;
       };
