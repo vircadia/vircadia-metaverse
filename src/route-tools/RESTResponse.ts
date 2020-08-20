@@ -23,6 +23,7 @@ import { Logger } from '@Tools/Logging';
 
 export enum HTTPStatusCode {
   OK = 200,
+  Found = 302,
   BadRequest = 400,
   Unauthorized = 401,
   Forbidden = 403,
