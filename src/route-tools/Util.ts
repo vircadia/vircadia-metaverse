@@ -23,6 +23,7 @@ import { createPublicKey } from 'crypto';
 import { VKeyedCollection } from '@Tools/vTypes';
 import { IsNotNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
+import { DomainEntity } from '@Entities/DomainEntity';
 
 // The public_key is sent as a binary (DER) form of a PKCS1 key.
 // To keep backward compatibility, we convert the PKCS1 key into a SPKI key in PEM format
@@ -131,4 +132,34 @@ export async function buildLocationInfo(pReq: Request, pAcct: AccountEntity): Pr
   ret.node_id = pReq.vSession.sessionId,
   ret.online = Accounts.isOnline(pReq.vAccount)
   return ret;
+};
+
+// Return a structure with the usual domain information.
+export async function buildDomainInfo(pDomain: DomainEntity): Promise<any> {
+  return {
+    'domainId': pDomain.domainId,
+    'place_name': pDomain.placeName,
+    'public_key': pDomain.publicKey ? createSimplifiedPublicKey(pDomain.publicKey) : undefined,
+    'sponser_accountid': pDomain.sponserAccountId,
+    'ice_server_address': pDomain.iceServerAddr,
+    'version': pDomain.version,
+    'protocol_version': pDomain.protocol,
+    'network_addr': pDomain.networkAddr,
+    'networking_mode': pDomain.networkingMode,
+    'restricted': pDomain.restricted,
+    'num_users': pDomain.numUsers,
+    'anon_users': pDomain.anonUsers,
+    'total_users': pDomain.totalUsers,
+    'capacity': pDomain.capacity,
+    'description': pDomain.description,
+    'maturity': pDomain.maturity,
+    'restriction': pDomain.restriction,
+    'hosts': pDomain.hosts,
+    'tags': pDomain.tags,
+    'meta': pDomain.meta,
+    'time_of_last_heartbeat': pDomain.timeOfLastHeartbeat ? pDomain.timeOfLastHeartbeat.toISOString() : undefined,
+    'last_sender_key': pDomain.lastSenderKey,
+    'addr_of_first_contact': pDomain.iPAddrOfFirstContact,
+    'when_domain_entry_created': pDomain.whenDomainEntryCreated ? pDomain.whenDomainEntryCreated.toISOString() : undefined
+  };
 };

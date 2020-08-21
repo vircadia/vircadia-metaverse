@@ -24,7 +24,7 @@ A request returns an array of domain descriptions:
                   "place_name": stringName,
                   "public_key": stringPublicKey,
                   "sponser_accountid": stringAccountIdAssociated,
-                  "ice_server": stringAddrIceServerBeingUsed,
+                  "ice_server_address": stringAddrIceServerBeingUsed,
                   "version": stringSoftwareVersion,
                   "protocol_version": stringProtocolVersion,
                   "network_addr": stringNetworkAddress,
@@ -37,6 +37,7 @@ A request returns an array of domain descriptions:
                   "description": stringDescription,
                   "maturity": stringMaturity,
                   "restriction": string,
+                  "meta": JSONdomainMetadata,
                   "hosts": [],
                   "tags": [ stringTag, stringTag, ... ],
                   "time_of_last_heartbeat": "YYYY-MM-DDTHH:MM:SS.MMMZ",
@@ -59,9 +60,32 @@ The request returns information:
 ```
   {
     "domain": {
-      "id": stringDomainId,
-      "name": stringPlaceName,
-      "ice_server_address": stringAddrIceServerBeingUsed
+      "domainid": stringDomainId,
+      "id": stringDomainId,       // added for backward compatibility
+      "place_name": stringName,
+      "name": stringPlaceName,    // added for backward compatibility
+      "public_key": stringPublicKey,
+      "sponser_accountid": stringAccountIdAssociated,
+      "ice_server_address": stringAddrIceServerBeingUsed,
+      "version": stringSoftwareVersion,
+      "protocol_version": stringProtocolVersion,
+      "network_addr": stringNetworkAddress,
+      "networking_mode": stringMode,  // one of "full", ...
+      "restricted": boolWhetherRestricted,
+      "num_users": intCurrentLoggedInUsers,
+      "anon_users": intCurrentAnonomousUsers,
+      "total_users": intTotalUsers,
+      "capacity": intMaxCapacity,
+      "description": stringDescription,
+      "maturity": stringMaturity,
+      "restriction": string,
+      "meta": JSONdomainMetadata,
+      "hosts": [],
+      "tags": [ stringTag, stringTag, ... ],
+      "time_of_last_heartbeat": "YYYY-MM-DDTHH:MM:SS.MMMZ",
+      "last_sender_key": stringHostPortSourceOfLastMessage,
+      "addr_of_first_contact": stringHostPortOfDomainEntryCreation,
+      "when_domain_entry_created": "YYYY-MM-DDTHH:MM:SS.MMMZ"
     }
   }
 ```
@@ -91,10 +115,22 @@ not included, the value is not set.
           "heartbeat": {
               "num_users": intUsers,
               "anon_users": intAnonUsers
-          }
+          },
+          "meta": JSONmetadata
       }
   }
 ```
+
+The 'meta' field is arbitrary JSON encoded information to be added
+to the domain's information. This information is not processed by
+the metaverse-server but is stored and returned for the domain.
+When PUT, the new value is "deep merged" with any existing data.
+That is, fields in the PUT data, no matter how deep in the JSON
+structure, will overlay existing values.
+Future feature: Values can be removed
+from the stored meta-data structure by passing the JSON "null"
+as the label's value (i.e., any label with the value "null" will
+be removed).
 
 ## DELETE /api/v1/domains/:domainId
 

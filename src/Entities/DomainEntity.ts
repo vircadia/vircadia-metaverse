@@ -43,6 +43,7 @@ export class DomainEntity {
   public restriction: string;  // Access restrictions ("open")
   public hosts: string[];      // Usernames of people who can be domain "hosts"
   public tags: string[];       // Categories for describing the domain
+  public meta: any;            // JSON data added and saved with the domain
 
   // admin stuff
   public iPAddrOfFirstContact: string; // IP address that registered this domain
