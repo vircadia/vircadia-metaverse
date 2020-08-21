@@ -2,8 +2,6 @@
 
 - [Accounts](#Accounts)
 - [Account Tokens](#AccountTokens)
-- [Domains](#Domains)
-
 
 ## Accounts
 
@@ -146,61 +144,3 @@ be an administrative account.
 Delete a particular token held by account.
 
 ---
-
-## Domains
-
-## GET /api/v1/domains
-
-Get information on the domains the metaverse-server knows about.
-
-The requester must include an account access token in the header of the request.
-
-Query parameters can be included to control the number of returned domains.
-
-- per_page: maximum number of entries to return
-- page: the group of "per_page" to return. For instance, if there are 100 users and `per_page=10` and `page=2`, the request will return entries 11 thru 20.
-
-A request returns an array of domain descriptions:
-
-
-```
-    {
-        "status": "success",
-        "data": {
-            "domains": [
-                {
-                    "domainid": stringDomainId,
-                    "place_name": stringName,
-                    "public_key": stringPublicKey,
-                    "sponser_accountid": stringAccountIdAssociated,
-                    "ice_server": stringAddrIceServerBeingUsed,
-                    "version": stringSoftwareVersion,
-                    "protocol_version": stringProtocolVersion,
-                    "network_addr": stringNetworkAddress,
-                    "networking_mode": stringMode,  // one of "full", ...
-                    "restricted": boolWhetherRestricted,
-                    "num_users": intCurrentLoggedInUsers,
-                    "anon_users": intCurrentAnonomousUsers,
-                    "total_users": intTotalUsers,
-                    "capacity": intMaxCapacity,
-                    "description": stringDescription,
-                    "maturity": stringMaturity,
-                    "restriction": string,
-                    "hosts": [],
-                    "tags": [ stringTag, stringTag, ... ],
-                    "time_of_last_heartbeat": "YYYY-MM-DDTHH:MM:SS.MMMZ",
-                    "last_sender_key": stringHostPortSourceOfLastMessage,
-                    "addr_of_first_contact": stringHostPortOfDomainEntryCreation,
-                    "when_domain_entry_created": "YYYY-MM-DDTHH:MM:SS.MMMZ"
-                },
-                ...
-            ]
-        }
-    }
-```
-
-## DELETE /api/v1/domain/%
-
-Delete the specified domain.
-
-The requestor must supply an account token of an administrator.
