@@ -91,9 +91,9 @@ initializeConfiguration()
         && IsNotNullOrEmpty(Config.server["chain-file"]) ) {
     try {
       const httpsOptions = {
-        key: fs.readFileSync(Config.server["key-file"]),
-        cert: fs.readFileSync(Config.server["cert-file"]),
-        ca: fs.readFileSync(Config.server["chain-file"])
+        key:  fs.readFileSync(Config.server["key-file"], 'utf8'),
+        cert: fs.readFileSync(Config.server["cert-file"], 'utf8'),
+        ca:   fs.readFileSync(Config.server["chain-file"], 'utf8')
       };
       server = https.createServer(httpsOptions, expr);
     }

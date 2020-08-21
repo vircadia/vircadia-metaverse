@@ -27,12 +27,12 @@ export let Config = {
     'server': {
       'listen-host': '0.0.0.0',
       'listen-port': 9400,
-      'key-file': '',  // if supplied, do https
+      'key-file': '',           // if supplied, do https
       'cert-file': '',
       'chain-file': '',
-      'static-base': '/static',
-      'user-config-file': './iamus.json',
-      'server-version': {
+      'static-base': '/static', // base of static data URL
+      'user-config-file': './iamus.json', // startup config over-ride
+      'server-version': {       // overlaid with VERSION.json
         'version-tag': '1.1.1-20200101-abcdefg'
       }
     },
@@ -46,11 +46,13 @@ export let Config = {
       'heartbeat-seconds-until-offline': 120,
       'metaverse-info-addition-file': './metaverse_info.json',
       'session-timeout-minutes': 5,
+      // redirection URL used for initial domain token generation
       'tokengen_url': '/static/DomainTokenLogin.html'
     },
     'activitypub': {
       // NOTE: there shouldn't be a trailing slash
-      'url-base': '/vircadia',
+      'url-base': '/v',
+      // This becomes the base of all object permanent URLs
       'external-hostname': 'localhost'
     },
     'debug': {
@@ -76,8 +78,8 @@ export let Config = {
     }
 };
 
-// Check environment variables and read in the user configuration file
-//   and overlay the default values above.
+// Check environment variables that overlay the defaults above.
+// Also read the configuration file and overlay the values.
 export async function initializeConfiguration(): Promise<void> {
 
   // Tweek some of the values based on environment variables
@@ -97,15 +99,18 @@ export async function initializeConfiguration(): Promise<void> {
   const envConfigFile = process.env.IAMUS_CONFIG_FILE;
   if (IsNotNullOrEmpty(envConfigFile)) Config.server["user-config-file"] = envConfigFile;
 
+  // Read in the configuration file if it exists and overlay the values.
   try {
     const userConfigFile = Config.server["user-config-file"];
-    Logger.debug(`initializeConfiguration: reading configuration file ${userConfigFile}`);
-    const userConfig = await readInJSON(userConfigFile);
-    if (IsNotNullOrEmpty(userConfig)) {
-      // this overlays all the Config values with values from the user's file
-      Config = deepmerge(Config, userConfig);
-      Logger.setLogLevel(Config.debug.loglevel);  // it could have changed the logLevel
-      Logger.debug(`initializeConfiguration: processed configuration file ${userConfigFile}`);
+    if (fs.existsSync(userConfigFile)) {
+      Logger.debug(`initializeConfiguration: reading configuration file ${userConfigFile}`);
+      const userConfig = await readInJSON(userConfigFile);
+      if (IsNotNullOrEmpty(userConfig)) {
+        // this overlays all the Config values with values from the user's file
+        Config = deepmerge(Config, userConfig);
+        Logger.setLogLevel(Config.debug.loglevel);  // it could have changed the logLevel
+        // Logger.debug(`initializeConfiguration: processed configuration file ${userConfigFile}`);
+      };
     };
   }
   catch (e) {
@@ -115,6 +120,7 @@ export async function initializeConfiguration(): Promise<void> {
   // Read in version info from distribution version file
   try {
     let versionInfo: any;
+    // depending on how built, version file might be in different places
     for (const versionFile of [ './VERSION.json' , './dist/VERSION.json' ]) {
       if (fs.existsSync(versionFile)) {
         versionInfo = await readInJSON(versionFile);
@@ -127,7 +133,7 @@ export async function initializeConfiguration(): Promise<void> {
       };
     };
     Config.server["server-version"] = versionInfo;
-      Logger.debug(`initializeConfiguration: version info: ${JSON.stringify(versionInfo)}`);
+    Logger.debug(`initializeConfiguration: version info: ${JSON.stringify(versionInfo)}`);
   }
   catch (e) {
     Logger.error('initializeConfiguration: exception reading version info: ' + e);
@@ -147,10 +153,12 @@ export async function initializeConfiguration(): Promise<void> {
     Config.metaverse["metaverse-server-url"] = newUrl;
   }
 
-  Logger.debug(`initializeConfiguration: debug setting: ${JSON.stringify(Config.debug)}`);
+  // Logger.debug(`initializeConfiguration: debug setting: ${JSON.stringify(Config.debug)}`);
   return;
 };
 
+// Utility routine that reads in JSON content from either an URL or a filename.
+// Returns the parsed JSON object or 'undefined' if any errors.
 export async function readInJSON(pFilenameOrURL: string): Promise<any> {
   let configBody: string;
   if (pFilenameOrURL.startsWith('http:')) {
