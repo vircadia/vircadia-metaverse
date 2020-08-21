@@ -50,7 +50,7 @@ A request returns an array of domain descriptions:
   }
 ```
 
-## GET /api/v1/domain/:domainId
+## GET /api/v1/domains/:domainId
 
 Get the information for a single domain.
 
@@ -66,7 +66,7 @@ The request returns information:
   }
 ```
 
-## PUT /api/v1/domain/:domainId
+## PUT /api/v1/domains/:domainId
 
 Sets values for the specified domain. The requestor must be either
 the domain "manager" or an account with "admin" role.
@@ -96,7 +96,7 @@ not included, the value is not set.
   }
 ```
 
-## DELETE /api/v1/domain/:domainId
+## DELETE /api/v1/domains/:domainId
 
 Delete the specified domain.
 
