@@ -23,6 +23,7 @@ import path from 'path';
 import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
+import crypto from 'crypto';
 import { Router } from 'express';
 
 import { setupDB } from '@Tools/Db';
@@ -91,9 +92,12 @@ initializeConfiguration()
         && IsNotNullOrEmpty(Config.server["chain-file"]) ) {
     try {
       const httpsOptions = {
+        // ca:   fs.readFileSync(Config.server["chain-file"], 'utf8'),
         key:  fs.readFileSync(Config.server["key-file"], 'utf8'),
         cert: fs.readFileSync(Config.server["cert-file"], 'utf8'),
-        ca:   fs.readFileSync(Config.server["chain-file"], 'utf8')
+        secureProtocol: 'SSLv23_server_method',
+        /* tslint:disable-next-line */
+        secureOptions: crypto.constants.SSL_OP_NO_SSLv3 | crypto.constants.SSL_OP_NO_TLSv1
       };
       server = https.createServer(httpsOptions, expr);
     }
