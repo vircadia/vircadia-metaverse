@@ -92,7 +92,7 @@ initializeConfiguration()
         && IsNotNullOrEmpty(Config.server["chain-file"]) ) {
     try {
       const httpsOptions = {
-        // ca:   fs.readFileSync(Config.server["chain-file"], 'utf8'),
+        ca:   fs.readFileSync(Config.server["chain-file"], 'utf8'),
         key:  fs.readFileSync(Config.server["key-file"], 'utf8'),
         cert: fs.readFileSync(Config.server["cert-file"], 'utf8'),
         secureProtocol: 'SSLv23_server_method',
