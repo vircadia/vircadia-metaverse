@@ -142,14 +142,19 @@ export const usernameFromParams: RequestHandler = async (req: Request, resp: Res
 // Decorate the passed Request with 'vDoamin' which points to a DomainEntity.
 // If domain cannot be found or verified, 'vDomainError' is set with text explaining the error.
 export const domainFromParams: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  let domainId: string;
   if (req.vRestResp) {
-    const domainId = req.params.domainId;
+    domainId = req.params.domainId;
     if (domainId) {
       req.vDomain = await Domains.getDomainWithId(domainId);
+    }
+    else {
+      Logger.error(`domainFromParams: wanted domain but none specified`);
     };
   };
   if (IsNullOrEmpty(req.vDomain)) {
     req.vDomainError = 'DomainId does not match a domain';
+    Logger.error(`domainFromParams: wanted domain ${domainId} but not found`);
   };
   next();
 };

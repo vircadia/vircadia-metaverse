@@ -74,6 +74,7 @@ const procPutDomainsPublicKey: RequestHandler = async (req: Request, resp: Respo
   }
   else {
     req.vRestResp.HTTPStatus = HTTPStatusCode.Unauthorized;
+    req.vRestResp.respondFailure(req.vDomainError ?? 'no such domain');
   };
   next();
 };
