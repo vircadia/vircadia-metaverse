@@ -1,7 +1,7 @@
-# Project Apollo: Notes On Development
+# Iamus: Notes On Development
 
 This document attempts to describe the environment you need to build
-and configure in order to enhance and debug a Project Apollo metaverser server.
+and configure in order to enhance and debug a Iamus metaverse server.
 
 Building and running this metaverse server is tricky because there
 are several applications and services that must link together:
@@ -14,7 +14,7 @@ All four of this services run as separate processes, can run on different comput
 and all have to properly link to each other.
 
 Below is described building the different servers.
-Especially check out the [Modifications]("#Modification") section for the changes that must
+Especially check out the [Modifications](#Modification) section for the changes that must
 be made to the sources to get all the URLs correct.
 The original sources from High Fidelity contained many, many URLs as in-source
 constants which need changing to run a different metaverse-server instance.
@@ -83,8 +83,10 @@ the Linux box running the metaverse-server and Interface, and
 Be sure to change these for your network setup.
 
 The `--get-temp-name` parameter is required to start a domain-server
-as it instructs it to fetch a temporary domain name if it is not
-configured from a previous run. The configuration of the
+the first time
+as it instructs the domain-server to fetch a temporary domain name
+if it is not configured from a previous run.
+The configuration of the
 domain-server ends up in `.local/share/Vircadia/domain-server`.
 
 Note that the ice-server and the domain-server get an environment variable

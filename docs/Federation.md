@@ -79,8 +79,30 @@ Model is "actors" and "activities".
 - similar in function to the W3C protocols
 - the grid servers are expected to be there and communicating
 
+## Matrix
+- https://matrix.org/
+- https://matrix.org/docs/spec/
+- Open/federated instant messaging, VoIP (WebRTC), IoT communication
+- Realtime communication
+- JSON over REST
+- Nearly the same size of network as Mastodon
+- "clients" generate "events" in "rooms": client => server
+  - "rooms" are synchronized across "homeServers": server <=> server
+  - pub/sub with authorization and encryption
+- "distributed" in that there is no central server
+  - if a user's server goes down, their data is not available
 
-### Notes
+## Secure Scuttlebutt
+
+- https://en.wikipedia.org/wiki/Secure_Scuttlebutt
+- signed identities, messages
+- end-to-end encryption included (Mastodon implements own signing format since it's not in ActivityPub)
+- database of immutable append-only feeds
+- Each user hosts their own content and the content of the peers they follow
+- "cleaner" protocol design with less flexibility  in design
+  - the main complaint about ActivityPub is that is flexible enough to make conformance difficult
+
+## More Notes
 
 - Go Implementation: https://github.com/go-fed/activity
 - C# Implementation: https://github.com/jfmcbrayer/Kroeg
@@ -101,8 +123,6 @@ Single Sign-On Alternatives
 - Zot protocol: Nomadic identity and Remote Authentication Zotlabs 1
     OpenWebAuth: https://framagit.org/zot/zap/-/blob/release/spec/OpenWebAuth/Home.md
 
-Other notes
-
 - ZCAP-LD: Authorization Capabilities for Linked Data https://w3c-ccg.github.io/zcap-ld/
 - IndieWeb
   - WebMention: https://webmention.net/draft/
@@ -113,15 +133,6 @@ Other notes
     - IndieAuth.com
   - MicroSub: https://indieweb.org/Microsub-spec
 - https://the-federation.info/ Site that tracks 13 protocols, 45 projects, ...
-- Matrix: https://matrix.org/
-  - https://matrix.org/docs/spec/
-  - Open/federated instant messaging, VoIP (WebRTC), IoT communication
-  - Realtime communication
-  - JSON over REST
-  - Nearly the same size of network as Mastodon
-  - "clients" generate "events" in "rooms": client => server
-    - "rooms" are synchronized across "homeServers": server <=> server
-    - pub/sub with authorization and encryption
 - A Glossary For the Fediverse: http://tilde.town/~petegozz/
 
 - https://developers.google.com/search/docs/data-types/event
@@ -129,7 +140,8 @@ Other notes
 - Murmurations: https://github.com/Photosynthesis/Murmurations
 - Big Blue Button: https://bbb.fosshost.org/b
 - https://fediverse.party/
-- Distributed Friends and Relations Network: DFRN Protocol: https://github.com/friendica/friendica/blob/master/spec/dfrn2.pdf
+- Distributed Friends and Relations Network
+  - DFRN Protocol: https://github.com/friendica/friendica/blob/master/spec/dfrn2.pdf
 
 
 
