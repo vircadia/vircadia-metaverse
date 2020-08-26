@@ -95,21 +95,25 @@ const procPostOauthToken: RequestHandler = async (req: Request, resp: Response, 
           }
           else {
             respBody = buildOAuthErrorBody('refresh token not owned by accessing account');
+            req.vRestResp.IsFailure = true;
           };
         }
         else {
           respBody = buildOAuthErrorBody('refresh token expired');
+          req.vRestResp.IsFailure = true;
         }
         break;
       };
       default: {
         respBody = buildOAuthErrorBody('Unknown grant_type: ' + accessGrantType);
+        req.vRestResp.IsFailure = true;
         break;
       };
     };
   }
   catch (err) {
     respBody = buildOAuthErrorBody('Exception: ' + err);
+    req.vRestResp.IsFailure = true;
   };
 
   req.vRestResp.Data = respBody;

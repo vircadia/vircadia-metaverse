@@ -104,7 +104,7 @@ export class RESTResponse {
         const errorHeader = Config["metaverse-server"]["error-header"];
         const errorAction = this._request.get(errorHeader);
         if (errorAction && errorAction.toLowerCase() === "badrequest") {
-          this._response.statusCode = 400;
+          this._response.statusCode = HTTPStatusCode.BadRequest;
         }
       }
       // Set status to 'failure'. Any additional error info is added by _additionalFields.
