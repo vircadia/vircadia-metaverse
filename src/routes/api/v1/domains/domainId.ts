@@ -25,7 +25,7 @@ import { Accounts } from '@Entities/Accounts';
 import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
 import { HTTPStatusCode } from '@Route-Tools/RESTResponse';
-import { buildDomainInfo } from '@Route-Tools/Util';
+import { buildDomainInfoV1 } from '@Route-Tools/Util';
 import deepmerge from 'deepmerge';
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
@@ -36,7 +36,7 @@ const procGetDomainsDomainid: RequestHandler = async (req: Request, resp: Respon
   Logger.debug('procGetDomainDomainid');
   if (req.vDomain) {
     const aDomain = req.vDomain;
-    const domainInfo = await buildDomainInfo(aDomain);
+    const domainInfo = await buildDomainInfoV1(aDomain);
     // A few copies are added for compatibiliity with legacy code
     domainInfo.id = domainInfo.domainId;
     domainInfo.name = domainInfo.place_name;
@@ -82,10 +82,6 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
       updated.anonUsers = Number(valuesToSet.heartbeat.num_anon_users);
       updated.totalUsers = updated.numUsers + updated.anonUsers;
     };
-    if (valuesToSet.hasOwnProperty('meta')) {
-      // TODO: add code to scan input for 'null' values and do a delete for those labels
-      updated.meta = deepmerge(req.vDomain.meta ? req.vDomain.meta : {}, valuesToSet.meta);
-    }
 
     updated.timeOfLastHeartbeat = new Date();
 

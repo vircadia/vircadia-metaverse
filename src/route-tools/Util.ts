@@ -135,7 +135,7 @@ export async function buildLocationInfo(pReq: Request, pAcct: AccountEntity): Pr
 };
 
 // Return a structure with the usual domain information.
-export async function buildDomainInfo(pDomain: DomainEntity): Promise<any> {
+export async function buildDomainInfoV1(pDomain: DomainEntity): Promise<any> {
   return {
     'domainId': pDomain.domainId,
     'place_name': pDomain.placeName,
@@ -156,7 +156,6 @@ export async function buildDomainInfo(pDomain: DomainEntity): Promise<any> {
     'restriction': pDomain.restriction,
     'hosts': pDomain.hosts,
     'tags': pDomain.tags,
-    'meta': pDomain.meta,
     'time_of_last_heartbeat': pDomain.timeOfLastHeartbeat ? pDomain.timeOfLastHeartbeat.toISOString() : undefined,
     'last_sender_key': pDomain.lastSenderKey,
     'addr_of_first_contact': pDomain.iPAddrOfFirstContact,

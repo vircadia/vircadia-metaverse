@@ -23,7 +23,7 @@ import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 import { HTTPStatusCode } from '@Route-Tools/RESTResponse';
 
 import { Logger } from '@Tools/Logging';
-import { buildDomainInfo } from '@Route-Tools/Util';
+import { buildDomainInfoV1 } from '@Route-Tools/Util';
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
@@ -35,7 +35,7 @@ const procGetDomains: RequestHandler = async (req: Request, resp: Response, next
     pagination.parametersFromRequest(req);
     const domainArray: any[] = [];
     for await (const aDomain of Domains.enumerateAsync(pagination)) {
-      domainArray.push( await buildDomainInfo(aDomain) );
+      domainArray.push( await buildDomainInfoV1(aDomain) );
     };
     req.vRestResp.Data = {
       'domains': domainArray
