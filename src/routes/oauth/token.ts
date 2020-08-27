@@ -67,19 +67,23 @@ const procPostOauthToken: RequestHandler = async (req: Request, resp: Response, 
             }
             else {
               respBody = buildOAuthErrorBody('Invalid password');
+              req.vRestResp.IsFailure = true;
             };
           }
           else{
             respBody = buildOAuthErrorBody('Unknown user');
+            req.vRestResp.IsFailure = true;
           };
         }
         else {
           respBody = buildOAuthErrorBody('Invalid scope');
+          req.vRestResp.IsFailure = true;
         };
         break;
       };
       case 'authorization_code': {
         respBody = buildOAuthErrorBody('Do not know what to do with an authorization_code');
+        req.vRestResp.IsFailure = true;
         break;
       };
       case 'refresh_token': {
