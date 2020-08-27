@@ -20,9 +20,11 @@ import { Accounts } from '@Entities/Accounts';
 import { AccountEntity } from '@Entities/AccountEntity';
 import { Domains } from '@Entities/Domains';
 import { Sessions } from '@Entities/Sessions';
+import { Tokens } from '@Entities/Tokens';
+
 import { RESTResponse } from './RESTResponse';
 
-import { IsNullOrEmpty } from '@Tools/Misc';
+import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
 import { Config } from '@Base/config';
 import { SessionEntity } from '@Entities/SessionEntity';
@@ -92,11 +94,25 @@ export const finishReturnData: RequestHandler = async (req: Request, resp: Respo
 
 // MetaverseAPI middleware.
 // Check for account specified by request 'Authorization:' token.
-// Decorate passed Request with 'vAuthAccount' which points to an AccountEntity.
+// Decorate passed Request with 'vAuthToken' and 'vAuthAccount' which point
+//      to an AccountEntity.
 // If account cannot be found, sets 'vAuthAccount' to undefined.
 export const accountFromAuthToken: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vRestResp) {
-    req.vAuthAccount = await Accounts.getAccountWithAuthToken(req.vRestResp.getAuthToken());
+    const authToken = req.vRestResp.getAuthToken();
+    if (IsNotNullOrEmpty(authToken)) {
+      try {
+        const tokenInfo = await Tokens.getTokenWithToken(authToken);
+        if (IsNotNullOrEmpty(tokenInfo)) {
+          req.vAuthAccount = await Accounts.getAccountWithId(tokenInfo.accountId);
+          req.vAuthToken = tokenInfo;
+        };
+      }
+      catch (err) {
+        Logger.error(`accountFromAuthToken: exception in lookup: ${err}`);
+        req.vAuthAccount = undefined;
+      };
+    };
   };
   if (IsNullOrEmpty(req.vAuthAccount)) {
     req.vAccountError = 'No account found for authorization';

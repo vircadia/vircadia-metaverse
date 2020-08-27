@@ -18,6 +18,7 @@ import { RESTResponse } from './route-tools/RESTResponse';
 import { AccountEntity } from './Entities/AccountEntity';
 import { DomainEntity } from './Entities/DomainEntity';
 import { SessionEntity } from './Entities/SessionEntity';
+import { AuthToken } from '@Entities/AuthToken';
 
 // This defintion adds our parameters to the Request type
 // Most of these are variables that are filled by processing on the request
@@ -27,6 +28,7 @@ declare global {
         interface Request {
             vRestResp?: RESTResponse;   // structure used to process the MetaverseAPI input and output JSON
             vSession?: SessionEntity;   // The session for this request
+            vAuthToken?: AuthToken;     // token looked up to get vAuthToken
             vAuthAccount?: AccountEntity;   // pointer to verified AccountEntity from authToken
             vAccount?: AccountEntity;   // pointer to account found in ':accountId'
             vAccountError?: string;     // if vAccount is not set, the reason why
