@@ -49,7 +49,7 @@ export const Accounts = {
     return null;
   },
   async getAccountWithUsername(pUsername: string): Promise<AccountEntity> {
-    return IsNullOrEmpty(pUsername) ? null : getObject(accountCollection, { 'username': pUsername.toLowerCase });
+    return IsNullOrEmpty(pUsername) ? null : getObject(accountCollection, { 'username': pUsername.toLowerCase() });
   },
   async getAccountWithNodeId(pNodeId: string): Promise<AccountEntity> {
     return IsNullOrEmpty(pNodeId) ? null : getObject(accountCollection, { 'location.nodeid': pNodeId });
