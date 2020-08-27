@@ -49,7 +49,7 @@ export const Accounts = {
     return null;
   },
   async getAccountWithUsername(pUsername: string): Promise<AccountEntity> {
-    return IsNullOrEmpty(pUsername) ? null : getObject(accountCollection, { 'username': pUsername.toLocaleUpperCase });
+    return IsNullOrEmpty(pUsername) ? null : getObject(accountCollection, { 'username': pUsername.toLowerCase });
   },
   async getAccountWithNodeId(pNodeId: string): Promise<AccountEntity> {
     return IsNullOrEmpty(pNodeId) ? null : getObject(accountCollection, { 'location.nodeid': pNodeId });
@@ -67,7 +67,7 @@ export const Accounts = {
   createAccount(pUsername: string, pPassword: string, pEmail: string): AccountEntity {
     const newAcct = new AccountEntity();
     newAcct.accountId= GenUUID();
-    newAcct.username = pUsername.toLocaleLowerCase();
+    newAcct.username = pUsername.toLowerCase();
     newAcct.email = pEmail;
     newAcct.roles = [Roles.USER];
     newAcct.whenAccountCreated = new Date();
