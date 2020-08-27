@@ -24,6 +24,9 @@ export interface VKeyValue {
   [ key: string]: string
 };
 
+// String array.
+// Several structures are an array of strings (TokenScope, AccountRoles, ...).
+// This adds typing to those.
 export interface SArray extends Array<string>{};
 export function sArrayAdd(pArray: SArray, pAdd: string): SArray {
   if (! sArrayHas(pArray, pAdd)) {

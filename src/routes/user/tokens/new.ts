@@ -19,7 +19,7 @@ import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
 
 import { Tokens } from '@Entities/Tokens';
-import { Scope } from '@Entities/Scope';
+import { TokenScope } from '@Entities/TokenScope';
 import { HTTPStatusCode } from '@Route-Tools/RESTResponse';
 
 import { Config } from '@Base/config';
@@ -27,7 +27,7 @@ import { Config } from '@Base/config';
 const procGetUserTokensNew: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
     const forDomainServer = req.query.for_domain_server;
-    const scope = forDomainServer ? Scope.DOMAIN : Scope.OWNER;
+    const scope = forDomainServer ? TokenScope.DOMAIN : TokenScope.OWNER;
     const tokenInfo = await Tokens.createToken(req.vAuthAccount.accountId, [ scope ]);
     Tokens.addToken(tokenInfo);
 

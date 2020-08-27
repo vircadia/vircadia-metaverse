@@ -23,10 +23,10 @@ import { setupMetaverseAPI, finishMetaverseAPI, finishReturnData } from '@Route-
 
 import { AccountEntity } from '@Entities/AccountEntity';
 import { Accounts } from '@Entities/Accounts';
-import { Roles } from '@Entities/Roles';
+import { AccountRoles } from '@Entities/AccountRoles';
 import { AuthToken } from '@Entities/AuthToken';
 import { Tokens } from '@Entities/Tokens';
-import { Scope } from '@Entities/Scope';
+import { TokenScope } from '@Entities/TokenScope';
 
 import { VKeyedCollection } from '@Tools/vTypes';
 
@@ -55,8 +55,8 @@ const procPostOauthToken: RequestHandler = async (req: Request, resp: Response, 
         // string userPassword = req.body.oculus_nonce;
         // string userPassword = req.body.oculus_id;
 
-        const userScope: string = req.body.scope ?? Scope.OWNER;
-        if (Scope.KnownScope(userScope)) {
+        const userScope: string = req.body.scope ?? TokenScope.OWNER;
+        if (TokenScope.KnownScope(userScope)) {
           const aAccount = await Accounts.getAccountWithUsername(userName);
           if (aAccount) {
             if (await Accounts.validatePassword(aAccount, userPassword)) {
@@ -132,7 +132,7 @@ export function buildOAuthResponseBody(pAcct: AccountEntity, pToken: AuthToken):
     'token_type': 'Bearer',
     'expires_in': pToken.tokenExpirationTime.valueOf()/1000 - pToken.tokenCreationTime.valueOf()/1000,
     'refresh_token': pToken.refreshToken,
-    'scope': Scope.MakeScopeString(pToken.scope),
+    'scope': TokenScope.MakeScopeString(pToken.scope),
     'created_at': pToken.tokenCreationTime.valueOf() / 1000,
   };
   if (pAcct) {

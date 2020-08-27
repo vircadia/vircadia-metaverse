@@ -16,7 +16,7 @@
 import { Config } from '@Base/config';
 
 import { AuthToken } from '@Entities/AuthToken';
-import { Scope } from '@Entities/Scope';
+import { TokenScope } from '@Entities/TokenScope';
 import { createObject, getObject, getObjects, updateObjectFields, deleteMany, deleteOne } from '@Tools/Db';
 
 import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
@@ -53,7 +53,7 @@ export const Tokens = {
     // Verify that passed scopes are known scope codes
     aToken.scope = [];
     pScope.forEach( aScope => {
-      if (Scope.KnownScope(aScope)) aToken.scope.push(aScope);
+      if (TokenScope.KnownScope(aScope)) aToken.scope.push(aScope);
     });
     aToken.tokenCreationTime = new Date();
     aToken.tokenExpirationTime = Tokens.computeDefaultExpiration(aToken.scope, aToken.tokenCreationTime);
@@ -92,7 +92,7 @@ export const Tokens = {
   // Return an expiration date for the token depending on its scope
   computeDefaultExpiration(pScopes: string[], pBaseDate?: Date): Date {
     return new Date((pBaseDate ? pBaseDate.valueOf() : new Date().valueOf())
-          + ( Scope.HasScope(pScopes, Scope.DOMAIN)
+          + ( TokenScope.HasScope(pScopes, TokenScope.DOMAIN)
                    ? Config.auth["domain-token-expire-hours"] * 1000*60*60
                    : Config.auth["owner-token-expire-hours"] * 1000*60*60
             )

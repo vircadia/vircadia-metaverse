@@ -18,7 +18,7 @@ import { Config } from '@Base/config';
 import crypto from 'crypto';
 
 import { AccountEntity } from '@Entities/AccountEntity';
-import { Roles } from '@Entities/Roles';
+import { AccountRoles } from '@Entities/AccountRoles';
 import { Tokens } from '@Entities/Tokens';
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 
@@ -69,7 +69,7 @@ export const Accounts = {
     newAcct.accountId= GenUUID();
     newAcct.username = pUsername.toLowerCase();
     newAcct.email = pEmail;
-    newAcct.roles = [Roles.USER];
+    newAcct.roles = [AccountRoles.USER];
     newAcct.whenAccountCreated = new Date();
 
     // Remember the password
@@ -109,7 +109,7 @@ export const Accounts = {
   },
   // getter property that is 'true' if the user is a grid administrator
   isAdmin(pAcct: AccountEntity): boolean {
-    return Roles.HasRole(pAcct.roles, Roles.ADMIN);
+    return AccountRoles.HasRole(pAcct.roles, AccountRoles.ADMIN);
   },
   // Return whether accessing account can access info about target account
   CanAccess(pAccessingAcct: AccountEntity, pTargetAcct: AccountEntity): boolean {

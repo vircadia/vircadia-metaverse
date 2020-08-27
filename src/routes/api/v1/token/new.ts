@@ -19,7 +19,7 @@ import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
 
 import { Tokens } from '@Entities/Tokens';
-import { Scope } from '@Entities/Scope';
+import { TokenScope } from '@Entities/TokenScope';
 import { IsNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
 
@@ -31,9 +31,9 @@ const procPostTokenNew: RequestHandler = async (req: Request, resp: Response, ne
     // The user passes the scope but make sure we know it's one we know
     let scope = req.query.scope as string;
     if (IsNullOrEmpty(scope)) {
-      scope = Scope.OWNER;
+      scope = TokenScope.OWNER;
     };
-    if (Scope.KnownScope(scope)) {
+    if (TokenScope.KnownScope(scope)) {
       const tokenInfo = await Tokens.createToken(req.vAuthAccount.accountId, [ scope ]);
       Tokens.addToken(tokenInfo);
       req.vRestResp.Data = {

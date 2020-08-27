@@ -17,7 +17,7 @@
 import { IsNotNullOrEmpty } from "@Tools/Misc";
 
 // Class to manage the manipulations on entities scope of application
-export class Scope {
+export class TokenScope {
   public static OWNER: string = 'owner';   // a 'user' or 'person'
   public static DOMAIN: string = 'domain'; // a domain-server
   // Added for ActivityPub access control
@@ -25,7 +25,7 @@ export class Scope {
   public static WRITE: string = 'write';
 
   static KnownScope(pScope: string): boolean {
-    return [ Scope.OWNER, Scope.DOMAIN ].includes(pScope);
+    return [ TokenScope.OWNER, TokenScope.DOMAIN ].includes(pScope);
   };
 
   static HasScope(pScopes: string[], pCheck:string): boolean {

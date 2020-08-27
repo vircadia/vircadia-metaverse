@@ -17,13 +17,13 @@
 import { IsNotNullOrEmpty } from "@Tools/Misc";
 
 // Class to manage the manipulations on roles that accounts can have
-export class Roles {
+export class AccountRoles {
   // at the moment, the only role is 'admin'
   public static ADMIN: string = 'admin';   // someone who has metaverse-server admin
   public static USER: string = 'user';     // a 'user' or 'person'
 
   static KnownRole(pRole: string): boolean {
-    return [ Roles.ADMIN, Roles.USER ].includes(pRole);
+    return [ AccountRoles.ADMIN, AccountRoles.USER ].includes(pRole);
   };
 
   static HasRole(pRoles: string[], pCheck:string): boolean {
@@ -34,7 +34,7 @@ export class Roles {
   static AddRole(pRoles: string[], pRole: string): boolean {
     let ret = false
     const role = pRole.toLowerCase();
-    if (Roles.KnownRole(role)) {
+    if (AccountRoles.KnownRole(role)) {
       if (! pRoles.includes(role)) {
         pRoles.push(role);
       };

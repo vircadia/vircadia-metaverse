@@ -24,7 +24,7 @@ import { getObject } from '@Tools/Db';
 import { Logger } from '@Tools/Logging';
 import { Accounts } from '@Entities/Accounts';
 import { IsNotNullOrEmpty } from '@Tools/Misc';
-import { Roles } from '@Entities/Roles';
+import { AccountRoles } from '@Entities/AccountRoles';
 
 // A maint function for admin account that lets one get any object in any collection
 const procMaintRaw: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {

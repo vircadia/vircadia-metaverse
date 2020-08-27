@@ -22,7 +22,7 @@ import { Accounts } from '@Entities/Accounts';
 
 import { VKeyedCollection } from '@Tools/vTypes';
 import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
-import { Roles } from '@Entities/Roles';
+import { AccountRoles } from '@Entities/AccountRoles';
 
 // Get the scope of the logged in account
 const procGetUserRoles: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
@@ -53,7 +53,7 @@ const procPostUserRoles: RequestHandler = (req: Request, resp: Response, next: N
       const roles = IsNullOrEmpty(req.vAccount.roles)
                 ? []        // if no roles info, return empty list
                 : req.vAccount.roles;
-      if (Roles.AddRole(roles, req.vTokenId)) {
+      if (AccountRoles.AddRole(roles, req.vTokenId)) {
         const updates: VKeyedCollection = {
           'roles': roles
         };
