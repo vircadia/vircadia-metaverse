@@ -1,6 +1,6 @@
 # Vircadia Metaverse API
 
-Vircadia's Project Apollo metaverse-server presents a REST API
+Vircadia's Iamus metaverse-server presents a REST API
 for the services for a metaverse.
 
 A "metaverse" is defined as a group of virtual world spaces (provided

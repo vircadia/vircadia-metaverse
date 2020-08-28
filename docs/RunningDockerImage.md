@@ -1,4 +1,4 @@
-# Running the Project Apollo Docker Image
+# Running the Iamus Docker Image
 
 ## Docker Image
 

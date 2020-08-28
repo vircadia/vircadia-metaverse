@@ -100,7 +100,7 @@ If the user does not pass a valid account token, the request returns
 response code "302 Found" and with a "Location:" header giving a redirection
 to a page for token generation. The default redirection location is
 "/static/DomainTokenLogin.html" which is a token generation page
-supplied with the Project Apollo metaverse server.
+supplied with the Iamus metaverse server.
 
 ## POST /api/v1/token/new
 
