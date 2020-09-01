@@ -74,7 +74,7 @@ export const name = '/api/v1/accounts';
 
 export const router = Router();
 
-router.get(   '/api/v1/accounts',                 [ setupMetaverseAPI,
-                                                    accountFromAuthToken,   // vRestResp.vAuthAccount
+router.get(   '/api/v1/accounts',                 [ setupMetaverseAPI,      // req.vRestResp
+                                                    accountFromAuthToken,   // req.vAuthAccount
                                                     procGetAccounts,
                                                     finishMetaverseAPI ] );

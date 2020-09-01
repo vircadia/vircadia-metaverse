@@ -16,9 +16,9 @@
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
+import { accountFromAuthToken } from '@Route-Tools/middleware';
 
 import { Accounts } from '@Entities/Accounts';
-import { Domains } from '@Entities/Domains';
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
 import { AccountFilterInfo } from '@Entities/EntityFilters/AccountFilterInfo';
@@ -26,14 +26,13 @@ import { AccountFilterInfo } from '@Entities/EntityFilters/AccountFilterInfo';
 import { buildLocationInfo } from '@Route-Tools/Util';
 
 import { Logger } from '@Tools/Logging';
-import { AccountEntity } from '@Entities/AccountEntity';
 import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
 // Get basic user information
 const procGetUsers: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vRestResp && req.vAuthAccount) {
+  if (req.vAuthAccount) {
     const pager = new PaginationInfo();
     const scoper = new AccountScopeFilter(req.vAuthAccount);
     const infoer = new AccountFilterInfo();
@@ -124,7 +123,8 @@ export const name = '/api/v1/users';
 
 export const router = Router();
 
-router.get(   '/api/v1/users',                    [ setupMetaverseAPI,
+router.get(   '/api/v1/users',                    [ setupMetaverseAPI,      // req.vRestResp
+                                                    accountFromAuthToken,   // req.vAuthAccount
                                                     procGetUsers,
                                                     finishMetaverseAPI ] );
 router.post(  '/api/v1/users',                    [ setupMetaverseAPI,
