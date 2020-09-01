@@ -15,13 +15,16 @@
 
 import * as loglevel from 'loglevel';
 
+import { Config } from '@Base/config';
 import { Options } from 'morgan';
 import http from 'http';
+import { VKeyValue } from './vTypes';
 
 interface ALogger {
   info( msg: string ): void,
   warn( msg: string ): void,
   debug( msg: string ): void,
+  cdebug( flag: string, msg: string ): void,
   error( msg: string ): void,
   setLogLevel( level: string ): void
 };
@@ -35,6 +38,12 @@ export const Logger : ALogger = {
   },
   debug: (msg: string) => {
     loglevel.debug(msg);
+  },
+  // Conditional debug. Looks for "debug.flag" in configuration.
+  cdebug: (flag: string, msg: string) => {
+    if ((Config.debug as any)[flag]) {
+      loglevel.debug(msg);
+    };
   },
   error: (msg: string) => {
     loglevel.error(msg);

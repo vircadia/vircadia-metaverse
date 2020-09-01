@@ -38,6 +38,7 @@ const procGetUsers: RequestHandler = async (req: Request, resp: Response, next: 
     const scoper = new AccountScopeFilter(req.vAuthAccount);
     const infoer = new AccountFilterInfo();
     pager.parametersFromRequest(req);
+    scoper.parametersFromRequest(req);
     infoer.parametersFromRequest(req);
 
     // Loop through all the filtered accounts and create array of info
@@ -52,9 +53,12 @@ const procGetUsers: RequestHandler = async (req: Request, resp: Response, next: 
     };
 
     req.vRestResp.Data = {
-      accounts: accts
+      users: accts
     };
   }
+  else {
+    req.vRestResp.respondFailure('No account specified');
+  };
   next();
 };
 

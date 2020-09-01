@@ -63,6 +63,8 @@ export let Config = {
       'request-body': false,
       // output the response sent back from MetaverseAPI requests
       'metaverseapi-response-detail': false,
+      // outputs details when selecting query parameters
+      'query-detail': false,
       // outputs details about DB queries
       'db-query-detail': false
     },

@@ -42,7 +42,8 @@ export class AccountScopeFilter extends CriteriaFilter {
       // The administrator can specify an account to limit requests to
       if (pRequest.query.acct) {
         this._targetAcct = pRequest.query.account as string;
-      }
+      };
+      Logger.cdebug('query-detail', `AccountScopeFilter.parametersFromRequest: asAdmin=${this._asAdmin}, target=${this._targetAcct}`);
     }
     catch (e) {
       Logger.error('AccountScopeFilter: parameters from request: exception: ' + e);

@@ -145,9 +145,7 @@ export async function *getObjects(pCollection: string,
     criteria = deepmerge(criteria, pScoper.criteriaParameters());
   };
 
-  if (Config.debug["db-query-detail"]) {
-    Logger.debug(`Db.getObjects: collection=${pCollection}, criteria=${JSON.stringify(criteria)}`)
-  };
+  Logger.cdebug('db-query-detail', `Db.getObjects: collection=${pCollection}, criteria=${JSON.stringify(criteria)}`)
   const cursor = Datab.collection(pCollection).find(criteria);
 
   while (await cursor.hasNext()) {

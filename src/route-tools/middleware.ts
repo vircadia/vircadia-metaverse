@@ -60,9 +60,7 @@ export const finishMetaverseAPI: RequestHandler = async (req: Request, resp: Res
     resp.statusCode = req.vRestResp.HTTPStatus;
     const response = req.vRestResp.buildRESTResponse();
     if (response) {
-      if (Config.debug["metaverseapi-response-detail"]) {
-        Logger.debug('finishMetaverseAPI: response: ' + JSON.stringify(response));
-      };
+      Logger.cdebug('metaverseapi-response-detail', 'finishMetaverseAPI: response: ' + JSON.stringify(response));
       resp.json(response);
     }
     else {
@@ -81,9 +79,7 @@ export const finishReturnData: RequestHandler = async (req: Request, resp: Respo
     resp.statusCode = req.vRestResp.HTTPStatus;
     const response = req.vRestResp.buildRESTResponse();
     if (response && response.data) {
-      if (Config.debug["metaverseapi-response-detail"]) {
-        Logger.debug('finishReturnData: response: ' + JSON.stringify(response.data));
-      };
+      Logger.cdebug('metaverseapi-response-detail', 'finishMetaverseAPI: response: ' + JSON.stringify(response.data));
       resp.json(response.data);
     }
     else {
