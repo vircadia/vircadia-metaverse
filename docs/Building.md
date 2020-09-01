@@ -75,6 +75,88 @@ the other configuration values. This is the preferred method of configuring the
 server: use the IAMUS_CONFIG_FILE environment variable to point at a configuration
 file that sets the values for the metaverse-server instance.
 
+An example configuration file to start with is:
+
+```
+{
+    "metaverse": {
+        "metaverse-name": "My Metaverse",
+        "metaverse-nick-name": "MyVerse",
+        "metaverse-server-url": "https://metaverse.example.org:9400/",
+        "default-ice-server-url": "ice.example.org:7337"
+    },
+    "server": {
+        "cert-file": "config/cert.pem",
+        "key-file": "config/privkey.pem",
+        "chain-file": "config/chain.pem"
+    },
+    "metaverse-server": {
+        "metaverse-info-addition-file": "config/metaverse_info.json"
+    },
+    "database": {
+        "db": "myverse",
+        "db-host": "metaverse.example.org",
+        "db-user": "DBUSER",
+        "db-pw": "DBUSERPASSWORD"
+    },
+    "debug": {
+        "loglevel": "debug",
+        "devel": true,
+    }
+}
+```
+
+This sets up a metaverse named "My Metaverse" that's available at the location `metaverse.example.org`.
+The `.pem` files are the certificates that enable `https:` for that domain.
+If the `.pem` files are not specified, the metaverse-server will only respond to `http:` requests.
+The `database` section specifies the connection to the MongoDB database.
+If you have a complex connection string, replace these parameters with one `db-connection`
+parameter which is just the connection string.
+
+All the configuration parameter default values are defined in `src/config.ts`.
+
+## Setup MongoDB
+
+Install MongoDb following the instructions at https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/ :
+
+```sh
+wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+sudo apt-get update
+sudo apt-get install -y mongodb-org
+sudo systemctl start mongod       # start server
+sudo systemctl status mongod     # check that it is running
+sudo systemctl enable mongod    # enable startup at boot
+mongo
+db.disableFreeMonitoring()
+```
+
+Turn on authentication and create some users for our instance:
+
+```sh
+mongo
+use admin
+db.createUser({user:"adminer", pwd: "LONGPASSWORD1", roles: [ "root" ]})
+use admin
+db.createUser({user:"backuper", pwd: "LONGPASSWORD2", roles: [ "backup" ]})
+use admin
+db.createUser({user:"cadiauser", pwd: "LONGPASSWORD3", roles: [{ role: "readWrite", db: "domainstore" }]})
+```
+
+Where, if course, "LONGPASSWORD*" is a collection of random letter and numbers.
+This creates account "adminer" for DB administration, "backuper" for doing backups
+and "cadiauser" to be the database user for the domain-server.
+The database is "domainstore".
+
+After doing the above creation steps, edit `/etc/mongod.conf` and add:
+
+```
+security:
+    authorization: enabled
+```
+
+then do `sudo systemctl restart mongod`.
+
 ## Troubleshooting
 
 [Running Docker Image]: ./RunningDockerImage.md
