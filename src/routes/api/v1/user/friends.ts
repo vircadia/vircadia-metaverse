@@ -20,7 +20,8 @@ import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken, usernameFromParams } from '@Route-Tools/middleware';
 import { Accounts } from '@Entities/Accounts';
 
-import { VKeyedCollection } from '@Tools/vTypes';
+import { SArray, VKeyedCollection } from '@Tools/vTypes';
+import { IsNotNullOrEmpty } from '@Tools/Misc';
 
 // Get the friends of the logged in account
 const procGetUserFriends: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
@@ -48,11 +49,12 @@ const procPostUserFriends: RequestHandler = (req: Request, resp: Response, next:
 // Remove a friend from my friend list.
 const procDeleteUserFriends: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
-    if (typeof(req.vAuthAccount.friends) !== 'undefined') {
-      const idx = req.vAuthAccount.friends.indexOf(req.vUsername);
-      if (idx >= 0) {
+    if (IsNotNullOrEmpty(req.vAuthAccount.friends)) {
+      if (SArray.has(req.vAuthAccount.friends, req.vUsername)) {
+        SArray.remove(req.vAuthAccount.friends, req.vUsername);
+
         const updates: VKeyedCollection = {
-          'friends': req.vAuthAccount.friends.splice(idx, 1)
+          'friends': req.vAuthAccount.friends
         };
         Accounts.updateEntityFields(req.vAuthAccount, updates);
       };

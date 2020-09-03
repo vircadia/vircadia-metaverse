@@ -17,10 +17,10 @@
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
 import { setupMetaverseAPI, finishMetaverseAPI, tokenFromParams } from '@Route-Tools/middleware';
-import { accountFromAuthToken, usernameFromParams } from '@Route-Tools/middleware';
+import { accountFromAuthToken, param1FromParams } from '@Route-Tools/middleware';
 import { Accounts } from '@Entities/Accounts';
 
-import { VKeyedCollection } from '@Tools/vTypes';
+import { SArray, VKeyedCollection } from '@Tools/vTypes';
 import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 
 // Get the scope of the logged in account
@@ -50,10 +50,11 @@ const procPostUserRoles: RequestHandler = (req: Request, resp: Response, next: N
 const procDeleteUserRole: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
     if (IsNotNullOrEmpty(req.vAuthAccount.roles)) {
-      const idx = req.vAuthAccount.roles.indexOf(req.vTokenId);
-      if (idx >= 0) {
+      if (SArray.has(req.vAuthAccount.roles, req.vParam1)) {
+        SArray.remove(req.vAuthAccount.roles, req.vParam1);
+
         const updates: VKeyedCollection = {
-          'roles': req.vAuthAccount.roles.splice(idx, 1)
+          'roles': req.vAuthAccount.roles
         };
         Accounts.updateEntityFields(req.vAuthAccount, updates);
       };
@@ -79,9 +80,9 @@ router.post(  '/api/v1/user/roles',         [ setupMetaverseAPI,
                                                 procPostUserRoles,
                                                 finishMetaverseAPI
                                               ] );
-router.delete('/api/v1/user/roles/:tokenId', [ setupMetaverseAPI,
+router.delete('/api/v1/user/roles/:param1', [ setupMetaverseAPI,
                                                 accountFromAuthToken, // req.vAuthAccount
-                                                tokenFromParams,      // role to req.vTokenId
+                                                param1FromParams,      // role into req.param1
                                                 procDeleteUserRole,
                                                 finishMetaverseAPI
                                               ] );

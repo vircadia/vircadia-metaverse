@@ -100,8 +100,8 @@ export const accountFromAuthToken: RequestHandler = async (req: Request, resp: R
       try {
         const tokenInfo = await Tokens.getTokenWithToken(authToken);
         if (IsNotNullOrEmpty(tokenInfo)) {
-          req.vAuthAccount = await Accounts.getAccountWithId(tokenInfo.accountId);
           req.vAuthToken = tokenInfo;
+          req.vAuthAccount = await Accounts.getAccountWithId(tokenInfo.accountId);
         };
       }
       catch (err) {

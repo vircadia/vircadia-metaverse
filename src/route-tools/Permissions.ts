@@ -101,7 +101,7 @@ export class Perm {
 //    RequiredAccess could be [ 'domain', 'admin', 'sponsor'] meaning the
 //    token must be from either an admin account or the sponsor account for the domain.
 // Note that the list of RequiredAccess is a OR list -- any one access type is sufficient.
-async function checkAccessToDomain(pAuthToken: AuthToken,       // token being used to access
+export async function checkAccessToDomain(pAuthToken: AuthToken,       // token being used to access
                             pTargetDomain: DomainEntity,  // domain being accessed
                             pRequiredAccess: string[],    // permissions required to access domain
                             pAuthTokenAccount?: AccountEntity  // AuthToken account if known
@@ -113,18 +113,23 @@ async function checkAccessToDomain(pAuthToken: AuthToken,       // token being u
         canAccess = true;
         break;
       case Perm.DOMAIN:
-        canAccess = SArray.has(pAuthToken.scope, TokenScope.DOMAIN)
-                && pAuthToken.accountId === pTargetDomain.sponserAccountId;
+        if (SArray.has(pAuthToken.scope, TokenScope.DOMAIN)) {
+          canAccess = pAuthToken.accountId === pTargetDomain.sponserAccountId;
+        };
         break;
       case Perm.OWNER:
         canAccess = pAuthToken.accountId === pTargetDomain.sponserAccountId;
         break;
       case Perm.ADMIN:
-        const acct = pAuthTokenAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
-        canAccess = Accounts.isAdmin(acct);
+        if (SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
+          const acct = pAuthTokenAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
+          canAccess = Accounts.isAdmin(acct);
+        };
         break;
       case Perm.SPONSOR:
-        canAccess = pAuthToken.accountId === pTargetDomain.sponserAccountId;
+        if (SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
+          canAccess = pAuthToken.accountId === pTargetDomain.sponserAccountId;
+        };
         break;
       default:
         canAccess = false;
@@ -143,7 +148,7 @@ async function checkAccessToDomain(pAuthToken: AuthToken,       // token being u
 //    which means the requestor must be the accound owner, a friend or connection of the
 //    requested account or the requestor must be an admin.
 // Note that the list of RequiredAccess is a OR list -- any one access type is sufficient.
-async function checkAccessToAccount(pAuthToken: AuthToken,  // token being used to access
+export async function checkAccessToAccount(pAuthToken: AuthToken,  // token being used to access
                             pTargetAccount: AccountEntity,  // account being accessed
                             pRequiredAccess: string[],      // permissions required to access domain
                             pRequestingAccount?: AccountEntity  // requesting account if known

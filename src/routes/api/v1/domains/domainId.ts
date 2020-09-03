@@ -16,19 +16,18 @@
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 import { setupMetaverseAPI, finishMetaverseAPI, domainAPIkeyFromBody, verifyDomainAccess } from '@Route-Tools/middleware';
+import { HTTPStatusCode } from '@Route-Tools/RESTResponse';
+
 import { accountFromAuthToken } from '@Route-Tools/middleware';
 import { domainFromParams } from '@Route-Tools/middleware';
+import { checkAccessToDomain, Perm } from '@Route-Tools/Permissions';
 
 import { Domains } from '@Entities/Domains';
 import { Accounts } from '@Entities/Accounts';
 
 import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
-import { HTTPStatusCode } from '@Route-Tools/RESTResponse';
 import { buildDomainInfoV1 } from '@Route-Tools/Util';
-import deepmerge from 'deepmerge';
-
-// metaverseServerApp.use(express.urlencoded({ extended: false }));
 
 // GET /domains/:domainId
 // Return a small snippet if domain data for the domainId specified in the request
@@ -57,36 +56,42 @@ const procGetDomainsDomainid: RequestHandler = async (req: Request, resp: Respon
 // The sender can send or not send lots of different fields so we have to be specific
 const procPutDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vDomain) {
-    const updated: VKeyedCollection = {};
-    const valuesToSet = req.body.domain;
-    // 'valuesToSet' are the values sent to use in the request.
-    // Collect the specific values set. Cannot just accept all because the
-    //     requestor could do things like set the password hash or other bad things.
-    if (valuesToSet.hasOwnProperty('version')) updated.version = valuesToSet.version;
-    if (valuesToSet.hasOwnProperty('protocol')) updated.protocol = valuesToSet.protocol;
-    if (valuesToSet.hasOwnProperty('network_addr')) updated.networkAddr = valuesToSet.network_addr;
-    if (valuesToSet.hasOwnProperty('automatic_networking')) updated.networkingMode = valuesToSet.automatic_networking;
-    if (valuesToSet.hasOwnProperty('restricted')) updated.restricted = valuesToSet.restricted;
-    if (valuesToSet.hasOwnProperty('capacity')) updated.capacity = valuesToSet.capacity;
-    if (valuesToSet.hasOwnProperty('description')) updated.description = valuesToSet.description;
-    if (valuesToSet.hasOwnProperty('maturity')) updated.maturity = valuesToSet.maturity;
-    if (valuesToSet.hasOwnProperty('restriction')) updated.restriction = valuesToSet.restriction;
-    if (valuesToSet.hasOwnProperty('hosts')) {
-      updated.hosts = CleanedStringArray(valuesToSet.hosts);
-    };
-    if (valuesToSet.hasOwnProperty('tags')) {
-      updated.tags = CleanedStringArray(valuesToSet.tags);
-    };
-    if (valuesToSet.hasOwnProperty('heartbeat')) {
-      updated.numUsers = Number(valuesToSet.heartbeat.num_users);
-      updated.anonUsers = Number(valuesToSet.heartbeat.num_anon_users);
-      updated.totalUsers = updated.numUsers + updated.anonUsers;
-    };
+    // Either the domain itself or an admin can update the domain information
+    if (checkAccessToDomain(req.vAuthToken, req.vDomain, [ Perm.DOMAIN, Perm.ADMIN ])) {
+      const updated: VKeyedCollection = {};
+      const valuesToSet = req.body.domain;
+      // 'valuesToSet' are the values sent to use in the request.
+      // Collect the specific values set. Cannot just accept all because the
+      //     requestor could do things like set the password hash or other bad things.
+      if (valuesToSet.hasOwnProperty('version')) updated.version = valuesToSet.version;
+      if (valuesToSet.hasOwnProperty('protocol')) updated.protocol = valuesToSet.protocol;
+      if (valuesToSet.hasOwnProperty('network_addr')) updated.networkAddr = valuesToSet.network_addr;
+      if (valuesToSet.hasOwnProperty('automatic_networking')) updated.networkingMode = valuesToSet.automatic_networking;
+      if (valuesToSet.hasOwnProperty('restricted')) updated.restricted = valuesToSet.restricted;
+      if (valuesToSet.hasOwnProperty('capacity')) updated.capacity = valuesToSet.capacity;
+      if (valuesToSet.hasOwnProperty('description')) updated.description = valuesToSet.description;
+      if (valuesToSet.hasOwnProperty('maturity')) updated.maturity = valuesToSet.maturity;
+      if (valuesToSet.hasOwnProperty('restriction')) updated.restriction = valuesToSet.restriction;
+      if (valuesToSet.hasOwnProperty('hosts')) {
+        updated.hosts = CleanedStringArray(valuesToSet.hosts);
+      };
+      if (valuesToSet.hasOwnProperty('tags')) {
+        updated.tags = CleanedStringArray(valuesToSet.tags);
+      };
+      if (valuesToSet.hasOwnProperty('heartbeat')) {
+        updated.numUsers = Number(valuesToSet.heartbeat.num_users);
+        updated.anonUsers = Number(valuesToSet.heartbeat.num_anon_users);
+        updated.totalUsers = updated.numUsers + updated.anonUsers;
+      };
 
-    updated.timeOfLastHeartbeat = new Date();
+      updated.timeOfLastHeartbeat = new Date();
 
-    Logger.debug('procPutDomains. updating=' + JSON.stringify(updated));
-    Domains.updateEntityFields(req.vDomain, updated);
+      Logger.debug('procPutDomains. updating=' + JSON.stringify(updated));
+      Domains.updateEntityFields(req.vDomain, updated);
+    }
+    else {
+      req.vRestResp.respondFailure('Unauthorized');
+    };
   }
   else {
     req.vRestResp.respondFailure(req.vDomainError ?? 'Domain not found');
