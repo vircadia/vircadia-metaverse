@@ -41,7 +41,7 @@ const procGetTokens: RequestHandler = async (req: Request, resp: Response, next:
         'token': tok.token,
         'accountId': tok.accountId,
         'refresh_token': tok.refreshToken,
-        'scope': TokenScope.MakeScopeString(tok.scope),
+        'scope': tok.scope,
         'creation_time': tok.tokenCreationTime ? tok.tokenCreationTime.toISOString() : undefined,
         'expiration_time': tok.tokenExpirationTime ? tok.tokenExpirationTime.toISOString() : undefined,
       });

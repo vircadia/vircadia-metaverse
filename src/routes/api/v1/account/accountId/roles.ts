@@ -20,7 +20,7 @@ import { setupMetaverseAPI, finishMetaverseAPI, tokenFromParams, accountFromPara
 import { accountFromAuthToken, usernameFromParams } from '@Route-Tools/middleware';
 import { Accounts } from '@Entities/Accounts';
 
-import { VKeyedCollection } from '@Tools/vTypes';
+import { SArray, VKeyedCollection } from '@Tools/vTypes';
 import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 import { AccountRoles } from '@Entities/AccountRoles';
 
@@ -53,7 +53,7 @@ const procPostUserRoles: RequestHandler = (req: Request, resp: Response, next: N
       const roles = IsNullOrEmpty(req.vAccount.roles)
                 ? []        // if no roles info, return empty list
                 : req.vAccount.roles;
-      if (AccountRoles.AddRole(roles, req.vTokenId)) {
+      if (SArray.add(roles, req.vTokenId)) {
         const updates: VKeyedCollection = {
           'roles': roles
         };

@@ -24,39 +24,9 @@ export class TokenScope {
   public static READ: string = 'read';
   public static WRITE: string = 'write';
 
+  // See if the passed scope token is a known scope code.
   static KnownScope(pScope: string): boolean {
     return [ TokenScope.OWNER, TokenScope.DOMAIN ].includes(pScope);
   };
 
-  static HasScope(pScopes: string[], pCheck:string): boolean {
-    return pScopes.includes(pCheck);
-  };
-
-  // Add a role to a list of roles.
-  static AddScope(pScopes: string[], pScope: string): boolean {
-    let ret = false
-    if (! pScopes.includes(pScope)) {
-      pScopes.push(pScope);
-      ret = true;
-    };
-    return ret;
-  };
-
-  static RemoveScope(pScopes: string[], pScope: string): boolean {
-    let ret = false;
-    const index: number = pScopes.indexOf(pScope);
-    if (index >= 0) {
-      pScopes.splice(index, 1);
-      ret = true;
-    };
-    return ret;
-  };
-
-  static MakeScopeString(pScopes: string[]) {
-    let ret = '';
-    if (IsNotNullOrEmpty(pScopes)) {
-      ret = pScopes.join(' ');
-    };
-    return ret;
-  };
 };

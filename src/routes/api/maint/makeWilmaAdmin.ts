@@ -22,16 +22,18 @@ import { Accounts } from '@Entities/Accounts';
 import { IsNotNullOrEmpty } from '@Tools/Misc';
 import { AccountRoles } from '@Entities/AccountRoles';
 
+import { SArray } from '@Tools/vTypes';
+
 // Temporary maint function to create the first admin account
 const procMakeWilmaAdmin: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vRestResp) {
     const wilma = await Accounts.getAccountWithUsername("wilma");
     if (IsNotNullOrEmpty(wilma)) {
-      if (AccountRoles.HasRole(wilma.roles, AccountRoles.ADMIN)) {
+      if (SArray.has(wilma.roles, AccountRoles.ADMIN)) {
         Logger.debug('procMakeWilmaAdmin: wilma already has role "admin"');
       }
       else {
-        AccountRoles.AddRole(wilma.roles, AccountRoles.ADMIN);
+        SArray.add(wilma.roles, AccountRoles.ADMIN);
         Logger.debug(`procMakeWilmaAdmin: added role ADMIN to wilma: ${wilma.roles}`);
         const update = {
           'roles': wilma.roles

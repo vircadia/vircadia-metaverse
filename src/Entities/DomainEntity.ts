@@ -13,11 +13,10 @@
 //   limitations under the License.
 'use strict'
 
-import { Domains } from "@Entities/Domains";
-import { VKeyedCollection } from '@Tools/vTypes';
+import { Entity } from "@Entities/Entity";
 
 // NOTE: this class cannot have functions in them as they are just JSON to and from the database
-export class DomainEntity {
+export class DomainEntity implements Entity {
   public domainId: string;     // globally unique domain identifier
   public placeName: string;    // place name
   public publicKey: string;    // DomainServers's public key in multi-line PEM format

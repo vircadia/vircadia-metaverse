@@ -22,7 +22,7 @@ import { createObject, getObject, getObjects, updateObjectFields, deleteMany, de
 import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 
-import { VKeyedCollection } from '@Tools/vTypes';
+import { SArray, VKeyedCollection } from '@Tools/vTypes';
 import { GenUUID, IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
 
@@ -92,7 +92,7 @@ export const Tokens = {
   // Return an expiration date for the token depending on its scope
   computeDefaultExpiration(pScopes: string[], pBaseDate?: Date): Date {
     return new Date((pBaseDate ? pBaseDate.valueOf() : new Date().valueOf())
-          + ( TokenScope.HasScope(pScopes, TokenScope.DOMAIN)
+          + ( SArray.has(pScopes, TokenScope.DOMAIN)
                    ? Config.auth["domain-token-expire-hours"] * 1000*60*60
                    : Config.auth["owner-token-expire-hours"] * 1000*60*60
             )

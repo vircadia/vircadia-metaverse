@@ -132,7 +132,7 @@ export function buildOAuthResponseBody(pAcct: AccountEntity, pToken: AuthToken):
     'token_type': 'Bearer',
     'expires_in': pToken.tokenExpirationTime.valueOf()/1000 - pToken.tokenCreationTime.valueOf()/1000,
     'refresh_token': pToken.refreshToken,
-    'scope': TokenScope.MakeScopeString(pToken.scope),
+    'scope': pToken.scope[0],
     'created_at': pToken.tokenCreationTime.valueOf() / 1000,
   };
   if (pAcct) {

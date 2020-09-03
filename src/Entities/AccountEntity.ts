@@ -15,10 +15,10 @@
 
 import Config from '../config';
 
-import { AuthToken } from './AuthToken';
+import { Entity } from '@Entities/Entity';
 
 // NOTE: this class cannot have functions in them as they are just JSON to and from the database
-export class AccountEntity {
+export class AccountEntity implements Entity {
   public accountId: string;
   public username: string;
   public email: string;

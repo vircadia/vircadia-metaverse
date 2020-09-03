@@ -22,43 +22,9 @@ export class AccountRoles {
   public static ADMIN: string = 'admin';   // someone who has metaverse-server admin
   public static USER: string = 'user';     // a 'user' or 'person'
 
-  static KnownRole(pRole: string): boolean {
-    return [ AccountRoles.ADMIN, AccountRoles.USER ].includes(pRole);
+  // See if the passed role code is a known role token
+  static KnownRole(pScope: string): boolean {
+    return [ AccountRoles.ADMIN, AccountRoles.USER ].includes(pScope);
   };
 
-  static HasRole(pRoles: string[], pCheck:string): boolean {
-    return pRoles.includes(pCheck.toLowerCase());
-  };
-
-  // Add a role to a list of roles.
-  static AddRole(pRoles: string[], pRole: string): boolean {
-    let ret = false
-    const role = pRole.toLowerCase();
-    if (AccountRoles.KnownRole(role)) {
-      if (! pRoles.includes(role)) {
-        pRoles.push(role);
-      };
-      ret = true;
-    };
-    return ret;
-  };
-
-  static RemoveRole(pRoles: string[], pRole: string): boolean {
-    let ret = false;
-    const role = pRole.toLowerCase();
-    const index: number = pRoles.indexOf(role);
-    if (index >= 0) {
-      pRoles.splice(index, 1);
-      ret = true;
-    };
-    return ret;
-  };
-
-  static MakeRoleString(pRoles: string[]) {
-    let ret = '';
-    if (IsNotNullOrEmpty(pRoles)) {
-      ret = pRoles.join(' ');
-    };
-    return ret;
-  };
 };

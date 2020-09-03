@@ -26,7 +26,7 @@ import { createObject, getObject, getObjects, updateObjectFields, deleteOne } fr
 import { GenUUID, genRandomString, IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 
 import { Logger } from '@Tools/Logging';
-import { VKeyedCollection } from '@Tools/vTypes';
+import { VKeyedCollection, SArray } from '@Tools/vTypes';
 
 export let accountCollection = 'accounts';
 
@@ -112,7 +112,7 @@ export const Accounts = {
   },
   // getter property that is 'true' if the user is a grid administrator
   isAdmin(pAcct: AccountEntity): boolean {
-    return AccountRoles.HasRole(pAcct.roles, AccountRoles.ADMIN);
+    return SArray.has(pAcct.roles, AccountRoles.ADMIN);
   },
   // Return whether accessing account can access info about target account
   CanAccess(pAccessingAcct: AccountEntity, pTargetAcct: AccountEntity): boolean {
