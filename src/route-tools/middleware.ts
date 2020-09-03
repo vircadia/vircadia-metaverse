@@ -37,6 +37,7 @@ export const setupMetaverseAPI: RequestHandler = async (req: Request, resp: Resp
   req.vRestResp = new RESTResponse(req, resp);
   if (req.socket) {
     req.vSenderKey = `${req.socket.remoteAddress}:${req.socket.remotePort}`;
+
     req.vSession = Sessions.getSessionWithSenderKey(req.vSenderKey);
     if (req.vSession) {
       SessionEntity.TouchSession(req.vSession);
@@ -46,6 +47,16 @@ export const setupMetaverseAPI: RequestHandler = async (req: Request, resp: Resp
       req.vSession = Sessions.createSession(req.vSenderKey);
       Sessions.addSession(req.vSession);
       Logger.debug('setupMetaverseAPI: created new session for ' + req.vSenderKey);
+    };
+
+    const authToken = req.vRestResp.getAuthToken();
+    if (IsNotNullOrEmpty(authToken)) {
+      try {
+        req.vAuthToken = await Tokens.getTokenWithToken(authToken);
+      }
+      catch (err) {
+        Logger.error(`setupMetaverseAPI: exception in token lookup: ${err}`);
+      };
     };
   };
   next();
@@ -95,19 +106,8 @@ export const finishReturnData: RequestHandler = async (req: Request, resp: Respo
 // If account cannot be found, sets 'vAuthAccount' to undefined.
 export const accountFromAuthToken: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vRestResp) {
-    const authToken = req.vRestResp.getAuthToken();
-    if (IsNotNullOrEmpty(authToken)) {
-      try {
-        const tokenInfo = await Tokens.getTokenWithToken(authToken);
-        if (IsNotNullOrEmpty(tokenInfo)) {
-          req.vAuthToken = tokenInfo;
-          req.vAuthAccount = await Accounts.getAccountWithId(tokenInfo.accountId);
-        };
-      }
-      catch (err) {
-        Logger.error(`accountFromAuthToken: exception in lookup: ${err}`);
-        req.vAuthAccount = undefined;
-      };
+    if (IsNotNullOrEmpty(req.vAuthToken)) {
+      req.vAuthAccount = await Accounts.getAccountWithId(req.vAuthToken.accountId);
     };
   };
   if (IsNullOrEmpty(req.vAuthAccount)) {

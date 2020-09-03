@@ -23,6 +23,7 @@ import { Accounts } from '@Entities/Accounts';
 import { Domains } from '@Entities/Domains';
 
 import { SArray } from '@Tools/vTypes';
+import { IsNotNullOrEmpty } from '@Tools/Misc';
 
 // A start at having a table driven access permissions to the Entity attributes.
 // Each Entity field would have an entry that includes who can read or write
@@ -107,37 +108,39 @@ export async function checkAccessToDomain(pAuthToken: AuthToken,       // token 
                             pAuthTokenAccount?: AccountEntity  // AuthToken account if known
                     ): Promise<boolean> {
   let canAccess: boolean = false;
-  for (const perm of pRequiredAccess) {
-    switch (perm) {
-      case Perm.ALL:
-        canAccess = true;
-        break;
-      case Perm.DOMAIN:
-        if (SArray.has(pAuthToken.scope, TokenScope.DOMAIN)) {
+  if (IsNotNullOrEmpty(pAuthToken) && IsNotNullOrEmpty(pTargetDomain)) {
+    for (const perm of pRequiredAccess) {
+      switch (perm) {
+        case Perm.ALL:
+          canAccess = true;
+          break;
+        case Perm.DOMAIN:
+          if (SArray.has(pAuthToken.scope, TokenScope.DOMAIN)) {
+            canAccess = pAuthToken.accountId === pTargetDomain.sponserAccountId;
+          };
+          break;
+        case Perm.OWNER:
           canAccess = pAuthToken.accountId === pTargetDomain.sponserAccountId;
-        };
-        break;
-      case Perm.OWNER:
-        canAccess = pAuthToken.accountId === pTargetDomain.sponserAccountId;
-        break;
-      case Perm.ADMIN:
-        if (SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
-          const acct = pAuthTokenAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
-          canAccess = Accounts.isAdmin(acct);
-        };
-        break;
-      case Perm.SPONSOR:
-        if (SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
-          canAccess = pAuthToken.accountId === pTargetDomain.sponserAccountId;
-        };
-        break;
-      default:
-        canAccess = false;
-        break;
-    }
-    // If some permission allows access, we are done
-    if (canAccess) break;
-  }
+          break;
+        case Perm.ADMIN:
+          if (SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
+            const acct = pAuthTokenAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
+            canAccess = Accounts.isAdmin(acct);
+          };
+          break;
+        case Perm.SPONSOR:
+          if (SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
+            canAccess = pAuthToken.accountId === pTargetDomain.sponserAccountId;
+          };
+          break;
+        default:
+          canAccess = false;
+          break;
+      }
+      // If some permission allows access, we are done
+      if (canAccess) break;
+    };
+  };
   return canAccess;
 };
 
