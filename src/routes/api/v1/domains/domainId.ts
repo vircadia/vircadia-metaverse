@@ -57,7 +57,7 @@ const procGetDomainsDomainid: RequestHandler = async (req: Request, resp: Respon
 const procPutDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vDomain) {
     // Either the domain itself or an admin can update the domain information
-    if (checkAccessToDomain(req.vAuthToken, req.vDomain, [ Perm.DOMAIN, Perm.ADMIN ])) {
+    if (checkAccessToDomain(req.vAuthToken, req.vDomain, [ Perm.DOMAIN, Perm.SPONSOR, Perm.ADMIN ])) {
       const updated: VKeyedCollection = {};
       const valuesToSet = req.body.domain;
       // 'valuesToSet' are the values sent to use in the request.
