@@ -34,9 +34,8 @@ export function initTokens(): void {
   // Expire tokens that have pased their prime
   setInterval( async () => {
     const nowtime = new Date();
-    const deleteInfo = await deleteMany(tokenCollection, { tokenExpirationTime: { $lt: nowtime } } );
-    const deletedTokens = deleteInfo.deletedCount;
-    if (typeof(deletedTokens) === 'number' && deletedTokens > 0) {
+    const deletedTokens = await deleteMany(tokenCollection, { tokenExpirationTime: { $lt: nowtime } } );
+    if (deletedTokens > 0) {
       Logger.debug(`Tokens.Expiration: expired ${deletedTokens} tokens`);
     };
   }, 1000 * 60 * 5 );
@@ -71,7 +70,7 @@ export const Tokens = {
   async addToken(pAuthToken: AuthToken) : Promise<AuthToken> {
     return createObject(tokenCollection, pAuthToken);
   },
-  async removeToken(pAuthToken: AuthToken) : Promise<any> {
+  async removeToken(pAuthToken: AuthToken) : Promise<boolean> {
     return deleteOne(tokenCollection, { 'tokenId': pAuthToken.tokenId });
   },
   async updateTokenFields(pEntity: AuthToken, pFields: VKeyedCollection): Promise<AuthToken> {

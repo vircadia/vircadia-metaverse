@@ -21,7 +21,7 @@ import { AccountEntity } from '@Entities/AccountEntity';
 
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 
-import { createObject, getObject, getObjects, updateObjectFields } from '@Tools/Db';
+import { createObject, getObject, getObjects, updateObjectFields, deleteOne } from '@Tools/Db';
 
 import { Logger } from '@Tools/Logging';
 import { GenUUID, IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
@@ -49,8 +49,8 @@ export const Domains = {
     newDomain.domainId = GenUUID();
     return newDomain;
   },
-  removeDomain(pAccountEntity: DomainEntity) : boolean {
-    return false;
+  removeDomain(pDomainEntity: DomainEntity) : Promise<boolean> {
+    return deleteOne(domainCollection, { 'domainId': pDomainEntity.domainId } );
   },
   async *enumerateAsync(pPager: PaginationInfo): AsyncGenerator<DomainEntity> {
     for await (const domain of getObjects(domainCollection, pPager)) {

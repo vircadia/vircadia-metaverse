@@ -119,12 +119,21 @@ export async function updateObjectFields(pCollection: string, pCriteria: any, pF
     );
 };
 
-export async function deleteMany(pCollection: string, pCriteria: any): Promise<DeleteWriteOpResultObject> {
-  return Datab.collection(pCollection).deleteMany(pCriteria);
+export async function deleteMany(pCollection: string, pCriteria: any): Promise<number> {
+  const result = await Datab.collection(pCollection).deleteMany(pCriteria);
+  return result.deletedCount ?? 0;
 };
 
-export async function deleteOne(pCollection: string, pCriteria: any): Promise<DeleteWriteOpResultObject> {
-  return Datab.collection(pCollection).deleteOne( pCriteria );
+export async function deleteOne(pCollection: string, pCriteria: any): Promise<boolean> {
+  let ret = false;
+  const result = await Datab.collection(pCollection).deleteOne( pCriteria );
+  if ( result.result && result.result.ok) {
+    ret = result.result.ok === 1
+  }
+  else {
+    ret = (result.deletedCount ?? 0) > 0;
+  };
+  return ret;
 };
 
 // Low level generator to a stream of objects fitting a criteria.

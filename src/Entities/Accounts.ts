@@ -57,7 +57,7 @@ export const Accounts = {
   async addAccount(pAccountEntity: AccountEntity) : Promise<AccountEntity> {
     return createObject(accountCollection, pAccountEntity);
   },
-  async removeAccount(pAccountEntity: AccountEntity) : Promise<any> {
+  async removeAccount(pAccountEntity: AccountEntity) : Promise<boolean> {
     return deleteOne(accountCollection, { 'accountId': pAccountEntity.accountId } );
   },
   // The contents of this entity have been updated
