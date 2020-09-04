@@ -48,7 +48,7 @@ const procGetUserRoles: RequestHandler = (req: Request, resp: Response, next: Ne
 // Add a role to my roles collection.
 // Not implemented as something needs to be done with request_connection, etc
 const procPostUserRoles: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount && req.vAuthAccount) {
+  if (req.vAuthAccount && req.vAccount) {
     if (Accounts.isAdmin(req.vAuthAccount)) {
       const roles = IsNullOrEmpty(req.vAccount.roles)
                 ? []        // if no roles info, return empty list
@@ -75,7 +75,7 @@ const procPostUserRoles: RequestHandler = (req: Request, resp: Response, next: N
 
 // Remove a friend from my friend list.
 const procDeleteUserRole: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount && req.vAuthAccount) {
+  if (req.vAuthAccount && req.vAccount) {
     if (Accounts.isAdmin(req.vAuthAccount)) {
       if (IsNotNullOrEmpty(req.vAccount.roles)) {
         if (SArray.has(req.vAccount.roles, req.vParam1)) {
