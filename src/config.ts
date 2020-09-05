@@ -46,7 +46,9 @@ export let Config = {
       'metaverse-info-addition-file': './metaverse_info.json',
       'session-timeout-minutes': 5,
       // redirection URL used for initial domain token generation
-      'tokengen_url': '/static/DomainTokenLogin.html'
+      'tokengen_url': '/static/DomainTokenLogin.html',
+      // The first administration account
+      'base-admin-account': 'adminer'
     },
     'activitypub': {
       // NOTE: there shouldn't be a trailing slash

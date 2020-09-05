@@ -14,6 +14,8 @@
 
 'use strict'
 
+import { Config } from '@Base/config';
+
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 
@@ -26,19 +28,20 @@ import { SArray } from '@Tools/vTypes';
 
 // Temporary maint function to create the first admin account
 const procMakeWilmaAdmin: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  let adminAccountName =  Config["metaverse-server"]["base-admin-account"] ?? 'wilma';
   if (req.vRestResp) {
-    const wilma = await Accounts.getAccountWithUsername("wilma");
-    if (IsNotNullOrEmpty(wilma)) {
-      if (SArray.has(wilma.roles, AccountRoles.ADMIN)) {
-        Logger.debug('procMakeWilmaAdmin: wilma already has role "admin"');
+    const adminAccount = await Accounts.getAccountWithUsername(adminAccountName);
+    if (IsNotNullOrEmpty(adminAccount)) {
+      if (SArray.has(adminAccount.roles, AccountRoles.ADMIN)) {
+        Logger.debug(`procMakeWilmaAdmin: ${adminAccountName} already has role "admin"`);
       }
       else {
-        SArray.add(wilma.roles, AccountRoles.ADMIN);
-        Logger.debug(`procMakeWilmaAdmin: added role ADMIN to wilma: ${wilma.roles}`);
+        SArray.add(adminAccount.roles, AccountRoles.ADMIN);
+        Logger.debug(`procMakeWilmaAdmin: added role ADMIN to ${adminAccountName}: ${adminAccount.roles}`);
         const update = {
-          'roles': wilma.roles
+          'roles': adminAccount.roles
         };
-        Accounts.updateEntityFields(wilma, update);
+        Accounts.updateEntityFields(adminAccount, update);
       };
     }
     else {
