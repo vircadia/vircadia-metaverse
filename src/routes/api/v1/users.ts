@@ -97,15 +97,15 @@ const procPostUsers: RequestHandler = async (req: Request, resp: Response, next:
           };
         }
         else {
-          req.vRestResp.respondFailure('Badly formated email');
+          req.vRestResp.respondFailure('Badly formatted email');
         };
       }
       else {
-        req.vRestResp.respondFailure('Badly formated username');
+        req.vRestResp.respondFailure('Badly formatted username');
       };
     }
     else {
-      req.vRestResp.respondFailure('Badly formated request');
+      req.vRestResp.respondFailure('Badly formatted request');
     };
   }
   next();
