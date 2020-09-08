@@ -112,11 +112,11 @@ export async function updateObjectFields(pCollection: string, pCriteria: any, pF
     op.$unset = unset
   }
 
+  Logger.cdebug('db-query-detail', `Db.updateObjectFields: collection=${pCollection}, criteria=${JSON.stringify(pCriteria)}, op=${JSON.stringify(op)}`)
   return Datab.collection(pCollection)
     .findOneAndUpdate(pCriteria, op, {
        returnOriginal: false    // return the updated entity
-      }
-    );
+    } );
 };
 
 export async function deleteMany(pCollection: string, pCriteria: any): Promise<number> {
