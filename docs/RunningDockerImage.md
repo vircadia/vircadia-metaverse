@@ -102,11 +102,17 @@ then do `sudo systemctl restart mongod`.
 
 ## Create Directories and Create Configuration File
 
+Now that you have the Droplet created, log into the 'cadia' account and
+create directories and a configuration file in its home directory.
+
 ```sh
+cd
 mkdir -p config
 cat > config/iamus.json << EOFFF
 {
     "metaverse": {
+        "metaverse-name": "LONG_NAME_OF_THIS_METAVERSE",
+        "metaverse-nick-name": "SHORT_NAME_FOR_THIS_METAVERSE",
         "metaverse-server-url": "EXTERNAL_URL",
         "default-ice-server-url": "ADDRESS_OF_ICE_SERVER"
     },
@@ -115,6 +121,9 @@ cat > config/iamus.json << EOFFF
         "db-host": "LOCAL_HOST_NAME",
         "db-user": "MONGO_USER",
         "db-pw": "MONGO_USER_PASSWORD"
+    },
+    "debug": {
+        
     }
 }
 EOFFF

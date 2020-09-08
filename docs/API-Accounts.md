@@ -25,7 +25,7 @@ are returned (limited by pagination).
         "data": {
             "accounts": [
                 {
-                    "accountid": "uniqueAccountId",
+                    "accountId": "uniqueAccountId",
                     "username: "username",
                     "email": "email",
                     "public_key": "usersPublicKey",     // stripped PEM public key
