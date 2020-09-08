@@ -2,7 +2,8 @@
 
 This document describes building and configuring the Iamus
 metaverse-server. There are other documents on setting up
-and running the server. For that, refer to
+and running the server.
+For development or other running configurations, refer to
 [Notes On Development] and [Running Docker Image].
 
 ## Build Instructions
@@ -17,7 +18,28 @@ npm run build
 
 ## Running
 
-When you run the server, you must point any domain-servers (Project-Athena) at this
+For testing and simple opertion, you can run Iamus in the build directory.
+Say you want to build and run Iamus in the directory IBASE. The steps are:
+
+```sh
+cd $IBASE
+git clone https://github.com/kasenvr/Iamus.git
+cd Iamus
+npm install     # install all the required NodeJS packages
+npm run build   # build Iamus into $IBASE/Iamus/dist/
+# setup MongoDB (see notes below)
+# create configuration file 'iamus.json' in directory $IBASE/Iamus (see below)
+node dist/index.js  # run Iamus
+```
+
+Note that the `iamus.json` configuration file is not put in the 'dist/' directory
+because that directory is cleaned out before each build.
+
+Iamus can also be built and run in a Docker container.
+Refer to [Running Docker Image] for instructions.
+
+For connecting domain-servers to the Iamus metaverse-server,
+you must point any domain-servers (Project-Athena) at this
 metaverse server. This is accomplished by setting the `HIFI_METAVERSE_URL`:
 
 ```sh
@@ -68,7 +90,7 @@ The environment variables are:
 - IAMUS_LISTEN_HOST: host to listen for requests on. Default '0.0.0.0'.
 - IAMUS_LISTEN_PORT: port to listen for requests on. Default 9400.
 - IAMUS_EXTERNAL_HOSTNAME: hostname to report as referencing back to this server. This is mostly used by ActivityPub for links to users. Default 'localhost'. This value MUST be set for proper metavserse-server operation.
-- IAMUS_CONFIG_FILE: filename or URL of a JSON formatted configuration file that over-rides the values. Default "./imus.json".
+- IAMUS_CONFIG_FILE: filename or URL of a JSON formatted configuration file that over-rides the values. Default "./iamus.json".
 
 The configuration file, if it exists, is read and its values overlay
 the other configuration values. This is the preferred method of configuring the
