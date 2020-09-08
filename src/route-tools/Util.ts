@@ -163,21 +163,21 @@ export async function buildDomainInfoV1(pDomain: DomainEntity): Promise<any> {
   };
 };
 
-export async function BuildAccountInfo(pAccount: AccountEntity): Promise<any> {
+export async function BuildAccountInfo(pReq: Request, pAccount: AccountEntity): Promise<any> {
   const entry: any = {
     'accountId': pAccount.accountId,
     'username': pAccount.username,
     'email': pAccount.email,
+    'administrator': Accounts.isAdmin(pAccount),
+    'roles': pAccount.roles,
+    'public_key': createSimplifiedPublicKey(pAccount.sessionPublicKey),
+    'images': pAccount.images,
+    'location': await buildLocationInfo(pReq, pAccount),
+    'friends': pAccount.friends,
+    'connections': pAccount.connections,
+    'when_account_created': pAccount.whenAccountCreated.toISOString(),
+    'time_of_last_heartbeat': pAccount.timeOfLastHeartbeat.toISOString()
   };
-  if (Accounts.isAdmin(pAccount))   entry.administrator = Accounts.isAdmin(pAccount);
-  if (pAccount.roles)               entry.roles = pAccount.roles;
-  if (pAccount.sessionPublicKey)    entry.public_key = createSimplifiedPublicKey(pAccount.sessionPublicKey);
-  if (pAccount.images)              entry.images = pAccount.images;
-  if (pAccount.location)            entry.location = pAccount.location;
-  if (pAccount.friends)             entry.friends = pAccount.friends;
-  if (pAccount.connections)         entry.connections = pAccount.connections;
-  if (pAccount.whenAccountCreated)  entry.when_account_created = pAccount.whenAccountCreated.toISOString();
-  if (pAccount.timeOfLastHeartbeat) entry.time_of_last_heartbeat = pAccount.timeOfLastHeartbeat.toISOString();
 
   return entry;
 };

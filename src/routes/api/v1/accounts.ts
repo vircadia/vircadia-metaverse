@@ -17,6 +17,7 @@
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
+import { BuildAccountInfo } from '@Route-Tools/Util';
 
 import { Accounts } from '@Entities/Accounts';
 
@@ -42,22 +43,7 @@ const procGetAccounts: RequestHandler = async (req: Request, resp: Response, nex
     // Loop through all the filtered accounts and create array of info
     const accts: any[] = [];
     for await (const acct of Accounts.enumerateAsync(pager, infoer, scoper)) {
-      const entry: any = {
-        'accountId': acct.accountId,
-        'username': acct.username,
-        'email': acct.email,
-      };
-      if (Accounts.isAdmin(acct)) entry.administrator = Accounts.isAdmin(acct);
-      if (acct.roles) entry.roles = acct.roles;
-      if (acct.sessionPublicKey)   entry.public_key = createSimplifiedPublicKey(acct.sessionPublicKey);
-      if (acct.images)      entry.images = acct.images;
-      if (acct.location)    entry.location = acct.location;
-      if (acct.friends)     entry.friends = acct.friends;
-      if (acct.connections) entry.connections = acct.connections;
-      if (acct.whenAccountCreated) entry.when_account_created = acct.whenAccountCreated.toISOString();
-      if (acct.timeOfLastHeartbeat) entry.time_of_last_heartbeat = acct.timeOfLastHeartbeat.toISOString();
-
-      accts.push(entry);
+      accts.push(await BuildAccountInfo(req, acct));
     };
 
     req.vRestResp.Data = {
