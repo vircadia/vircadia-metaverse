@@ -35,8 +35,10 @@ export class AccountScopeFilter extends CriteriaFilter {
   public parametersFromRequest(pRequest: Request) : void {
     try {
       if (pRequest.query.hasOwnProperty('asAdmin')) {
-        if (Accounts.isAdmin(this._accessingAcct)) {
-          this._asAdmin = true;
+        if (pRequest.query.asAdmin) {
+          if (Accounts.isAdmin(this._accessingAcct)) {
+            this._asAdmin = true;
+          };
         };
       };
       // The administrator can specify an account to limit requests to
