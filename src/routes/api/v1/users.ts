@@ -14,6 +14,8 @@
 
 'use strict';
 
+import { Config } from '@Base/config';
+
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
@@ -27,6 +29,8 @@ import { buildLocationInfo } from '@Route-Tools/Util';
 
 import { Logger } from '@Tools/Logging';
 import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
+import { AccountRoles } from '@Entities/AccountRoles';
+import { SArray } from '@Tools/vTypes';
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
@@ -75,10 +79,16 @@ const procPostUsers: RequestHandler = async (req: Request, resp: Response, next:
           // See if account already exists
           const prevAccount = await Accounts.getAccountWithUsername(userName);
           if (IsNullOrEmpty(prevAccount)) {
-
             const newAcct = await Accounts.createAccount(userName, userPassword, userEmail);
             if (newAcct) {
               try {
+                const adminAccountName =  Config["metaverse-server"]["base-admin-account"] ?? 'wilma';
+                // If we're creating the admin account, assign it admin privilages
+                if (newAcct.username === adminAccountName) {
+                  if (IsNullOrEmpty(newAcct.roles)) newAcct.roles = [];
+                  SArray.add(newAcct.roles, AccountRoles.ADMIN);
+                  Logger.info(`procPostUsers: setting new account ${adminAccountName} as admin`);
+                }
                 newAcct.IPAddrOfCreator = req.vSenderKey;
                 await Accounts.addAccount(newAcct);
               }
