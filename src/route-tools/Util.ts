@@ -162,3 +162,22 @@ export async function buildDomainInfoV1(pDomain: DomainEntity): Promise<any> {
     'when_domain_entry_created': pDomain.whenDomainEntryCreated ? pDomain.whenDomainEntryCreated.toISOString() : undefined
   };
 };
+
+export async function BuildAccountInfo(pAccount: AccountEntity): Promise<any> {
+  const entry: any = {
+    'accountId': pAccount.accountId,
+    'username': pAccount.username,
+    'email': pAccount.email,
+  };
+  if (Accounts.isAdmin(pAccount))   entry.administrator = Accounts.isAdmin(pAccount);
+  if (pAccount.roles)               entry.roles = pAccount.roles;
+  if (pAccount.sessionPublicKey)    entry.public_key = createSimplifiedPublicKey(pAccount.sessionPublicKey);
+  if (pAccount.images)              entry.images = pAccount.images;
+  if (pAccount.location)            entry.location = pAccount.location;
+  if (pAccount.friends)             entry.friends = pAccount.friends;
+  if (pAccount.connections)         entry.connections = pAccount.connections;
+  if (pAccount.whenAccountCreated)  entry.when_account_created = pAccount.whenAccountCreated.toISOString();
+  if (pAccount.timeOfLastHeartbeat) entry.time_of_last_heartbeat = pAccount.timeOfLastHeartbeat.toISOString();
+
+  return entry;
+};

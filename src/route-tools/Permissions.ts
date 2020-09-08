@@ -45,11 +45,29 @@ interface FieldDefn {
     setter: setterFunction
 };
 const domainFields: { [key: string]: FieldDefn } = {
-  'place-name': {
+  'place_name': {
     entity_field: 'placeName',
-    request_field_name: 'place-name',
+    request_field_name: 'place_name',
     get_permissions: [ 'all' ],
     set_permissions: [ 'domain', 'sponser', 'admin' ],
+    validate: isStringValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'public_key': {
+    entity_field: 'version',
+    request_field_name: 'version',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'domain' ],
+    validate: isStringValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'sponsor_account_id': {
+    entity_field: 'version',
+    request_field_name: 'version',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'domain', 'sponsor', 'admin' ],
     validate: isStringValidator,
     setter: simpleSetter,
     getter: simpleGetter
@@ -62,14 +80,108 @@ const domainFields: { [key: string]: FieldDefn } = {
     validate: isStringValidator,
     setter: simpleSetter,
     getter: simpleGetter
+  },
+  'protocol': {
+    entity_field: 'protocol',
+    request_field_name: 'protocol',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'domain' ],
+    validate: isStringValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'network_address': {
+    entity_field: 'networkAddr',
+    request_field_name: 'network_address',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'domain' ],
+    validate: isStringValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'networking_mode': {
+    entity_field: 'networkingMode',
+    request_field_name: 'networking_mode',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'domain' ],
+    validate: isStringValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'num_users': {
+    entity_field: 'numUsers',
+    request_field_name: 'num_users',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'domain' ],
+    validate: isNumberValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'num_anon_users': {
+    entity_field: 'anonUsers',
+    request_field_name: 'num_anon_users',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'domain' ],
+    validate: isNumberValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'restricted': {
+    entity_field: 'restricted',
+    request_field_name: 'restricted',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'domain', 'sponsor', 'admin' ],
+    validate: isStringValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'capacity': {
+    entity_field: 'capacity',
+    request_field_name: 'capacity',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'domain', 'sponsor', 'admin' ],
+    validate: isNumberValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'description': {
+    entity_field: 'description',
+    request_field_name: 'description',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'domain', 'sponsor', 'admin' ],
+    validate: isStringValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'maturity': {
+    entity_field: 'description',
+    request_field_name: 'description',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'domain', 'sponsor', 'admin' ],
+    validate: isStringValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'restriction': {
+    entity_field: 'description',
+    request_field_name: 'description',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'domain', 'sponsor', 'admin' ],
+    validate: isStringValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
   }
-
+  // hosts
+  // tags
 };
 function simpleValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
   return true;
 };
 function isStringValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
   return typeof(pValue) === 'string';
+};
+function isNumberValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
+  return typeof(pValue) === 'number';
 };
 function simpleGetter(pField: FieldDefn, pEntity: Entity): any {
   return (pEntity as any)[pField.entity_field];
@@ -173,8 +285,7 @@ export async function checkAccessToAccount(pAuthToken: AuthToken,  // token bein
         canAccess = SArray.hasNoCase(pTargetAccount.connections, pRequestingAccount.username);
         break;
       case 'admin': break;
-        const acct = await Accounts.getAccountWithId(pAuthToken.accountId);
-        canAccess = Accounts.isAdmin(acct);
+        canAccess = Accounts.isAdmin(requestingAcct);
         break;
       default:
         canAccess = true;
@@ -184,4 +295,18 @@ export async function checkAccessToAccount(pAuthToken: AuthToken,  // token bein
     if (canAccess) break;
   }
   return canAccess;
+};
+
+export function setDomainField(pAuthToken: AuthToken, pDomain: DomainEntity, pField: string, pVal: any): boolean {
+  let didSet = false;
+  const perms = domainFields[pField];
+  if (perms) {
+    if (checkAccessToDomain(pAuthToken, pDomain, perms.set_permissions)) {
+      if (perms.validate(perms, pDomain, pVal)) {
+        perms.setter(perms, pDomain, pVal);
+        didSet = true;
+      };
+    };
+  };
+  return didSet;
 };

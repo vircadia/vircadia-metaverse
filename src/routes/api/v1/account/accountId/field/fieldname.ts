@@ -22,7 +22,7 @@ import { accountFromAuthToken, param1FromParams } from '@Route-Tools/middleware'
 import { Accounts } from '@Entities/Accounts';
 import { AccountRoles } from '@Entities/AccountRoles';
 
-import { SArray, VKeyedCollection } from '@Tools/vTypes';
+import { SArray, VKeyedCollection, VKeyValue } from '@Tools/vTypes';
 import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 
 // Get the scope of the logged in account
@@ -46,6 +46,10 @@ const procPostField: RequestHandler = (req: Request, resp: Response, next: NextF
     req.vRestResp.respondFailure('unauthorized');
   };
   next();
+};
+
+const extIntNames: VKeyValue = {
+  'public_key': 'publicKey'
 };
 
 export const name = '/api/v1/account/:accountId/field/:fieldname';

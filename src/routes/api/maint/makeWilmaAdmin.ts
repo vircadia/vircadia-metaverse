@@ -28,7 +28,7 @@ import { SArray } from '@Tools/vTypes';
 
 // Temporary maint function to create the first admin account
 const procMakeWilmaAdmin: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  let adminAccountName =  Config["metaverse-server"]["base-admin-account"] ?? 'wilma';
+  const adminAccountName =  Config["metaverse-server"]["base-admin-account"] ?? 'wilma';
   if (req.vRestResp) {
     const adminAccount = await Accounts.getAccountWithUsername(adminAccountName);
     if (IsNotNullOrEmpty(adminAccount)) {
