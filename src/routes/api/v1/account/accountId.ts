@@ -64,8 +64,7 @@ const procPostAccountId: RequestHandler = async (req: Request, resp: Response, n
 const procDeleteAccountId: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vRestResp) {
     if (req.vAuthAccount && req.vAccount) {
-      if (Accounts.isAdmin(req.vAuthAccount)
-                && req.vAuthAccount.accountId !== req.vAuthAccount.accountId) {
+      if (Accounts.isAdmin(req.vAuthAccount)) {
         await Accounts.removeAccount(req.vAccount);
       };
     };
