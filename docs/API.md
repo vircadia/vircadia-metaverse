@@ -11,132 +11,61 @@ by managing the user accounts, the relationships between the users
 Additionally, the metaverse server coordinates services between the
 world spaces -- services like audio and chat.
 
-The domain-servers and any browser interfaces interact with the
-metaverse-server through REST API calls. In general, a requestor
-does a GET, PUT, POST, or DELETE HTTP operation on an endpoint
-and gets back a `application/json` body response of the form:
+In general, requests are REST requests made to an URL. The 'Authorization:'
+HTTP header field contains an access token for the requestor.
+The operations possible and the data returned depends on the access
+afforded by the passed access token. For instance, an access token
+for a particular user will fetch user location information for other
+accounts that are that account's friends and connections.
 
-```
-    {
-        "status": "success",
-        "data": JSON-object
-    }
-```
-
-where the "JSON-object" is the response data.
-
-If the request failed, for some reason, the status value will be "fail".
-
-Authorization to make the calls is through access tokens that are
-included in the "Authorization:" HTTP header of the REST request.
-Access tokens are aquired by giving user account information
-(currently limited to account/password). See the
-[/oauth/token](./API-Tokens.md#post-oauthtoken)
-request.
-
-## Metaverse_info
-
-The metaverse-server has an information API. A GET operation
-returns information about the metaverse-server itself:
-
-Here is an example response for a possible metaverse.
-
-GET /api/metaverse_info
-
-```
-    {
-        "metaverse_name": "BlueStuff Test Metaverse",
-        "metaverse_nick_name": "BlueStuff",
-        "metaverse_url": "http://metaverse.bluestuff.org:9400",
-        "ice_server_url": "ice.bluestuff.org:7337",
-        "metaverse_server_version": {
-            "npm-package-version":"2.2.1",
-            "git-commit":"ef6394bf8c4600dd5640c607476fa617eaca683f",
-            "version-tag":"2.2.1-20200818-ef6394b"
-        }
-    }
-```
-
-Any additional information can be included in the response by a particular metaverse-server
-but these are the default items returned.
-
-## Operations
-
-User access to the metaverse-server starts by getting an access token.
-The
-[/oauth/token](./API-Tokens.md#post-oauthtoken)
-request accepts a username and password and returns an access token.
-The token comes with a type (usually "Bearer") and a refresh token.
-The refresh token is used to extend an access token's expiration time.
-All tokens have an expiration time after which they become invalid.
-
-After aquiring an access token, future requests must include this
-token in the HTTP header.
-
-```
-    Authorization: Bearer 98793872341897231723098172348190283-401729304289
-```
-
-The access granted by the access token depends on the account. Administrative
-accounts will have wide access to the information on the metaverse server
-while plain user accounts will be limited to their connections and personal information.
-
-With the access token, requests are made for information on
+Refer to the [API Overview](./API-Overview.md) for general API design
+(request and response format and usage conventions).
+Documentation referenced below is available for the
 [Accounts](./API-Accounts.md),
-[Users](./API-Users.md),
-and
-[Tokens](./API-Tokens.md)
+[Domains](./API-Domains.md),
+[Tokens](./API-Tokens.md), and
+[User](./API-Users.md) categories.
 
-The [/oauth/token](./API-Tokens.md#post-oauthtoken)
-request mimics the [OAuth2] request format and thus the response conforms to that
-specification rather than following the usual response format (status/data).
-Also refer to that requests documentation for other [OAuth2] format
-requests.
+The API requests to the metaverse-server are:
 
-## Account Creation
-
-A new account can be created with the
-[POST /api/v1/users](./API-Accounts.md#post-apiv1users)
-request.
-This accepts basic user information (username, password, and email)
-and creates an account.
-The account can then aquire an access token.
-
-## Error Handling
-
-Most requests return the results of the operation as a HTTP "200 OK" response with
-the JSON structure:
-
-```
-    {
-        "status": "success",
-        "data": JSON-Object-Results
-    }
-```
-
-Where "JSON-Object-Results" is a JSON formatted object with the results of the request.
-
-If there is an error, though, the "200 OK" structure returned is:
-
-```
-    {
-        "status": "fail",
-        "error": "error explanation"
-    }
-```
-
-Thus, every API invocation must check the returned structure for "status" equaling "success".
-
-A hack has been added to cause all errors to be returned with a HTTP "400 Bad Request" response.
-The same "status"/"fail" JSON object is returned -- it is just the HTTP response code that changes.
-This hack is enabled when the request has a specific header:
-
-```
-    x-vircadia-error-handle: badrequest
-```
-
-If this header is in the API request, errors, that would have normally been returned with
-an HTTP "200 OK" will be returned with a "400 Bad Request". All other operation is unchanged.
-
-[OAuth2]: https://oauth.net/2/
-
+| GET    | api | v1 | accounts |           |        |            | [doc](./API-Accounts.md#get-apiv1accounts) fetch list of account information |
+| POST   |     |    | account | :accountId |        |            | [doc](./API-Accounts.md#post-apiv1accountaccountid) update account parameters |
+| DELETE |     |    |         | :accountId |        |            | [doc](./API-Accounts.md#delete-apiv1accountaccountid) delete account |
+| GET    |     |    |         | :accountId | field  | :fieldname | [doc](./API-Accounts.md#get-apiv1accountaccountidfieldfieldname) fetch specific account parameter |
+| POST   |     |    |         | :accountId | field  | :fieldname | [doc](./API-Accounts.md#post-apiv1accountaccountidfieldfieldname) update specific account parameter |
+| GET    |     |    |         |            | tokens |            | [doc](./API-Accounts.md#get-apiv1accountaccountidtokens) fetch tokens associated with account |
+| DELETE |     |    |         |            | tokens | :tokenId   | [doc](./API-Accounts.md#delete-apiv1accountaccountidtokenstokenid) delete accounts token |
+| GET    |     |    | commerce | available_updates | |           | legacy request |
+| GET    |     |    |          | hfc_accounts      | |           | legacy request |
+| GET    |     |    |          | history           | |           | legacy request |
+| GET    |     |    |          | marketplace_key   | |           | legacy request |
+| GET    |     |    | domains  |            |       |            | [doc](./API-Domains.md#) fetch list of domain information |
+| GET    |     |    |          | :domainId  |       |            | [doc](./API-Domains.md#get-apiv1domainsdomainid) fetch information for a domain |
+| PUT    |     |    |          | :domainId  |       |            | [doc](./API-Domains.md#put-apiv1domainsdomainid) update domain parameters |
+| DELETE |     |    |          | :domainId  |       |            | [doc](./API-Domains.md#delete-apiv1domainsdomainid) delete a domain entry |
+| GET    |     |    |          | :domainId | field  | :fieldname | [doc](./API-Domains.md#get-apiv1domainsdomainidfieldfieldname) fetch specific account parameter |
+| POST   |     |    |          | :domainId | field  | :fieldname | [doc](./API-Domains.md#post-apiv1domainsdomainidfieldfieldname) update specific account parameter |
+| PUT    |     |    |          | :domainId  | ice_server_address | | [doc](./API-Domains.md#put-apiv1domainsdomainidiceserveraddress) set the ice-server used by domain |
+| GET    |     |    |          | :domainId  | public_key |       | [doc](./API-Domains.md#get-apiv1domainsdomainidpublic_key) get the public key for a domain |
+| PUT    |     |    |          | :domainId  | public_key |       | [doc](./API-Domains.md#put-apiv1domainsdomainidpublic_key) update public key used by domain |
+| POST   |     |    |          | temporary  |       |            | [doc](./API-Domains.md#post-apiv1domainstemporary) create a domain temporary name/entry |
+| GET    |     |    | tokens   |            |       |            | [doc](./API-Tokens.md#get-apiv1tokens) fetch list of created tokens |
+| POST   |     |    | token    | new        |       |            | [doc](./API-Tokens.md#post-apiv1tokennew) create a new token for account/domain |
+| POST   |     |    | user     | connection_request  |   |       | [doc](./API-Users.md#post-apiv1userconnection_request) request friend/connection |
+| GET    |     |    |          | friends    |       |            | [doc](./API-Users.md#get-apiv1userfriends) fetch list of friends |
+| POST   |     |    |          | friends    |       |            | [doc](./API-Users.md#post-apiv1userfriends) update list of friends |
+| DELETE |     |    |          | friends    |       |            | [doc](./API-Users.md#delete-apiv1userfriends) delete a friend from list of friends |
+| PUT    |     |    |          | heartbeat  |       |            | [doc](./API-Users.md#put-apiv1userheartbeat) update user location/login information |
+| PUT    |     |    |          | location   |       |            | [doc](./API-Users.md#put-apiv1userlocation) update user location information |
+| GET    |     |    |          | locker     |       |            | [doc](./API-Users.md#get-apiv1userlocker) fetch per-user parameters |
+| POST   |     |    |          | locker     |       |            | [doc](./API-Users.md#post-apiv1userlocker) update per-user parameters |
+| GET    |     |    |          | profile    |       |            | [doc](./API-Users.md#get-apiv1userprofile) get this user's profile |
+| PUT    |     |    |          | public_key |       |            | [doc](./API-Users.md#put-apiv1userpublic_key) update this user's public key |
+| GET    |     |    | users    |            |       |            | [doc](./API-Users.md#get-apiv1users) fetch list of user information |
+| POST   |     |    | users    |            |       |            | [doc](./API-Users.md#post-apiv1users) create account |
+| GET    |     |    | users    | :username  | location   |       | [doc](./API-Users.md#) fetch a particular user's location |
+| GET    |     |    |          | :username  | public_key |       | [doc](./API-Users.md#) fetch a particular user's public_key |
+| POST   |     |    | user_activities |     |       |            | update the user activitiy state |
+| GET    |     |    | user_stories    |     |       |            | fetch stories |
+| POST   | oauth | token |     |            |       |            | [doc](./API-Tokens.md#post-oauthtoken) OAUTH2 login |
+| GET    | user | tokens | new  |            |       |            | [doc](./API-Tokens.md#get-usertokensnew) legacy initial token request |
