@@ -28,6 +28,8 @@ Documentation referenced below is available for the
 
 The API requests to the metaverse-server are:
 
+| OP     |     |    |          |           |        |            | DESCRIPTION |
+| ------ | --- | -- | -------- | --------- | ------ | ---------- | ----------- |
 | GET    | api | v1 | accounts |           |        |            | [doc](./API-Accounts.md#get-apiv1accounts) fetch list of account information |
 | POST   |     |    | account | :accountId |        |            | [doc](./API-Accounts.md#post-apiv1accountaccountid) update account parameters |
 | DELETE |     |    |         | :accountId |        |            | [doc](./API-Accounts.md#delete-apiv1accountaccountid) delete account |
