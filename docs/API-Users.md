@@ -16,7 +16,7 @@ Returns a list of users.
 A user can only see the other accounts they are 'connected' to so
 this request returns a subset of all accounts depending on the account 
 of the requestor. If the requestor is an administrator and the query
-parameter 'asAdmin' is part of the request, all user are returned.
+parameter 'asAdmin=true' is part of the request, all user are returned.
 
 The GET request url can have queries added which controls the user's returned by
 the request. These queries are:
@@ -26,7 +26,7 @@ the request. These queries are:
 - filter: select type of user. A comma separated list of "connections", "friends"
 - status: status of user. A comma separated list of "online"
 - search: TODO: figure this one out
-- asAdmin: if requesting account is an administrator, return all users
+- asAdmin=true: if requesting account is an administrator, return all users
 
 So `GET /api/v1/users?per_page=10&filter=friends&status=online` will return the first 10 users
 who are online friends.

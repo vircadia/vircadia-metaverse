@@ -17,7 +17,7 @@ are returned (limited by pagination).
 - filter: select type of user. A comma separated list of "connections", "friends"
 - status: status of user. A comma separated list of "online"
 - search: TODO: figure this one out
-- asAdmin: if logged in account is administrator, list all accounts. Value is optional.
+- asAdmin=true: if logged in account is administrator, list all accounts. Value is optional.
 
 ```
     {
