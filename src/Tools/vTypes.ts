@@ -43,9 +43,11 @@ export class SArray  {
   };
   static add(pArray: string[], pAdd: string): boolean {
     let added = false;
-    if (! pArray.includes(pAdd)) {
-      pArray.push(pAdd);
-      added = true;
+    if (typeof(pAdd) === 'string') {
+      if (! pArray.includes(pAdd)) {
+        pArray.push(pAdd);
+        added = true;
+      };
     };
     return added;
   };

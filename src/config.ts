@@ -50,6 +50,15 @@ export let Config = {
       // The first administration account
       'base-admin-account': 'adminer'
     },
+    'database': {
+      'db-host': 'localhost',
+      'db-port': 27017,
+      'db': 'tester',
+      'db-user': 'metaverse',
+      'db-pw': 'nooneknowsit',
+      'db-authdb': 'admin',
+      'db-connection': ''   // connection string replaces above if supplied
+    },
     'activitypub': {
       // NOTE: there shouldn't be a trailing slash
       'url-base': '/v',
@@ -68,16 +77,9 @@ export let Config = {
       // outputs details when selecting query parameters
       'query-detail': false,
       // outputs details about DB queries
-      'db-query-detail': false
-    },
-    'database': {
-      'db-host': 'localhost',
-      'db-port': 27017,
-      'db': 'tester',
-      'db-user': 'metaverse',
-      'db-pw': 'nooneknowsit',
-      'db-authdb': 'admin',
-      'db-connection': ''   // connection string replaces above if supplied
+      'db-query-detail': false,
+      // Details of entity field getting and setting
+      'field-setting': false
     }
 };
 

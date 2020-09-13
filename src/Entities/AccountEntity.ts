@@ -63,5 +63,5 @@ export class AccountEntity implements Entity {
 // Helper function that checks to make sure 'availability' is the right value.
 // Returns 'true' if availability is legal
 export function checkAvailability(pAvailability: string): boolean {
-  return ['none', 'all', 'friends', 'connections'].includes(pAvailability);
-}
+  return ['none', 'all', 'friends', 'connections'].includes(pAvailability.toLowerCase());
+};

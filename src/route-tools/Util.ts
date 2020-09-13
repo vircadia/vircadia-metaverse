@@ -20,7 +20,7 @@ import { Domains } from '@Entities/Domains';
 import { checkAvailability, AccountEntity } from '@Entities/AccountEntity';
 
 import { createPublicKey } from 'crypto';
-import { VKeyedCollection } from '@Tools/vTypes';
+import { VKeyedCollection, VKeyValue } from '@Tools/vTypes';
 import { IsNotNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
 import { DomainEntity } from '@Entities/DomainEntity';
@@ -163,8 +163,10 @@ export async function buildDomainInfoV1(pDomain: DomainEntity): Promise<any> {
   };
 };
 
+// Return the block of account information.
+// Used by several of the requests to return the complete account information.
 export async function BuildAccountInfo(pReq: Request, pAccount: AccountEntity): Promise<any> {
-  const entry: any = {
+  return {
     'accountId': pAccount.accountId,
     'username': pAccount.username,
     'email': pAccount.email,
@@ -175,9 +177,7 @@ export async function BuildAccountInfo(pReq: Request, pAccount: AccountEntity): 
     'location': await buildLocationInfo(pReq, pAccount),
     'friends': pAccount.friends,
     'connections': pAccount.connections,
-    'when_account_created': pAccount.whenAccountCreated.toISOString(),
-    'time_of_last_heartbeat': pAccount.timeOfLastHeartbeat.toISOString()
+    'when_account_created': pAccount.whenAccountCreated ? pAccount.whenAccountCreated.toISOString() : undefined,
+    'time_of_last_heartbeat': pAccount.timeOfLastHeartbeat ? pAccount.timeOfLastHeartbeat.toISOString() : undefined
   };
-
-  return entry;
 };

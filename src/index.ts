@@ -135,4 +135,4 @@ function createAPIRouter(pBaseDir: string): Router {
     .map(rr => { Logger.debug('createAPIRouter: adding ' + rr.name ?? 'UNKNOWN'); return rr; })
     // create a Router and add each found Router and end up with a Router with all found Routers
     .reduce((rootRouter, router) => rootRouter.use(router.router), Router({ mergeParams: true } ) );
-}
+};

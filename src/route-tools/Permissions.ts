@@ -23,7 +23,9 @@ import { Accounts } from '@Entities/Accounts';
 import { Domains } from '@Entities/Domains';
 
 import { SArray } from '@Tools/vTypes';
-import { IsNotNullOrEmpty } from '@Tools/Misc';
+import { IsNotNullOrEmpty, IsNullOrEmpty } from '@Tools/Misc';
+import { createSimplifiedPublicKey } from './Util';
+import { Logger } from '@Tools/Logging';
 
 // A start at having a table driven access permissions to the Entity attributes.
 // Each Entity field would have an entry that includes who can read or write
@@ -32,10 +34,10 @@ import { IsNotNullOrEmpty } from '@Tools/Misc';
 // The setter is not part of the 'updated' field logic so that must be separate.
 //    The best logic is to use the setter and then use the resulting Entity value
 //    for the 'updated' field (since the 'set' could be a merge type operation).
-type getterFunction = (pDfd: FieldDefn, pD: Entity) => any;
-type setterFunction = (pDfd: FieldDefn, pD: Entity, pV: any) => void;
-type validateFunction = (pDfd: FieldDefn, pD: Entity, pV: any) => boolean;
-interface FieldDefn {
+export type getterFunction = (pDfd: FieldDefn, pD: Entity) => any;
+export type setterFunction = (pDfd: FieldDefn, pD: Entity, pV: any) => void;
+export type validateFunction = (pDfd: FieldDefn, pD: Entity, pV: any) => boolean;
+export interface FieldDefn {
     entity_field: string,
     request_field_name: string,
     get_permissions: string[],
@@ -44,152 +46,87 @@ interface FieldDefn {
     getter: getterFunction,
     setter: setterFunction
 };
-const domainFields: { [key: string]: FieldDefn } = {
-  'place_name': {
-    entity_field: 'placeName',
-    request_field_name: 'place_name',
-    get_permissions: [ 'all' ],
-    set_permissions: [ 'domain', 'sponser', 'admin' ],
-    validate: isStringValidator,
-    setter: simpleSetter,
-    getter: simpleGetter
-  },
-  'public_key': {
-    entity_field: 'version',
-    request_field_name: 'version',
-    get_permissions: [ 'all' ],
-    set_permissions: [ 'domain' ],
-    validate: isStringValidator,
-    setter: simpleSetter,
-    getter: simpleGetter
-  },
-  'sponsor_account_id': {
-    entity_field: 'version',
-    request_field_name: 'version',
-    get_permissions: [ 'all' ],
-    set_permissions: [ 'domain', 'sponsor', 'admin' ],
-    validate: isStringValidator,
-    setter: simpleSetter,
-    getter: simpleGetter
-  },
-  'version': {
-    entity_field: 'version',
-    request_field_name: 'version',
-    get_permissions: [ 'all' ],
-    set_permissions: [ 'domain' ],
-    validate: isStringValidator,
-    setter: simpleSetter,
-    getter: simpleGetter
-  },
-  'protocol': {
-    entity_field: 'protocol',
-    request_field_name: 'protocol',
-    get_permissions: [ 'all' ],
-    set_permissions: [ 'domain' ],
-    validate: isStringValidator,
-    setter: simpleSetter,
-    getter: simpleGetter
-  },
-  'network_address': {
-    entity_field: 'networkAddr',
-    request_field_name: 'network_address',
-    get_permissions: [ 'all' ],
-    set_permissions: [ 'domain' ],
-    validate: isStringValidator,
-    setter: simpleSetter,
-    getter: simpleGetter
-  },
-  'networking_mode': {
-    entity_field: 'networkingMode',
-    request_field_name: 'networking_mode',
-    get_permissions: [ 'all' ],
-    set_permissions: [ 'domain' ],
-    validate: isStringValidator,
-    setter: simpleSetter,
-    getter: simpleGetter
-  },
-  'num_users': {
-    entity_field: 'numUsers',
-    request_field_name: 'num_users',
-    get_permissions: [ 'all' ],
-    set_permissions: [ 'domain' ],
-    validate: isNumberValidator,
-    setter: simpleSetter,
-    getter: simpleGetter
-  },
-  'num_anon_users': {
-    entity_field: 'anonUsers',
-    request_field_name: 'num_anon_users',
-    get_permissions: [ 'all' ],
-    set_permissions: [ 'domain' ],
-    validate: isNumberValidator,
-    setter: simpleSetter,
-    getter: simpleGetter
-  },
-  'restricted': {
-    entity_field: 'restricted',
-    request_field_name: 'restricted',
-    get_permissions: [ 'all' ],
-    set_permissions: [ 'domain', 'sponsor', 'admin' ],
-    validate: isStringValidator,
-    setter: simpleSetter,
-    getter: simpleGetter
-  },
-  'capacity': {
-    entity_field: 'capacity',
-    request_field_name: 'capacity',
-    get_permissions: [ 'all' ],
-    set_permissions: [ 'domain', 'sponsor', 'admin' ],
-    validate: isNumberValidator,
-    setter: simpleSetter,
-    getter: simpleGetter
-  },
-  'description': {
-    entity_field: 'description',
-    request_field_name: 'description',
-    get_permissions: [ 'all' ],
-    set_permissions: [ 'domain', 'sponsor', 'admin' ],
-    validate: isStringValidator,
-    setter: simpleSetter,
-    getter: simpleGetter
-  },
-  'maturity': {
-    entity_field: 'description',
-    request_field_name: 'description',
-    get_permissions: [ 'all' ],
-    set_permissions: [ 'domain', 'sponsor', 'admin' ],
-    validate: isStringValidator,
-    setter: simpleSetter,
-    getter: simpleGetter
-  },
-  'restriction': {
-    entity_field: 'description',
-    request_field_name: 'description',
-    get_permissions: [ 'all' ],
-    set_permissions: [ 'domain', 'sponsor', 'admin' ],
-    validate: isStringValidator,
-    setter: simpleSetter,
-    getter: simpleGetter
-  }
-  // hosts
-  // tags
-};
-function simpleValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
+export function simpleValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
   return true;
 };
-function isStringValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
+export function isStringValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
   return typeof(pValue) === 'string';
 };
-function isNumberValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
+export function isNumberValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
   return typeof(pValue) === 'number';
 };
-function simpleGetter(pField: FieldDefn, pEntity: Entity): any {
+export function isSArraySet(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
+  if (typeof(pValue) === 'string') {
+    return true;
+  }
+  else {
+    if (pValue && (pValue.set || pValue.add || pValue.remove)) {
+      return true;
+    };
+  };
+  return false;
+};
+export function simpleGetter(pField: FieldDefn, pEntity: Entity): any {
   return (pEntity as any)[pField.entity_field];
 };
-function simpleSetter(pField: FieldDefn, pEntity: Entity, pVal: any): void {
+export function simpleSetter(pField: FieldDefn, pEntity: Entity, pVal: any): void {
   (pEntity as any)[pField.entity_field] = pVal;
 };
+// SArray setting. The passed value can be a string (which is added to the SValue)
+//     or an object with the field 'set', 'add' or 'remove'. The values of  the
+//     latter fields can be a string or an array of strings.
+export function sArraySetter(pField: FieldDefn, pEntity: Entity, pVal: any): void {
+  let val = (pEntity as any)[pField.entity_field];
+  if (IsNullOrEmpty(val)) {
+    Logger.cdebug('field-setting', `sArraySetting: setting "${pField.entity_field}" Starting with null value`);
+    val = [];
+  };
+  if (typeof(pVal) === 'string') {
+    Logger.cdebug('field-setting', `sArraySetting: adding string ${pField.entity_field}`);
+    SArray.add(val, pVal);
+  }
+  else {
+    if (pVal && (pVal.set || pVal.add || pVal.remove)) {
+      if (pVal.set) {
+        val = pVal.set;
+      };
+      if (pVal.add) {
+        if (Array.isArray(pVal.add)) {
+          Logger.cdebug('field-setting', `sArraySetting: adding array ${pField.entity_field}=>${JSON.stringify(pVal.add)}`);
+          for (const aVal of pVal.add) {
+            SArray.add(val, aVal);
+          };
+        }
+        else {
+          Logger.cdebug('field-setting', `sArraySetting: adding one ${pField.entity_field}=>${JSON.stringify(pVal.add)}`);
+          SArray.add(val, pVal.add);
+        };
+      };
+      if (pVal.remove) {
+        if (Array.isArray(pVal.remove)) {
+          Logger.cdebug('field-setting', `sArraySetting: removing array ${pField.entity_field}=>${JSON.stringify(pVal.remove)}`);
+          for (const aVal of pVal.remove) {
+            SArray.add(val, aVal);
+          };
+        }
+        else {
+          Logger.cdebug('field-setting', `sArraySetting: removing one ${pField.entity_field}=>${JSON.stringify(pVal.remove)}`);
+          SArray.remove(val, pVal.remove);
+        };
+      };
+    };
+  };
+  Logger.cdebug('field-setting', `sArraySetting: resulting ${pField.entity_field}=>${JSON.stringify(val)}`);
+  (pEntity as any)[pField.entity_field] = val;
+};
 
+//  'all': any one
+//  'domain': the requesting authToken is for a domain and the sponsor account matches
+//  'owner': the requesting account is the owner of the target account
+//  'friend': the requesting account is a friend of the target account
+//  'connection': the requesting account is a connection of the target account
+//  'admin': the requesting account has 'admin' privilages
+//  'sponser': the requesting account is the sponsor of the traget domain
 export class Perm {
   public static ALL      = 'all';
   public static DOMAIN   = 'domain';
@@ -199,14 +136,6 @@ export class Perm {
   public static ADMIN    = 'admin';
   public static SPONSOR  = 'sponsor';
 };
-// Possible permissions
-//  'all': any one
-//  'domain': the requesting authToken is for a domain and the sponsor account matches
-//  'owner': the requesting account is the owner of the target account
-//  'friend': the requesting account is a friend of the target account
-//  'connection': the requesting account is a connection of the target account
-//  'admin': the requesting account has 'admin' privilages
-//  'sponser': the requesting account is the sponsor of the traget domain
 
 // Check if the passed AuthToken has access to the passed DomainEntity.
 // The "required access" parameter lists the type of access the token must have.
@@ -295,18 +224,4 @@ export async function checkAccessToAccount(pAuthToken: AuthToken,  // token bein
     if (canAccess) break;
   }
   return canAccess;
-};
-
-export function setDomainField(pAuthToken: AuthToken, pDomain: DomainEntity, pField: string, pVal: any): boolean {
-  let didSet = false;
-  const perms = domainFields[pField];
-  if (perms) {
-    if (checkAccessToDomain(pAuthToken, pDomain, perms.set_permissions)) {
-      if (perms.validate(perms, pDomain, pVal)) {
-        perms.setter(perms, pDomain, pVal);
-        didSet = true;
-      };
-    };
-  };
-  return didSet;
 };
