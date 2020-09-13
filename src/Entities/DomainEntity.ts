@@ -101,20 +101,22 @@ export function setDomainField(pAuthToken: AuthToken, pDomain: DomainEntity, pFi
 };
 // Generate an 'update' block for the specified field or fields.
 // This is a field/value collection that can be passed to the database routines.
+// Note that this directly fetches the field value rather than using 'getter' since
+//     we want the actual value (whatever it is) to go into the database.
 export function getDomainUpdateForField(pDomain: DomainEntity, pField: string | string[]): VKeyedCollection {
   const ret: VKeyedCollection = {};
   if (Array.isArray(pField)) {
     pField.forEach( fld => {
       const perms = domainFields[fld];
       if (perms) {
-        ret[perms.entity_field] = perms.getter(perms, pDomain);
+        ret[perms.entity_field] = (pDomain as any)[perms.entity_field];
       };
     });
   }
   else {
     const perms = domainFields[pField];
     if (perms) {
-      ret[perms.entity_field] = perms.getter(perms, pDomain);
+      ret[perms.entity_field] = (pDomain as any)[perms.entity_field];
     };
   };
   return ret;
