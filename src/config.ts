@@ -157,6 +157,14 @@ export async function initializeConfiguration(): Promise<void> {
     Config.metaverse["metaverse-server-url"] = newUrl;
   };
 
+  // Make sure the metaverse-server-url does not end in a slash.
+  // There is a bunch of code that expects to add the "/api/v1/..." to this variable.
+  let msu: string = Config.metaverse["metaverse-server-url"];
+  while (msu.endsWith('/')) {
+    msu = msu.slice(0, -1);
+  };
+  Config.metaverse["metaverse-server-url"] = msu;
+
   // Write a subset of the built configuration information into the 'static' directory
   //    so the static pages will know our configuration.
   const configSubset: any = {};
