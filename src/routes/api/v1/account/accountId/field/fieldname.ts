@@ -19,28 +19,13 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 import { setupMetaverseAPI, finishMetaverseAPI, tokenFromParams, accountFromParams } from '@Route-Tools/middleware';
 import { accountFromAuthToken, param1FromParams } from '@Route-Tools/middleware';
 
+import { getAccountField, setAccountField, getAccountUpdateForField } from '@Entities/AccountEntity';
 import { Accounts } from '@Entities/Accounts';
-import { AccountRoles } from '@Entities/AccountRoles';
-
-import { SArray, VKeyedCollection, VKeyValue } from '@Tools/vTypes';
-import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 
 // Get the scope of the logged in account
 const procGetField: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount && req.vAccount) {
-    req.vRestResp.respondFailure('not implemented');
-  }
-  else {
-    req.vRestResp.respondFailure('unauthorized');
-  }
-  next();
-};
-
-// Add a role to my roles collection.
-// Not implemented as something needs to be done with request_connection, etc
-const procPostField: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount && req.vAccount) {
-    req.vRestResp.respondFailure('not implemented');
+    req.vRestResp.Data = getAccountField(req.vAuthToken, req.vAccount, req.vParam1);
   }
   else {
     req.vRestResp.respondFailure('unauthorized');
@@ -48,8 +33,23 @@ const procPostField: RequestHandler = (req: Request, resp: Response, next: NextF
   next();
 };
 
-const extIntNames: VKeyValue = {
-  'public_key': 'publicKey'
+// Add a role to my roles collection.
+// Not implemented as something needs to be done with request_connection, etc
+const procPostField: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+  if (req.vAuthAccount && req.vAccount) {
+    if (setAccountField(req.vAuthToken, req.vAccount, req.vParam1, req.body)) {
+      // Setting worked so update the database
+      const update = getAccountUpdateForField(req.vAccount, req.vParam1);
+      Accounts.updateEntityFields(req.vAccount, update);
+    }
+    else {
+      req.vRestResp.respondFailure('value could not be set');
+    };
+  }
+  else {
+    req.vRestResp.respondFailure('unauthorized');
+  };
+  next();
 };
 
 export const name = '/api/v1/account/:accountId/field/:fieldname';

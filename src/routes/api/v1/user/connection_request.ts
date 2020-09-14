@@ -38,26 +38,21 @@ const procPostUserConnectionRequest: RequestHandler = (req: Request, resp: Respo
       //    nodeIds that we have to verify that the connection nodeIds are really the
       //    same ones as passed in the location.
       // All this debugging output can go away once nodeId usage is understood.
-      if (req.vAuthAccount.location) {
-        if (req.vAuthAccount.location.nodeId) {
-          if (req.vAuthAccount.location.nodeId === thisNode) {
-            Logger.debug(`procPostUserConnectionRequest: request from ${req.vAuthAccount.username} and location.nodeid matches main node`);
-          }
-          else {
-            if (req.vAuthAccount.location.nodeId === otherNode) {
-              Logger.debug(`procPostUserConnectionRequest: request from ${req.vAuthAccount.username} and location.nodeid matches proposed node`);
-            }
-            else {
-              Logger.debug(`procPostUserConnectionRequest: request from ${req.vAuthAccount.username} and location.nodeid does not match either node`);
-            };
-          };
+      if (req.vAuthAccount.locationNodeId) {
+        if (req.vAuthAccount.locationNodeId === thisNode) {
+          Logger.debug(`procPostUserConnectionRequest: request from ${req.vAuthAccount.username} and location.nodeid matches main node`);
         }
         else {
-          Logger.debug(`procPostUserConnectionRequest: request from ${req.vAuthAccount.username} and no nodeID info`);
+          if (req.vAuthAccount.locationNodeId === otherNode) {
+            Logger.debug(`procPostUserConnectionRequest: request from ${req.vAuthAccount.username} and location.nodeid matches proposed node`);
+          }
+          else {
+            Logger.debug(`procPostUserConnectionRequest: request from ${req.vAuthAccount.username} and location.nodeid does not match either node`);
+          };
         };
       }
       else {
-        Logger.debug(`procPostUserConnectionRequest: request from ${req.vAuthAccount.username} and no location info`);
+        Logger.debug(`procPostUserConnectionRequest: request from ${req.vAuthAccount.username} and no nodeID info`);
       };
 
       // END sanity check DEBUG DEBUG

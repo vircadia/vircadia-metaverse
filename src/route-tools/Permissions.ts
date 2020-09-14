@@ -22,9 +22,8 @@ import { TokenScope } from '@Entities/TokenScope';
 import { Accounts } from '@Entities/Accounts';
 import { Domains } from '@Entities/Domains';
 
-import { SArray } from '@Tools/vTypes';
+import { SArray, VKeyedCollection } from '@Tools/vTypes';
 import { IsNotNullOrEmpty, IsNullOrEmpty } from '@Tools/Misc';
-import { createSimplifiedPublicKey } from './Util';
 import { Logger } from '@Tools/Logging';
 
 // A start at having a table driven access permissions to the Entity attributes.
@@ -37,6 +36,7 @@ import { Logger } from '@Tools/Logging';
 export type getterFunction = (pDfd: FieldDefn, pD: Entity) => any;
 export type setterFunction = (pDfd: FieldDefn, pD: Entity, pV: any) => void;
 export type validateFunction = (pDfd: FieldDefn, pD: Entity, pV: any) => boolean;
+export type updaterFunction = (pDfd: FieldDefn, pD: Entity, pUpdates: VKeyedCollection) => void;
 export interface FieldDefn {
     entity_field: string,
     request_field_name: string,
@@ -44,7 +44,8 @@ export interface FieldDefn {
     set_permissions: string[],
     validate: validateFunction,
     getter: getterFunction,
-    setter: setterFunction
+    setter: setterFunction,
+    updater?: updaterFunction
 };
 export function simpleValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
   return true;
@@ -54,6 +55,9 @@ export function isStringValidator(pField: FieldDefn, pEntity: Entity, pValue: an
 };
 export function isNumberValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
   return typeof(pValue) === 'number';
+};
+export function isDateValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
+  return pValue instanceof Date;
 };
 export function isSArraySet(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
   if (typeof(pValue) === 'string') {
@@ -67,10 +71,22 @@ export function isSArraySet(pField: FieldDefn, pEntity: Entity, pValue: any): bo
   return false;
 };
 export function simpleGetter(pField: FieldDefn, pEntity: Entity): any {
-  return (pEntity as any)[pField.entity_field];
+  if (pEntity.hasOwnProperty(pField.entity_field)) {
+    return (pEntity as any)[pField.entity_field];
+  };
+  return undefined;
 };
 export function simpleSetter(pField: FieldDefn, pEntity: Entity, pVal: any): void {
-  (pEntity as any)[pField.entity_field] = pVal;
+  if (pEntity.hasOwnProperty(pField.entity_field)) {
+    (pEntity as any)[pField.entity_field] = pVal;
+  };
+};
+export function dateStringGetter(pField: FieldDefn, pEntity: Entity): string {
+  if (pEntity.hasOwnProperty(pField.entity_field)) {
+    const dateVal: Date = (pEntity as any)[pField.entity_field];
+    return dateVal ? dateVal.toISOString() : undefined;
+  };
+  return undefined;
 };
 // SArray setting. The passed value can be a string (which is added to the SValue)
 //     or an object with the field 'set', 'add' or 'remove'. The values of  the
@@ -128,6 +144,7 @@ export function sArraySetter(pField: FieldDefn, pEntity: Entity, pVal: any): voi
 //  'admin': the requesting account has 'admin' privilages
 //  'sponser': the requesting account is the sponsor of the traget domain
 export class Perm {
+  public static NONE     = 'none';
   public static ALL      = 'all';
   public static DOMAIN   = 'domain';
   public static OWNER    = 'owner';
@@ -164,6 +181,7 @@ export async function checkAccessToDomain(pAuthToken: AuthToken,       // token 
           canAccess = pAuthToken.accountId === pTargetDomain.sponserAccountId;
           break;
         case Perm.ADMIN:
+          // If the authToken is an account, verify that the account has administrative access
           if (SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
             const acct = pAuthTokenAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
             canAccess = Accounts.isAdmin(acct);

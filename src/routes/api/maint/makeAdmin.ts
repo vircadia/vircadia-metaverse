@@ -27,17 +27,17 @@ import { AccountRoles } from '@Entities/AccountRoles';
 import { SArray } from '@Tools/vTypes';
 
 // Temporary maint function to create the first admin account
-const procMakeWilmaAdmin: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+const procMakeAdmin: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   const adminAccountName =  Config["metaverse-server"]["base-admin-account"] ?? 'wilma';
   if (req.vRestResp) {
     const adminAccount = await Accounts.getAccountWithUsername(adminAccountName);
     if (IsNotNullOrEmpty(adminAccount)) {
       if (SArray.has(adminAccount.roles, AccountRoles.ADMIN)) {
-        Logger.debug(`procMakeWilmaAdmin: ${adminAccountName} already has role "admin"`);
+        Logger.debug(`procMakeAdmin: ${adminAccountName} already has role "admin"`);
       }
       else {
         SArray.add(adminAccount.roles, AccountRoles.ADMIN);
-        Logger.debug(`procMakeWilmaAdmin: added role ADMIN to ${adminAccountName}: ${adminAccount.roles}`);
+        Logger.debug(`procMakeAdmin: added role ADMIN to ${adminAccountName}: ${adminAccount.roles}`);
         const update = {
           'roles': adminAccount.roles
         };
@@ -45,20 +45,20 @@ const procMakeWilmaAdmin: RequestHandler = async (req: Request, resp: Response, 
       };
     }
     else {
-      Logger.error(`procMakeWilmaAdmin: could not fetch account "wilma"`);
+      Logger.error(`procMakeAdmin: could not fetch account "${adminAccountName}"`);
       req.vRestResp.respondFailure('no such account');
     };
   };
   next();
 };
 
-export const name = '/api/maint/makeWilmaAdmain';
+export const name = '/api/maint/makeAdmin';
 
 export const router = Router();
 
-router.get('/api/maint/makeWilmaAdmin',  [ setupMetaverseAPI,
-                                           procMakeWilmaAdmin,
-                                           finishMetaverseAPI ] );
+router.get('/api/maint/makeAdmin',  [ setupMetaverseAPI,
+                                      procMakeAdmin,
+                                      finishMetaverseAPI ] );
 
 
 

@@ -18,7 +18,7 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
-import { getAccountLocationIfSpecified } from '@Route-Tools/Util';
+import { updateLocationInfo } from '@Route-Tools/Util';
 
 import { Accounts } from '@Entities/Accounts';
 
@@ -27,12 +27,10 @@ import { Logger } from '@Tools/Logging';
 
 const procPutUserHeartbeat: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
-    const updates = getAccountLocationIfSpecified(req);
+    const updates = updateLocationInfo(req);
     if (IsNotNullOrEmpty(updates)) {
-      await Accounts.updateEntityFields(req.vAuthAccount, {
-        'timeOfLastHeartbeat': new Date(),
-        'location': updates
-      });
+      updates.timeOfLastHeartbeat = new Date();
+      await Accounts.updateEntityFields(req.vAuthAccount, updates);
       req.vRestResp.Data = {
         'session_id': req.vSession.sessionId
       };

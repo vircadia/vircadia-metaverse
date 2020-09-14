@@ -18,7 +18,6 @@ import * as loglevel from 'loglevel';
 import { Config } from '@Base/config';
 import { Options } from 'morgan';
 import http from 'http';
-import { VKeyValue } from './vTypes';
 
 interface ALogger {
   info( msg: string ): void,

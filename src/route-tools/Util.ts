@@ -56,21 +56,22 @@ export function createSimplifiedPublicKey(pPubKey: string): string {
     return keyLines.join('');    // Combine all lines into one long string
 };
 
-// Returns a set of fields for 'location' that should be updated.
-// Returns undefined if there was an error
-export function getAccountLocationIfSpecified(pReq: Request): any {
-  let newLoc: VKeyedCollection = IsNotNullOrEmpty(pReq.vAuthAccount.location) ? pReq.vAuthAccount.location : {};
+// Process the user request data and update fields fields in the account.
+// This is infomation from the user from heartbeats or location updates.
+// Return a VKeyedCollection of the updates made so it can be used to update the database.
+export function updateLocationInfo(pReq: Request): VKeyedCollection {
+  let newLoc: VKeyedCollection = {};
   if (pReq.body.location) {
     try {
       // build location from what is in the account already
       const loc = pReq.body.location;
-      if (loc.hasOwnProperty('connected'))       newLoc.connected = loc.connected;
-      if (loc.hasOwnProperty('path'))            newLoc.path = loc.path;
-      if (loc.hasOwnProperty('place_id'))        newLoc.placeId = loc.place_id;
-      if (loc.hasOwnProperty('domain_id'))       newLoc.domainId = loc.domain_id;
-      if (loc.hasOwnProperty('network_address')) newLoc.networkAddress = loc.network_address;
-      if (loc.hasOwnProperty('network_port'))    newLoc.networkPort = loc.network_port;
-      if (loc.hasOwnProperty('node_id'))         newLoc.nodeId = loc.node_id;
+      if (loc.hasOwnProperty('connected'))       newLoc.locationConnected = loc.connected;
+      if (loc.hasOwnProperty('path'))            newLoc.locationPath = loc.path;
+      if (loc.hasOwnProperty('place_id'))        newLoc.locationPlaceId = loc.place_id;
+      if (loc.hasOwnProperty('domain_id'))       newLoc.locationDomainId = loc.domain_id;
+      if (loc.hasOwnProperty('network_address')) newLoc.locationNetworkAddress = loc.network_address;
+      if (loc.hasOwnProperty('network_port'))    newLoc.locationNetworkPort = loc.network_port;
+      if (loc.hasOwnProperty('node_id'))         newLoc.locationNodeId = loc.node_id;
       if (loc.hasOwnProperty('availablity')) {
         if (checkAvailability(loc.availablity)) {
           newLoc.availablity = loc.availablity;
@@ -95,37 +96,35 @@ export function getAccountLocationIfSpecified(pReq: Request): any {
 // Return a structure that represents the target account's domain
 export async function buildLocationInfo(pReq: Request, pAcct: AccountEntity): Promise<any> {
   const ret: any = {};
-  if (IsNotNullOrEmpty(pAcct.location)) {
-    if (pAcct.location.domainId) {
-      const aDomain = await Domains.getDomainWithId(pAcct.location.domainId);
-      if (IsNotNullOrEmpty(aDomain)) {
-        return {
-          'node_id': pReq.vSession.sessionId,
-          'root': {
-            'domain': {
-              'id': aDomain.domainId,
-              'name': aDomain.placeName,
-              'network_address': aDomain.networkAddr,
-              'ice_server_address': aDomain.iceServerAddr
-            },
-            'name': aDomain.placeName
+  if (pAcct.locationDomainId) {
+    const aDomain = await Domains.getDomainWithId(pAcct.locationDomainId);
+    if (IsNotNullOrEmpty(aDomain)) {
+      return {
+        'node_id': pReq.vSession.sessionId,
+        'root': {
+          'domain': {
+            'id': aDomain.domainId,
+            'name': aDomain.placeName,
+            'network_address': aDomain.networkAddr,
+            'ice_server_address': aDomain.iceServerAddr
           },
-          'path': pAcct.location.path,
-          'online': Accounts.isOnline(pReq.vAccount)
-        };
-      }
-      else {
-        // The domain doesn't have an ID
-        return {
-          'node_id': pReq.vSession.sessionId,
-          'online': Accounts.isOnline(pReq.vAccount),
-          'root': {
-            'domain': {
-              'network_address': pAcct.location.networkAddress,
-              'network_port': pAcct.location.networkPort
-            }
+          'name': aDomain.placeName
+        },
+        'path': pAcct.locationPath,
+        'online': Accounts.isOnline(pReq.vAccount)
+      };
+    }
+    else {
+      // The domain doesn't have an ID
+      return {
+        'node_id': pReq.vSession.sessionId,
+        'online': Accounts.isOnline(pReq.vAccount),
+        'root': {
+          'domain': {
+            'network_address': pAcct.locationNetworkAddress,
+            'network_port': pAcct.locationNetworkPort
           }
-        };
+        }
       };
     };
   };
@@ -173,7 +172,11 @@ export async function BuildAccountInfo(pReq: Request, pAccount: AccountEntity): 
     'administrator': Accounts.isAdmin(pAccount),
     'roles': pAccount.roles,
     'public_key': createSimplifiedPublicKey(pAccount.sessionPublicKey),
-    'images': pAccount.images,
+    'images': {
+      'hero': pAccount.imagesHero,
+      'tiny': pAccount.imagesTiny,
+      'thumbnail': pAccount.imagesThumbnail
+    },
     'location': await buildLocationInfo(pReq, pAccount),
     'friends': pAccount.friends,
     'connections': pAccount.connections,

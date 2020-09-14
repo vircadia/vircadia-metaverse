@@ -18,8 +18,8 @@ import { AuthToken } from '@Entities/AuthToken';
 
 import { FieldDefn } from '@Route-Tools/Permissions';
 import { checkAccessToDomain } from '@Route-Tools/Permissions';
-import { isStringValidator, isNumberValidator, isSArraySet } from '@Route-Tools/Permissions';
-import { simpleGetter, simpleSetter, sArraySetter } from '@Route-Tools/Permissions';
+import { isStringValidator, isNumberValidator, isSArraySet, isDateValidator } from '@Route-Tools/Permissions';
+import { simpleGetter, simpleSetter, sArraySetter, dateStringGetter } from '@Route-Tools/Permissions';
 
 import { createSimplifiedPublicKey } from '@Route-Tools/Util';
 import { Logger } from '@Tools/Logging';
@@ -108,18 +108,26 @@ export function getDomainUpdateForField(pDomain: DomainEntity, pField: string | 
   if (Array.isArray(pField)) {
     pField.forEach( fld => {
       const perms = domainFields[fld];
-      if (perms) {
-        ret[perms.entity_field] = (pDomain as any)[perms.entity_field];
-      };
+      makeDomainFieldUpdate(perms, pDomain, ret);
     });
   }
   else {
     const perms = domainFields[pField];
-    if (perms) {
-      ret[perms.entity_field] = (pDomain as any)[perms.entity_field];
-    };
+    makeDomainFieldUpdate(perms, pDomain, ret);
   };
   return ret;
+};
+
+// if the field has an updater, do that, elas just create an update for the base named field
+function makeDomainFieldUpdate(pPerms: FieldDefn, pDomain: DomainEntity, pRet: VKeyedCollection): void {
+  if (pPerms) {
+    if (pPerms.updater) {
+      pPerms.updater(pPerms, pDomain, pRet);
+    }
+    else {
+      pRet[pPerms.entity_field] = (pDomain as any)[pPerms.entity_field];
+    };
+  };
 };
 
 // Naming and access for the fields in a DomainEntity.
@@ -279,5 +287,42 @@ export const domainFields: { [key: string]: FieldDefn } = {
     validate: isSArraySet,
     setter: sArraySetter,
     getter: simpleGetter
-  }
+  },
+  // admin stuff
+  'addr_of_first_contact': {
+    entity_field: 'iPAddrOfFirstContact',
+    request_field_name: 'addr_of_first_contact',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'none' ],
+    validate: isStringValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'when_domain_entry_created': {
+    entity_field: 'whenDomainEntryCreated',
+    request_field_name: 'when_domain_entry_created',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'none' ],
+    validate: isDateValidator,
+    setter: undefined,
+    getter: dateStringGetter
+  },
+  'time_of_last_heartbeat': {
+    entity_field: 'timeOfLastHeartbeat',
+    request_field_name: 'time_of_last_heartbeat',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'none' ],
+    validate: isDateValidator,
+    setter: undefined,
+    getter: dateStringGetter
+  },
+  'last_sender_key': {
+    entity_field: 'lastSenderKey',
+    request_field_name: 'last_sender_key',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'none' ],
+    validate: isStringValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
 };

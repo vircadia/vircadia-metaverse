@@ -16,7 +16,7 @@
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
-import { setupMetaverseAPI, finishMetaverseAPI, tokenFromParams, accountFromParams, domainFromParams } from '@Route-Tools/middleware';
+import { setupMetaverseAPI, finishMetaverseAPI, domainFromParams } from '@Route-Tools/middleware';
 import { accountFromAuthToken, param1FromParams } from '@Route-Tools/middleware';
 
 import { getDomainField, setDomainField, getDomainUpdateForField } from '@Entities/DomainEntity';

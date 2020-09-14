@@ -50,7 +50,11 @@ const procGetUsers: RequestHandler = async (req: Request, resp: Response, next: 
       accts.push( {
         'accountId': acct.accountId,
         'username': acct.username,
-        'images': acct.images,
+        'images': {
+          'tiny': acct.imagesTiny,
+          'hero': acct.imagesHero,
+          'thumbnail': acct.imagesThumbnail
+        },
         'location': await buildLocationInfo(req, acct),
       });
     };
