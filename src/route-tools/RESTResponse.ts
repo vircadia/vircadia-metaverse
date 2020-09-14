@@ -116,10 +116,12 @@ export class RESTResponse {
       responseData = {
           'status': this.Status,
       };
-      if (IsNotNullOrEmpty(this.Data)) {
-        responseData.data = this.Data;
-      };
-    }
+    };
+
+    if (IsNotNullOrEmpty(this.Data)) {
+      responseData.data = this.Data;
+    };
+
     if (this._additionalFields.size > 0) {
       this._additionalFields.forEach( (val, key) => {
         responseData[key] = val;
