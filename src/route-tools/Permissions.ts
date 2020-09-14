@@ -59,16 +59,51 @@ export function isNumberValidator(pField: FieldDefn, pEntity: Entity, pValue: an
 export function isDateValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
   return pValue instanceof Date;
 };
+// verify the value is a string or a set/add/remove collection of string arrays
 export function isSArraySet(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
+  let ret = false;
   if (typeof(pValue) === 'string') {
-    return true;
+    Logger.cdebug('field-setting', `isSArraySet: checks as string`);
+    ret = true;
   }
   else {
     if (pValue && (pValue.set || pValue.add || pValue.remove)) {
-      return true;
+      Logger.cdebug('field-setting', `isSArraySet: object with one of the fields`);
+      let eachIsOk = true;
+      if (eachIsOk && pValue.set) {
+        eachIsOk = typeof(pValue.set) === 'string' || isSArray(pField, pEntity, pValue.set);
+        Logger.cdebug('field-setting', `isSArraySet: pValue.set is ${eachIsOk}`);
+      };
+      if (eachIsOk && pValue.add) {
+        eachIsOk = typeof(pValue.add) === 'string' || isSArray(pField, pEntity, pValue.add);
+        Logger.cdebug('field-setting', `isSArraySet: pValue.add is ${eachIsOk}`);
+      };
+      if (eachIsOk && pValue.remove) {
+        eachIsOk = typeof(pValue.remove) === 'string' || isSArray(pField, pEntity, pValue.remove);
+        Logger.cdebug('field-setting', `isSArraySet: pValue.remove is ${eachIsOk}`);
+      };
+      ret = eachIsOk;
     };
   };
-  return false;
+  return ret;
+};
+// Return 'true' is pValue is an array of strings
+export function isSArray(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
+  let ret = false;
+  if (pValue) {
+    if (Array.isArray(pValue)) {
+      let allStrings = true;
+      for (const val of pValue) {
+        if (typeof(val) !== 'string') {
+          allStrings = false;
+          break;
+        };
+      };
+      ret = allStrings;
+    };
+  };
+  Logger.cdebug('field-setting', `isSArray: "${JSON.stringify(pValue)} is ${ret}`);
+  return ret;
 };
 export function simpleGetter(pField: FieldDefn, pEntity: Entity): any {
   if (pEntity.hasOwnProperty(pField.entity_field)) {
@@ -96,7 +131,14 @@ export function sArraySetter(pField: FieldDefn, pEntity: Entity, pVal: any): voi
   if (IsNullOrEmpty(val)) {
     Logger.cdebug('field-setting', `sArraySetting: setting "${pField.entity_field}" Starting with null value`);
     val = [];
+  }
+  else {
+    // Kludge for old entiries that are just a string rather than a prople SArray
+    if (typeof(val) === 'string') {
+      val = [ val ];
+    };
   };
+
   if (typeof(pVal) === 'string') {
     Logger.cdebug('field-setting', `sArraySetting: adding string ${pField.entity_field}`);
     SArray.add(val, pVal);
@@ -104,7 +146,8 @@ export function sArraySetter(pField: FieldDefn, pEntity: Entity, pVal: any): voi
   else {
     if (pVal && (pVal.set || pVal.add || pVal.remove)) {
       if (pVal.set) {
-        val = pVal.set;
+        // this relies on the validator to make sure we're passed clean values
+        val = (typeof(pVal.set) === 'string') ? [ pVal.set ] : pVal.set;
       };
       if (pVal.add) {
         if (Array.isArray(pVal.add)) {
@@ -122,7 +165,7 @@ export function sArraySetter(pField: FieldDefn, pEntity: Entity, pVal: any): voi
         if (Array.isArray(pVal.remove)) {
           Logger.cdebug('field-setting', `sArraySetting: removing array ${pField.entity_field}=>${JSON.stringify(pVal.remove)}`);
           for (const aVal of pVal.remove) {
-            SArray.add(val, aVal);
+            SArray.remove(val, aVal);
           };
         }
         else {
@@ -168,27 +211,28 @@ export async function checkAccessToDomain(pAuthToken: AuthToken,       // token 
   let canAccess: boolean = false;
   if (IsNotNullOrEmpty(pAuthToken) && IsNotNullOrEmpty(pTargetDomain)) {
     for (const perm of pRequiredAccess) {
+      Logger.cdebug('field-setting', `checkAccessToDomain: checking ${perm}`);
       switch (perm) {
         case Perm.ALL:
           canAccess = true;
           break;
         case Perm.DOMAIN:
           if (SArray.has(pAuthToken.scope, TokenScope.DOMAIN)) {
+            Logger.cdebug('field-setting', `checkAccessToDomain: authToken is domain. auth.AccountId=${pAuthToken.accountId}, sponsor=${pTargetDomain.sponserAccountId}`);
             canAccess = pAuthToken.accountId === pTargetDomain.sponserAccountId;
           };
-          break;
-        case Perm.OWNER:
-          canAccess = pAuthToken.accountId === pTargetDomain.sponserAccountId;
           break;
         case Perm.ADMIN:
           // If the authToken is an account, verify that the account has administrative access
           if (SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
             const acct = pAuthTokenAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
+            Logger.cdebug('field-setting', `checkAccessToDomain: admin. auth.AccountId=${pAuthToken.accountId}`);
             canAccess = Accounts.isAdmin(acct);
           };
           break;
         case Perm.SPONSOR:
           if (SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
+            Logger.cdebug('field-setting', `checkAccessToDomain: check sponsor. auth.AccountId=${pAuthToken.accountId}, sponsor=${pTargetDomain.sponserAccountId}`);
             canAccess = pAuthToken.accountId === pTargetDomain.sponserAccountId;
           };
           break;
@@ -200,6 +244,7 @@ export async function checkAccessToDomain(pAuthToken: AuthToken,       // token 
       if (canAccess) break;
     };
   };
+  Logger.cdebug('field-setting', `checkAccessToDomain: canAccess=${canAccess}`);
   return canAccess;
 };
 
@@ -216,30 +261,37 @@ export async function checkAccessToAccount(pAuthToken: AuthToken,  // token bein
                             pRequestingAccount?: AccountEntity  // requesting account if known
                     ): Promise<boolean> {
   let canAccess: boolean = false;
-  const requestingAcct = pRequestingAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
-  for (const perm of pRequiredAccess) {
-    switch (perm) {
-      case 'all':
-        canAccess = true;
-        break;
-      case 'owner': break;
-        canAccess = pAuthToken.accountId === pTargetAccount.accountId;
-        break;
-      case 'friend': break;
-        canAccess = SArray.hasNoCase(pTargetAccount.friends, pRequestingAccount.username);
-        break;
-      case 'connection': break;
-        canAccess = SArray.hasNoCase(pTargetAccount.connections, pRequestingAccount.username);
-        break;
-      case 'admin': break;
-        canAccess = Accounts.isAdmin(requestingAcct);
-        break;
-      default:
-        canAccess = true;
-        break;
-    }
-    // If some permission allows access, we are done
-    if (canAccess) break;
-  }
+  if (IsNotNullOrEmpty(pAuthToken) && IsNotNullOrEmpty(pTargetAccount)) {
+    for (const perm of pRequiredAccess) {
+      Logger.cdebug('field-setting', `checkAccessToDomain: checking ${perm}`);
+      switch (perm) {
+        case Perm.ALL:
+          canAccess = true;
+          break;
+        case Perm.OWNER:
+          canAccess = pAuthToken.accountId === pTargetAccount.accountId;
+          break;
+        case Perm.FRIEND:
+          canAccess = SArray.hasNoCase(pTargetAccount.friends, pRequestingAccount.username);
+          break;
+        case Perm.CONNECTION:
+          canAccess = SArray.hasNoCase(pTargetAccount.connections, pRequestingAccount.username);
+          break;
+        case Perm.ADMIN:
+          // If the authToken is an account, verify that the account has administrative access
+          if (SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
+            const acct = pRequestingAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
+            Logger.cdebug('field-setting', `checkAccessToAccount: admin. auth.AccountId=${pAuthToken.accountId}`);
+            canAccess = Accounts.isAdmin(acct);
+          };
+          break;
+        default:
+          canAccess = false;
+          break;
+      }
+      // If some permission allows access, we are done
+      if (canAccess) break;
+    };
+  };
   return canAccess;
 };

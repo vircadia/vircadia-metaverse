@@ -23,9 +23,9 @@ import { getAccountField, setAccountField, getAccountUpdateForField } from '@Ent
 import { Accounts } from '@Entities/Accounts';
 
 // Get the scope of the logged in account
-const procGetField: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procGetField: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount && req.vAccount) {
-    req.vRestResp.Data = getAccountField(req.vAuthToken, req.vAccount, req.vParam1);
+    req.vRestResp.Data = await getAccountField(req.vAuthToken, req.vAccount, req.vParam1);
   }
   else {
     req.vRestResp.respondFailure('unauthorized');
@@ -35,9 +35,9 @@ const procGetField: RequestHandler = (req: Request, resp: Response, next: NextFu
 
 // Add a role to my roles collection.
 // Not implemented as something needs to be done with request_connection, etc
-const procPostField: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procPostField: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount && req.vAccount) {
-    if (setAccountField(req.vAuthToken, req.vAccount, req.vParam1, req.body)) {
+    if (await setAccountField(req.vAuthToken, req.vAccount, req.vParam1, req.body)) {
       // Setting worked so update the database
       const update = getAccountUpdateForField(req.vAccount, req.vParam1);
       Accounts.updateEntityFields(req.vAccount, update);

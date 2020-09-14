@@ -66,11 +66,11 @@ export class DomainEntity implements Entity {
 // Checks to make sure the getter has permission to get the values.
 // Returns the value. Could be 'undefined' whether the requestor doesn't have permissions or that's
 //     the actual field value.
-export function getDomainField(pAuthToken: AuthToken, pDomain: DomainEntity, pField: string): any {
+export async function getDomainField(pAuthToken: AuthToken, pDomain: DomainEntity, pField: string): Promise<any> {
   let val;
   const perms = domainFields[pField];
   if (perms) {
-    if (checkAccessToDomain(pAuthToken, pDomain, perms.get_permissions)) {
+    if (await checkAccessToDomain(pAuthToken, pDomain, perms.get_permissions)) {
         if (typeof(perms.getter) === 'function') {
           val = perms.getter(perms, pDomain);
         };
@@ -81,12 +81,12 @@ export function getDomainField(pAuthToken: AuthToken, pDomain: DomainEntity, pFi
 // Set a domain field with the fieldname and a value.
 // Checks to make sure the setter has permission to set.
 // Returns 'true' if the value was set and 'false' if the value could not be set.
-export function setDomainField(pAuthToken: AuthToken, pDomain: DomainEntity, pField: string, pVal: any): boolean {
+export async function setDomainField(pAuthToken: AuthToken, pDomain: DomainEntity, pField: string, pVal: any): Promise<boolean> {
   let didSet = false;
   const perms = domainFields[pField];
   if (perms) {
     Logger.cdebug('field-setting', `setDomainField: ${pField}=>${JSON.stringify(pVal)}`);
-    if (checkAccessToDomain(pAuthToken, pDomain, perms.set_permissions)) {
+    if (await checkAccessToDomain(pAuthToken, pDomain, perms.set_permissions)) {
       Logger.cdebug('field-setting', `setDomainField: access passed`);
       if (perms.validate(perms, pDomain, pVal)) {
         Logger.cdebug('field-setting', `setDomainField: value validated`);

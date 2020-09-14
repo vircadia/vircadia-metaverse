@@ -91,11 +91,11 @@ export function checkAvailability(pAvailability: string): boolean {
 // Checks to make sure the getter has permission to get the values.
 // Returns the value. Could be 'undefined' whether the requestor doesn't have permissions or that's
 //     the actual field value.
-export function getAccountField(pAuthToken: AuthToken, pAccount: AccountEntity, pField: string): any {
+export async function getAccountField(pAuthToken: AuthToken, pAccount: AccountEntity, pField: string): Promise<any> {
   let val;
   const perms = accountFields[pField];
   if (perms) {
-    if (checkAccessToAccount(pAuthToken, pAccount, perms.get_permissions)) {
+    if (await checkAccessToAccount(pAuthToken, pAccount, perms.get_permissions)) {
         if (typeof(perms.getter) === 'function') {
           val = perms.getter(perms, pAccount);
         };
@@ -106,12 +106,12 @@ export function getAccountField(pAuthToken: AuthToken, pAccount: AccountEntity, 
 // Set a domain field with the fieldname and a value.
 // Checks to make sure the setter has permission to set.
 // Returns 'true' if the value was set and 'false' if the value could not be set.
-export function setAccountField(pAuthToken: AuthToken, pAccount: AccountEntity, pField: string, pVal: any): boolean {
+export async function setAccountField(pAuthToken: AuthToken, pAccount: AccountEntity, pField: string, pVal: any): Promise<boolean> {
   let didSet = false;
   const perms = accountFields[pField];
   if (perms) {
     Logger.cdebug('field-setting', `setAccountField: ${pField}=>${JSON.stringify(pVal)}`);
-    if (checkAccessToAccount(pAuthToken, pAccount, perms.set_permissions)) {
+    if (await checkAccessToAccount(pAuthToken, pAccount, perms.set_permissions)) {
       Logger.cdebug('field-setting', `setAccountField: access passed`);
       if (perms.validate(perms, pAccount, pVal)) {
         Logger.cdebug('field-setting', `setAccountField: value validated`);
