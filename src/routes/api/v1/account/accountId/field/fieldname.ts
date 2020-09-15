@@ -25,7 +25,7 @@ import { Accounts } from '@Entities/Accounts';
 // Get the scope of the logged in account
 const procGetField: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount && req.vAccount) {
-    req.vRestResp.Data = await getAccountField(req.vAuthToken, req.vAccount, req.vParam1);
+    req.vRestResp.Data = await getAccountField(req.vAuthToken, req.vAccount, req.vParam1, req.vAuthAccount);
   }
   else {
     req.vRestResp.respondFailure('unauthorized');
@@ -37,13 +37,18 @@ const procGetField: RequestHandler = async (req: Request, resp: Response, next: 
 // Not implemented as something needs to be done with request_connection, etc
 const procPostField: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount && req.vAccount) {
-    if (await setAccountField(req.vAuthToken, req.vAccount, req.vParam1, req.body)) {
-      // Setting worked so update the database
-      const update = getAccountUpdateForField(req.vAccount, req.vParam1);
-      Accounts.updateEntityFields(req.vAccount, update);
+    if (req.body.hasOwnProperty('set')) {
+      if (await setAccountField(req.vAuthToken, req.vAccount, req.vParam1, req.body.set, req.vAuthAccount)) {
+        // Setting worked so update the database
+        const update = getAccountUpdateForField(req.vAccount, req.vParam1);
+        Accounts.updateEntityFields(req.vAccount, update);
+      }
+      else {
+        req.vRestResp.respondFailure('value could not be set');
+      };
     }
     else {
-      req.vRestResp.respondFailure('value could not be set');
+      req.vRestResp.respondFailure('no set value given');
     };
   }
   else {

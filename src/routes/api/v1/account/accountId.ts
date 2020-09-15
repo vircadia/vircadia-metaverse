@@ -20,6 +20,7 @@ import { accountFromAuthToken, accountFromParams } from '@Route-Tools/middleware
 import { tokenFromParams } from '@Route-Tools/middleware';
 
 import { Accounts } from '@Entities/Accounts';
+import { setAccountField, getAccountUpdateForField } from '@Entities/AccountEntity';
 
 import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
@@ -46,11 +47,44 @@ const procPostAccountId: RequestHandler = async (req: Request, resp: Response, n
             if (valuesToSet.images.hasOwnProperty('tiny')) updated.images.hero = valuesToSet.images.tiny;
           };
           await Accounts.updateEntityFields(req.vAuthAccount, updated);
+
         };
       }
       else {
         req.vRestResp.respondFailure(req.vAccountError ?? 'Unauthorized');
       };
+      // Alternate account update code using the 'setAccountField' routines.
+      // This is better at checking for permissions and value validation but not tested.
+      // It is expected that future Vircadia code would use the individual fieldname operations to change settings.
+      /*
+      const valuesToSet = req.body.accounts;
+      let updates: VKeyedCollection = {};
+      [ 'username', 'email', 'public_key' ].forEach( prop => {
+        if (valuesToSet.hasOwnProperty(prop)) {
+          if (await setAccountField(req.vAuthToken, req.vAccount, prop, valuesToSet.username, req.vAuthAccount)) {
+            updates = getAccountUpdateForField(req.vAccount, prop, updates);
+          };
+        };
+      });
+      if (valuesToSet.hasOwnProperty('images')) {
+        if (valuesToSet.images.hero) {
+          if (await setAccountField(req.vAuthToken, req.vAccount, 'images_hero', valuesToSet.images.hero, req.vAuthAccount)) {
+            updates = getAccountUpdateForField(req.vAccount, 'images_hero', updates);
+          };
+        };
+        if (valuesToSet.images.tiny) {
+          if (await setAccountField(req.vAuthToken, req.vAccount, 'images_tiny', valuesToSet.images.tiny, req.vAuthAccount)) {
+            updates = getAccountUpdateForField(req.vAccount, 'images_tiny', updates);
+          };
+        };
+        if (valuesToSet.images.thumbnail) {
+          if (await setAccountField(req.vAuthToken, req.vAccount, 'images_thumbnail', valuesToSet.images.thumbnail, req.vAuthAccount)) {
+            updates = getAccountUpdateForField(req.vAccount, 'images_thumbnail', updates);
+          };
+        };
+      };
+      await Accounts.updateEntityFields(req.vAuthAccount, updates);
+      */
     }
     else {
       req.vRestResp.respondFailure(req.vAccountError ?? 'Accounts not specified');

@@ -36,11 +36,7 @@ export class AccountEntity implements Entity {
   public imagesHero: string;
   public imagesThumbnail: string;
   public imagesTiny: string;
-  // public images: {
-  //   hero: string;
-  //   thumbNail: string;
-  //   tiny: string;
-  // };
+
   public locationConnected: boolean;
   public locationPath: string;        // "/floatX,floatY,floatZ/floatX,floatY,floatZ,floatW"
   public locationPlaceId: string;     // uuid of place
@@ -49,16 +45,7 @@ export class AccountEntity implements Entity {
   public locationNetworkPort: number;
   public locationNodeId: string;      // sessionId
   public availability: string;  // on of 'none', 'friends', 'connections', 'all'
-  // public location: {
-  //   connected: boolean;
-  //   path: string;       // "/floatX,floatY,floatZ/floatX,floatY,floatZ,floatW"
-  //   placeId: string;    // uuid of place
-  //   domainId: string;   // uuid of domain located in
-  //   networkAddress: string;
-  //   networkPort: number;
-  //   nodeId: string;     // sessionId
-  //   availability: string;  // one of 'none', 'friends', 'connections', 'all'
-  // };
+
   public connections: string[];
   public friends: string[];
   public locker: string;      // JSON blob stored for user from server
@@ -91,11 +78,12 @@ export function checkAvailability(pAvailability: string): boolean {
 // Checks to make sure the getter has permission to get the values.
 // Returns the value. Could be 'undefined' whether the requestor doesn't have permissions or that's
 //     the actual field value.
-export async function getAccountField(pAuthToken: AuthToken, pAccount: AccountEntity, pField: string): Promise<any> {
+export async function getAccountField(pAuthToken: AuthToken, pAccount: AccountEntity,
+                  pField: string, pRequestingAccount?: AccountEntity): Promise<any> {
   let val;
   const perms = accountFields[pField];
   if (perms) {
-    if (await checkAccessToAccount(pAuthToken, pAccount, perms.get_permissions)) {
+    if (await checkAccessToAccount(pAuthToken, pAccount, perms.get_permissions, pRequestingAccount)) {
         if (typeof(perms.getter) === 'function') {
           val = perms.getter(perms, pAccount);
         };
@@ -106,18 +94,26 @@ export async function getAccountField(pAuthToken: AuthToken, pAccount: AccountEn
 // Set a domain field with the fieldname and a value.
 // Checks to make sure the setter has permission to set.
 // Returns 'true' if the value was set and 'false' if the value could not be set.
-export async function setAccountField(pAuthToken: AuthToken, pAccount: AccountEntity, pField: string, pVal: any): Promise<boolean> {
+export async function setAccountField(pAuthToken: AuthToken,  // authorization for making this change
+            pAccount: AccountEntity,            // the account being changed
+            pField: string, pVal: any,          // field being changed and the new value
+            pRequestingAccount?: AccountEntity, // Account associated with pAuthToken, if known
+            pUpdates?: VKeyedCollection         // where to record updates made (optional)
+                    ): Promise<boolean> {
   let didSet = false;
   const perms = accountFields[pField];
   if (perms) {
     Logger.cdebug('field-setting', `setAccountField: ${pField}=>${JSON.stringify(pVal)}`);
-    if (await checkAccessToAccount(pAuthToken, pAccount, perms.set_permissions)) {
+    if (await checkAccessToAccount(pAuthToken, pAccount, perms.set_permissions, pRequestingAccount)) {
       Logger.cdebug('field-setting', `setAccountField: access passed`);
       if (perms.validate(perms, pAccount, pVal)) {
         Logger.cdebug('field-setting', `setAccountField: value validated`);
         if (typeof(perms.setter) === 'function') {
           perms.setter(perms, pAccount, pVal);
           didSet = true;
+          if (pUpdates) {
+            getAccountUpdateForField(pAccount, pField, pUpdates);
+          };
         };
       };
     };
@@ -128,8 +124,10 @@ export async function setAccountField(pAuthToken: AuthToken, pAccount: AccountEn
 // This is a field/value collection that can be passed to the database routines.
 // Note that this directly fetches the field value rather than using 'getter' since
 //     we want the actual value (whatever it is) to go into the database.
-export function getAccountUpdateForField(pAccount: AccountEntity, pField: string | string[]): VKeyedCollection {
-  const ret: VKeyedCollection = {};
+// If an existing VKeyedCollection is passed, it is added to an returned.
+export function getAccountUpdateForField(pAccount: AccountEntity,
+              pField: string | string[], pExisting?: VKeyedCollection): VKeyedCollection {
+  const ret: VKeyedCollection = pExisting ?? {};
   if (Array.isArray(pField)) {
     pField.forEach( fld => {
       const perms = accountFields[fld];
@@ -158,6 +156,15 @@ function makeAccountFieldUpdate(pPerms: FieldDefn, pAccount: AccountEntity, pRet
 // Naming and access for the fields in a AccountEntity.
 // Indexed by request_field_name.
 export const accountFields: { [key: string]: FieldDefn } = {
+  'accountId': {
+    entity_field: 'accountId',
+    request_field_name: 'accountId',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'none' ],
+    validate: isStringValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
   'username': {
     entity_field: 'username',
     request_field_name: 'username',
@@ -224,7 +231,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
   'connections': {
     entity_field: 'connections',
     request_field_name: 'connections',
-    get_permissions: [ 'all' ],
+    get_permissions: [ 'owner', 'admin', 'friend', 'connection' ],
     set_permissions: [ 'owner', 'admin' ],
     validate: isSArraySet,
     setter: sArraySetter,
@@ -233,7 +240,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
   'friends': {
     entity_field: 'friends',
     request_field_name: 'friends',
-    get_permissions: [ 'all' ],
+    get_permissions: [ 'owner', 'admin', 'friend', 'connection' ],
     set_permissions: [ 'owner', 'admin' ],
     validate: isSArraySet,
     setter: sArraySetter,
@@ -269,17 +276,6 @@ export const accountFields: { [key: string]: FieldDefn } = {
   'public_key': {
     entity_field: 'sessionPublicKey',
     request_field_name: 'public_key',
-    get_permissions: [ 'all' ],
-    set_permissions: [ 'owner', 'admin' ],
-    validate: isStringValidator,
-    setter: simpleSetter,
-    getter: (pField: FieldDefn, pEntity: Entity): any => {
-      return createSimplifiedPublicKey((pEntity as AccountEntity).sessionPublicKey);
-    }
-  },
-  'public_key_pem': {
-    entity_field: 'sessionPublicKey',
-    request_field_name: 'public_key_pem',
     get_permissions: [ 'all' ],
     set_permissions: [ 'owner', 'admin' ],
     validate: isStringValidator,
@@ -321,7 +317,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
     entity_field: 'roles',
     request_field_name: 'roles',
     get_permissions: [ 'all' ],
-    set_permissions: [ 'owner', 'admin' ],
+    set_permissions: [ 'admin' ],
     validate: isSArraySet,
     setter: sArraySetter,
     getter: simpleGetter
@@ -339,11 +335,18 @@ export const accountFields: { [key: string]: FieldDefn } = {
     entity_field: 'WhenAccountCreated',
     request_field_name: 'when_account_created',
     get_permissions: [ 'all' ],
-    set_permissions: [ 'owner', 'admin' ],
+    set_permissions: [ 'none' ],
     validate: isDateValidator,
     setter: undefined,
     getter: dateStringGetter
   },
-  // whenAccountCreated: Date;  // date of account creation
-  // timeOfLastHeartbeat: Date; // when we last heard from this user
+  'time_of_last_heartbeat': {
+    entity_field: 'timeOfLastHeartbeat',
+    request_field_name: 'time_of_last_heartbeat',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'none' ],
+    validate: isDateValidator,
+    setter: undefined,
+    getter: dateStringGetter
+  },
 };

@@ -14,6 +14,7 @@
 'use strict'
 
 import { Entity } from '@Entities/Entity';
+import { AccountEntity } from '@Entities/AccountEntity';
 import { AuthToken } from '@Entities/AuthToken';
 
 import { FieldDefn } from '@Route-Tools/Permissions';
@@ -66,11 +67,12 @@ export class DomainEntity implements Entity {
 // Checks to make sure the getter has permission to get the values.
 // Returns the value. Could be 'undefined' whether the requestor doesn't have permissions or that's
 //     the actual field value.
-export async function getDomainField(pAuthToken: AuthToken, pDomain: DomainEntity, pField: string): Promise<any> {
+export async function getDomainField(pAuthToken: AuthToken, pDomain: DomainEntity,
+                                pField: string, pRequestingAccount?: AccountEntity): Promise<any> {
   let val;
   const perms = domainFields[pField];
   if (perms) {
-    if (await checkAccessToDomain(pAuthToken, pDomain, perms.get_permissions)) {
+    if (await checkAccessToDomain(pAuthToken, pDomain, perms.get_permissions, pRequestingAccount)) {
         if (typeof(perms.getter) === 'function') {
           val = perms.getter(perms, pDomain);
         };
@@ -81,18 +83,29 @@ export async function getDomainField(pAuthToken: AuthToken, pDomain: DomainEntit
 // Set a domain field with the fieldname and a value.
 // Checks to make sure the setter has permission to set.
 // Returns 'true' if the value was set and 'false' if the value could not be set.
-export async function setDomainField(pAuthToken: AuthToken, pDomain: DomainEntity, pField: string, pVal: any): Promise<boolean> {
+// export async function setDomainField(pAuthToken: AuthToken, pDomain: DomainEntity,
+//                                 pField: string, pVal: any, pRequestingAccount?: AccountEntity): Promise<boolean> {
+export async function setDomainField(pAuthToken: AuthToken,  // authorization for making this change
+            pDomain: DomainEntity,              // the domain being changed
+            pField: string, pVal: any,          // field being changed and the new value
+            pRequestingAccount?: AccountEntity, // Account associated with pAuthToken, if known
+            pUpdates?: VKeyedCollection         // where to record updates made (optional)
+                    ): Promise<boolean> {
   let didSet = false;
   const perms = domainFields[pField];
   if (perms) {
     Logger.cdebug('field-setting', `setDomainField: ${pField}=>${JSON.stringify(pVal)}`);
-    if (await checkAccessToDomain(pAuthToken, pDomain, perms.set_permissions)) {
+    if (await checkAccessToDomain(pAuthToken, pDomain, perms.set_permissions, pRequestingAccount)) {
       Logger.cdebug('field-setting', `setDomainField: access passed`);
       if (perms.validate(perms, pDomain, pVal)) {
         Logger.cdebug('field-setting', `setDomainField: value validated`);
         if (typeof(perms.setter) === 'function') {
           perms.setter(perms, pDomain, pVal);
           didSet = true;
+          // If the caller passed a place to return the update info, update same
+          if (pUpdates) {
+            getDomainUpdateForField(pDomain, pField, pUpdates);
+          };
         };
       };
     };
@@ -103,8 +116,10 @@ export async function setDomainField(pAuthToken: AuthToken, pDomain: DomainEntit
 // This is a field/value collection that can be passed to the database routines.
 // Note that this directly fetches the field value rather than using 'getter' since
 //     we want the actual value (whatever it is) to go into the database.
-export function getDomainUpdateForField(pDomain: DomainEntity, pField: string | string[]): VKeyedCollection {
-  const ret: VKeyedCollection = {};
+// If an existing VKeyedCollection is passed, it is added to an returned.
+export function getDomainUpdateForField(pDomain: DomainEntity,
+              pField: string | string[], pExisting?: VKeyedCollection): VKeyedCollection {
+  const ret: VKeyedCollection = pExisting ?? {};
   if (Array.isArray(pField)) {
     pField.forEach( fld => {
       const perms = domainFields[fld];
@@ -133,6 +148,15 @@ function makeDomainFieldUpdate(pPerms: FieldDefn, pDomain: DomainEntity, pRet: V
 // Naming and access for the fields in a DomainEntity.
 // Indexed by request_field_name.
 export const domainFields: { [key: string]: FieldDefn } = {
+  'domainId': {
+    entity_field: 'domainId',
+    request_field_name: 'domainId',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'none' ],
+    validate: isStringValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
   'place_name': {
     entity_field: 'placeName',
     request_field_name: 'place_name',
@@ -145,17 +169,6 @@ export const domainFields: { [key: string]: FieldDefn } = {
   'public_key': {
     entity_field: 'publicKey',
     request_field_name: 'public_key',
-    get_permissions: [ 'all' ],
-    set_permissions: [ 'domain' ],
-    validate: isStringValidator,
-    setter: simpleSetter,
-    getter: (pField: FieldDefn, pEntity: Entity): any => {
-      return createSimplifiedPublicKey((pEntity as DomainEntity).publicKey);
-    }
-  },
-  'public_key_pem': {
-    entity_field: 'publicKey',
-    request_field_name: 'public_key_pem',
     get_permissions: [ 'all' ],
     set_permissions: [ 'domain' ],
     validate: isStringValidator,

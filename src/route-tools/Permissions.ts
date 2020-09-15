@@ -47,14 +47,14 @@ export interface FieldDefn {
     setter: setterFunction,
     updater?: updaterFunction
 };
-export function simpleValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
+export function noValidation(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
   return true;
 };
 export function isStringValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
   return typeof(pValue) === 'string';
 };
 export function isNumberValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
-  return typeof(pValue) === 'number';
+  return typeof(pValue.set) === 'number';
 };
 export function isDateValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
   return pValue instanceof Date;
@@ -62,28 +62,22 @@ export function isDateValidator(pField: FieldDefn, pEntity: Entity, pValue: any)
 // verify the value is a string or a set/add/remove collection of string arrays
 export function isSArraySet(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
   let ret = false;
-  if (typeof(pValue) === 'string') {
-    Logger.cdebug('field-setting', `isSArraySet: checks as string`);
-    ret = true;
-  }
-  else {
-    if (pValue && (pValue.set || pValue.add || pValue.remove)) {
-      Logger.cdebug('field-setting', `isSArraySet: object with one of the fields`);
-      let eachIsOk = true;
-      if (eachIsOk && pValue.set) {
-        eachIsOk = typeof(pValue.set) === 'string' || isSArray(pField, pEntity, pValue.set);
-        Logger.cdebug('field-setting', `isSArraySet: pValue.set is ${eachIsOk}`);
-      };
-      if (eachIsOk && pValue.add) {
-        eachIsOk = typeof(pValue.add) === 'string' || isSArray(pField, pEntity, pValue.add);
-        Logger.cdebug('field-setting', `isSArraySet: pValue.add is ${eachIsOk}`);
-      };
-      if (eachIsOk && pValue.remove) {
-        eachIsOk = typeof(pValue.remove) === 'string' || isSArray(pField, pEntity, pValue.remove);
-        Logger.cdebug('field-setting', `isSArraySet: pValue.remove is ${eachIsOk}`);
-      };
-      ret = eachIsOk;
+  if (pValue && (pValue.set || pValue.add || pValue.remove)) {
+    Logger.cdebug('field-setting', `isSArraySet: object with one of the fields`);
+    let eachIsOk = true;
+    if (eachIsOk && pValue.set) {
+      eachIsOk = typeof(pValue.set) === 'string' || isSArray(pField, pEntity, pValue.set);
+      Logger.cdebug('field-setting', `isSArraySet: pValue.set is ${eachIsOk}`);
     };
+    if (eachIsOk && pValue.add) {
+      eachIsOk = typeof(pValue.add) === 'string' || isSArray(pField, pEntity, pValue.add);
+      Logger.cdebug('field-setting', `isSArraySet: pValue.add is ${eachIsOk}`);
+    };
+    if (eachIsOk && pValue.remove) {
+      eachIsOk = typeof(pValue.remove) === 'string' || isSArray(pField, pEntity, pValue.remove);
+      Logger.cdebug('field-setting', `isSArraySet: pValue.remove is ${eachIsOk}`);
+    };
+    ret = eachIsOk;
   };
   return ret;
 };
@@ -113,7 +107,9 @@ export function simpleGetter(pField: FieldDefn, pEntity: Entity): any {
 };
 export function simpleSetter(pField: FieldDefn, pEntity: Entity, pVal: any): void {
   if (pEntity.hasOwnProperty(pField.entity_field)) {
-    (pEntity as any)[pField.entity_field] = pVal;
+    if (pVal.set) {
+      (pEntity as any)[pField.entity_field] = pVal;
+    };
   };
 };
 export function dateStringGetter(pField: FieldDefn, pEntity: Entity): string {
@@ -260,6 +256,7 @@ export async function checkAccessToAccount(pAuthToken: AuthToken,  // token bein
                             pRequiredAccess: string[],      // permissions required to access domain
                             pRequestingAccount?: AccountEntity  // requesting account if known
                     ): Promise<boolean> {
+  const requester = pRequestingAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
   let canAccess: boolean = false;
   if (IsNotNullOrEmpty(pAuthToken) && IsNotNullOrEmpty(pTargetAccount)) {
     for (const perm of pRequiredAccess) {
@@ -272,17 +269,16 @@ export async function checkAccessToAccount(pAuthToken: AuthToken,  // token bein
           canAccess = pAuthToken.accountId === pTargetAccount.accountId;
           break;
         case Perm.FRIEND:
-          canAccess = SArray.hasNoCase(pTargetAccount.friends, pRequestingAccount.username);
+          canAccess = SArray.hasNoCase(pTargetAccount.friends, requester.username);
           break;
         case Perm.CONNECTION:
-          canAccess = SArray.hasNoCase(pTargetAccount.connections, pRequestingAccount.username);
+          canAccess = SArray.hasNoCase(pTargetAccount.connections, requester.username);
           break;
         case Perm.ADMIN:
           // If the authToken is an account, verify that the account has administrative access
           if (SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
-            const acct = pRequestingAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
             Logger.cdebug('field-setting', `checkAccessToAccount: admin. auth.AccountId=${pAuthToken.accountId}`);
-            canAccess = Accounts.isAdmin(acct);
+            canAccess = Accounts.isAdmin(requester);
           };
           break;
         default:
