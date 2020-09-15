@@ -249,7 +249,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
   'locker': {
     entity_field: 'locker',
     request_field_name: 'locker',
-    get_permissions: [ 'all' ],
+    get_permissions: [ 'owner', 'admin' ],
     set_permissions: [ 'owner', 'admin' ],
     validate: isStringValidator,
     setter: simpleSetter,
@@ -287,7 +287,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
   'xmpp_password': {
     entity_field: 'xmppPassword',
     request_field_name: 'xmpp_password',
-    get_permissions: [ 'all' ],
+    get_permissions: [ 'owner' ],
     set_permissions: [ 'owner', 'admin' ],
     validate: isStringValidator,
     setter: simpleSetter,
@@ -296,7 +296,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
   'discourse_api_key': {
     entity_field: 'discourseApiKey',
     request_field_name: 'discourse_api_key',
-    get_permissions: [ 'all' ],
+    get_permissions: [ 'owner' ],
     set_permissions: [ 'owner', 'admin' ],
     validate: isStringValidator,
     setter: simpleSetter,
@@ -305,7 +305,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
   'wallet_id': {
     entity_field: 'walletId',
     request_field_name: 'wallet_id',
-    get_permissions: [ 'all' ],
+    get_permissions: [ 'owner' ],
     set_permissions: [ 'owner', 'admin' ],
     validate: isStringValidator,
     setter: simpleSetter,

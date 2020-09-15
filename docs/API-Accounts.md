@@ -80,6 +80,107 @@ The fields that can be changed are:
     }
 ```
 
+## GET /api/v1/account/{accountId}/field/{fieldname}
+
+Get the value of an account field. The result returned is just the value of
+that field.
+
+This request is the opposite of the POST request that sets the values.
+
+There are per-field permissions and value verification.
+So the below table lists the permissions needed for doing a GET
+of the field and the permissions to change the field value.
+
+The account fields that can be fetched:
+
+| FIELDNAME   | GET PERM | SET PERM    | TYPE |
+| ---------   | -------- | --------    | ---- |
+| accountId   |   all    | noone        |   string |
+| username    |   all    | owner admin |   string |
+| email       |   email  | all |   owner admin |   string |
+| account_settings | all | owner admin |   string |
+|images_hero  |   all    | owner admin |   string |
+|images_tiny  |   all    | owner admin |   string |
+|images_thumbnail |  all | owner admin |   string |
+|availability |   all    | owner admin |   stringArray |
+|connections  | owner admin friend connection |   owner admin |   stringArray |
+|friends      | owner admin friend connection |   owner admin |   stringArray |
+|locker       | owner admin | owner admin |   string |
+|password     |   none   | owner       |   string |
+|public_key   |   all    | owner admin |   string |
+|xmpp_password | owner   | owner admin |   string |
+|discourse_api_key | owner | owner admin |   string |
+|wallet_id    |  owner   | owner admin |   string |
+|roles        |   all    | admin       |   stringArray |
+|ip_addr_of_creator | all | noone       |   string |
+|when_account_created | all | noone     |   ISODateString |
+|time_of_last_heartbeat | all | noone   |   ISODateString |
+
+The JSON structure returned looks like the regular REST response
+with the "data" object being the value requests.
+
+```
+GET /api/v1/account/f7e2bac9-ba02-4db7-bfd0-473286a502c6/field/email
+```
+returns
+
+```
+    {
+        "status": "success",
+        "data": "someperson@example.com"
+    }
+```
+
+```
+GET /api/v1/account/f7e2bac9-ba02-4db7-bfd0-473286a502c6/field/friends
+```
+
+returns:
+
+```
+    {
+        "status": "success",
+        "data": [ "fred", "barney", "MrRumble" ]
+    }
+```
+
+## POST /api/v1/account/{accountId}/field/{fieldname}
+
+This request sets the value of an account field.
+See the table under GET for the possible fields and the permissions
+required to change account values.
+
+The request to set a value POST's a JSON structure that gives
+the value to set. So,
+
+```
+POST /api/v1/account/f7e2bac9-ba02-4db7-bfd0-473286a502c6/field/images_hero
+    {
+        "set": "http://mysite.example.com/buff-images/smiling.jpg"
+    }
+```
+
+Note that the "set" element gives the value to set in the value.
+
+For setting string arrays, one must send an array item manipulator
+so:
+
+```
+POST /api/v1/account/f7e2bac9-ba02-4db7-bfd0-473286a502c6/field/friends
+    {
+        "set": {
+            "set": [ "friend1", "friend2" ],
+            "add": [ "friend3" ],
+            "remove": [ "friend2" ]
+        }
+    }
+```
+
+This will set the "friends" field to the "set" value, then add the "add" value
+then remove the "remove" value. Of course, each of these manipulation fields
+are optional so, if you wanted to add a new friend, just having "add" will add
+that friend to the list.
+
 ## DELETE /api/v1/account/{accountId}
 
 Delete an account.
