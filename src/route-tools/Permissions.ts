@@ -256,7 +256,7 @@ export async function checkAccessToAccount(pAuthToken: AuthToken,  // token bein
                             pRequiredAccess: string[],      // permissions required to access domain
                             pRequestingAccount?: AccountEntity  // requesting account if known
                     ): Promise<boolean> {
-  const requester = pRequestingAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
+  let requestingAccount = pRequestingAccount;
   let canAccess: boolean = false;
   if (IsNotNullOrEmpty(pAuthToken) && IsNotNullOrEmpty(pTargetAccount)) {
     for (const perm of pRequiredAccess) {
@@ -269,16 +269,19 @@ export async function checkAccessToAccount(pAuthToken: AuthToken,  // token bein
           canAccess = pAuthToken.accountId === pTargetAccount.accountId;
           break;
         case Perm.FRIEND:
-          canAccess = SArray.hasNoCase(pTargetAccount.friends, requester.username);
+          requestingAccount = requestingAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
+          canAccess = SArray.hasNoCase(pTargetAccount.friends, requestingAccount.username);
           break;
         case Perm.CONNECTION:
-          canAccess = SArray.hasNoCase(pTargetAccount.connections, requester.username);
+          requestingAccount = requestingAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
+          canAccess = SArray.hasNoCase(pTargetAccount.connections, requestingAccount.username);
           break;
         case Perm.ADMIN:
           // If the authToken is an account, verify that the account has administrative access
           if (SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
             Logger.cdebug('field-setting', `checkAccessToAccount: admin. auth.AccountId=${pAuthToken.accountId}`);
-            canAccess = Accounts.isAdmin(requester);
+            requestingAccount = requestingAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
+            canAccess = Accounts.isAdmin(requestingAccount);
           };
           break;
         default:
