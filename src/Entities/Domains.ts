@@ -14,16 +14,11 @@
 'use strict'
 
 import { DomainEntity } from '@Entities/DomainEntity';
-import { Tokens } from '@Entities/Tokens';
-import { AuthToken } from '@Entities/AuthToken';
-import { Accounts } from '@Entities/Accounts';
-import { AccountEntity } from '@Entities/AccountEntity';
 
-import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
+import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 
 import { createObject, getObject, getObjects, updateObjectFields, deleteOne } from '@Tools/Db';
 
-import { Logger } from '@Tools/Logging';
 import { GenUUID, IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 import { VKeyedCollection } from '@Tools/vTypes';
 
@@ -52,8 +47,9 @@ export const Domains = {
   removeDomain(pDomainEntity: DomainEntity) : Promise<boolean> {
     return deleteOne(domainCollection, { 'domainId': pDomainEntity.domainId } );
   },
-  async *enumerateAsync(pPager: PaginationInfo): AsyncGenerator<DomainEntity> {
-    for await (const domain of getObjects(domainCollection, pPager)) {
+  async *enumerateAsync(pPager: CriteriaFilter,
+              pInfoer?: CriteriaFilter, pScoper?: CriteriaFilter): AsyncGenerator<DomainEntity> {
+    for await (const domain of getObjects(domainCollection, pPager, pInfoer, pScoper)) {
       yield domain;
     };
     // return getObjects(domainCollection, pCriteria, pPager); // not sure why this doesn't work
