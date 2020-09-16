@@ -21,7 +21,7 @@ A request returns an array of domain descriptions:
           "domains": [
               {
                   "domainid": stringDomainId,
-                  "place_name": stringName,
+                  "name": stringName,
                   "public_key": stringPublicKey,
                   "sponser_accountid": stringAccountIdAssociated,
                   "ice_server_address": stringAddrIceServerBeingUsed,
@@ -62,8 +62,7 @@ The request returns information:
     "domain": {
       "domainid": stringDomainId,
       "id": stringDomainId,       // added for backward compatibility
-      "place_name": stringName,
-      "name": stringPlaceName,    // added for backward compatibility
+      "name": stringName,
       "public_key": stringPublicKey,
       "sponser_accountid": stringAccountIdAssociated,
       "ice_server_address": stringAddrIceServerBeingUsed,
@@ -101,7 +100,7 @@ not included, the value is not set.
 ```
   {
       "domain": {
-          "place_name": stringName,
+          "name": stringName,
           "version": stringSoftwareVersion,
           "protocol": stringProtocolVersion,
           "network_addr": stringNetworkAddress,
@@ -115,23 +114,91 @@ not included, the value is not set.
           "heartbeat": {
               "num_users": intUsers,
               "anon_users": intAnonUsers
-          },
-          "meta": JSONmetadata
+          }
       }
   }
 ```
 
-The 'meta' field is arbitrary JSON encoded information to be added
-to the domain's information. This information is not processed by
-the metaverse-server but is stored and returned for the domain.
-When PUT, the new value is "deep merged" with any existing data.
-That is, fields in the PUT data, no matter how deep in the JSON
-structure, will overlay existing values.
-Future feature: Values can be removed
-from the stored meta-data structure by passing the JSON "null"
-as the label's value (i.e., any label with the value "null" will
-be removed).
+## GET /api/v1/domains/{domainId}/field/{fieldname}
 
+Get the value of an domain field. The result returned is just the value of
+that field.
+
+This request is the opposite of the POST request that sets the values.
+
+There are per-field permissions and value verification.
+So the below table lists the permissions needed for doing a GET
+of the field and the permissions to change the field value.
+
+The domain fields that can be fetched:
+
+| FIELDNAME   | GET PERM | SET PERM    | TYPE |
+| ---------   | -------- | --------    | ---- |
+
+The JSON structure returned looks like the regular REST response
+with the "data" object being the value requests.
+
+```
+GET /api/v1/domains/f7e2bac9-ba02-4db7-bfd0-473286a502c6/field/email
+```
+returns
+
+```
+    {
+        "status": "success",
+        "data": "someperson@example.com"
+    }
+```
+
+```
+GET /api/v1/domains/f7e2bac9-ba02-4db7-bfd0-473286a502c6/field/friends
+```
+
+returns:
+
+```
+    {
+        "status": "success",
+        "data": [ "fred", "barney", "MrRumble" ]
+    }
+```
+
+## POST /api/v1/domains/{domainId}/field/{fieldname}
+
+This request sets the value of an account field.
+See the table under GET for the possible fields and the permissions
+required to change account values.
+
+The request to set a value POST's a JSON structure that gives
+the value to set. So,
+
+```
+POST /api/v1/domains/f7e2bac9-ba02-4db7-bfd0-473286a502c6/field/images_hero
+    {
+        "set": "http://mysite.example.com/buff-images/smiling.jpg"
+    }
+```
+
+Note that the "set" element gives the value to set in the value.
+
+For setting string arrays, one must send an array item manipulator
+so:
+
+```
+POST /api/v1/domains/f7e2bac9-ba02-4db7-bfd0-473286a502c6/field/friends
+    {
+        "set": {
+            "set": [ "friend1", "friend2" ],
+            "add": [ "friend3" ],
+            "remove": [ "friend2" ]
+        }
+    }
+```
+
+This will set the "friends" field to the "set" value, then add the "add" value
+then remove the "remove" value. Of course, each of these manipulation fields
+are optional so, if you wanted to add a new friend, just having "add" will add
+that friend to the list.
 ## DELETE /api/v1/domains/:domainId
 
 Delete the specified domain.

@@ -56,7 +56,6 @@ The response body is an "applicaton/json" structure that contains an array of us
                                 "network_port": intPortNum,
                                 "ice_server_address": stringHostname,
                                 "name": name,
-                                "default_place_name": name
                             },
                             "name": placeName
                         },
@@ -171,7 +170,6 @@ The `username` is percent-encoded for inclusion to the URL.
                         "network_port":
                         "ice_server_address":
                         "name":
-                        "default_place_name":
                     },
                     "name": placeName,
                 },

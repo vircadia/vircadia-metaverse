@@ -18,6 +18,8 @@ import { Config } from '@Base/config';
 import { MongoClient, Db, DeleteWriteOpResultObject } from 'mongodb';
 import deepmerge from 'deepmerge';
 
+import { domainCollection } from '@Entities/Domains';
+
 import { VKeyedCollection } from '@Tools/vTypes';
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 import { Logger } from '@Tools/Logging';
@@ -60,6 +62,9 @@ export async function setupDB(): Promise<void> {
     useNewUrlParser: true
   });
   Datab = BaseClient.db(Config.database.db);
+
+  // Do any operations to update database formats
+  await DoDatabaseFormatChanges();
   return;
 };
 
@@ -102,17 +107,17 @@ export async function updateObjectFields(pCollection: string, pCriteria: any, pF
       doSet = true;
       set[key] = value
     }
-  }
+  };
 
   // Create the 'operation' object that specifies what to change on the  target object
   if (doSet) {
     op.$set = set
-  }
+  };
   if (doUnset) {
     op.$unset = unset
-  }
+  };
 
-  Logger.cdebug('db-query-detail', `Db.updateObjectFields: collection=${pCollection}, criteria=${JSON.stringify(pCriteria)}, op=${JSON.stringify(op)}`)
+  Logger.cdebug('db-query-detail', `Db.updateObjectFields: collection=${pCollection}, criteria=${JSON.stringify(pCriteria)}, op=${JSON.stringify(op)}`);
   return Datab.collection(pCollection)
     .findOneAndUpdate(pCriteria, op, {
        returnOriginal: false    // return the updated entity
@@ -154,7 +159,7 @@ export async function *getObjects(pCollection: string,
     criteria = deepmerge(criteria, pScoper.criteriaParameters());
   };
 
-  Logger.cdebug('db-query-detail', `Db.getObjects: collection=${pCollection}, criteria=${JSON.stringify(criteria)}`)
+  Logger.cdebug('db-query-detail', `Db.getObjects: collection=${pCollection}, criteria=${JSON.stringify(criteria)}`);
   const cursor = Datab.collection(pCollection).find(criteria);
 
   while (await cursor.hasNext()) {
@@ -166,4 +171,25 @@ export async function *getObjects(pCollection: string,
       yield nextItem;
     };
   };
+};
+
+// Do any database format changes.
+// Eventually, there should be a system of multiple, versioned updates
+//    but, to keep things running, just do the updates needed for now.
+async function DoDatabaseFormatChanges() {
+
+  // Domain naming changed a little when place_names were added.
+  //    so domain.placeName changed to domain.name.
+  // If any domain entry exists with 'place_name', replace it with 'name'
+  let placeNameUpdateCount = 0;
+  await Datab.collection(domainCollection).find({ 'placeName': { '$exists': true }})
+  .forEach( doc => {
+    placeNameUpdateCount++;
+    Datab.collection(domainCollection).updateOne(
+            { _id: doc._id},
+            { '$rename': { 'placeName': 'name' } }
+    );
+  });
+  Logger.debug(`Db.DoDatabaseFormatChanges: ${placeNameUpdateCount} Domain.placeName renames`);
+
 };

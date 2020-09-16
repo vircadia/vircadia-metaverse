@@ -29,7 +29,7 @@ import { VKeyedCollection } from '@Tools/vTypes';
 // NOTE: this class cannot have functions in them as they are just JSON to and from the database
 export class DomainEntity implements Entity {
   public domainId: string;     // globally unique domain identifier
-  public placeName: string;    // place name
+  public name: string;         // domain name/label
   public publicKey: string;    // DomainServers's public key in multi-line PEM format
   public apiKey: string;       // Access key if a temp domain
   public sponserAccountId: string; // The account that gave this domain an access key
@@ -157,9 +157,9 @@ export const domainFields: { [key: string]: FieldDefn } = {
     setter: simpleSetter,
     getter: simpleGetter
   },
-  'place_name': {
-    entity_field: 'placeName',
-    request_field_name: 'place_name',
+  'name': {
+    entity_field: 'name',
+    request_field_name: 'name',
     get_permissions: [ 'all' ],
     set_permissions: [ 'domain', 'sponser', 'admin' ],
     validate: isStringValidator,

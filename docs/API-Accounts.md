@@ -97,7 +97,7 @@ The account fields that can be fetched:
 | ---------   | -------- | --------    | ---- |
 | accountId   |   all    | noone        |   string |
 | username    |   all    | owner admin |   string |
-| email       |   email  | all |   owner admin |   string |
+| email       |   all    | owner admin |   string |
 | account_settings | all | owner admin |   string |
 |images_hero  |   all    | owner admin |   string |
 |images_tiny  |   all    | owner admin |   string |

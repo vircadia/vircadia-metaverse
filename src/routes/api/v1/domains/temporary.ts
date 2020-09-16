@@ -45,7 +45,7 @@ const procPostDomainsTemporary: RequestHandler = async (req: Request, resp: Resp
   const generatedAPIkey: string = GenUUID();
 
   const newDomain = Domains.createDomain();
-  newDomain.placeName = generatedPlacename;
+  newDomain.name = generatedPlacename;
   newDomain.apiKey = generatedAPIkey;
   if (req.vSenderKey) {
     newDomain.iPAddrOfFirstContact = req.vSenderKey;
@@ -55,7 +55,7 @@ const procPostDomainsTemporary: RequestHandler = async (req: Request, resp: Resp
   req.vRestResp.Data = {
     'domain': {
       'id': newDomain.domainId,
-      'name': newDomain.placeName,
+      'name': newDomain.name,
       'api_key': newDomain.apiKey
     }
   };

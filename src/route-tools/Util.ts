@@ -104,11 +104,11 @@ export async function buildLocationInfo(pReq: Request, pAcct: AccountEntity): Pr
         'root': {
           'domain': {
             'id': aDomain.domainId,
-            'name': aDomain.placeName,
+            'name': aDomain.name,
             'network_address': aDomain.networkAddr,
             'ice_server_address': aDomain.iceServerAddr
           },
-          'name': aDomain.placeName
+          'name': aDomain.name
         },
         'path': pAcct.locationPath,
         'online': Accounts.isOnline(pReq.vAccount)
@@ -137,7 +137,7 @@ export async function buildLocationInfo(pReq: Request, pAcct: AccountEntity): Pr
 export async function buildDomainInfoV1(pDomain: DomainEntity): Promise<any> {
   return {
     'domainId': pDomain.domainId,
-    'place_name': pDomain.placeName,
+    'name': pDomain.name,
     'public_key': pDomain.publicKey ? createSimplifiedPublicKey(pDomain.publicKey) : undefined,
     'sponser_accountid': pDomain.sponserAccountId,
     'ice_server_address': pDomain.iceServerAddr,
