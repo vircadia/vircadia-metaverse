@@ -294,3 +294,83 @@ export async function checkAccessToAccount(pAuthToken: AuthToken,  // token bein
   };
   return canAccess;
 };
+
+// Check if the passed AuthToken has access to the passed Entity.
+// Generalized for any Entity. The permissions expect 'accountId' and 'sponsorAccountId'
+//    in the entities.
+// The "required access" parameter lists the type of access the token must have.
+// For instance, a REST request is made to get a list of users, the request token
+//    goes through the list with the permissions [ 'owner', 'admin', 'friend', 'connection' ]
+//    which means the requestor must be the account owner, a friend or connection of the
+//    requested account or the requestor must be an admin.
+// Note that the list of RequiredAccess is a OR list -- any one access type is sufficient.
+export async function checkAccessToEntity(pAuthToken: AuthToken,  // token being used to access
+                            pTargetEntity: Entity,              // entity being accessed
+                            pRequiredAccess: string[],          // permissions required to access domain
+                            pRequestingAccount?: AccountEntity  // requesting account if known
+                    ): Promise<boolean> {
+  let requestingAccount = pRequestingAccount;
+  let canAccess: boolean = false;
+  if (IsNotNullOrEmpty(pAuthToken) && IsNotNullOrEmpty(pTargetEntity)) {
+    for (const perm of pRequiredAccess) {
+      Logger.cdebug('field-setting', `checkAccessToEntity: checking ${perm}`);
+      switch (perm) {
+        case Perm.ALL:
+          canAccess = true;
+          break;
+        case Perm.DOMAIN:
+          // requestor is a domain and it's account is the domain's sponsoring account
+          if (SArray.has(pAuthToken.scope, TokenScope.DOMAIN)) {
+            if (pTargetEntity.hasOwnProperty('sponserAccountId')) {
+              Logger.cdebug('field-setting', `checkAccessToEntity: authToken is domain. auth.AccountId=${pAuthToken.accountId}, sponsor=${(pTargetEntity as any).sponserAccountId}`);
+              canAccess = pAuthToken.accountId === (pTargetEntity as any).sponserAccountId;
+            };
+          };
+          break;
+        case Perm.OWNER:
+          // The requestor is the target entity
+          if (pTargetEntity.hasOwnProperty('accountId')) {
+            canAccess = pAuthToken.accountId === (pTargetEntity as any).accountId;
+          };
+          break;
+        case Perm.FRIEND:
+          // The requestor is a 'friend' of the target entity
+          if (pTargetEntity.hasOwnProperty('friends')) {
+            requestingAccount = requestingAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
+            canAccess = SArray.hasNoCase((pTargetEntity as any).friends, requestingAccount.username);
+          };
+          break;
+        case Perm.CONNECTION:
+          // The requestor is a 'connection' of the target entity
+          if (pTargetEntity.hasOwnProperty('connections')) {
+            requestingAccount = requestingAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
+            canAccess = SArray.hasNoCase((pTargetEntity as any).connections, requestingAccount.username);
+          };
+          break;
+        case Perm.ADMIN:
+          // If the authToken is an account, has access if admin
+          if (SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
+            Logger.cdebug('field-setting', `checkAccessToEntity: admin. auth.AccountId=${pAuthToken.accountId}`);
+            requestingAccount = requestingAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
+            canAccess = Accounts.isAdmin(requestingAccount);
+          };
+          break;
+        case Perm.SPONSOR:
+          // Requestor is a regular account and is the sponsor of the domain
+          if (SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
+            if (pTargetEntity.hasOwnProperty('sponserAccountId')) {
+              Logger.cdebug('field-setting', `checkAccessToEntity: authToken is domain. auth.AccountId=${pAuthToken.accountId}, sponsor=${(pTargetEntity as any).sponserAccountId}`);
+              canAccess = pAuthToken.accountId === (pTargetEntity as any).sponserAccountId;
+            };
+          };
+          break;
+        default:
+          canAccess = false;
+          break;
+      }
+      // If some permission allows access, we are done
+      if (canAccess) break;
+    };
+  };
+  return canAccess;
+};
