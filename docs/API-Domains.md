@@ -23,7 +23,7 @@ A request returns an array of domain descriptions:
                   "domainid": stringDomainId,
                   "name": stringName,
                   "public_key": stringPublicKey,
-                  "sponser_accountid": stringAccountIdAssociated,
+                  "sponsor_accountid": stringAccountIdAssociated,
                   "ice_server_address": stringAddrIceServerBeingUsed,
                   "version": stringSoftwareVersion,
                   "protocol_version": stringProtocolVersion,
@@ -64,7 +64,7 @@ The request returns information:
       "id": stringDomainId,       // added for backward compatibility
       "name": stringName,
       "public_key": stringPublicKey,
-      "sponser_accountid": stringAccountIdAssociated,
+      "sponsor_accountid": stringAccountIdAssociated,
       "ice_server_address": stringAddrIceServerBeingUsed,
       "version": stringSoftwareVersion,
       "protocol_version": stringProtocolVersion,

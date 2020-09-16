@@ -181,7 +181,7 @@ export function sArraySetter(pField: FieldDefn, pEntity: Entity, pVal: any): voi
 //  'friend': the requesting account is a friend of the target account
 //  'connection': the requesting account is a connection of the target account
 //  'admin': the requesting account has 'admin' privilages
-//  'sponser': the requesting account is the sponsor of the traget domain
+//  'sponsor': the requesting account is the sponsor of the traget domain
 export class Perm {
   public static NONE     = 'none';
   public static ALL      = 'all';
@@ -214,8 +214,8 @@ export async function checkAccessToDomain(pAuthToken: AuthToken,       // token 
           break;
         case Perm.DOMAIN:
           if (SArray.has(pAuthToken.scope, TokenScope.DOMAIN)) {
-            Logger.cdebug('field-setting', `checkAccessToDomain: authToken is domain. auth.AccountId=${pAuthToken.accountId}, sponsor=${pTargetDomain.sponserAccountId}`);
-            canAccess = pAuthToken.accountId === pTargetDomain.sponserAccountId;
+            Logger.cdebug('field-setting', `checkAccessToDomain: authToken is domain. auth.AccountId=${pAuthToken.accountId}, sponsor=${pTargetDomain.sponsorAccountId}`);
+            canAccess = pAuthToken.accountId === pTargetDomain.sponsorAccountId;
           };
           break;
         case Perm.ADMIN:
@@ -228,8 +228,8 @@ export async function checkAccessToDomain(pAuthToken: AuthToken,       // token 
           break;
         case Perm.SPONSOR:
           if (SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
-            Logger.cdebug('field-setting', `checkAccessToDomain: check sponsor. auth.AccountId=${pAuthToken.accountId}, sponsor=${pTargetDomain.sponserAccountId}`);
-            canAccess = pAuthToken.accountId === pTargetDomain.sponserAccountId;
+            Logger.cdebug('field-setting', `checkAccessToDomain: check sponsor. auth.AccountId=${pAuthToken.accountId}, sponsor=${pTargetDomain.sponsorAccountId}`);
+            canAccess = pAuthToken.accountId === pTargetDomain.sponsorAccountId;
           };
           break;
         default:
@@ -321,9 +321,9 @@ export async function checkAccessToEntity(pAuthToken: AuthToken,  // token being
         case Perm.DOMAIN:
           // requestor is a domain and it's account is the domain's sponsoring account
           if (SArray.has(pAuthToken.scope, TokenScope.DOMAIN)) {
-            if (pTargetEntity.hasOwnProperty('sponserAccountId')) {
-              Logger.cdebug('field-setting', `checkAccessToEntity: authToken is domain. auth.AccountId=${pAuthToken.accountId}, sponsor=${(pTargetEntity as any).sponserAccountId}`);
-              canAccess = pAuthToken.accountId === (pTargetEntity as any).sponserAccountId;
+            if (pTargetEntity.hasOwnProperty('sponsorAccountId')) {
+              Logger.cdebug('field-setting', `checkAccessToEntity: authToken is domain. auth.AccountId=${pAuthToken.accountId}, sponsor=${(pTargetEntity as any).sponsorAccountId}`);
+              canAccess = pAuthToken.accountId === (pTargetEntity as any).sponsorAccountId;
             };
           };
           break;
@@ -358,9 +358,9 @@ export async function checkAccessToEntity(pAuthToken: AuthToken,  // token being
         case Perm.SPONSOR:
           // Requestor is a regular account and is the sponsor of the domain
           if (SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
-            if (pTargetEntity.hasOwnProperty('sponserAccountId')) {
-              Logger.cdebug('field-setting', `checkAccessToEntity: authToken is domain. auth.AccountId=${pAuthToken.accountId}, sponsor=${(pTargetEntity as any).sponserAccountId}`);
-              canAccess = pAuthToken.accountId === (pTargetEntity as any).sponserAccountId;
+            if (pTargetEntity.hasOwnProperty('sponsorAccountId')) {
+              Logger.cdebug('field-setting', `checkAccessToEntity: authToken is domain. auth.AccountId=${pAuthToken.accountId}, sponsor=${(pTargetEntity as any).sponsorAccountId}`);
+              canAccess = pAuthToken.accountId === (pTargetEntity as any).sponsorAccountId;
             };
           };
           break;

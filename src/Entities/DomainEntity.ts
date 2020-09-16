@@ -32,7 +32,7 @@ export class DomainEntity implements Entity {
   public name: string;         // domain name/label
   public publicKey: string;    // DomainServers's public key in multi-line PEM format
   public apiKey: string;       // Access key if a temp domain
-  public sponserAccountId: string; // The account that gave this domain an access key
+  public sponsorAccountId: string; // The account that gave this domain an access key
   public iceServerAddr: string;// IP address of ICE server being used by this domain
 
   // Information that comes in via heartbeat
@@ -161,7 +161,7 @@ export const domainFields: { [key: string]: FieldDefn } = {
     entity_field: 'name',
     request_field_name: 'name',
     get_permissions: [ 'all' ],
-    set_permissions: [ 'domain', 'sponser', 'admin' ],
+    set_permissions: [ 'domain', 'sponsor', 'admin' ],
     validate: isStringValidator,
     setter: simpleSetter,
     getter: simpleGetter

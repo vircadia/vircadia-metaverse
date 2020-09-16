@@ -205,11 +205,11 @@ export const verifyDomainAccess: RequestHandler = async (req: Request, resp: Res
       else {
         const aAccount: AccountEntity = await Accounts.getAccountWithAuthToken(authToken);
         if (aAccount) {
-          if (IsNullOrEmpty(req.vDomain.sponserAccountId)) {
+          if (IsNullOrEmpty(req.vDomain.sponsorAccountId)) {
             // If the domain doesn't have an associated account, form the link to this account
-            await Domains.updateEntityFields(req.vDomain, { 'sponserAccountId': aAccount.accountId } );
+            await Domains.updateEntityFields(req.vDomain, { 'sponsorAccountId': aAccount.accountId } );
           };
-          if (req.vDomain.sponserAccountId === aAccount.accountId) {
+          if (req.vDomain.sponsorAccountId === aAccount.accountId) {
             verified = true;
           };
         };

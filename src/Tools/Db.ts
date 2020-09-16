@@ -192,4 +192,17 @@ async function DoDatabaseFormatChanges() {
   });
   Logger.debug(`Db.DoDatabaseFormatChanges: ${placeNameUpdateCount} Domain.placeName renames`);
 
+  // Domain naming changed 'sponserAccountId' =? 'sponsorAccountId'
+  let sponsorUpdateCount = 0;
+  await Datab.collection(domainCollection).find({ 'sponserAccountId': { '$exists': true }})
+  .forEach( doc => {
+    sponsorUpdateCount++;
+    Datab.collection(domainCollection).updateOne(
+            { _id: doc._id},
+            { '$rename': { 'sponserAccountId': 'sponsorAccountId' } }
+    );
+  });
+  Logger.debug(`Db.DoDatabaseFormatChanges: ${sponsorUpdateCount} Domain.sponserAccountId renames`);
+
+
 };
