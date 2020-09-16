@@ -83,8 +83,6 @@ export async function getDomainField(pAuthToken: AuthToken, pDomain: DomainEntit
 // Set a domain field with the fieldname and a value.
 // Checks to make sure the setter has permission to set.
 // Returns 'true' if the value was set and 'false' if the value could not be set.
-// export async function setDomainField(pAuthToken: AuthToken, pDomain: DomainEntity,
-//                                 pField: string, pVal: any, pRequestingAccount?: AccountEntity): Promise<boolean> {
 export async function setDomainField(pAuthToken: AuthToken,  // authorization for making this change
             pDomain: DomainEntity,              // the domain being changed
             pField: string, pVal: any,          // field being changed and the new value
