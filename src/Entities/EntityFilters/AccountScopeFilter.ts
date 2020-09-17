@@ -18,6 +18,7 @@ import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 import { Accounts } from '@Entities/Accounts';
 import { AccountEntity } from '@Entities/AccountEntity';
 import { Logger } from '@Tools/Logging';
+import { ParseQueryString } from '@Tools/Misc';
 
 export class AccountScopeFilter extends CriteriaFilter {
   private _asAdmin = false;
@@ -35,7 +36,8 @@ export class AccountScopeFilter extends CriteriaFilter {
   public parametersFromRequest(pRequest: Request) : void {
     try {
       if (pRequest.query.hasOwnProperty('asAdmin')) {
-        if (pRequest.query.asAdmin) {
+        const askingForAdmin = pRequest.query.asAdmin === 'true';
+        if (askingForAdmin) {
           if (Accounts.isAdmin(this._accessingAcct)) {
             this._asAdmin = true;
           };
