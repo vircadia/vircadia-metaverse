@@ -102,13 +102,7 @@ export async function buildLocationInfo(pReq: Request, pAcct: AccountEntity): Pr
       return {
         'node_id': pReq.vSession.sessionId,
         'root': {
-          'domain': {
-            'id': aDomain.domainId,
-            'name': aDomain.name,
-            'network_address': aDomain.networkAddr,
-            'ice_server_address': aDomain.iceServerAddr
-          },
-          'name': aDomain.name
+          'domain': buildDomainInfo(aDomain),
         },
         'path': pAcct.locationPath,
         'online': Accounts.isOnline(pReq.vAccount)
@@ -132,6 +126,16 @@ export async function buildLocationInfo(pReq: Request, pAcct: AccountEntity): Pr
   ret.online = Accounts.isOnline(pReq.vAccount)
   return ret;
 };
+
+export function buildDomainInfo(pDomain: DomainEntity): any {
+  return {
+    'id': pDomain.domainId,
+    'name': pDomain.name,
+    'network_address': pDomain.networkAddr,
+    'ice_server_address': pDomain.iceServerAddr
+
+  };
+}
 
 // Return a structure with the usual domain information.
 export async function buildDomainInfoV1(pDomain: DomainEntity): Promise<any> {
