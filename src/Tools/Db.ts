@@ -18,7 +18,7 @@ import { Config } from '@Base/config';
 import { MongoClient, Db, DeleteWriteOpResultObject } from 'mongodb';
 import deepmerge from 'deepmerge';
 
-import { domainCollection } from '@Entities/Domains';
+// import { domainCollection } from '@Entities/Domains';
 
 import { VKeyedCollection } from '@Tools/vTypes';
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
@@ -177,6 +177,8 @@ export async function *getObjects(pCollection: string,
 // Eventually, there should be a system of multiple, versioned updates
 //    but, to keep things running, just do the updates needed for now.
 async function DoDatabaseFormatChanges() {
+
+  const domainCollection = 'domains';
 
   // Domain naming changed a little when place_names were added.
   //    so domain.placeName changed to domain.name.
