@@ -72,6 +72,7 @@ export class PaginationInfo extends CriteriaFilter {
     };
   };
 
+  /*
   public *filter<T>(pToFilter: Generator<T>) : Generator<T> {
     this._currentPage = 1;
     this._currentItem = 1;
@@ -105,4 +106,5 @@ export class PaginationInfo extends CriteriaFilter {
       };
     };
   };
+  */
 };
