@@ -21,6 +21,7 @@ import { FieldDefn } from '@Route-Tools/Permissions';
 import { checkAccessToDomain } from '@Route-Tools/Permissions';
 import { isStringValidator, isNumberValidator, isSArraySet, isDateValidator } from '@Route-Tools/Permissions';
 import { simpleGetter, simpleSetter, sArraySetter, dateStringGetter } from '@Route-Tools/Permissions';
+import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/Permissions';
 
 import { createSimplifiedPublicKey } from '@Route-Tools/Util';
 import { Logger } from '@Tools/Logging';
@@ -69,16 +70,7 @@ export class DomainEntity implements Entity {
 //     the actual field value.
 export async function getDomainField(pAuthToken: AuthToken, pDomain: DomainEntity,
                                 pField: string, pRequestingAccount?: AccountEntity): Promise<any> {
-  let val;
-  const perms = domainFields[pField];
-  if (perms) {
-    if (await checkAccessToDomain(pAuthToken, pDomain, perms.get_permissions, pRequestingAccount)) {
-        if (typeof(perms.getter) === 'function') {
-          val = perms.getter(perms, pDomain);
-        };
-    };
-  };
-  return val;
+  return getEntityField(domainFields, pAuthToken, pDomain, pField, pRequestingAccount);
 };
 // Set a domain field with the fieldname and a value.
 // Checks to make sure the setter has permission to set.
@@ -89,26 +81,7 @@ export async function setDomainField(pAuthToken: AuthToken,  // authorization fo
             pRequestingAccount?: AccountEntity, // Account associated with pAuthToken, if known
             pUpdates?: VKeyedCollection         // where to record updates made (optional)
                     ): Promise<boolean> {
-  let didSet = false;
-  const perms = domainFields[pField];
-  if (perms) {
-    Logger.cdebug('field-setting', `setDomainField: ${pField}=>${JSON.stringify(pVal)}`);
-    if (await checkAccessToDomain(pAuthToken, pDomain, perms.set_permissions, pRequestingAccount)) {
-      Logger.cdebug('field-setting', `setDomainField: access passed`);
-      if (perms.validate(perms, pDomain, pVal)) {
-        Logger.cdebug('field-setting', `setDomainField: value validated`);
-        if (typeof(perms.setter) === 'function') {
-          perms.setter(perms, pDomain, pVal);
-          didSet = true;
-          // If the caller passed a place to return the update info, update same
-          if (pUpdates) {
-            getDomainUpdateForField(pDomain, pField, pUpdates);
-          };
-        };
-      };
-    };
-  };
-  return didSet;
+  return setEntityField(domainFields, pAuthToken, pDomain, pField, pVal, pRequestingAccount, pUpdates);
 };
 // Generate an 'update' block for the specified field or fields.
 // This is a field/value collection that can be passed to the database routines.
@@ -117,30 +90,7 @@ export async function setDomainField(pAuthToken: AuthToken,  // authorization fo
 // If an existing VKeyedCollection is passed, it is added to an returned.
 export function getDomainUpdateForField(pDomain: DomainEntity,
               pField: string | string[], pExisting?: VKeyedCollection): VKeyedCollection {
-  const ret: VKeyedCollection = pExisting ?? {};
-  if (Array.isArray(pField)) {
-    pField.forEach( fld => {
-      const perms = domainFields[fld];
-      makeDomainFieldUpdate(perms, pDomain, ret);
-    });
-  }
-  else {
-    const perms = domainFields[pField];
-    makeDomainFieldUpdate(perms, pDomain, ret);
-  };
-  return ret;
-};
-
-// if the field has an updater, do that, elas just create an update for the base named field
-function makeDomainFieldUpdate(pPerms: FieldDefn, pDomain: DomainEntity, pRet: VKeyedCollection): void {
-  if (pPerms) {
-    if (pPerms.updater) {
-      pPerms.updater(pPerms, pDomain, pRet);
-    }
-    else {
-      pRet[pPerms.entity_field] = (pDomain as any)[pPerms.entity_field];
-    };
-  };
+  return getEntityUpdateForField(domainFields, pDomain, pField, pExisting);
 };
 
 // Naming and access for the fields in a DomainEntity.

@@ -21,6 +21,7 @@ import { FieldDefn } from '@Route-Tools/Permissions';
 import { checkAccessToEntity } from '@Route-Tools/Permissions';
 import { isStringValidator, isNumberValidator, isSArraySet, isDateValidator } from '@Route-Tools/Permissions';
 import { simpleGetter, simpleSetter, sArraySetter, dateStringGetter } from '@Route-Tools/Permissions';
+import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/Permissions';
 
 import { Logger } from '@Tools/Logging';
 import { VKeyedCollection } from '@Tools/vTypes';
@@ -45,16 +46,7 @@ export class PlaceEntity implements Entity {
 //     the actual field value.
 export async function getPlaceField(pAuthToken: AuthToken, pPlace: PlaceEntity,
                                 pField: string, pRequestingAccount?: AccountEntity): Promise<any> {
-  let val;
-  const perms = placeFields[pField];
-  if (perms) {
-    if (await checkAccessToEntity(pAuthToken, pPlace, perms.get_permissions, pRequestingAccount)) {
-        if (typeof(perms.getter) === 'function') {
-          val = perms.getter(perms, pPlace);
-        };
-    };
-  };
-  return val;
+  return getEntityField(placeFields, pAuthToken, pPlace, pField, pRequestingAccount);
 };
 // Set a place field with the fieldname and a value.
 // Checks to make sure the setter has permission to set.
@@ -65,26 +57,7 @@ export async function setPlaceField(pAuthToken: AuthToken,  // authorization for
             pRequestingAccount?: AccountEntity, // Account associated with pAuthToken, if known
             pUpdates?: VKeyedCollection         // where to record updates made (optional)
                     ): Promise<boolean> {
-  let didSet = false;
-  const perms = placeFields[pField];
-  if (perms) {
-    Logger.cdebug('field-setting', `setPlaceField: ${pField}=>${JSON.stringify(pVal)}`);
-    if (await checkAccessToEntity(pAuthToken, pPlace, perms.set_permissions, pRequestingAccount)) {
-      Logger.cdebug('field-setting', `setPlaceField: access passed`);
-      if (perms.validate(perms, pPlace, pVal)) {
-        Logger.cdebug('field-setting', `setPlaceField: value validated`);
-        if (typeof(perms.setter) === 'function') {
-          perms.setter(perms, pPlace, pVal);
-          didSet = true;
-          // If the caller passed a place to return the update info, update same
-          if (pUpdates) {
-            getPlaceUpdateForField(pPlace, pField, pUpdates);
-          };
-        };
-      };
-    };
-  };
-  return didSet;
+  return setEntityField(placeFields, pAuthToken, pPlace, pField, pVal, pRequestingAccount, pUpdates);
 };
 // Generate an 'update' block for the specified field or fields.
 // This is a field/value collection that can be passed to the database routines.
@@ -93,30 +66,7 @@ export async function setPlaceField(pAuthToken: AuthToken,  // authorization for
 // If an existing VKeyedCollection is passed, it is added to an returned.
 export function getPlaceUpdateForField(pPlace: PlaceEntity,
               pField: string | string[], pExisting?: VKeyedCollection): VKeyedCollection {
-  const ret: VKeyedCollection = pExisting ?? {};
-  if (Array.isArray(pField)) {
-    pField.forEach( fld => {
-      const perms = placeFields[fld];
-      makePlaceFieldUpdate(perms, pPlace, ret);
-    });
-  }
-  else {
-    const perms = placeFields[pField];
-    makePlaceFieldUpdate(perms, pPlace, ret);
-  };
-  return ret;
-};
-
-// if the field has an updater, do that, elas just create an update for the base named field
-function makePlaceFieldUpdate(pPerms: FieldDefn, pPlace: PlaceEntity, pRet: VKeyedCollection): void {
-  if (pPerms) {
-    if (pPerms.updater) {
-      pPerms.updater(pPerms, pPlace, pRet);
-    }
-    else {
-      pRet[pPerms.entity_field] = (pPlace as any)[pPerms.entity_field];
-    };
-  };
+  return getEntityUpdateForField(placeFields, pPlace, pField, pExisting);
 };
 
 // Naming and access for the fields in a PlaceEntity.

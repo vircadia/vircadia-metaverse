@@ -47,6 +47,8 @@ export interface FieldDefn {
     setter: setterFunction,
     updater?: updaterFunction
 };
+export type EntityFieldsDefn = { [ key: string]: FieldDefn };
+
 export function noValidation(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
   return true;
 };
@@ -173,6 +175,101 @@ export function sArraySetter(pField: FieldDefn, pEntity: Entity, pVal: any): voi
   };
   Logger.cdebug('field-setting', `sArraySetting: resulting ${pField.entity_field}=>${JSON.stringify(val)}`);
   (pEntity as any)[pField.entity_field] = val;
+};
+
+// Get the value of a entity field with the fieldname.
+// Checks to make sure the getter has permission to get the values.
+// Returns the value. Could be 'undefined' whether the requestor doesn't have permissions or that's
+//     the actual field value.
+export async function getEntityField(
+                  pPerms: EntityFieldsDefn,
+                  pAuthToken: AuthToken, pEntity: Entity,
+                  pField: string, pRequestingAccount?: AccountEntity): Promise<any> {
+  let val;
+  const perms = pPerms[pField];
+  if (perms) {
+    Logger.cdebug('field-setting', `getEntityField: get ${pField}, perms.entity_field=${perms.entity_field}`);
+    if (await checkAccessToEntity(pAuthToken, pEntity, perms.get_permissions, pRequestingAccount)) {
+      Logger.cdebug('field-setting', `getEntityField: access passed`);
+      if (typeof(perms.getter) === 'function') {
+        Logger.cdebug('field-setting', `getEntityField: doing getter`);
+        val = perms.getter(perms, pEntity);
+        Logger.cdebug('field-setting', `getEntityField: ${pField}=>${JSON.stringify(val)}`);
+      }
+      else {
+        Logger.cdebug('field-setting', `getEntityField: no function getter ${pField}, perms.entity_field=${perms.entity_field}, typeof(perms.getter)=${typeof(perms.getter)}`);
+        Logger.cdebug('field-setting', `getEntityField: no function getter perms=${JSON.stringify(perms)}`);
+      };
+    };
+  };
+  return val;
+};
+
+// Set a entity field with the fieldname and a value.
+// Checks to make sure the setter has permission to set.
+// Returns 'true' if the value was set and 'false' if the value could not be set.
+export async function setEntityField(
+            pPerms: EntityFieldsDefn,
+            pAuthToken: AuthToken,      // authorization for making this change
+            pEntity: Entity,            // the entity being changed
+            pField: string, pVal: any,          // field being changed and the new value
+            pRequestingAccount?: AccountEntity, // Account associated with pAuthToken, if known
+            pUpdates?: VKeyedCollection         // where to record updates made (optional)
+                    ): Promise<boolean> {
+  let didSet = false;
+  const perms = pPerms[pField];
+  if (perms) {
+    Logger.cdebug('field-setting', `setEntityField: ${pField}=>${JSON.stringify(pVal)}`);
+    if (await checkAccessToEntity(pAuthToken, pEntity, perms.set_permissions, pRequestingAccount)) {
+      Logger.cdebug('field-setting', `setEntityField: access passed`);
+      if (perms.validate(perms, pEntity, pVal)) {
+        Logger.cdebug('field-setting', `setEntityField: value validated`);
+        if (typeof(perms.setter) === 'function') {
+          perms.setter(perms, pEntity, pVal);
+          didSet = true;
+          if (pUpdates) {
+            getEntityUpdateForField(pPerms, pEntity, pField, pUpdates);
+          };
+        };
+      };
+    };
+  };
+  return didSet;
+};
+// Generate an 'update' block for the specified field or fields.
+// This is a field/value collection that can be passed to the database routines.
+// Note that this directly fetches the field value rather than using 'getter' since
+//     we want the actual value (whatever it is) to go into the database.
+// If an existing VKeyedCollection is passed, it is added to an returned.
+export function getEntityUpdateForField(
+            pPerms: EntityFieldsDefn,
+            pEntity: Entity,
+            pField: string | string[],
+            pExisting?: VKeyedCollection): VKeyedCollection {
+  const ret: VKeyedCollection = pExisting ?? {};
+  if (Array.isArray(pField)) {
+    pField.forEach( fld => {
+      const perms = pPerms[fld];
+      makeEntityFieldUpdate(perms, pEntity, ret);
+    });
+  }
+  else {
+    const perms = pPerms[pField];
+    makeEntityFieldUpdate(perms, pEntity, ret);
+  };
+  return ret;
+};
+
+// if the field has an updater, do that, elas just create an update for the base named field
+function makeEntityFieldUpdate(pPerms: FieldDefn, pEntity: Entity, pRet: VKeyedCollection): void {
+  if (pPerms) {
+    if (pPerms.updater) {
+      pPerms.updater(pPerms, pEntity, pRet);
+    }
+    else {
+      pRet[pPerms.entity_field] = (pEntity as any)[pPerms.entity_field];
+    };
+  };
 };
 
 //  'all': any one
