@@ -54,6 +54,27 @@ are returned (limited by pagination).
     }
 ```
 
+## GET /api/v1/account/{accountId}
+
+Get the information for one account. The requestor must either be the
+account owner or an admin account.
+
+The information returned is the same as in the "/api/v1/accounts" but just
+for one account so the information is for "account" and is not enclosed
+in an array.
+
+```
+    {
+        "status": "success",
+        "data": {
+            "account": {
+                INFORMATION AS DESCRIBED ABOVE
+            }
+        }
+    }
+```
+
+
 ## POST /api/v1/account/{accountId}
 
 Update account information.
