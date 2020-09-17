@@ -106,7 +106,7 @@ The account fields that can be fetched:
 |connections  | owner admin friend connection |   owner admin |   stringArray |
 |friends      | owner admin friend connection |   owner admin |   stringArray |
 |locker       | owner admin | owner admin |   string |
-|password     |   none   | owner       |   string |
+|password     |   none   | owner admin |   string |
 |public_key   |   all    | owner admin |   string |
 |xmpp_password | owner   | owner admin |   string |
 |discourse_api_key | owner | owner admin |   string |
