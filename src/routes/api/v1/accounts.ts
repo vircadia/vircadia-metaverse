@@ -17,7 +17,7 @@
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
-import { BuildAccountInfo } from '@Route-Tools/Util';
+import { buildAccountInfo } from '@Route-Tools/Util';
 
 import { Accounts } from '@Entities/Accounts';
 
@@ -43,7 +43,7 @@ const procGetAccounts: RequestHandler = async (req: Request, resp: Response, nex
     // Loop through all the filtered accounts and create array of info
     const accts: any[] = [];
     for await (const acct of Accounts.enumerateAsync(pager, infoer, scoper)) {
-      accts.push(await BuildAccountInfo(req, acct));
+      accts.push(await buildAccountInfo(req, acct));
     };
 
     req.vRestResp.Data = {

@@ -20,7 +20,7 @@ import { accountFromAuthToken, accountFromParams } from '@Route-Tools/middleware
 import { tokenFromParams } from '@Route-Tools/middleware';
 
 import { Perm, checkAccessToEntity } from '@Route-Tools/Permissions';
-import { BuildAccountInfo } from '@Route-Tools/Util';
+import { buildAccountInfo } from '@Route-Tools/Util';
 
 import { Accounts } from '@Entities/Accounts';
 import { setAccountField, getAccountUpdateForField } from '@Entities/AccountEntity';
@@ -34,7 +34,7 @@ const procGetAccountId: RequestHandler = async (req: Request, resp: Response, ne
   if (req.vAuthAccount && req.vAccount) {
     if (checkAccessToEntity(req.vAuthToken, req.vAccount, [ Perm.OWNER, Perm.ADMIN ])) {
       req.vRestResp.Data = {
-        account: await BuildAccountInfo(req, req.vAccount)
+        account: await buildAccountInfo(req, req.vAccount)
       };
     }
     else {
