@@ -200,5 +200,6 @@ export async function buildPlaceInfo(pPlace: PlaceEntity, pDomain?: DomainEntity
     'address': pPlace.address,
     'description': pPlace.description,
     'domain': buildDomainInfo(aDomain),
+    'accountId': pPlace.accountId
   };
 };

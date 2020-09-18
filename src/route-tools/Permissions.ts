@@ -109,9 +109,11 @@ export function simpleGetter(pField: FieldDefn, pEntity: Entity): any {
 };
 export function simpleSetter(pField: FieldDefn, pEntity: Entity, pVal: any): void {
   if (pEntity.hasOwnProperty(pField.entity_field)) {
-    if (pVal.set) {
-      (pEntity as any)[pField.entity_field] = pVal;
-    };
+    Logger.cdebug('field-setting', `simpleSetter: setting ${pField.entity_field}=>${JSON.stringify(pVal)}`);
+    (pEntity as any)[pField.entity_field] = pVal;
+  }
+  else {
+    Logger.cdebug('field-setting', `simpleSetter: Entity does not have ${pField.entity_field}`);
   };
 };
 export function dateStringGetter(pField: FieldDefn, pEntity: Entity): string {
