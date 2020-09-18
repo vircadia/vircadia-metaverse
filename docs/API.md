@@ -23,6 +23,7 @@ Refer to the [API Overview](./API-Overview.md) for general API design
 Documentation referenced below is available for the
 [Accounts](./API-Accounts.md),
 [Domains](./API-Domains.md),
+[Places](./API-Places.md),
 [Tokens](./API-Tokens.md), and
 [User](./API-Users.md) categories.
 
