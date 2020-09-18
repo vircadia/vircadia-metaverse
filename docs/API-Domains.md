@@ -37,7 +37,6 @@ A request returns an array of domain descriptions:
                   "description": stringDescription,
                   "maturity": stringMaturity,
                   "restriction": string,
-                  "meta": JSONdomainMetadata,
                   "hosts": [],
                   "tags": [ stringTag, stringTag, ... ],
                   "time_of_last_heartbeat": "YYYY-MM-DDTHH:MM:SS.MMMZ",
@@ -60,31 +59,7 @@ The request returns information:
 ```
   {
     "domain": {
-      "domainid": stringDomainId,
-      "id": stringDomainId,       // added for backward compatibility
-      "name": stringName,
-      "public_key": stringPublicKey,
-      "sponsor_accountid": stringAccountIdAssociated,
-      "ice_server_address": stringAddrIceServerBeingUsed,
-      "version": stringSoftwareVersion,
-      "protocol_version": stringProtocolVersion,
-      "network_addr": stringNetworkAddress,
-      "networking_mode": stringMode,  // one of "full", ...
-      "restricted": boolWhetherRestricted,
-      "num_users": intCurrentLoggedInUsers,
-      "anon_users": intCurrentAnonomousUsers,
-      "total_users": intTotalUsers,
-      "capacity": intMaxCapacity,
-      "description": stringDescription,
-      "maturity": stringMaturity,
-      "restriction": string,
-      "meta": JSONdomainMetadata,
-      "hosts": [],
-      "tags": [ stringTag, stringTag, ... ],
-      "time_of_last_heartbeat": "YYYY-MM-DDTHH:MM:SS.MMMZ",
-      "last_sender_key": stringHostPortSourceOfLastMessage,
-      "addr_of_first_contact": stringHostPortOfDomainEntryCreation,
-      "when_domain_entry_created": "YYYY-MM-DDTHH:MM:SS.MMMZ"
+        SAME INFORMATION AS ABOVE
     }
   }
 ```
@@ -132,8 +107,29 @@ of the field and the permissions to change the field value.
 
 The domain fields that can be fetched:
 
-| FIELDNAME   | GET PERM | SET PERM    | TYPE |
-| ---------   | -------- | --------    | ---- |
+| FIELDNAME     | GET PERM | SET PERM   | TYPE |
+| ---------     | -------- | --------   | ---- |
+| domainId      |    all   | noone      |string |
+| name          |    all   | domain sponsor admin | string |
+| public_key    |    all   | domain     | string |
+| sponsor_account_id | all | domain sponsor admin | string |
+| version       |    all   | domain     | string |
+| protocol      |    all   | domain     | string |
+| network_address |  all   | domain     | string |
+| networking_mode |  all   | domain     | string |
+| num_users     |    all   | domain     | string |
+| num_anon_users |   all   | domain     | string |
+| restricted    |    all   | domain sponsor admin | string |
+| capacity      |    all   | domain sponsor admin | string |
+| description   |    all   | domain sponsor admin | string |
+| maturity      |    all   | domain sponsor admin | string |
+| restriction   |    all   | domain sponsor admin | string |
+| hosts         |    all   | domain sponsor admin | stringArray |
+| tags          |    all   | domain sponsor admin | stringArray |
+| addr_of_first_contact    | all   | noone | string |
+| when_domain_entry_created | all  | noone | ISODateString |
+| time_of_last_heartbeat   | all   | noone | ISODateString |
+| last_sender_key | all    | noone | string |
 
 The JSON structure returned looks like the regular REST response
 with the "data" object being the value requests.
