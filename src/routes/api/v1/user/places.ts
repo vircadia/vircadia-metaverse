@@ -66,7 +66,7 @@ const procPostPlaces: RequestHandler = async (req: Request, resp: Response, next
         const aDomain = await Domains.getDomainWithId(req.body.place.domainId);
         if (aDomain) {
           if (checkAccessToEntity(req.vAuthToken, aDomain, [ Perm.SPONSOR, Perm.ADMIN ], req.vAuthAccount)) {
-            const maybePlace = Places.getPlaceWithName(placeSpec.name);
+            const maybePlace = await Places.getPlaceWithName(placeSpec.name);
             if (IsNullOrEmpty(maybePlace)) {
               const newPlace = Places.createPlace();
               newPlace.name = placeSpec.name;

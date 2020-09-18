@@ -87,8 +87,8 @@ router.get( '/api/v1/user/place/:param1/field/:param2',
 router.post('/api/v1/user/place/:param1/field/:param2',
                                           [ setupMetaverseAPI,    // req.vRestResp
                                             accountFromAuthToken, // req.vAuthAccount
-                                            accountFromParams,    // req.vAccount
                                             param1FromParams,     // req.vParam1
+                                            param2FromParams,     // req.vParam2
                                             procPostField,
                                             finishMetaverseAPI
                                           ] );
