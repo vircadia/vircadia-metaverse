@@ -214,8 +214,8 @@ export const domainFields: { [key: string]: FieldDefn } = {
     getter: simpleGetter
   },
   'maturity': {
-    entity_field: 'description',
-    request_field_name: 'description',
+    entity_field: 'maturity',
+    request_field_name: 'maturity',
     get_permissions: [ 'all' ],
     set_permissions: [ 'domain', 'sponsor', 'admin' ],
     validate: isStringValidator,
@@ -223,8 +223,8 @@ export const domainFields: { [key: string]: FieldDefn } = {
     getter: simpleGetter
   },
   'restriction': {
-    entity_field: 'description',
-    request_field_name: 'description',
+    entity_field: 'restriction',
+    request_field_name: 'restriction',
     get_permissions: [ 'all' ],
     set_permissions: [ 'domain', 'sponsor', 'admin' ],
     validate: isStringValidator,
@@ -285,5 +285,5 @@ export const domainFields: { [key: string]: FieldDefn } = {
     validate: isStringValidator,
     setter: simpleSetter,
     getter: simpleGetter
-  },
+  }
 };
