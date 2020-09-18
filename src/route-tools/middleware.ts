@@ -14,6 +14,8 @@
 
 'use strict';
 
+import { Config } from '@Base/config';
+
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
 import { Accounts } from '@Entities/Accounts';
@@ -22,11 +24,10 @@ import { Domains } from '@Entities/Domains';
 import { Sessions } from '@Entities/Sessions';
 import { Tokens } from '@Entities/Tokens';
 
-import { RESTResponse } from './RESTResponse';
+import { RESTResponse } from '@Route-Tools/RESTResponse';
 
 import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
-import { Config } from '@Base/config';
 import { SessionEntity } from '@Entities/SessionEntity';
 
 // MetaverseAPI middleware.

@@ -16,14 +16,15 @@
 
 import { Request } from 'express';
 import { Accounts } from '@Entities/Accounts';
-import { Domains } from '@Entities/Domains';
 import { checkAvailability, AccountEntity } from '@Entities/AccountEntity';
+import { Domains } from '@Entities/Domains';
+import { DomainEntity } from '@Entities/DomainEntity';
+import { PlaceEntity } from '@Entities/PlaceEntity';
 
 import { createPublicKey } from 'crypto';
 import { VKeyedCollection, VKeyValue } from '@Tools/vTypes';
 import { IsNotNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
-import { DomainEntity } from '@Entities/DomainEntity';
 
 // The public_key is sent as a binary (DER) form of a PKCS1 key.
 // To keep backward compatibility, we convert the PKCS1 key into a SPKI key in PEM format
@@ -186,5 +187,18 @@ export async function buildAccountInfo(pReq: Request, pAccount: AccountEntity): 
     'connections': pAccount.connections,
     'when_account_created': pAccount.whenAccountCreated ? pAccount.whenAccountCreated.toISOString() : undefined,
     'time_of_last_heartbeat': pAccount.timeOfLastHeartbeat ? pAccount.timeOfLastHeartbeat.toISOString() : undefined
+  };
+};
+
+// Return an object with the formatted place information
+// Pass the PlaceEntity and the place's domain if known.
+export async function buildPlaceInfo(pPlace: PlaceEntity, pDomain?: DomainEntity): Promise<any> {
+  const aDomain = pDomain ?? await Domains.getDomainWithId(pPlace.domainId);
+  return {
+    'placeId': pPlace.placeId,
+    'name': pPlace.name,
+    'address': pPlace.address,
+    'description': pPlace.description,
+    'domain': buildDomainInfo(aDomain),
   };
 };
