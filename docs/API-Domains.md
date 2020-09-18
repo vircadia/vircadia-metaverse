@@ -141,10 +141,13 @@ The domain fields that can be fetched:
 | restricted    |    all   | domain sponsor admin | string |
 | capacity      |    all   | domain sponsor admin | string |
 | description   |    all   | domain sponsor admin | string |
+| contact_info  |    all   | domain sponsor admin | string |
 | maturity      |    all   | domain sponsor admin | string |
 | restriction   |    all   | domain sponsor admin | string |
 | hosts         |    all   | domain sponsor admin | stringArray |
 | tags          |    all   | domain sponsor admin | stringArray |
+| thumbnail     |    all   | domain sponsor admin | string |
+| images        |    all   | domain sponsor admin | stringArray |
 | addr_of_first_contact    | all   | noone | string |
 | when_domain_entry_created | all  | noone | ISODateString |
 | time_of_last_heartbeat   | all   | noone | ISODateString |
