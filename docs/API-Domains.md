@@ -37,8 +37,24 @@ A request returns an array of domain descriptions:
                   "description": stringDescription,
                   "maturity": stringMaturity,
                   "restriction": string,
-                  "hosts": [],
+                  "hosts": [ hostname, hostname, ... ],
                   "tags": [ stringTag, stringTag, ... ],
+                  "meta": {
+                        "capacity": intMaxCapacity,
+                        "contact_info": string,
+                        "description": stringDescription,
+                        "images": [ imageURL, imageURL, ... ],
+                        "thumbnail": imageURL,
+                        "managers": [ hostname, hostname, ... ],
+                        "restriction": string,
+                        "tags": [ stringTag, stringTag, ... ],
+                        "world_name": stringName
+                  },
+                  "users": {
+                        "num_users": intCurrentLoggedInUsers,
+                        "anon_users": intCurrentAnonomousUsers,
+                        "user_hostnames": [];
+                  },
                   "time_of_last_heartbeat": "YYYY-MM-DDTHH:MM:SS.MMMZ",
                   "last_sender_key": stringHostPortSourceOfLastMessage,
                   "addr_of_first_contact": stringHostPortOfDomainEntryCreation,
@@ -58,9 +74,12 @@ The request returns information:
 
 ```
   {
-    "domain": {
-        SAME INFORMATION AS ABOVE
-    }
+      "status": "success",
+      "data": {
+            "domain": {
+                SAME INFORMATION AS ABOVE
+           }
+      }
   }
 ```
 
