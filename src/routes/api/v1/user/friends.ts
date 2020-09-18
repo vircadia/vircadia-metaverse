@@ -39,7 +39,7 @@ const procGetUserFriends: RequestHandler = (req: Request, resp: Response, next: 
   next();
 };
 
-// Add a friend to my friend collection.
+// Upgrade a connection to a friend.
 // Not implemented as something needs to be done with request_connection, etc
 const procPostUserFriends: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
   req.vRestResp.respondFailure('cannot add friends this way');
