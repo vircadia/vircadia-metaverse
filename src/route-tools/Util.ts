@@ -160,6 +160,22 @@ export async function buildDomainInfoV1(pDomain: DomainEntity): Promise<any> {
     'restriction': pDomain.restriction,
     'hosts': pDomain.hosts,
     'tags': pDomain.tags,
+    'meta': {
+      'capacity': pDomain.capacity,
+      'contact_info': pDomain.contactInfo,
+      'description': pDomain.description,
+      'images': pDomain.images,
+      'managers': pDomain.hosts,
+      'restriction': pDomain.restriction,
+      'tags': pDomain.tags,
+      'thumbnail': pDomain.thumbnail,
+      'world_name': pDomain.name
+    },
+    'users': {
+      'num_anon_users': pDomain.anonUsers,
+      'num_users': pDomain.numUsers,
+      'user_hostnames': pDomain.hostnames
+    },
     'time_of_last_heartbeat': pDomain.timeOfLastHeartbeat ? pDomain.timeOfLastHeartbeat.toISOString() : undefined,
     'last_sender_key': pDomain.lastSenderKey,
     'addr_of_first_contact': pDomain.iPAddrOfFirstContact,

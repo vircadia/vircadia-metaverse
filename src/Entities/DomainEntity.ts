@@ -18,14 +18,12 @@ import { AccountEntity } from '@Entities/AccountEntity';
 import { AuthToken } from '@Entities/AuthToken';
 
 import { FieldDefn } from '@Route-Tools/Permissions';
-import { checkAccessToDomain } from '@Route-Tools/Permissions';
 import { isStringValidator, isNumberValidator, isSArraySet, isDateValidator } from '@Route-Tools/Permissions';
 import { simpleGetter, simpleSetter, sArraySetter, dateStringGetter } from '@Route-Tools/Permissions';
 import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/Permissions';
 
-import { createSimplifiedPublicKey } from '@Route-Tools/Util';
-import { Logger } from '@Tools/Logging';
 import { VKeyedCollection } from '@Tools/vTypes';
+import { Logger } from '@Tools/Logging';
 
 // NOTE: this class cannot have functions in them as they are just JSON to and from the database
 export class DomainEntity implements Entity {
@@ -50,6 +48,9 @@ export class DomainEntity implements Entity {
   // More information that's metadata that's passed in PUT domain
   public capacity: number;     // Total possible users
   public description: string;  // Short description of domain
+  public contactInfo: string;  // domain contact information
+  public thumbnail: string;    // thumbnail image of domain
+  public images: string[];     // collection of images for the domain
   public maturity: string;     // Maturity rating
   public restriction: string;  // Access restrictions ("open")
   public hosts: string[];      // Usernames of people who can be domain "hosts"
@@ -211,6 +212,33 @@ export const domainFields: { [key: string]: FieldDefn } = {
     set_permissions: [ 'domain', 'sponsor', 'admin' ],
     validate: isStringValidator,
     setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'contact_info': {
+    entity_field: 'contactInfo',
+    request_field_name: 'contact_info',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'domain', 'sponsor', 'admin' ],
+    validate: isStringValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'thumbnail': {
+    entity_field: 'thumbnail',
+    request_field_name: 'thumbnail',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'domain', 'sponsor', 'admin' ],
+    validate: isStringValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'images': {
+    entity_field: 'images',
+    request_field_name: 'images',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'domain', 'sponsor', 'admin' ],
+    validate: isSArraySet,
+    setter: sArraySetter,
     getter: simpleGetter
   },
   'maturity': {
