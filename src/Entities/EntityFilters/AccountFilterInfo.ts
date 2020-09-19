@@ -14,15 +14,31 @@
 'use strict'
 
 import { Request } from 'express';
-import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
+import { Accounts } from '@Entities/Accounts';
 import { AccountEntity } from '@Entities/AccountEntity';
 
+import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
+
+import { IsNullOrEmpty } from '@Tools/Misc';
+import { SArray } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
 
+
 export class AccountFilterInfo extends CriteriaFilter {
-  private _filter: string;
-  private _status: string;
-  private _search: string;
+
+  private _requestingAccount: AccountEntity;
+
+  private _filter: string;  // comma list of "all", "friends", "connections"
+  private _findFriends: boolean = false;
+  private _friendsList: string[];
+  private _findConnections: boolean = false;
+  private _connectionsList: string[];
+
+  private _status: string;  // comma list of "online"
+  private _findOnline: boolean = false;
+
+  private _search: string;  // specific name to look for?
+  private _findMatch: string;
 
   // Set to 'true' if the pagination was passed in the criteria query parameters
   private _doingQuery: boolean = false;
@@ -32,29 +48,127 @@ export class AccountFilterInfo extends CriteriaFilter {
     return;
   }
 
+  // Passed the request, get the filter parameters from the query.
+  // Here we pre-process the parameters to make the DB query construction quicker.
   public parametersFromRequest(pRequest: Request) : void {
+    this._requestingAccount = pRequest.vAuthAccount;
+
     try {
-      this._filter = String(pRequest.query.filter);
-      this._status = String(pRequest.query.status);
+      // Comma separated list of attribute criteria.
+      if (typeof(pRequest.query.filter) === 'string') {
+        this._filter = pRequest.query.filter;
+        const filterPieces = this._filter.split(',');
+        filterPieces.forEach( filterClass => {
+          switch (filterClass) {
+            case 'all':
+              this._findFriends = false;
+              this._findConnections = false;
+              break;
+            case 'friends':
+              this._findFriends = true;
+              break;
+            case 'connections':
+              this._findConnections = true;
+              break;
+            default:
+              break;
+          };
+        });
+        if (this._findFriends && this._requestingAccount) {
+          this._friendsList = this._requestingAccount.friends;
+          if (IsNullOrEmpty(this._friendsList)) {
+            // asking to filter on friends but has no friends
+            this._findFriends = false;  // if no friends, don't search for it
+          };
+        };
+        if (this._findConnections && this._requestingAccount) {
+          this._connectionsList = this._requestingAccount.connections;
+          if (IsNullOrEmpty(this._connectionsList)) {
+            // asking to filter on friends but has no friends
+            this._findConnections = false;  // if no friends, don't search for it
+          };
+        };
+      };
+
+      // Commas separated list of target's status.
+      // Currently, the only selection is 'online'.
+      if (typeof(pRequest.query.status) === 'string') {
+        this._status = pRequest.query.status;
+        const statusPieces = this._status.split(',');
+        statusPieces.forEach( statusClass => {
+          switch (statusClass) {
+            case 'online':
+              this._findOnline = true;
+              break;
+            default:
+              break;
+          };
+        });
+      };
+
       this._search = String(pRequest.query.search);
+
+      Logger.cdebug('query-detail', `AccountFilterInfo.parametersFromRequest: findFriends=${this._findFriends}, findConn=${this._findConnections}, findOnline=${this._findOnline}`);
     }
     catch (e) {
       Logger.error('AccountFilterInfo: parameters from request: exception: ' + e);
     }
   };
 
+  // Passed (what should be) an AccountEntity, test if the filters
+  //    think it's passable.
+  // Return 'true' of this account fits the search criteria.
   public criteriaTest(pThingy: any): boolean {
-    return true;
+    let ret = false;
+    if (this._doingQuery) {
+      ret = true;
+    }
+    else {
+      let filterSelect = false
+      if (this._findFriends) {
+        if (pThingy.hasOwnProperty('friends')) {
+          for (const friend of this._friendsList) {
+            if (SArray.has(pThingy.friends, friend)) {
+              filterSelect = true;
+              break;
+            };
+          };
+        };
+      };
+      if (this._findConnections) {
+        if (pThingy.hasOwnProperty('connections')) {
+          for (const connection of this._connectionsList) {
+            if (SArray.has(pThingy.connections, connection)) {
+              filterSelect = true;
+              break;
+            };
+          };
+        };
+      };
+      const statusSelect = false;
+      if (this._findOnline) {
+        if (pThingy.hasOwnProperty('timeOfLastHeartbeat')) {
+          ret = Accounts.isOnline(pThingy as AccountEntity);
+        };
+      };
+      ret = filterSelect && statusSelect;
+    }
+    return ret;
   };
 
+  // Return the MongoDB query parameters for the search criteria
   public criteriaParameters(): any {
-    // Logger.debug(`AccountFilterInfo.criteriaParameters: `);
-    return {
+    this._doingQuery = true;
+    const criteria:any = {};
+    if (this._findFriends) {
+      criteria.friends = { '$in': this._friendsList }
     };
-  };
-
-  // TODO: add some filtering
-  async *filter(pToFilter: AsyncGenerator<AccountEntity>) : AsyncGenerator<AccountEntity> {
-    return pToFilter;
+    if (this._findConnections) {
+      criteria.connections = { '$in': this._connectionsList }
+    };
+    if (this._findOnline) {
+      criteria.timeOfLastHeartbeat = { '$gte': Accounts.dateWhenNotOnline() }
+    }
+    return criteria;
   };
 };

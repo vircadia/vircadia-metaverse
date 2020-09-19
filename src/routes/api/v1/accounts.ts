@@ -31,7 +31,6 @@ import { createSimplifiedPublicKey } from '@Route-Tools/Util';
 // Return account information
 // The accounts returned depend on the scope (whether admin) and the search criteria (infoer)
 const procGetAccounts: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('procGetAccounts');
   if (req.vAuthAccount) {
     const pager = new PaginationInfo();
     const scoper = new AccountScopeFilter(req.vAuthAccount);
