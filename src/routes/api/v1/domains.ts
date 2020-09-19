@@ -20,6 +20,7 @@ import { accountFromAuthToken } from '@Route-Tools/middleware';
 
 import { Domains } from '@Entities/Domains';
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
+import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
 import { HTTPStatusCode } from '@Route-Tools/RESTResponse';
 
 import { Logger } from '@Tools/Logging';
@@ -31,10 +32,15 @@ import { buildDomainInfoV1 } from '@Route-Tools/Util';
 const procGetDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   Logger.debug('procGetDomains');
   if (req.vAuthAccount) {
-    const pagination = new PaginationInfo(1,1000);
+
+    const pagination = new PaginationInfo();
+    const scoper = new AccountScopeFilter(req.vAuthAccount, "sponsorAccountId");
+
     pagination.parametersFromRequest(req);
+    scoper.parametersFromRequest(req);
+
     const domainArray: any[] = [];
-    for await (const aDomain of Domains.enumerateAsync(pagination)) {
+    for await (const aDomain of Domains.enumerateAsync(scoper, pagination)) {
       domainArray.push( await buildDomainInfoV1(aDomain) );
     };
     req.vRestResp.Data = {
