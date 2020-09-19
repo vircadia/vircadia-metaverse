@@ -23,14 +23,20 @@ import { ParseQueryString } from '@Tools/Misc';
 export class AccountScopeFilter extends CriteriaFilter {
   private _asAdmin = false;
   private _accessingAcct: AccountEntity;
+  private _field: string;
   private _targetAcct: string = undefined;
 
   // Set to 'true' if the pagination was passed in the criteria query parameters
   private _doingQuery: boolean = false;
 
-  public constructor(pRequestorAccount: AccountEntity) {
+  // Create a new filter and specify the requesting account and
+  //     field in target entity to check for match.
+  // "accountId" works for most things but scoping domains by their owners
+  //     requires checking "sponsorAccountId">
+  public constructor(pRequestorAccount: AccountEntity, pField: string = 'accountId') {
     super();
     this._accessingAcct = pRequestorAccount;
+    this._field = pField;
     return;
   }
   public parametersFromRequest(pRequest: Request) : void {
@@ -77,12 +83,14 @@ export class AccountScopeFilter extends CriteriaFilter {
   public criteriaParameters(): any {
     this._doingQuery = true;
     const criteria: any = {};
+    // If not an admin, the found items must match the id of the requestor
     if (! this._asAdmin) {
-      criteria.accountId = this._accessingAcct.accountId;
+      criteria[this._field] = this._accessingAcct.accountId;
       // Logger.debug(`AccountScopeFilter.criteriaParameters: not admin so limiting to account ${this._accessingAcct.username}`);
     };
+    // If an admin and requested scope of target account, do that check
     if (this._asAdmin && typeof(this._targetAcct) !== 'undefined') {
-      criteria.accountId = this._targetAcct
+      criteria[this._field] = this._targetAcct
     }
     return criteria;
   };
