@@ -110,6 +110,15 @@ export const Accounts = {
     };
     return false;
   },
+  // Return the ISODate when an account is considered offline
+  dateWhenNotOnline(): string {
+    const whenOffline = new Date(
+          Date.now()
+          - (Config["metaverse-server"]["heartbeat-seconds-until-offline"] * 1000)
+    );
+    return whenOffline.toISOString();
+
+  },
   // getter property that is 'true' if the user is a grid administrator
   isAdmin(pAcct: AccountEntity): boolean {
     return SArray.has(pAcct.roles, AccountRoles.ADMIN);
