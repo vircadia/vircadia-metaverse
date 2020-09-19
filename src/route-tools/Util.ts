@@ -183,6 +183,20 @@ export async function buildDomainInfoV1(pDomain: DomainEntity): Promise<any> {
   };
 };
 
+// Return the limited "user" info.. used by /api/v1/users
+export async function buildUserInfo(pReq: Request, pAccount: AccountEntity): Promise<any> {
+  return {
+    'accountId': pAccount.accountId,
+    'username': pAccount.username,
+    'images': {
+      'tiny': pAccount.imagesTiny,
+      'hero': pAccount.imagesHero,
+      'thumbnail': pAccount.imagesThumbnail
+    },
+    'location': await buildLocationInfo(pReq, pAccount),
+  };
+};
+
 // Return the block of account information.
 // Used by several of the requests to return the complete account information.
 export async function buildAccountInfo(pReq: Request, pAccount: AccountEntity): Promise<any> {

@@ -25,7 +25,7 @@ import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
 import { AccountFilterInfo } from '@Entities/EntityFilters/AccountFilterInfo';
 
-import { buildLocationInfo } from '@Route-Tools/Util';
+import { buildUserInfo, buildLocationInfo } from '@Route-Tools/Util';
 
 import { Logger } from '@Tools/Logging';
 import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
@@ -47,16 +47,12 @@ const procGetUsers: RequestHandler = async (req: Request, resp: Response, next: 
     // Loop through all the filtered accounts and create array of info
     const accts: any[] = [];
     for await (const acct of Accounts.enumerateAsync(scoper, infoer, pager)) {
-      accts.push( {
-        'accountId': acct.accountId,
-        'username': acct.username,
-        'images': {
-          'tiny': acct.imagesTiny,
-          'hero': acct.imagesHero,
-          'thumbnail': acct.imagesThumbnail
-        },
-        'location': await buildLocationInfo(req, acct),
-      });
+      const userInfo = await buildUserInfo(req, acct);
+      if (req.vAuthAccount.accountId === acct.accountId) {
+        // Add a tag to denote the requestor's entry
+        userInfo.connection = "self";
+      };
+      accts.push(userInfo);
     };
 
     req.vRestResp.Data = {
