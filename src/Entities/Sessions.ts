@@ -78,6 +78,15 @@ export const Sessions = {
   removeSession(pSessionEntity: SessionEntity) : void {
     _currentSessions.delete(pSessionEntity.senderKey);
   },
+  // touch a session to not that it has been used
+  touchSession(pSession: SessionEntity): void {
+    pSession.countReference++;
+    pSession.timeOfLastReference = new Date();
+  },
+  // clear activity count to start over
+  clearCounts(pSession: SessionEntity): void {
+    pSession.countReference = 0;
+  },
   *enumerate(pPager?: PaginationInfo): Generator<SessionEntity> {
     for (const sess of _currentSessions.values()) {
       if (pPager) {

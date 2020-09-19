@@ -41,7 +41,7 @@ const procGetAccounts: RequestHandler = async (req: Request, resp: Response, nex
 
     // Loop through all the filtered accounts and create array of info
     const accts: any[] = [];
-    for await (const acct of Accounts.enumerateAsync(pager, infoer, scoper)) {
+    for await (const acct of Accounts.enumerateAsync(scoper, infoer, pager)) {
       accts.push(await buildAccountInfo(req, acct));
     };
 

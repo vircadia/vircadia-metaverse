@@ -41,7 +41,7 @@ export const setupMetaverseAPI: RequestHandler = async (req: Request, resp: Resp
 
     req.vSession = Sessions.getSessionWithSenderKey(req.vSenderKey);
     if (req.vSession) {
-      SessionEntity.TouchSession(req.vSession);
+      Sessions.touchSession(req.vSession);
     }
     else {
       // No existing session for this request

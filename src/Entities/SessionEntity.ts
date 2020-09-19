@@ -26,13 +26,4 @@ export class SessionEntity {
   public whenSessionCreated: Date;
   public timeOfLastReference: Date;
   public countReference: number;
-
-  public static TouchSession(pSession: SessionEntity): void {
-    pSession.countReference++;
-    pSession.timeOfLastReference = new Date();
-  };
-
-  public static ClearCounts(pSession: SessionEntity): void {
-    pSession.countReference = 0;
-  };
 };
