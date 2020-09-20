@@ -23,7 +23,7 @@ A request returns an array of domain descriptions:
                   "domainid": stringDomainId,
                   "name": stringName,
                   "public_key": stringPublicKey,
-                  "sponsor_accountid": stringAccountIdAssociated,
+                  "sponsor_account_id": stringAccountIdAssociated,
                   "ice_server_address": stringAddrIceServerBeingUsed,
                   "version": stringSoftwareVersion,
                   "protocol_version": stringProtocolVersion,

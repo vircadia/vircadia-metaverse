@@ -18,7 +18,7 @@ import { Entity } from '@Entities/Entity';
 import { AccountEntity } from '@Entities/AccountEntity';
 import { DomainEntity } from '@Entities/DomainEntity';
 import { AuthToken } from '@Entities/AuthToken';
-import { TokenScope } from '@Entities/TokenScope';
+import { TokenScope } from '@Entities/Tokens';
 import { Accounts } from '@Entities/Accounts';
 import { Domains } from '@Entities/Domains';
 
@@ -56,7 +56,7 @@ export function isStringValidator(pField: FieldDefn, pEntity: Entity, pValue: an
   return typeof(pValue) === 'string';
 };
 export function isNumberValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
-  return typeof(pValue.set) === 'number';
+  return typeof(pValue) === 'number';
 };
 export function isDateValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
   return pValue instanceof Date;
@@ -292,108 +292,6 @@ export class Perm {
   public static SPONSOR  = 'sponsor';
 };
 
-// Check if the passed AuthToken has access to the passed DomainEntity.
-// The "required access" parameter lists the type of access the token must have.
-// For instance, a REST request is made to change a domain parameter. The
-//    RequiredAccess could be [ 'domain', 'admin', 'sponsor'] meaning the
-//    token must be from either an admin account or the sponsor account for the domain.
-// Note that the list of RequiredAccess is a OR list -- any one access type is sufficient.
-export async function checkAccessToDomain(pAuthToken: AuthToken,       // token being used to access
-                            pTargetDomain: DomainEntity,  // domain being accessed
-                            pRequiredAccess: string[],    // permissions required to access domain
-                            pAuthTokenAccount?: AccountEntity  // AuthToken account if known
-                    ): Promise<boolean> {
-  let canAccess: boolean = false;
-  if (IsNotNullOrEmpty(pAuthToken) && IsNotNullOrEmpty(pTargetDomain)) {
-    for (const perm of pRequiredAccess) {
-      Logger.cdebug('field-setting', `checkAccessToDomain: checking ${perm}`);
-      switch (perm) {
-        case Perm.ALL:
-          canAccess = true;
-          break;
-        case Perm.DOMAIN:
-          if (SArray.has(pAuthToken.scope, TokenScope.DOMAIN)) {
-            Logger.cdebug('field-setting', `checkAccessToDomain: authToken is domain. auth.AccountId=${pAuthToken.accountId}, sponsor=${pTargetDomain.sponsorAccountId}`);
-            canAccess = pAuthToken.accountId === pTargetDomain.sponsorAccountId;
-          };
-          break;
-        case Perm.ADMIN:
-          // If the authToken is an account, verify that the account has administrative access
-          if (SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
-            const acct = pAuthTokenAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
-            Logger.cdebug('field-setting', `checkAccessToDomain: admin. auth.AccountId=${pAuthToken.accountId}`);
-            canAccess = Accounts.isAdmin(acct);
-          };
-          break;
-        case Perm.SPONSOR:
-          if (SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
-            Logger.cdebug('field-setting', `checkAccessToDomain: check sponsor. auth.AccountId=${pAuthToken.accountId}, sponsor=${pTargetDomain.sponsorAccountId}`);
-            canAccess = pAuthToken.accountId === pTargetDomain.sponsorAccountId;
-          };
-          break;
-        default:
-          canAccess = false;
-          break;
-      }
-      // If some permission allows access, we are done
-      if (canAccess) break;
-    };
-  };
-  Logger.cdebug('field-setting', `checkAccessToDomain: canAccess=${canAccess}`);
-  return canAccess;
-};
-
-// Check if the passed AuthToken has access to the passed AccountEntity.
-// The "required access" parameter lists the type of access the token must have.
-// For instance, a REST request is made to get a list of users, the request token
-//    goes through the list with the permissions [ 'owner', 'admin', 'friend', 'connection' ]
-//    which means the requestor must be the accound owner, a friend or connection of the
-//    requested account or the requestor must be an admin.
-// Note that the list of RequiredAccess is a OR list -- any one access type is sufficient.
-export async function checkAccessToAccount(pAuthToken: AuthToken,  // token being used to access
-                            pTargetAccount: AccountEntity,  // account being accessed
-                            pRequiredAccess: string[],      // permissions required to access domain
-                            pRequestingAccount?: AccountEntity  // requesting account if known
-                    ): Promise<boolean> {
-  let requestingAccount = pRequestingAccount;
-  let canAccess: boolean = false;
-  if (IsNotNullOrEmpty(pAuthToken) && IsNotNullOrEmpty(pTargetAccount)) {
-    for (const perm of pRequiredAccess) {
-      Logger.cdebug('field-setting', `checkAccessToDomain: checking ${perm}`);
-      switch (perm) {
-        case Perm.ALL:
-          canAccess = true;
-          break;
-        case Perm.OWNER:
-          canAccess = pAuthToken.accountId === pTargetAccount.accountId;
-          break;
-        case Perm.FRIEND:
-          requestingAccount = requestingAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
-          canAccess = SArray.hasNoCase(pTargetAccount.friends, requestingAccount.username);
-          break;
-        case Perm.CONNECTION:
-          requestingAccount = requestingAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
-          canAccess = SArray.hasNoCase(pTargetAccount.connections, requestingAccount.username);
-          break;
-        case Perm.ADMIN:
-          // If the authToken is an account, verify that the account has administrative access
-          if (SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
-            Logger.cdebug('field-setting', `checkAccessToAccount: admin. auth.AccountId=${pAuthToken.accountId}`);
-            requestingAccount = requestingAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
-            canAccess = Accounts.isAdmin(requestingAccount);
-          };
-          break;
-        default:
-          canAccess = false;
-          break;
-      }
-      // If some permission allows access, we are done
-      if (canAccess) break;
-    };
-  };
-  return canAccess;
-};
-
 // Check if the passed AuthToken has access to the passed Entity.
 // Generalized for any Entity. The permissions expect 'accountId' and 'sponsorAccountId'
 //    in the entities.
@@ -423,6 +321,13 @@ export async function checkAccessToEntity(pAuthToken: AuthToken,  // token being
             if (pTargetEntity.hasOwnProperty('sponsorAccountId')) {
               Logger.cdebug('field-setting', `checkAccessToEntity: authToken is domain. auth.AccountId=${pAuthToken.accountId}, sponsor=${(pTargetEntity as any).sponsorAccountId}`);
               canAccess = pAuthToken.accountId === (pTargetEntity as any).sponsorAccountId;
+            }
+            else {
+              // Super special case where domain doesn't have a sponsor but has an api_key.
+              // In this case, the API_KEY is put in the accountId field of the DOMAIN scoped AuthToken
+              if (pTargetEntity.hasOwnProperty('apiKey')) {
+                canAccess = pAuthToken.accountId === (pTargetEntity as any).apiKey;
+              };
             };
           };
           break;

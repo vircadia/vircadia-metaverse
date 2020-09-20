@@ -20,14 +20,17 @@ import { HTTPStatusCode } from '@Route-Tools/RESTResponse';
 
 import { accountFromAuthToken } from '@Route-Tools/middleware';
 import { domainFromParams } from '@Route-Tools/middleware';
-import { checkAccessToDomain, Perm } from '@Route-Tools/Permissions';
+import { checkAccessToEntity, Perm } from '@Route-Tools/Permissions';
+import { buildDomainInfoV1 } from '@Route-Tools/Util';
 
 import { Domains } from '@Entities/Domains';
+import { setDomainField } from '@Entities/DomainEntity';
 import { Accounts } from '@Entities/Accounts';
+import { Tokens, TokenScope } from '@Entities/Tokens';
 
+import { IsNullOrEmpty } from '@Tools/Misc';
 import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
-import { buildDomainInfoV1 } from '@Route-Tools/Util';
 
 // GET /domains/:domainId
 // Return a small snippet if domain data for the domainId specified in the request
@@ -57,31 +60,27 @@ const procGetDomainsDomainid: RequestHandler = async (req: Request, resp: Respon
 const procPutDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vDomain) {
     // Either the domain itself or an admin can update the domain information
-    if (checkAccessToDomain(req.vAuthToken, req.vDomain, [ Perm.DOMAIN, Perm.SPONSOR, Perm.ADMIN ])) {
+    if (await checkAccessToEntity(req.vAuthToken, req.vDomain, [ Perm.DOMAIN, Perm.SPONSOR, Perm.ADMIN ])) {
       const updated: VKeyedCollection = {};
       const valuesToSet = req.body.domain;
       // 'valuesToSet' are the values sent to use in the request.
       // Collect the specific values set. Cannot just accept all because the
       //     requestor could do things like set the password hash or other bad things.
-      if (valuesToSet.hasOwnProperty('version')) updated.version = valuesToSet.version;
-      if (valuesToSet.hasOwnProperty('protocol')) updated.protocol = valuesToSet.protocol;
-      if (valuesToSet.hasOwnProperty('network_addr')) updated.networkAddr = valuesToSet.network_addr;
-      if (valuesToSet.hasOwnProperty('automatic_networking')) updated.networkingMode = valuesToSet.automatic_networking;
-      if (valuesToSet.hasOwnProperty('restricted')) updated.restricted = valuesToSet.restricted;
-      if (valuesToSet.hasOwnProperty('capacity')) updated.capacity = valuesToSet.capacity;
-      if (valuesToSet.hasOwnProperty('description')) updated.description = valuesToSet.description;
-      if (valuesToSet.hasOwnProperty('maturity')) updated.maturity = valuesToSet.maturity;
-      if (valuesToSet.hasOwnProperty('restriction')) updated.restriction = valuesToSet.restriction;
+      for (const field of ['version', 'protocol', 'network_addr', 'automatic_networking', 'restricted',
+                  'capacity', 'description', 'maturity', 'restriction' ]) {
+        if (valuesToSet.hasOwnProperty(field)) {
+          await setDomainField(req.vAuthToken, req.vDomain, field, valuesToSet[field], req.vAuthAccount, updated);
+        };
+      };
       if (valuesToSet.hasOwnProperty('hosts')) {
-        updated.hosts = CleanedStringArray(valuesToSet.hosts);
+        await setDomainField(req.vAuthToken, req.vDomain, 'hosts', { 'set': CleanedStringArray(valuesToSet.hosts)}, req.vAuthAccount, updated);
       };
       if (valuesToSet.hasOwnProperty('tags')) {
-        updated.tags = CleanedStringArray(valuesToSet.tags);
+        await setDomainField(req.vAuthToken, req.vDomain, 'tags', { 'set': CleanedStringArray(valuesToSet.tags)}, req.vAuthAccount, updated);
       };
       if (valuesToSet.hasOwnProperty('heartbeat')) {
-        updated.numUsers = Number(valuesToSet.heartbeat.num_users);
-        updated.anonUsers = Number(valuesToSet.heartbeat.num_anon_users);
-        updated.totalUsers = updated.numUsers + updated.anonUsers;
+        await setDomainField(req.vAuthToken, req.vDomain, 'num_users', valuesToSet.heartbeat.num_users, req.vAuthAccount, updated);
+        await setDomainField(req.vAuthToken, req.vDomain, 'num_anon_users', valuesToSet.heartbeat.num_anon_users, req.vAuthAccount, updated);
       };
 
       updated.timeOfLastHeartbeat = new Date();
@@ -128,11 +127,11 @@ const procDeleteDomains: RequestHandler = async (req: Request, resp: Response, n
 function CleanedStringArray(pValues: any): string[] {
   const ret: string[] = [];
   if (Array.isArray(pValues)) {
-    pValues.forEach( val => {
-      if (typeof val === 'string') {
+    for (const val of pValues) {
+      if (typeof(val) === 'string') {
         ret.push(val);
       };
-    });
+    };
   };
   return ret;
 };

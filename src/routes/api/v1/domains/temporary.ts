@@ -18,7 +18,8 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 
 import { Domains } from '@Entities/Domains';
-import { DomainEntity } from '@Entities/DomainEntity';
+import { Places } from '@Entities/Places';
+import { buildDomainInfo, buildPlaceInfo } from '@Route-Tools/Util';
 
 import { uniqueNamesGenerator, Config, adjectives, colors, animals } from 'unique-names-generator';
 
@@ -41,7 +42,6 @@ const procPostDomainsTemporary: RequestHandler = async (req: Request, resp: Resp
     length: 2
   };
   const generatedPlacename: string = uniqueNamesGenerator(customConfig);
-
   const generatedAPIkey: string = GenUUID();
 
   const newDomain = Domains.createDomain();
@@ -53,12 +53,9 @@ const procPostDomainsTemporary: RequestHandler = async (req: Request, resp: Resp
   Domains.addDomain(newDomain);
 
   req.vRestResp.Data = {
-    'domain': {
-      'id': newDomain.domainId,
-      'name': newDomain.name,
-      'api_key': newDomain.apiKey
-    }
+    'domain': buildDomainInfo(newDomain)
   };
+  req.vRestResp.Data.domain.api_key = newDomain.apiKey;
   next();
 };
 

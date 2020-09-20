@@ -42,7 +42,6 @@ export class DomainEntity implements Entity {
   public restricted: boolean;  // 'true' if restricted to users with accounts
   public numUsers: number;     // regular users logged in
   public anonUsers: number;    // number of anonymous users
-  public totalUsers: number;   // number of users
   public hostnames: string[];  // User segmentation
 
   // More information that's metadata that's passed in PUT domain

@@ -18,8 +18,7 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
 
-import { Tokens } from '@Entities/Tokens';
-import { TokenScope } from '@Entities/TokenScope';
+import { Tokens, TokenScope } from '@Entities/Tokens';
 
 import { Logger } from '@Tools/Logging';
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';

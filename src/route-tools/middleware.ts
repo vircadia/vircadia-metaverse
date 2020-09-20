@@ -22,7 +22,7 @@ import { Accounts } from '@Entities/Accounts';
 import { AccountEntity } from '@Entities/AccountEntity';
 import { Domains } from '@Entities/Domains';
 import { Sessions } from '@Entities/Sessions';
-import { Tokens } from '@Entities/Tokens';
+import { Tokens, TokenScope } from '@Entities/Tokens';
 
 import { RESTResponse } from '@Route-Tools/RESTResponse';
 
@@ -200,6 +200,8 @@ export const verifyDomainAccess: RequestHandler = async (req: Request, resp: Res
       if (IsNullOrEmpty(authToken)) {
         // Auth token not available. See if APIKey does the trick
         if (req.vDomain.apiKey === req.vDomainAPIKey) {
+          // APIKEY matches so create a fake AuthToken that works with checkAccessToEntity
+          req.vAuthToken = await Tokens.createToken(req.vDomainAPIKey, [ TokenScope.DOMAIN ], 1);
           verified = true;
         };
       }
@@ -208,6 +210,7 @@ export const verifyDomainAccess: RequestHandler = async (req: Request, resp: Res
         if (aAccount) {
           if (IsNullOrEmpty(req.vDomain.sponsorAccountId)) {
             // If the domain doesn't have an associated account, form the link to this account
+            req.vDomain.sponsorAccountId = aAccount.accountId;
             await Domains.updateEntityFields(req.vDomain, { 'sponsorAccountId': aAccount.accountId } );
           };
           if (req.vDomain.sponsorAccountId === aAccount.accountId) {

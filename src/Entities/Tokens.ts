@@ -16,7 +16,6 @@
 import { Config } from '@Base/config';
 
 import { AuthToken } from '@Entities/AuthToken';
-import { TokenScope } from '@Entities/TokenScope';
 import { createObject, getObject, getObjects, updateObjectFields, deleteMany, deleteOne } from '@Tools/Db';
 
 import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
@@ -39,6 +38,20 @@ export function initTokens(): void {
       Logger.debug(`Tokens.Expiration: expired ${deletedTokens} tokens`);
     };
   }, 1000 * 60 * 5 );
+};
+
+// Class to manage the manipulations on entities scope of application
+export class TokenScope {
+  public static OWNER: string = 'owner';   // a 'user' or 'person'
+  public static DOMAIN: string = 'domain'; // a domain-server
+  // Added for ActivityPub access control
+  public static READ: string = 'read';
+  public static WRITE: string = 'write';
+
+  // See if the passed scope token is a known scope code.
+  static KnownScope(pScope: string): boolean {
+    return [ TokenScope.OWNER, TokenScope.DOMAIN ].includes(pScope);
+  };
 };
 
 export const Tokens = {

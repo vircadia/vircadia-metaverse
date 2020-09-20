@@ -25,8 +25,7 @@ import { AccountEntity } from '@Entities/AccountEntity';
 import { Accounts } from '@Entities/Accounts';
 import { AccountRoles } from '@Entities/AccountRoles';
 import { AuthToken } from '@Entities/AuthToken';
-import { Tokens } from '@Entities/Tokens';
-import { TokenScope } from '@Entities/TokenScope';
+import { Tokens, TokenScope } from '@Entities/Tokens';
 
 import { VKeyedCollection } from '@Tools/vTypes';
 
