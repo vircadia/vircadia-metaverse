@@ -133,7 +133,9 @@ export function buildDomainInfo(pDomain: DomainEntity): any {
     'id': pDomain.domainId,
     'name': pDomain.name,
     'network_address': pDomain.networkAddr,
-    'ice_server_address': pDomain.iceServerAddr
+    'ice_server_address': pDomain.iceServerAddr,
+    'time_of_last_heartbeat': pDomain.timeOfLastHeartbeat ? pDomain.timeOfLastHeartbeat.toISOString() : undefined,
+    'num_users': pDomain.numUsers
   };
 }
 
