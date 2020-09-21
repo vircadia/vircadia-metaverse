@@ -58,6 +58,13 @@ export function isStringValidator(pField: FieldDefn, pEntity: Entity, pValue: an
 export function isNumberValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
   return typeof(pValue) === 'number';
 };
+export function isBooleanValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
+  return typeof(pValue) === 'boolean';
+};
+export function isPathValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
+  // TODO: Add regexp to check format of "domainname/float,float,float/float,float,float,float"
+  return typeof(pValue) === 'string';
+};
 export function isDateValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
   return pValue instanceof Date;
 };

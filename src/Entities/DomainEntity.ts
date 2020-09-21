@@ -18,7 +18,7 @@ import { AccountEntity } from '@Entities/AccountEntity';
 import { AuthToken } from '@Entities/AuthToken';
 
 import { FieldDefn } from '@Route-Tools/Permissions';
-import { isStringValidator, isNumberValidator, isSArraySet, isDateValidator } from '@Route-Tools/Permissions';
+import { isStringValidator, isNumberValidator, isBooleanValidator, isSArraySet, isDateValidator } from '@Route-Tools/Permissions';
 import { simpleGetter, simpleSetter, sArraySetter, dateStringGetter } from '@Route-Tools/Permissions';
 import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/Permissions';
 
@@ -191,7 +191,7 @@ export const domainFields: { [key: string]: FieldDefn } = {
     request_field_name: 'restricted',
     get_permissions: [ 'all' ],
     set_permissions: [ 'domain', 'sponsor', 'admin' ],
-    validate: isStringValidator,
+    validate: isBooleanValidator,
     setter: simpleSetter,
     getter: simpleGetter
   },
