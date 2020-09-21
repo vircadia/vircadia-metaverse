@@ -45,7 +45,11 @@ const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next:
 };
 
 const procGetPlacesPlaceId: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  const aPlace = await Places.getPlaceWithId(req.vParam1);
+  let aPlace = await Places.getPlaceWithId(req.vParam1);
+  if (IsNullOrEmpty(aPlace)) {
+    // the request can be made for the ID or the placename
+    aPlace = await Places.getPlaceWithName(req.vParam1);
+  }
   if (aPlace) {
     req.vRestResp.Data = {
       'place': await buildPlaceInfo(aPlace)
@@ -57,50 +61,63 @@ const procGetPlacesPlaceId: RequestHandler = async (req: Request, resp: Response
   next();
 };
 
-// Create a Place
+// Create a Place.
+// We receive either the new request with the data under 'place' or
+//    the legacy request with some of the data at the top level.
+// { 'place_id': id, 'path': path, 'domain_id': id }
 const procPostPlaces: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
-    if (req.body.place) {
-      const placeSpec: any = req.body.place;
-      if (placeSpec.name && placeSpec.address && placeSpec.domainId) {
-        const aDomain = await Domains.getDomainWithId(req.body.place.domainId);
-        if (aDomain) {
-          if (checkAccessToEntity(req.vAuthToken, aDomain, [ Perm.SPONSOR, Perm.ADMIN ], req.vAuthAccount)) {
-            const maybePlace = await Places.getPlaceWithName(placeSpec.name);
-            if (IsNullOrEmpty(maybePlace)) {
-              const newPlace = Places.createPlace();
-              newPlace.name = placeSpec.name;
-              newPlace.description = placeSpec.description;
-              newPlace.address = placeSpec.address;
-              newPlace.accountId = aDomain.sponsorAccountId;
-              newPlace.domainId = aDomain.domainId;
-              Places.addPlace(newPlace);
+    let requestedName: string;
+    let requestedDesc: string;
+    let requestedAddr: string;
+    let requestedDomainId: string;
 
-              req.vRestResp.Data = buildPlaceInfo(newPlace);
-            }
-            else {
-              req.vRestResp.respondFailure('place name already exists');
-            };
+    if (req.body.place) {
+      requestedName = req.body.place.name;
+      requestedDesc = req.body.place.description;
+      requestedAddr = req.body.place.address;
+      requestedDomainId = req.body.place.domainId;
+    }
+    else {
+      requestedName = req.body.place_id;
+      requestedAddr = req.body.path;
+      requestedDomainId = req.body.domain_id;
+    };
+
+    if (requestedName && requestedAddr && requestedDomainId) {
+      const aDomain = await Domains.getDomainWithId(requestedDomainId);
+      if (aDomain) {
+        if (await checkAccessToEntity(req.vAuthToken, aDomain, [ Perm.SPONSOR, Perm.ADMIN ], req.vAuthAccount)) {
+          const maybePlace = await Places.getPlaceWithName(requestedName);
+          if (IsNullOrEmpty(maybePlace)) {
+            const newPlace = Places.createPlace();
+            newPlace.name = requestedName;
+            newPlace.description = requestedDesc;
+            newPlace.address = requestedAddr;
+            newPlace.accountId = aDomain.sponsorAccountId;
+            newPlace.domainId = aDomain.domainId;
+            Places.addPlace(newPlace);
+
+            req.vRestResp.Data = buildPlaceInfo(newPlace, aDomain);
           }
           else {
-            req.vRestResp.respondFailure('unauthorized');
+            req.vRestResp.respondFailure('place name already exists');
           };
         }
         else {
-          req.vRestResp.respondFailure('name/address/domainId not specified');
+          req.vRestResp.respondFailure('unauthorized');
         };
       }
       else {
-        req.vRestResp.respondFailure('no domain specified');
+        req.vRestResp.respondFailure('name/address/domainId not specified');
       };
     }
     else {
       req.vRestResp.respondFailure('no domain specified');
     };
-    const pPlace = Places.getPlaceWithId(req.vParam1);
   }
   else {
-    req.vRestResp.respondFailure('unauthorized');
+    req.vRestResp.respondFailure('no domain specified');
   };
   next();
 };
@@ -112,8 +129,8 @@ const procDeletePlacesPlaceId: RequestHandler = async (req: Request, resp: Respo
     if (aPlace) {
       const aDomain = await Domains.getDomainWithId(aPlace.domainId);
       if (aDomain) {
-        if (checkAccessToEntity(req.vAuthToken, aDomain, [ Perm.SPONSOR, Perm.ADMIN ], req.vAuthAccount)) {
-          Places.removePlace(aPlace);
+        if (await checkAccessToEntity(req.vAuthToken, aDomain, [ Perm.SPONSOR, Perm.ADMIN ], req.vAuthAccount)) {
+          await Places.removePlace(aPlace);
         }
         else {
           req.vRestResp.respondFailure('unauthorized');
