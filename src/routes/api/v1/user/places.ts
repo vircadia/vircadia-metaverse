@@ -17,29 +17,37 @@
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 import { setupMetaverseAPI, finishMetaverseAPI, param1FromParams } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
+
 import { checkAccessToEntity, Perm } from '@Route-Tools/Permissions';
 
 import { buildPlaceInfo } from '@Route-Tools/Util';
 
 import { Domains } from '@Entities/Domains';
 import { Places } from '@Entities/Places';
-import { PlaceEntity } from '@Entities/PlaceEntity';
 
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
+import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
 import { IsNullOrEmpty } from '@Tools/Misc';
 
 const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  const pager = new PaginationInfo();
+  if (req.vAuthAccount) {
+    const scoper = new AccountScopeFilter(req.vAuthAccount);
+    const pager = new PaginationInfo();
 
-  pager.parametersFromRequest(req);
+    scoper.parametersFromRequest(req);
+    pager.parametersFromRequest(req);
 
-  const allPlaces: any[] = [];
-  for await (const place of Places.enumerateAsync(pager)) {
-    allPlaces.push(await buildPlaceInfo(place));
-  };
+    const allPlaces: any[] = [];
+    for await (const place of Places.enumerateAsync(scoper, pager)) {
+      allPlaces.push(await buildPlaceInfo(place));
+    };
 
-  req.vRestResp.Data = {
-    'places': allPlaces
+    req.vRestResp.Data = {
+      'places': allPlaces
+    };
+  }
+  else {
+    req.vRestResp.respondFailure('unauthorized');
   };
   next();
 };
