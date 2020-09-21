@@ -168,6 +168,7 @@ export const name = '/api/v1/user/places';
 export const router = Router();
 
 router.get(   '/api/v1/user/places', [ setupMetaverseAPI,   // req.vRESTResp
+                                      accountFromAuthToken, // req.vAuthAccount
                                       procGetPlaces,
                                       finishMetaverseAPI ] );
 router.post(   '/api/v1/user/places',

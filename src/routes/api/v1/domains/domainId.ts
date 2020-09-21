@@ -26,16 +26,16 @@ import { buildDomainInfoV1 } from '@Route-Tools/Util';
 import { Domains } from '@Entities/Domains';
 import { setDomainField } from '@Entities/DomainEntity';
 import { Accounts } from '@Entities/Accounts';
-import { Tokens, TokenScope } from '@Entities/Tokens';
+import { Places } from '@Entities/Places';
 
-import { IsNullOrEmpty } from '@Tools/Misc';
+import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
+
 import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
 
 // GET /api/v1/domains/:domainId
 // Return a small snippet if domain data for the domainId specified in the request
 const procGetDomainsDomainid: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('procGetDomainDomainid');
   if (req.vDomain) {
     const aDomain = req.vDomain;
     const domainInfo = await buildDomainInfoV1(aDomain);
@@ -45,6 +45,8 @@ const procGetDomainsDomainid: RequestHandler = async (req: Request, resp: Respon
     req.vRestResp.Data = {
       'domain': domainInfo
     };
+    // For legacy code which expects the domain information at the top level
+    req.vRestResp.addAdditionalField('domain', domainInfo);
   }
   else {
     req.vRestResp.respondFailure(req.vDomainError ?? 'Domain not found');
@@ -102,11 +104,15 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
 
 // DELETE /api/v1/domains/:domainId
 const procDeleteDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('procDeleteDomains');
   if (req.vAuthAccount) {
     if (Accounts.isAdmin(req.vAuthAccount)) {
       if (req.vDomain) {
         Domains.removeDomain(req.vDomain);
+
+        // if deleting the domain, also delete its places
+        for await (const place of Places.enumerateAsync(new GenericFilter({ 'domainId': req.vDomain.domainId }))) {
+          Places.removePlace(place);
+        };
       }
       else {
         req.vRestResp.respondFailure('Target domain does not exist');

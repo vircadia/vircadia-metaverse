@@ -19,7 +19,7 @@ import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 
 import { createObject, getObject, getObjects, updateObjectFields, deleteOne } from '@Tools/Db';
 
-import { GenUUID, IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
+import { GenUUID, IsNullOrEmpty, IsNotNullOrEmpty, genRandomString } from '@Tools/Misc';
 import { VKeyedCollection } from '@Tools/vTypes';
 
 export let placeCollection = 'places';
@@ -37,6 +37,9 @@ export const Places = {
   createPlace(): PlaceEntity {
     const newPlace = new PlaceEntity();
     newPlace.placeId = GenUUID();
+    newPlace.name = 'UNKNOWN-' + genRandomString(5);
+    newPlace.address = '/0,0,0/0,0,0,0/';
+    newPlace.whenPlaceEntryCreated = new Date();
     return newPlace;
   },
   removePlace(pPlaceEntity: PlaceEntity) : Promise<boolean> {

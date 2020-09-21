@@ -24,11 +24,15 @@ import { Domains } from '@Entities/Domains';
 import { Tokens, TokenScope } from '@Entities/Tokens';
 import { AuthToken } from '@Entities/AuthToken';
 import { Sessions } from '@Entities/Sessions';
+import { Places } from '@Entities/Places';
+import { setPlaceField } from '@Entities/PlaceEntity';
 
 import { RESTResponse } from '@Route-Tools/RESTResponse';
 
+import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
+
 import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
-import { SArray } from '@Tools/vTypes';
+import { SArray, VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
 
 // MetaverseAPI middleware.
@@ -176,6 +180,13 @@ export const verifyDomainAccess: RequestHandler = async (req: Request, resp: Res
                 Logger.debug(`verifyDomainAccess: assigning domain ${req.vDomain.domainId} to account ${aAccount.accountId}`);
                 req.vDomain.sponsorAccountId = aAccount.accountId;
                 await Domains.updateEntityFields(req.vDomain, { 'sponsorAccountId': aAccount.accountId } );
+              };
+              // If associating a domain with an account, make sure the domain places also point to this account
+              for await (const place of Places.enumerateAsync(new GenericFilter({ 'domainId': req.vDomain.domainId }))) {
+                const updates: VKeyedCollection = {};
+                // Not using "setPlaceField" since this field should not ever be set except by this code
+                place.accountId = aAccount.accountId;
+                await Places.updateEntityFields(place, { 'accountId': aAccount.accountId });
               };
             };
             if (req.vDomain.sponsorAccountId === aToken.accountId) {

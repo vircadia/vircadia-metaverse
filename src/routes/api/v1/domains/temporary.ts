@@ -52,6 +52,13 @@ const procPostDomainsTemporary: RequestHandler = async (req: Request, resp: Resp
   };
   Domains.addDomain(newDomain);
 
+  // Creating a domain also creates a Place for that domain
+  const newPlace = Places.createPlace();
+  newPlace.domainId = newDomain.domainId;
+  newPlace.name = newDomain.name;
+  newPlace.iPAddrOfFirstContact = req.vSenderKey;
+  Places.addPlace(newPlace);
+
   req.vRestResp.Data = {
     'domain': buildDomainInfo(newDomain)
   };

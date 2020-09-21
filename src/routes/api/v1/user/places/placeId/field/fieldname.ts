@@ -25,6 +25,8 @@ import { getPlaceField, setPlaceField } from '@Entities/PlaceEntity';
 import { checkAccessToEntity } from '@Route-Tools/Permissions';
 
 import { VKeyedCollection } from '@Tools/vTypes';
+import { IsNullOrEmpty } from '@Tools/Misc';
+import { Logger } from '@Tools/Logging';
 
 // Get the scope of the logged in account
 const procGetField: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
@@ -48,8 +50,9 @@ const procGetField: RequestHandler = async (req: Request, resp: Response, next: 
 const procPostField: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount && req.vParam1 && req.vParam2) {
     let aPlace = await Places.getPlaceWithId(req.vParam1);
-    if (typeof(aPlace) === 'undefined') {
+    if (IsNullOrEmpty(aPlace)) {
       // Places can be looked up by their name as well as their ID.
+      Logger.debug(`procPostField: couldn't find with placeId. Trying name of "${req.vParam1}"`);
       aPlace = await Places.getPlaceWithName(req.vParam1);
     };
     if (aPlace) {
