@@ -59,8 +59,13 @@ const procGetPlacesPlaceId: RequestHandler = async (req: Request, resp: Response
     aPlace = await Places.getPlaceWithName(req.vParam1);
   }
   if (aPlace) {
-    req.vRestResp.Data = {
-      'place': await buildPlaceInfo(aPlace)
+    if (checkAccessToEntity(req.vAuthToken, aPlace, [ Perm.OWNER, Perm.ADMIN ], req.vAuthAccount)) {
+      req.vRestResp.Data = {
+        'place': await buildPlaceInfo(aPlace)
+      };
+    }
+    else {
+      req.vRestResp.respondFailure('unauthorized');
     };
   }
   else {
