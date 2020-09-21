@@ -104,9 +104,8 @@ export const Accounts = {
   // getter property that is 'true' if the user has been heard from recently
   isOnline(pAcct: AccountEntity): boolean {
     if (pAcct && pAcct.timeOfLastHeartbeat) {
-      return pAcct.timeOfLastHeartbeat
-          && ((Date.now() - pAcct.timeOfLastHeartbeat.getUTCMilliseconds())
-                < (Config["metaverse-server"]["heartbeat-seconds-until-offline"] * 1000));
+      return (Date.now().valueOf() - pAcct.timeOfLastHeartbeat.valueOf())
+                < (Config["metaverse-server"]["heartbeat-seconds-until-offline"] * 1000);
     };
     return false;
   },

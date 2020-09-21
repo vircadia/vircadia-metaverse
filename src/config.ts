@@ -41,7 +41,7 @@ export let Config = {
     'metaverse-server': {
       'http-error-on-failure': true,  // whether to include x-vircadia error header
       'error-header': 'x-vircadia-error-handle',
-      'heartbeat-seconds-until-offline': 120,
+      'heartbeat-seconds-until-offline': 300,
       'metaverse-info-addition-file': './metaverse_info.json',
       'session-timeout-minutes': 5,
       // redirection URL used for initial domain token generation
