@@ -6,6 +6,10 @@ Requests that create and manage Place entries
 
 Get the list of places.
 
+This only returns the places the requestor "owns". That is, the places for
+domains the requestor is the associated account of.
+
+
 ```
     {
         "status": "success",
@@ -22,7 +26,9 @@ Get the list of places.
                         "network_address": string,
                         "ice_server_address": string
                     },
-                    "accountId": string
+                    "accountId": string,
+                    "thumbnail": URL,
+                    "images": [ URL, URL, ... ]
                 },
                 ...
             ]
@@ -39,17 +45,7 @@ Get the place information for one place.
         "status": "success",
         "data": {
             "place": {
-                "placeId": string,
-                "name": string,
-                "address": string,
-                "description": string,
-                "domain": {
-                    "id": domainId,
-                    "name": domainName,
-                    "network_address": string,
-                    "ice_server_address": string
-                },
-                "accountId": string
+                SAME INFORMATION AS RETURNED ABOVE
             }
         }
     }
@@ -63,7 +59,7 @@ contains a domainId of the domain the place points to.
 To create a place, one must either be an admin account or
 the account that is associated with  the domain.
 
-The address is formatted as "//x,y,z/x,y,z,w/".
+The address is formatted as "/x,y,z/x,y,z,w".
 
 ```
     {

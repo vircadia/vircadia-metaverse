@@ -19,7 +19,7 @@ import { AuthToken } from '@Entities/AuthToken';
 
 import { FieldDefn } from '@Route-Tools/Permissions';
 import { checkAccessToEntity } from '@Route-Tools/Permissions';
-import { isStringValidator, isNumberValidator, isSArraySet, isDateValidator } from '@Route-Tools/Permissions';
+import { isStringValidator, isSArraySet, isPathValidator, isDateValidator } from '@Route-Tools/Permissions';
 import { simpleGetter, simpleSetter, sArraySetter, dateStringGetter } from '@Route-Tools/Permissions';
 import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/Permissions';
 
@@ -34,6 +34,8 @@ export class PlaceEntity implements Entity {
   public accountId: string;     // the 'owner' of the place (should be sponsor of the domain)
   public domainId: string;      // domain the place is in
   public address: string;       // Address within the domain
+  public thumbnail: string;     // thumbnail for place
+  public images: string[];      // images for the place
 
   // admin stuff
   public iPAddrOfFirstContact: string; // IP address that registered this place
@@ -122,8 +124,26 @@ export const placeFields: { [key: string]: FieldDefn } = {
     request_field_name: 'address',
     get_permissions: [ 'all' ],
     set_permissions: [ 'domain', 'owner', 'admin' ],
+    validate: isPathValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'thumbnail': {
+    entity_field: 'thumbnail',
+    request_field_name: 'thumbnail',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'domain', 'owner', 'admin' ],
     validate: isStringValidator,
     setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'images': {
+    entity_field: 'images',
+    request_field_name: 'images',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'domain', 'owner', 'admin' ],
+    validate: isSArraySet,
+    setter: sArraySetter,
     getter: simpleGetter
   },
   // admin stuff
