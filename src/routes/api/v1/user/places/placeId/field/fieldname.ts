@@ -47,7 +47,11 @@ const procGetField: RequestHandler = async (req: Request, resp: Response, next: 
 // Not implemented as something needs to be done with request_connection, etc
 const procPostField: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount && req.vParam1 && req.vParam2) {
-    const aPlace = await Places.getPlaceWithId(req.vParam1);
+    let aPlace = await Places.getPlaceWithId(req.vParam1);
+    if (typeof(aPlace) === 'undefined') {
+      // Places can be looked up by their name as well as their ID.
+      aPlace = await Places.getPlaceWithName(req.vParam1);
+    };
     if (aPlace) {
       if (req.body.hasOwnProperty('set')) {
         const updates: VKeyedCollection = {};
