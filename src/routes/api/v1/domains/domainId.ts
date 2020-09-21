@@ -32,7 +32,7 @@ import { IsNullOrEmpty } from '@Tools/Misc';
 import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
 
-// GET /domains/:domainId
+// GET /api/v1/domains/:domainId
 // Return a small snippet if domain data for the domainId specified in the request
 const procGetDomainsDomainid: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   Logger.debug('procGetDomainDomainid');
@@ -54,9 +54,9 @@ const procGetDomainsDomainid: RequestHandler = async (req: Request, resp: Respon
   next();
 };
 
-// PUT /domains/:domainId
-// Set domain parameters.
-// The sender can send or not send lots of different fields so we have to be specific
+// PUT /api/v1/domains/:domainId
+// Set domain parameters. Used by domain for heartbeat.
+// The sender can send or not send lots of different fields so we have to be specific.
 const procPutDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vDomain) {
     // Either the domain itself or an admin can update the domain information
@@ -100,7 +100,7 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
   next();
 };
 
-// DELETE /domains/:domainId
+// DELETE /api/v1/domains/:domainId
 const procDeleteDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   Logger.debug('procDeleteDomains');
   if (req.vAuthAccount) {

@@ -21,14 +21,15 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 import { Accounts } from '@Entities/Accounts';
 import { AccountEntity } from '@Entities/AccountEntity';
 import { Domains } from '@Entities/Domains';
-import { Sessions } from '@Entities/Sessions';
 import { Tokens, TokenScope } from '@Entities/Tokens';
+import { AuthToken } from '@Entities/AuthToken';
+import { Sessions } from '@Entities/Sessions';
 
 import { RESTResponse } from '@Route-Tools/RESTResponse';
 
 import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
+import { SArray } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
-import { SessionEntity } from '@Entities/SessionEntity';
 
 // MetaverseAPI middleware.
 // The request is a standard MetaverseAPI JSON-in and JSON-out request.
@@ -125,65 +126,21 @@ export const accountFromAuthToken: RequestHandler = async (req: Request, resp: R
 // If account cannot be found or verified, 'vAccountError' is set with text explaining the error.
 export const accountFromParams: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vRestResp) {
-    const accountId = req.params.accountId;
-    if (accountId) {
-      // Most of the account references are by username
-      req.vAccount = await Accounts.getAccountWithUsername(accountId);
-      if (IsNullOrEmpty(req.vAccount)) {
-        // If username didn't work, try by the accountId
-        req.vAccount = await Accounts.getAccountWithId(accountId);
-      };
+    if (req.params && req.params.accountId && typeof(req.params.accountId) === 'string') {
+      const accountId = req.params.accountId;
+      if (accountId) {
+        // Most of the account references are by username
+        req.vAccount = await Accounts.getAccountWithUsername(accountId);
+        if (IsNullOrEmpty(req.vAccount)) {
+          // If username didn't work, try by the accountId
+          req.vAccount = await Accounts.getAccountWithId(accountId);
+        };
 
+      };
     };
   };
   if (IsNullOrEmpty(req.vAccount)) {
     req.vAccountError = 'AccountId does not match an account';
-  };
-  next();
-};
-
-// Find domain apikey from JSON body and set as 'vDomainAPIKey'
-export const usernameFromParams: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vRestResp) {
-    req.vUsername = req.params.username;
-  };
-  next();
-};
-
-// MetaverseAPI middleware.
-// The request has a :domainId label that needs to be looked up and verified.
-// Decorate the passed Request with 'vDoamin' which points to a DomainEntity.
-// If domain cannot be found or verified, 'vDomainError' is set with text explaining the error.
-export const domainFromParams: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  let domainId: string;
-  if (req.vRestResp) {
-    domainId = req.params.domainId;
-    if (domainId) {
-      req.vDomain = await Domains.getDomainWithId(domainId);
-    }
-    else {
-      Logger.error(`domainFromParams: wanted domain but none specified`);
-    };
-  };
-  if (IsNullOrEmpty(req.vDomain)) {
-    req.vDomainError = 'DomainId does not match a domain';
-    Logger.error(`domainFromParams: wanted domain ${domainId} but not found`);
-  };
-  next();
-};
-
-// Find domain apikey from JSON body and set as 'vDomainAPIKey'
-export const domainAPIkeyFromBody: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.body && req.body.domain && req.body.domain.api_key) {
-    req.vDomainAPIKey = req.body.domain.api_key;
-  };
-  next();
-};
-
-// Find domain apikey from previously parsed multi-part form body and set as 'vDomainAPIKey'
-export const domainAPIkeyFromMultipart: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.body && req.body.api_key) {
-    req.vDomainAPIKey = req.body.api_key;
   };
   next();
 };
@@ -206,15 +163,27 @@ export const verifyDomainAccess: RequestHandler = async (req: Request, resp: Res
         };
       }
       else {
-        const aAccount: AccountEntity = await Accounts.getAccountWithAuthToken(authToken);
-        if (aAccount) {
-          if (IsNullOrEmpty(req.vDomain.sponsorAccountId)) {
-            // If the domain doesn't have an associated account, form the link to this account
-            req.vDomain.sponsorAccountId = aAccount.accountId;
-            await Domains.updateEntityFields(req.vDomain, { 'sponsorAccountId': aAccount.accountId } );
-          };
-          if (req.vDomain.sponsorAccountId === aAccount.accountId) {
-            verified = true;
+        // The request is being made with an authToken.
+        // The token should be for a domain.
+        const aToken: AuthToken = await Tokens.getTokenWithToken(authToken);
+        if (aToken && aToken.accountId) {
+          if (SArray.has(aToken.scope, TokenScope.DOMAIN)) {
+            // As a hack, if the domain doesn't have a sponsor set, assign the account to the domain.
+            // This should be fixed with a request that does the initial domain-to-account assignment
+            if (IsNullOrEmpty(req.vDomain.sponsorAccountId)) {
+              const aAccount: AccountEntity = await Accounts.getAccountWithId(aToken.accountId);
+              if (aAccount) {
+                Logger.debug(`verifyDomainAccess: assigning domain ${req.vDomain.domainId} to account ${aAccount.accountId}`);
+                req.vDomain.sponsorAccountId = aAccount.accountId;
+                await Domains.updateEntityFields(req.vDomain, { 'sponsorAccountId': aAccount.accountId } );
+              };
+            };
+            if (req.vDomain.sponsorAccountId === aToken.accountId) {
+              verified = true;
+            };
+          }
+          else {
+            Logger.debug(`verifyDomainAccess: not DOMAIN token: ${authToken}`);
           };
         };
       };
@@ -227,35 +196,97 @@ export const verifyDomainAccess: RequestHandler = async (req: Request, resp: Res
     next();
 };
 
+// Find domain apikey from JSON body and set as 'vDomainAPIKey'
+export const usernameFromParams: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  if (req.params && req.params.username) {
+    if (typeof(req.params.username) === 'string') {
+      req.vUsername = req.params.username;
+    };
+  };
+  next();
+};
+
+// MetaverseAPI middleware.
+// The request has a :domainId label that needs to be looked up and verified.
+// Decorate the passed Request with 'vDoamin' which points to a DomainEntity.
+// If domain cannot be found or verified, 'vDomainError' is set with text explaining the error.
+export const domainFromParams: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  let domainId: string;
+  if (req.params && req.params.domainId) {
+    if (typeof(req.params.domainId) === 'string') {
+      domainId = req.params.domainId;
+      if (domainId) {
+        req.vDomain = await Domains.getDomainWithId(domainId);
+      }
+      else {
+        Logger.error(`domainFromParams: wanted domain but none specified`);
+      };
+    };
+  };
+  if (IsNullOrEmpty(req.vDomain)) {
+    req.vDomainError = 'DomainId does not match a domain';
+    Logger.error(`domainFromParams: wanted domain ${domainId} but not found`);
+  };
+  next();
+};
+
+// Find domain apikey from JSON body and set as 'vDomainAPIKey'
+export const domainAPIkeyFromBody: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  if (req.body && req.body.domain && req.body.domain.api_key) {
+    if (typeof(req.body.domain.api_key) === 'string') {
+      req.vDomainAPIKey = req.body.domain.api_key;
+    };
+  };
+  next();
+};
+
+// Find domain apikey from previously parsed multi-part form body and set as 'vDomainAPIKey'
+export const domainAPIkeyFromMultipart: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  if (req.body && req.body.api_key) {
+    if (typeof(req.body.api_key) === 'string') {
+      req.vDomainAPIKey = req.body.api_key;
+    };
+  };
+  next();
+};
+
 // MetaverseAPI middleware.
 // The request has a :tokenId label that is returned in 'vTokenId'.
 export const tokenFromParams: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vRestResp) {
-    req.vTokenId = req.params.tokenId;
+  if (req.params && req.params.tokenId) {
+    if (typeof(req.params.tokenId) === 'string') {
+      req.vTokenId = req.params.tokenId;
+    };
   };
   next();
 };
 // MetaverseAPI middleware.
-// The request has a :tokenId label that is returned in 'vTokenId'.
+// The request has a :param1 label that is returned in 'vParam1'.
 export const param1FromParams: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vRestResp) {
-    req.vParam1 = req.params.param1;
+  if (req.params && req.params.param1) {
+    if (typeof(req.params.param1) === 'string') {
+      req.vParam1 = decodeURIComponent(req.params.param1);
+    };
   };
   next();
 };
 // MetaverseAPI middleware.
-// The request has a :tokenId label that is returned in 'vTokenId'.
+// The request has a :param2 label that is returned in 'vParam2'.
 export const param2FromParams: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vRestResp) {
-    req.vParam2 = req.params.param2;
+  if (req.params && req.params.param2) {
+    if (typeof(req.params.param2) === 'string') {
+      req.vParam2 = decodeURIComponent(req.params.param2);
+    };
   };
   next();
 };
 // MetaverseAPI middleware.
-// The request has a :tokenId label that is returned in 'vTokenId'.
+// The request has a :param3 label that is returned in 'vParam3'.
 export const param3FromParams: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vRestResp) {
-    req.vParam3 = req.params.param3;
+  if (req.params && req.params.param3) {
+    if (typeof(req.params.param3) === 'string') {
+      req.vParam3 = decodeURIComponent(req.params.param3);
+    };
   };
   next();
 };
