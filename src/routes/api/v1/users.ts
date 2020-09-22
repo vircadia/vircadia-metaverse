@@ -21,6 +21,7 @@ import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
 
 import { Accounts } from '@Entities/Accounts';
+import { accountFields } from '@Entities/AccountEntity';
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
 import { AccountFilterInfo } from '@Entities/EntityFilters/AccountFilterInfo';
@@ -73,9 +74,9 @@ const procPostUsers: RequestHandler = async (req: Request, resp: Response, next:
       const userPassword: string = req.body.user.password;
       const userEmail: string = req.body.user.email;
       Logger.debug(`procPostUsers: request to create account for ${userName} with email ${userEmail}`);
-      if (checkUsernameFormat(userName)) {
-        if (checkEmailFormat(userEmail)) {
-
+      // Precheck format of username and email before trying to set them
+      if (accountFields.username.validate(accountFields.username, 'username', userName)) {
+        if (accountFields.email.validate(accountFields.email, 'email', userEmail)) {
           // See if account already exists
           const prevAccount = await Accounts.getAccountWithUsername(userName);
           if (IsNullOrEmpty(prevAccount)) {
@@ -119,14 +120,6 @@ const procPostUsers: RequestHandler = async (req: Request, resp: Response, next:
     };
   }
   next();
-};
-
-function checkUsernameFormat(pUsername: string): boolean {
-  return pUsername && /^[a-z0-9+\-_\.]+$/.test(pUsername);
-};
-
-function checkEmailFormat(pEmail: string): boolean {
-  return pEmail && /^[a-z0-9+\-_\.]+@[a-z0-9-\.]+$/.test(pEmail);
 };
 
 export const name = '/api/v1/users';
