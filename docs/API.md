@@ -52,6 +52,7 @@ The API requests to the metaverse-server are:
 | GET    | /api/v1/domains/:domainId/public_key | [doc](./API-Domains.md#get-apiv1domainsdomainidpublic_key) get the public key for a domain |
 | PUT    | /api/v1/domains/:domainId/public_key | [doc](./API-Domains.md#put-apiv1domainsdomainidpublic_key) update public key used by domain |
 | POST   | /api/v1/domains/temporary            | [doc](./API-Domains.md#post-apiv1domainstemporary) create a domain temporary name/entry |
+| GET    | /api/v1/places                  | [doc](./API-Places.md#get-apiv1places) get list of visitable places |
 | GET    | /api/v1/tokens                  | [doc](./API-Tokens.md#get-apiv1tokens) fetch list of created tokens |
 | POST   | /api/v1/token/new               | [doc](./API-Tokens.md#post-apiv1tokennew) create a new token for account/domain |
 | POST   | /api/v1/user/connection_request | [doc](./API-Users.md#post-apiv1userconnection_request) request friend/connection |
@@ -63,6 +64,12 @@ The API requests to the metaverse-server are:
 | GET    | /api/v1/user/location           | [doc](./API-Users.md#get-apiv1userlocker) fetch per-user parameters |
 | POST   | /api/v1/user/location           | [doc](./API-Users.md#post-apiv1userlocker) update per-user parameters |
 | GET    | /api/v1/user/location           | [doc](./API-Users.md#get-apiv1userprofile) get this user's profile |
+| GET    | /api/v1/user/places/            | [doc](./API-places.md#get-apiv1userplaces) fetch requesting user's places |
+| POST   | /api/v1/user/places/            | [doc](./API-places.md#post-apiv1userplaces) create a place |
+| GET    | /api/v1/user/places/:placeId    | [doc](./API-places.md#get-apiv1userplacesplaceId) get information on specific place |
+| DELETE | /api/v1/user/places/:placeId    | [doc](./API-places.md#delete-apiv1userplacesplaceId) delete a place |
+| GET    | /api/v1/user/places/:placeId/field/:fieldname  | [doc](./API-places.md#get-apiv1userplacesplaceidfieldfieldname) fetch specific place parameter |
+| POST   | /api/v1/user/places/:placeId/field/:fieldname  | [doc](./API-places.md#post-apiv1userplacesplaceidfieldfieldname) set specific place parameter |
 | PUT    | /api/v1/user/public_key         | [doc](./API-Users.md#put-apiv1userpublic_key) update this user's public key |
 | GET    | /api/v1/users                   | [doc](./API-Users.md#get-apiv1users) fetch list of user information |
 | POST   | /api/v1/users                   | [doc](./API-Users.md#post-apiv1users) create account |

@@ -1,6 +1,14 @@
 # MetaverseAPI - Place Management
 
-Requests that create and manage Place entries
+Requests that create and manage Place entries.
+
+Places are basicly location "bookmarks" that are created by a domain owner
+to denote locations of interest in a domain.
+
+Places are created by a domain "owner" using
+[POST /api/v1/user/places](./API-Places.md#post-apiv1userplaces).
+The domain "owner" is the account that is associated with the 
+domain (the account that registered the domain with the metaverse-server).
 
 ## GET /api/v1/places
 

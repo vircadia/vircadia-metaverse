@@ -89,7 +89,6 @@ The fields that can be changed are:
 ```
     {
         "accounts": {
-            "username": newUsername,
             "email": newEmail,
             "public_key": newPublicKey,
             "images": {
