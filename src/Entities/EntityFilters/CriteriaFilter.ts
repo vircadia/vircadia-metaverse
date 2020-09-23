@@ -27,4 +27,7 @@ export abstract class CriteriaFilter {
   // This changes what 'criteriaTest' returns since the testing is now
   //     expected to be in the query.
   abstract criteriaParameters(): any;
+
+  // return Mongodb critera for sort operations
+  abstract sortCriteriaParameters(): any;
 };

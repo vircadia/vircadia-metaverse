@@ -94,4 +94,8 @@ export class AccountScopeFilter extends CriteriaFilter {
     }
     return criteria;
   };
+
+  public sortCriteriaParameters(): any {
+    return null;
+  };
 };

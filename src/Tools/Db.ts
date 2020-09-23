@@ -152,18 +152,27 @@ export async function *getObjects(pCollection: string,
 
   // If a paging filter is passed, incorporate it's search criteria
   let criteria:any = {};
+  let sortCriteria:any
+
   if (pPager) {
     criteria = deepmerge(criteria, pPager.criteriaParameters());
+    sortCriteria = pPager.sortCriteriaParameters ?? sortCriteria;
   };
   if (pInfoer) {
     criteria = deepmerge(criteria, pInfoer.criteriaParameters());
+    sortCriteria = pInfoer.sortCriteriaParameters ?? sortCriteria;
   };
   if (pScoper) {
     criteria = deepmerge(criteria, pScoper.criteriaParameters());
+    sortCriteria = pScoper.sortCriteriaParameters ?? sortCriteria;
   };
 
   Logger.cdebug('db-query-detail', `Db.getObjects: collection=${pCollection}, criteria=${JSON.stringify(criteria)}`);
   const cursor = Datab.collection(pCollection).find(criteria);
+
+  if (sortCriteria) {
+    cursor.sort(sortCriteria);
+  };
 
   while (await cursor.hasNext()) {
     const nextItem = await cursor.next();
