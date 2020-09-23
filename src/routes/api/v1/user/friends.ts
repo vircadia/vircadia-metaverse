@@ -19,14 +19,16 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken, usernameFromParams } from '@Route-Tools/middleware';
 import { Accounts } from '@Entities/Accounts';
+import { getAccountField } from '@Entities/AccountEntity';
 
 import { SArray, VKeyedCollection } from '@Tools/vTypes';
 import { IsNotNullOrEmpty } from '@Tools/Misc';
 
 // Get the friends of the logged in account
-const procGetUserFriends: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procGetUserFriends: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
-    const friends = typeof(req.vAuthAccount.friends) === 'undefined'
+    let friends = await getAccountField(req.vAuthToken, req.vAuthAccount, 'friends', req.vAuthAccount);
+    friends = typeof(friends) === 'undefined'
               ? []        // if no friends info, return empty list
               : req.vAuthAccount.friends;
     req.vRestResp.Data = {
@@ -41,13 +43,13 @@ const procGetUserFriends: RequestHandler = (req: Request, resp: Response, next: 
 
 // Upgrade a connection to a friend.
 // Not implemented as something needs to be done with request_connection, etc
-const procPostUserFriends: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procPostUserFriends: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   req.vRestResp.respondFailure('cannot add friends this way');
   next();
 };
 
 // Remove a friend from my friend list.
-const procDeleteUserFriends: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procDeleteUserFriends: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
     if (IsNotNullOrEmpty(req.vAuthAccount.friends)) {
       if (SArray.has(req.vAuthAccount.friends, req.vUsername)) {
