@@ -180,7 +180,7 @@ async function BuildIndexes() {
   // Accounts:
   //    'accountId'
   //    'username': should be case-less compare. Also update Accounts.getAccountWithUsername()
-  //    'location.nodeId'
+  //    'locationNodeId'
   //    friends?
   // Domains:
   //    'domainId'

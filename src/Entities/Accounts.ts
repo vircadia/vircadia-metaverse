@@ -59,7 +59,7 @@ export const Accounts = {
     return null;
   },
   async getAccountWithNodeId(pNodeId: string): Promise<AccountEntity> {
-    return IsNullOrEmpty(pNodeId) ? null : getObject(accountCollection, { 'location.nodeid': pNodeId });
+    return IsNullOrEmpty(pNodeId) ? null : getObject(accountCollection, { 'locationNodeid': pNodeId });
   },
   async addAccount(pAccountEntity: AccountEntity) : Promise<AccountEntity> {
     return createObject(accountCollection, pAccountEntity);
