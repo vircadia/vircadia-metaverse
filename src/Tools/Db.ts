@@ -65,6 +65,9 @@ export async function setupDB(): Promise<void> {
 
   // Do any operations to update database formats
   await DoDatabaseFormatChanges();
+
+  await BuildIndexes();
+
   return;
 };
 
@@ -173,6 +176,21 @@ export async function *getObjects(pCollection: string,
   };
 };
 
+async function BuildIndexes() {
+  // Accounts:
+  //    'accountId'
+  //    'username': should be case-less compare. Also update Accounts.getAccountWithUsername()
+  //    'location.nodeId'
+  //    friends?
+  // Domains:
+  //    'domainId'
+  //    'apiKey'
+  //    'lastSenderKey'
+  // Places:
+  //    'placeId'
+  //    'name'
+};
+
 // Do any database format changes.
 // Eventually, there should be a system of multiple, versioned updates
 //    but, to keep things running, just do the updates needed for now.
@@ -205,6 +223,4 @@ async function DoDatabaseFormatChanges() {
     );
   });
   Logger.debug(`Db.DoDatabaseFormatChanges: ${sponsorUpdateCount} Domain.sponserAccountId renames`);
-
-
 };
