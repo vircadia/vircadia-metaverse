@@ -80,18 +80,18 @@ const procPostField: RequestHandler = async (req: Request, resp: Response, next:
   next();
 };
 
-export const name = '/api/v1/user/place/:placeId/field/:fieldname';
+export const name = '/api/v1/places/:placeId/field/:fieldname';
 
 export const router = Router();
 
-router.get( '/api/v1/user/place/:param1/field/:param2',
+router.get( '/api/v1/places/:param1/field/:param2',
                                           [ setupMetaverseAPI,    // req.vRestResp
                                             param1FromParams,     // req.vParam1
                                             param2FromParams,     // req.vParam2
                                             procGetField,
                                             finishMetaverseAPI
                                           ] );
-router.post('/api/v1/user/place/:param1/field/:param2',
+router.post('/api/v1/places/:param1/field/:param2',
                                           [ setupMetaverseAPI,    // req.vRestResp
                                             accountFromAuthToken, // req.vAuthAccount
                                             param1FromParams,     // req.vParam1
