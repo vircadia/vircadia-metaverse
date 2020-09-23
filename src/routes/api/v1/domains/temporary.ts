@@ -60,7 +60,8 @@ const procPostDomainsTemporary: RequestHandler = async (req: Request, resp: Resp
   Places.addPlace(newPlace);
 
   req.vRestResp.Data = {
-    'domain': buildDomainInfo(newDomain)
+    'domain': await buildDomainInfo(newDomain),
+    'place': await buildPlaceInfo(newPlace)
   };
   req.vRestResp.Data.domain.api_key = newDomain.apiKey;
   next();

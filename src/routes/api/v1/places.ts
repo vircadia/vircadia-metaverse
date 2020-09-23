@@ -17,9 +17,8 @@
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
-import { buildDomainInfo, buildPlaceInfo } from '@Route-Tools/Util';
+import { buildPlaceInfo } from '@Route-Tools/Util';
 
-import { Domains } from '@Entities/Domains';
 import { Places } from '@Entities/Places';
 
 import { Logger } from '@Tools/Logging';
@@ -40,14 +39,6 @@ const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next:
     // Loop through all the filtered accounts and create array of info
     const places: any[] = [];
     for await (const place of Places.enumerateAsync(pager)) {
-      const placeInfo = await buildPlaceInfo(place);
-      if (place.domainId) {
-        const aDomain = await Domains.getDomainWithId(place.domainId);
-        if (IsNotNullOrEmpty(aDomain)) {
-          placeInfo.domain = buildDomainInfo(aDomain);
-
-        }
-      }
       places.push(await buildPlaceInfo(place));
     };
 

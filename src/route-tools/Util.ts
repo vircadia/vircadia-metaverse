@@ -103,7 +103,7 @@ export async function buildLocationInfo(pReq: Request, pAcct: AccountEntity): Pr
       return {
         'node_id': pReq.vSession.sessionId,
         'root': {
-          'domain': buildDomainInfo(aDomain),
+          'domain': await buildDomainInfo(aDomain),
         },
         'path': pAcct.locationPath,
         'online': Accounts.isOnline(pAcct)
@@ -128,7 +128,7 @@ export async function buildLocationInfo(pReq: Request, pAcct: AccountEntity): Pr
   return ret;
 };
 
-export function buildDomainInfo(pDomain: DomainEntity): any {
+export async function buildDomainInfo(pDomain: DomainEntity): Promise<any> {
   return {
     'id': pDomain.domainId,
     'name': pDomain.name,
@@ -224,15 +224,18 @@ export async function buildAccountInfo(pReq: Request, pAccount: AccountEntity): 
 // Return an object with the formatted place information
 // Pass the PlaceEntity and the place's domain if known.
 export async function buildPlaceInfo(pPlace: PlaceEntity, pDomain?: DomainEntity): Promise<any> {
-  const aDomain = pDomain ?? await Domains.getDomainWithId(pPlace.domainId);
-  return {
+  const ret: VKeyedCollection =  {
     'placeId': pPlace.placeId,
     'name': pPlace.name,
     'address': pPlace.address,
     'description': pPlace.description,
-    'domain': buildDomainInfo(aDomain),
     'accountId': pPlace.accountId,
     'thumbnail': pPlace.thumbnail,
     'images': pPlace.images
   };
+  if (IsNotNullOrEmpty(pPlace.domainId)) {
+    const aDomain = pDomain ?? await Domains.getDomainWithId(pPlace.domainId);
+    ret.domain = await buildDomainInfo(aDomain);
+  };
+  return ret;
 };
