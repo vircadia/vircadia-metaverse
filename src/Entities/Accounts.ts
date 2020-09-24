@@ -22,7 +22,7 @@ import { AccountRoles } from '@Entities/AccountRoles';
 import { Tokens } from '@Entities/Tokens';
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 
-import { createObject, getObject, getObjects, updateObjectFields, deleteOne } from '@Tools/Db';
+import { createObject, getObject, getObjects, updateObjectFields, deleteOne, noCaseCollation } from '@Tools/Db';
 import { GenUUID, genRandomString, IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 
 import { Logger } from '@Tools/Logging';
@@ -53,13 +53,16 @@ export const Accounts = {
       // build username query with case-insensitive Regex.
       // When indexes are added, create a 'username' case-insensitive index.
       // Need to clean the username of search characters since we're just passing it to the database
-      return getObject(accountCollection,
-                { 'username': new RegExp(['^', pUsername.replace('[\\\*]', ''), '$'].join(''), 'i') } );
+      return getObject(accountCollection, { 'username': pUsername }, noCaseCollation );
+                // { 'username': new RegExp(['^', pUsername.replace('[\\\*]', ''), '$'].join(''), 'i') } );
     };
     return null;
   },
   async getAccountWithNodeId(pNodeId: string): Promise<AccountEntity> {
     return IsNullOrEmpty(pNodeId) ? null : getObject(accountCollection, { 'locationNodeid': pNodeId });
+  },
+  async getAccountWithEmail(email: string): Promise<AccountEntity> {
+    return IsNullOrEmpty(email) ? null : getObject(accountCollection, { 'email': email }, noCaseCollation );
   },
   async addAccount(pAccountEntity: AccountEntity) : Promise<AccountEntity> {
     return createObject(accountCollection, pAccountEntity);
@@ -75,7 +78,7 @@ export const Accounts = {
     const newAcct = new AccountEntity();
     newAcct.accountId= GenUUID();
     newAcct.username = pUsername;
-    newAcct.email = pEmail;
+    newAcct.email = pEmail.toLowerCase();
     newAcct.roles = [AccountRoles.USER];
     newAcct.whenAccountCreated = new Date();
 

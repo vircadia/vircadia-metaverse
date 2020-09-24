@@ -15,16 +15,18 @@
 
 import { Config } from '@Base/config';
 
-import { MongoClient, Db, DeleteWriteOpResultObject } from 'mongodb';
+import { MongoClient, Db } from 'mongodb';
+
 import deepmerge from 'deepmerge';
 
+// This seems to create a circular reference  that causes variables to not be initialized
 // import { domainCollection } from '@Entities/Domains';
 
-import { VKeyedCollection } from '@Tools/vTypes';
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
-import { Logger } from '@Tools/Logging';
+
+import { VKeyedCollection } from '@Tools/vTypes';
 import { IsNotNullOrEmpty } from './Misc';
-import { createConnection } from 'net';
+import { Logger } from '@Tools/Logging';
 
 // The initial MongoClient
 export let BaseClient: MongoClient;
@@ -83,9 +85,16 @@ export async function createObject(pCollection: string, pObject: any): Promise<a
 
 // Low level access to database to fetch the first instance of an object matching the criteria
 // Throws exception if anything wrong with the fetch.
-export async function getObject(pCollection: string, pCriteria: any): Promise<any> {
-  return Datab.collection(pCollection)
-    .findOne(pCriteria)
+// You can optionally pass a collation which is used to select index (usually for case-insensitive queries)..
+export async function getObject(pCollection: string, pCriteria: any, pCollation?: any): Promise<any> {
+  if (pCollation) {
+    const cursor = Datab.collection(pCollection).find(pCriteria).collation(pCollation);
+    if (await cursor.hasNext()) {
+      return cursor.next();
+    };
+    return null;
+  };
+  return Datab.collection(pCollection).findOne(pCriteria);
 };
 
 // Low level access to database to update the passed object in the passed collection.
@@ -185,27 +194,47 @@ export async function *getObjects(pCollection: string,
   };
 };
 
+const domainCollection = 'domains';
+const accountCollection = 'accounts';
+const placeCollection = 'places';
+
+export let noCaseCollation: any = {
+  locale: 'en_US',
+  strength: 2
+};
+
 async function BuildIndexes() {
   // Accounts:
   //    'accountId'
   //    'username': should be case-less compare. Also update Accounts.getAccountWithUsername()
   //    'locationNodeId'
-  //    friends?
+  //    'email'
+  //    what is needed for friends?
+  await Datab.createIndex(accountCollection, { 'accountId': 1 } );
+  await Datab.createIndex(accountCollection, { 'username': 1 },
+                    { collation: noCaseCollation } );
+  await Datab.createIndex(accountCollection, { 'locationNodeId': 1 } );
+  await Datab.createIndex(accountCollection, { 'email': 1 },
+                    { collation: noCaseCollation } );
   // Domains:
   //    'domainId'
   //    'apiKey'
   //    'lastSenderKey'
+  await Datab.createIndex(domainCollection, { 'domainId': 1 } );
+  await Datab.createIndex(domainCollection, { 'apiKey': 1 } );
+  await Datab.createIndex(domainCollection, { 'lastSenderKey': 1 } );
   // Places:
   //    'placeId'
   //    'name'
+  await Datab.createIndex(placeCollection, { 'placeId': 1 } );
+  await Datab.createIndex(placeCollection, { 'name': 1 },
+                    { collation: { locale: 'en_US', strength: 2 } } );
 };
 
 // Do any database format changes.
 // Eventually, there should be a system of multiple, versioned updates
 //    but, to keep things running, just do the updates needed for now.
 async function DoDatabaseFormatChanges() {
-
-  const domainCollection = 'domains';
 
   // Domain naming changed a little when place_names were added.
   //    so domain.placeName changed to domain.name.

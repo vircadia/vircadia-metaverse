@@ -137,7 +137,7 @@ export async function initializeConfiguration(): Promise<void> {
       };
     };
     Config.server["server-version"] = versionInfo;
-    Logger.debug(`initializeConfiguration: version info: ${JSON.stringify(versionInfo)}`);
+    Logger.debug(`initializeConfiguration: version info: ${JSON.stringify(versionInfo, null, 4)}`);
   }
   catch (e) {
     Logger.error('initializeConfiguration: exception reading version info: ' + e);

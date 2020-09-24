@@ -131,10 +131,16 @@ export const accountFields: { [key: string]: FieldDefn } = {
     get_permissions: [ 'all' ],
     set_permissions: [ 'owner', 'admin' ],
     validate: (pField: FieldDefn, pEntity: Entity, pVal: any): any => {
-      // Check email for sanity
-      return pVal && /^[A-Za-z0-9+\-_\.]+@[A-Za-z0-9-\.]+$/.test(pVal);
+      if (typeof(pVal) === 'string') {
+        // Check email for sanity
+        return pVal && /^[A-Za-z0-9+\-_\.]+@[A-Za-z0-9-\.]+$/.test(pVal);
+      };
+      return false;
     },
-    setter: simpleSetter,
+    setter: (pField: FieldDefn, pEntity: Entity, pVal: any): any => {
+      // emails are stored in lower-case
+      (pEntity as AccountEntity).email = (pVal as string).toLowerCase();
+    },
     getter: simpleGetter
   },
   'account_settings': {

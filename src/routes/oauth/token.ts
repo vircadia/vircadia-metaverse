@@ -27,6 +27,7 @@ import { AccountRoles } from '@Entities/AccountRoles';
 import { AuthToken } from '@Entities/AuthToken';
 import { Tokens, TokenScope } from '@Entities/Tokens';
 
+import { IsNullOrEmpty } from '@Tools/Misc';
 import { VKeyedCollection } from '@Tools/vTypes';
 
 import { Logger } from '@Tools/Logging';
@@ -56,7 +57,11 @@ const procPostOauthToken: RequestHandler = async (req: Request, resp: Response, 
 
         const userScope: string = req.body.scope ?? TokenScope.OWNER;
         if (TokenScope.KnownScope(userScope)) {
-          const aAccount = await Accounts.getAccountWithUsername(userName);
+          let aAccount = await Accounts.getAccountWithUsername(userName);
+          if (IsNullOrEmpty(aAccount)) {
+            // people can log in with either their username or their email
+            aAccount = await Accounts.getAccountWithEmail(userName);
+          };
           if (aAccount) {
             if (await Accounts.validatePassword(aAccount, userPassword)) {
               Logger.debug(`procPostOAuthToken: login of user ${userName}`);
