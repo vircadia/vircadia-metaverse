@@ -42,6 +42,7 @@ export const Domains = {
   createDomain(): DomainEntity {
     const newDomain = new DomainEntity();
     newDomain.domainId = GenUUID();
+    newDomain.whenCreated = new Date();
     return newDomain;
   },
   removeDomain(pDomainEntity: DomainEntity) : Promise<boolean> {

@@ -180,7 +180,7 @@ export async function buildDomainInfoV1(pDomain: DomainEntity): Promise<any> {
     'time_of_last_heartbeat': pDomain.timeOfLastHeartbeat ? pDomain.timeOfLastHeartbeat.toISOString() : undefined,
     'last_sender_key': pDomain.lastSenderKey,
     'addr_of_first_contact': pDomain.iPAddrOfFirstContact,
-    'when_domain_entry_created': pDomain.whenDomainEntryCreated ? pDomain.whenDomainEntryCreated.toISOString() : undefined
+    'when_domain_entry_created': pDomain.whenCreated ? pDomain.whenCreated.toISOString() : undefined
   };
 };
 
@@ -216,7 +216,7 @@ export async function buildAccountInfo(pReq: Request, pAccount: AccountEntity): 
     'location': await buildLocationInfo(pReq, pAccount),
     'friends': pAccount.friends,
     'connections': pAccount.connections,
-    'when_account_created': pAccount.whenAccountCreated ? pAccount.whenAccountCreated.toISOString() : undefined,
+    'when_account_created': pAccount.whenCreated ? pAccount.whenCreated.toISOString() : undefined,
     'time_of_last_heartbeat': pAccount.timeOfLastHeartbeat ? pAccount.timeOfLastHeartbeat.toISOString() : undefined
   };
 };

@@ -39,7 +39,7 @@ export const Places = {
     newPlace.placeId = GenUUID();
     newPlace.name = 'UNKNOWN-' + genRandomString(5);
     newPlace.address = '/0,0,0/0,0,0,0/';
-    newPlace.whenPlaceEntryCreated = new Date();
+    newPlace.whenCreated = new Date();
     return newPlace;
   },
   removePlace(pPlaceEntity: PlaceEntity) : Promise<boolean> {

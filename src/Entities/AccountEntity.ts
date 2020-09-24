@@ -62,7 +62,7 @@ export class AccountEntity implements Entity {
   // ALWAYS USE functions in Roles class to manipulate this list of roles
   public roles: string[];           // account roles (like 'admin')
   public IPAddrOfCreator: string;   // IP address that created this account
-  public whenAccountCreated: Date;  // date of account creation
+  public whenCreated: Date;  // date of account creation
   public timeOfLastHeartbeat: Date; // when we last heard from this user
 };
 
@@ -292,7 +292,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
     getter: simpleGetter
   },
   'when_account_created': {
-    entity_field: 'WhenAccountCreated',
+    entity_field: 'whenCreated',
     request_field_name: 'when_account_created',
     get_permissions: [ 'all' ],
     set_permissions: [ 'none' ],

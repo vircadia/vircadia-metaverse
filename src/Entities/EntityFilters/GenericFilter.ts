@@ -17,6 +17,7 @@ import { Request } from 'express';
 
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 
+// A generic filter wrapper where the caller can pass any criteria.
 export class GenericFilter extends CriteriaFilter {
 
   private _criteria: any;

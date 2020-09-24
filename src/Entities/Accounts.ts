@@ -80,7 +80,7 @@ export const Accounts = {
     newAcct.username = pUsername;
     newAcct.email = pEmail.toLowerCase();
     newAcct.roles = [AccountRoles.USER];
-    newAcct.whenAccountCreated = new Date();
+    newAcct.whenCreated = new Date();
 
     // Remember the password
     Accounts.storePassword(newAcct, pPassword);

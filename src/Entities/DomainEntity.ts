@@ -57,7 +57,7 @@ export class DomainEntity implements Entity {
 
   // admin stuff
   public iPAddrOfFirstContact: string; // IP address that registered this domain
-  public whenDomainEntryCreated: Date; // What the variable name says
+  public whenCreated: Date; // What the variable name says
   public timeOfLastHeartbeat: Date;    // time of last heartbeat
   public lastSenderKey: string;        // a key identifying the sender
 
@@ -287,7 +287,7 @@ export const domainFields: { [key: string]: FieldDefn } = {
     getter: simpleGetter
   },
   'when_domain_entry_created': {
-    entity_field: 'whenDomainEntryCreated',
+    entity_field: 'whenCreated',
     request_field_name: 'when_domain_entry_created',
     get_permissions: [ 'all' ],
     set_permissions: [ 'none' ],

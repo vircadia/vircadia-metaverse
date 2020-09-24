@@ -18,13 +18,12 @@ import { AccountEntity } from '@Entities/AccountEntity';
 import { AuthToken } from '@Entities/AuthToken';
 
 import { FieldDefn } from '@Route-Tools/Permissions';
-import { checkAccessToEntity } from '@Route-Tools/Permissions';
 import { isStringValidator, isSArraySet, isPathValidator, isDateValidator } from '@Route-Tools/Permissions';
 import { simpleGetter, simpleSetter, sArraySetter, dateStringGetter } from '@Route-Tools/Permissions';
 import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/Permissions';
 
-import { Logger } from '@Tools/Logging';
 import { VKeyedCollection } from '@Tools/vTypes';
+import { Logger } from '@Tools/Logging';
 
 // NOTE: this class cannot have functions in them as they are just JSON to and from the database
 export class PlaceEntity implements Entity {
@@ -39,7 +38,7 @@ export class PlaceEntity implements Entity {
 
   // admin stuff
   public iPAddrOfFirstContact: string; // IP address that registered this place
-  public whenPlaceEntryCreated: Date; // What the variable name says
+  public whenCreated: Date; // What the variable name says
 };
 
 // Get the value of a place field with the fieldname.
@@ -157,7 +156,7 @@ export const placeFields: { [key: string]: FieldDefn } = {
     getter: simpleGetter
   },
   'when_place_entry_created': {
-    entity_field: 'whenPlaceEntryCreated',
+    entity_field: 'whenCreated',
     request_field_name: 'when_place_entry_created',
     get_permissions: [ 'all' ],
     set_permissions: [ 'none' ],
