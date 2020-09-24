@@ -143,7 +143,9 @@ export async function buildDomainInfo(pDomain: DomainEntity): Promise<any> {
 export async function buildDomainInfoV1(pDomain: DomainEntity): Promise<any> {
   return {
     'domainId': pDomain.domainId,
+    'id': pDomain.domainId,     // legacy
     'name': pDomain.name,
+    'label': pDomain.name,      // legacy
     'public_key': pDomain.publicKey ? createSimplifiedPublicKey(pDomain.publicKey) : undefined,
     'sponsor_account_id': pDomain.sponsorAccountId,
     'ice_server_address': pDomain.iceServerAddr,

@@ -38,6 +38,7 @@ export class DomainEntity implements Entity {
   public version: string;      // DomainServer's build version (like "K3")
   public protocol: string;     // Protocol version
   public networkAddr: string;  // reported network address
+  public networkPort: string;  // reported network address
   public networkingMode: string;   // one of "full", ?
   public restricted: boolean;  // 'true' if restricted to users with accounts
   public numUsers: number;     // regular users logged in
@@ -156,6 +157,15 @@ export const domainFields: { [key: string]: FieldDefn } = {
     get_permissions: [ 'all' ],
     set_permissions: [ 'domain' ],
     validate: isStringValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'network_port': {
+    entity_field: 'networkPort',
+    request_field_name: 'network_port',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'domain' ],
+    validate: isNumberValidator,
     setter: simpleSetter,
     getter: simpleGetter
   },
