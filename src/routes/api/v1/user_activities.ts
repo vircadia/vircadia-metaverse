@@ -20,7 +20,7 @@ import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 
 import { Logger } from '@Tools/Logging';
 
-const procPostUserActivities: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procPostUserActivities: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vRestResp) {
     if (req.body.action_name) {
       const activity = req.body.action_name;

@@ -18,7 +18,7 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 
 // GET /api/v1/commerce/history?per_page=10&since=1597015135.983
-const procGetCommerceHistory: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procGetCommerceHistory: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vRestResp) {
     req.vRestResp.Data = {
     };

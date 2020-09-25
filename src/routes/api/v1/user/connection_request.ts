@@ -20,7 +20,7 @@ import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken, usernameFromParams } from '@Route-Tools/middleware';
 import { Logger } from '@Tools/Logging';
 
-const procPostUserConnectionRequest: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procPostUserConnectionRequest: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
     // The client script looks for two types of 'connection' responses.
     // If is sees data.connection == "pending", it trys again and eventually times out

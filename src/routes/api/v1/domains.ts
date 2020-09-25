@@ -85,9 +85,15 @@ const procPostDomains: RequestHandler = async (req: Request, resp: Response, nex
       Domains.addDomain(newDomain);
       Places.addPlace(newPlace);
 
-      req.vRestResp.Data.domain.api_key = newDomain.apiKey;
+      const domainInfo = await buildDomainInfo(newDomain);
+      domainInfo.api_key = newDomain.apiKey;
+
+      req.vRestResp.Data = {
+        'domain': domainInfo
+      };
+
       // some legacy requests want the domain information at the top level
-      req.vRestResp.addAdditionalField('domain', buildDomainInfo(newDomainName));
+      req.vRestResp.addAdditionalField('domain', domainInfo);
     }
     else {
       req.vRestResp.respondFailure('name contains not allowed characters');

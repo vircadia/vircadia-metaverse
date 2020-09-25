@@ -25,7 +25,7 @@ import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 import { AccountRoles } from '@Entities/AccountRoles';
 
 // Get the scope of the logged in account
-const procGetUserRoles: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procGetUserRoles: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount && req.vAccount) {
     if (Accounts.isAdmin(req.vAuthAccount)) {
       const roles = IsNullOrEmpty(req.vAccount.roles)
@@ -47,7 +47,7 @@ const procGetUserRoles: RequestHandler = (req: Request, resp: Response, next: Ne
 
 // Add a role to my roles collection.
 // Not implemented as something needs to be done with request_connection, etc
-const procPostUserRoles: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procPostUserRoles: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount && req.vAccount) {
     if (Accounts.isAdmin(req.vAuthAccount)) {
       const roles = IsNullOrEmpty(req.vAccount.roles)
@@ -74,7 +74,7 @@ const procPostUserRoles: RequestHandler = (req: Request, resp: Response, next: N
 };
 
 // Remove a friend from my friend list.
-const procDeleteUserRole: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procDeleteUserRole: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount && req.vAccount) {
     if (Accounts.isAdmin(req.vAuthAccount)) {
       if (IsNotNullOrEmpty(req.vAccount.roles)) {

@@ -33,7 +33,6 @@ import { Logger } from '@Tools/Logging';
 
 // POST /domains/temporary
 const procPostDomainsTemporary: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('procPostDomainsTemporary');
 
   const customConfig: Config = {
     // dictionaries: [ adjectives, colors, animals ],
@@ -61,7 +60,7 @@ const procPostDomainsTemporary: RequestHandler = async (req: Request, resp: Resp
 
   req.vRestResp.Data = {
     'domain': await buildDomainInfo(newDomain),
-    'place': await buildPlaceInfo(newPlace)
+    'place': await buildPlaceInfo(newPlace, newDomain)
   };
   req.vRestResp.Data.domain.api_key = newDomain.apiKey;
   next();

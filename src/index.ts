@@ -24,7 +24,8 @@ import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
 import crypto from 'crypto';
-import { Router } from 'express';
+
+import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
 import { setupDB } from '@Tools/Db';
 
@@ -62,7 +63,31 @@ initializeConfiguration()
   } ));
 
   // Most of the requests are JSON in an out
-  expr.use(express.json());
+  expr.use(express.json({ 'strict': false }));
+  expr.use( (err:Error, req:Request, resp:Response, next:NextFunction) => {
+    if (err instanceof SyntaxError) {
+      if ('body' in err) {
+        Logger.error(`JSON parseError: have body and trying reparse with terminator`);
+        try {
+          /* tslint:disable-next-line */
+          req.body = JSON.parse(err['body'] + '}');
+          next();
+        }
+        catch (ex) {
+          /* tslint:disable-next-line */
+          Logger.error(`parseError: ${err['body']}`);
+          resp.status(400).send({ 'status': 'failure', 'error': 'JSON parse error'});
+        };
+      }
+      else {
+        Logger.error(`JSON parseError: no body`);
+        resp.status(400).send({ 'status': 'failure', 'error': 'JSON parse error'});
+      };
+    }
+    else {
+      next();
+    };
+  });
 
   // Early router entry to do any early debugging
   expr.use(createAPIRouter('routes-first'));

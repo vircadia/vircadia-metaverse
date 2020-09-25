@@ -19,7 +19,7 @@ import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
-const procGetCommerceMarketplaceKey: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procGetCommerceMarketplaceKey: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vRestResp) {
     req.vRestResp.Data = {
       'public_key': 'laksdjfioasdofuoavanvowieroiawueroaijsdlkfajsdlfjalsdkfjlasdjfaklhkoiu'

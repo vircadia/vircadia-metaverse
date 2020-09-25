@@ -138,6 +138,7 @@ export async function buildDomainInfo(pDomain: DomainEntity): Promise<any> {
   return {
     'id': pDomain.domainId,
     'name': pDomain.name,
+    'label': pDomain.name,
     'network_address': pDomain.networkAddr,
     'ice_server_address': pDomain.iceServerAddr,
     'time_of_last_heartbeat': pDomain.timeOfLastHeartbeat ? pDomain.timeOfLastHeartbeat.toISOString() : undefined,
@@ -149,7 +150,9 @@ export async function buildDomainInfo(pDomain: DomainEntity): Promise<any> {
 export async function buildDomainInfoV1(pDomain: DomainEntity): Promise<any> {
   return {
     'domainId': pDomain.domainId,
+    'id': pDomain.domainId,       // legacy
     'name': pDomain.name,
+    'label': pDomain.name,        // legacy
     'public_key': pDomain.publicKey ? createSimplifiedPublicKey(pDomain.publicKey) : undefined,
     'owner_places': await buildPlacesForDomain(pDomain),
     'sponsor_account_id': pDomain.sponsorAccountId,

@@ -65,30 +65,35 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
     if (await checkAccessToEntity(req.vAuthToken, req.vDomain, [ Perm.DOMAIN, Perm.SPONSOR, Perm.ADMIN ])) {
       const updated: VKeyedCollection = {};
       const valuesToSet = req.body.domain;
-      // 'valuesToSet' are the values sent to use in the request.
-      // Collect the specific values set. Cannot just accept all because the
-      //     requestor could do things like set the password hash or other bad things.
-      for (const field of ['version', 'protocol', 'network_addr', 'network_port', 'automatic_networking',
-                  'restricted', 'capacity', 'description', 'maturity', 'restriction' ]) {
-        if (valuesToSet.hasOwnProperty(field)) {
-          await setDomainField(req.vAuthToken, req.vDomain, field, valuesToSet[field], req.vAuthAccount, updated);
+      if (valuesToSet) {
+        // 'valuesToSet' are the values sent to use in the request.
+        // Collect the specific values set. Cannot just accept all because the
+        //     requestor could do things like set the password hash or other bad things.
+        for (const field of ['version', 'protocol', 'network_addr', 'network_port', 'automatic_networking',
+                    'restricted', 'capacity', 'description', 'maturity', 'restriction' ]) {
+          if (valuesToSet.hasOwnProperty(field)) {
+            await setDomainField(req.vAuthToken, req.vDomain, field, valuesToSet[field], req.vAuthAccount, updated);
+          };
         };
-      };
-      if (valuesToSet.hasOwnProperty('hosts')) {
-        await setDomainField(req.vAuthToken, req.vDomain, 'hosts', { 'set': CleanedStringArray(valuesToSet.hosts)}, req.vAuthAccount, updated);
-      };
-      if (valuesToSet.hasOwnProperty('tags')) {
-        await setDomainField(req.vAuthToken, req.vDomain, 'tags', { 'set': CleanedStringArray(valuesToSet.tags)}, req.vAuthAccount, updated);
-      };
-      if (valuesToSet.hasOwnProperty('heartbeat')) {
-        await setDomainField(req.vAuthToken, req.vDomain, 'num_users', valuesToSet.heartbeat.num_users, req.vAuthAccount, updated);
-        await setDomainField(req.vAuthToken, req.vDomain, 'num_anon_users', valuesToSet.heartbeat.num_anon_users, req.vAuthAccount, updated);
-      };
+        if (valuesToSet.hasOwnProperty('hosts')) {
+          await setDomainField(req.vAuthToken, req.vDomain, 'hosts', { 'set': CleanedStringArray(valuesToSet.hosts)}, req.vAuthAccount, updated);
+        };
+        if (valuesToSet.hasOwnProperty('tags')) {
+          await setDomainField(req.vAuthToken, req.vDomain, 'tags', { 'set': CleanedStringArray(valuesToSet.tags)}, req.vAuthAccount, updated);
+        };
+        if (valuesToSet.hasOwnProperty('heartbeat')) {
+          await setDomainField(req.vAuthToken, req.vDomain, 'num_users', valuesToSet.heartbeat.num_users, req.vAuthAccount, updated);
+          await setDomainField(req.vAuthToken, req.vDomain, 'num_anon_users', valuesToSet.heartbeat.num_anon_users, req.vAuthAccount, updated);
+        };
 
-      updated.timeOfLastHeartbeat = new Date();
+        updated.timeOfLastHeartbeat = new Date();
 
-      Logger.debug('procPutDomains. updating=' + JSON.stringify(updated));
-      Domains.updateEntityFields(req.vDomain, updated);
+        Logger.debug('procPutDomains. updating=' + JSON.stringify(updated));
+        Domains.updateEntityFields(req.vDomain, updated);
+      }
+      else {
+        req.vRestResp.respondFailure('badly formed data');
+      };
     }
     else {
       req.vRestResp.respondFailure('Unauthorized');

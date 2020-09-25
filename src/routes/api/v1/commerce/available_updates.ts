@@ -18,7 +18,7 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 
 // GET /api/v1/commerce/available_updates?per_page=10
-const procGetCommerceAvailableUpdates: RequestHandler = (req: Request, resp: Response, next: NextFunction) => {
+const procGetCommerceAvailableUpdates: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vRestResp) {
     req.vRestResp.Data = {
     };
