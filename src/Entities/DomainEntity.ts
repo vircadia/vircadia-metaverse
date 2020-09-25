@@ -111,7 +111,12 @@ export const domainFields: { [key: string]: FieldDefn } = {
     request_field_name: 'name',
     get_permissions: [ 'all' ],
     set_permissions: [ 'domain', 'sponsor', 'admin' ],
-    validate: isStringValidator,
+    validate: (pField: FieldDefn, pEntity: Entity, pVal: any): any => {
+      if (typeof(pVal) === 'string') {
+        return /^[A-Za-z0-9+\-_\.]*$/.test(pVal);
+      };
+      return false;
+    },
     setter: simpleSetter,
     getter: simpleGetter
   },

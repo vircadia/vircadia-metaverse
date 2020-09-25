@@ -119,8 +119,10 @@ export const accountFields: { [key: string]: FieldDefn } = {
     get_permissions: [ 'all' ],
     set_permissions: [ 'owner', 'admin' ],
     validate: (pField: FieldDefn, pEntity: Entity, pVal: any): any => {
-      // Check username for latin alpha-numeric
-      return pVal && /^[A-Za-z][A-Za-z0-9+\-_\.]*$/.test(pVal);
+      if (typeof(pVal) === 'string') {
+        // Check username for latin alpha-numeric
+        return /^[A-Za-z][A-Za-z0-9+\-_\.]*$/.test(pVal);
+      };
     },
     setter: simpleSetter,
     getter: simpleGetter
@@ -133,7 +135,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
     validate: (pField: FieldDefn, pEntity: Entity, pVal: any): any => {
       if (typeof(pVal) === 'string') {
         // Check email for sanity
-        return pVal && /^[A-Za-z0-9+\-_\.]+@[A-Za-z0-9-\.]+$/.test(pVal);
+        return /^[A-Za-z0-9+\-_\.]+@[A-Za-z0-9-\.]+$/.test(pVal);
       };
       return false;
     },

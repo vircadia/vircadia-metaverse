@@ -15,11 +15,17 @@
 'use strict';
 
 import { Request } from 'express';
+
 import { Accounts } from '@Entities/Accounts';
 import { checkAvailability, AccountEntity } from '@Entities/AccountEntity';
+
 import { Domains } from '@Entities/Domains';
 import { DomainEntity } from '@Entities/DomainEntity';
+
+import { Places } from '@Entities/Places';
 import { PlaceEntity } from '@Entities/PlaceEntity';
+
+import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
 
 import { createPublicKey } from 'crypto';
 import { VKeyedCollection, VKeyValue } from '@Tools/vTypes';
@@ -143,10 +149,9 @@ export async function buildDomainInfo(pDomain: DomainEntity): Promise<any> {
 export async function buildDomainInfoV1(pDomain: DomainEntity): Promise<any> {
   return {
     'domainId': pDomain.domainId,
-    'id': pDomain.domainId,     // legacy
     'name': pDomain.name,
-    'label': pDomain.name,      // legacy
     'public_key': pDomain.publicKey ? createSimplifiedPublicKey(pDomain.publicKey) : undefined,
+    'owner_places': await buildPlacesForDomain(pDomain),
     'sponsor_account_id': pDomain.sponsorAccountId,
     'ice_server_address': pDomain.iceServerAddr,
     'version': pDomain.version,
@@ -238,6 +243,13 @@ export async function buildPlaceInfo(pPlace: PlaceEntity, pDomain?: DomainEntity
   if (IsNotNullOrEmpty(pPlace.domainId)) {
     const aDomain = pDomain ?? await Domains.getDomainWithId(pPlace.domainId);
     ret.domain = await buildDomainInfo(aDomain);
+  };
+  return ret;
+};
+export async function buildPlacesForDomain(pDomain: DomainEntity): Promise<any[]> {
+  const ret: any[] = [];
+  for await (const aPlace of Places.enumerateAsync(new GenericFilter({ 'domainId': pDomain.domainId }))) {
+    ret.push(await buildPlaceInfo(aPlace));
   };
   return ret;
 };

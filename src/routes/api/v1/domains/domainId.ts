@@ -41,7 +41,7 @@ const procGetDomainsDomainid: RequestHandler = async (req: Request, resp: Respon
     const domainInfo = await buildDomainInfoV1(aDomain);
     // A few copies are added for compatibiliity with legacy code
     domainInfo.id = domainInfo.domainId;
-    domainInfo.name = domainInfo.place_name;
+
     req.vRestResp.Data = {
       'domain': domainInfo
     };

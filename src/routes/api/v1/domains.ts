@@ -19,18 +19,20 @@ import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
 
 import { Domains } from '@Entities/Domains';
+import { Places } from '@Entities/Places';
+import { domainFields } from '@Entities/DomainEntity';
+import { buildDomainInfoV1 } from '@Route-Tools/Util';
+import { buildDomainInfo, buildPlaceInfo } from '@Route-Tools/Util';
+
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
 import { HTTPStatusCode } from '@Route-Tools/RESTResponse';
 
+import { GenUUID } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
-import { buildDomainInfoV1 } from '@Route-Tools/Util';
 
-// metaverseServerApp.use(express.urlencoded({ extended: false }));
-
-// GET /domains
+// GET /api/v1/domains
 const procGetDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('procGetDomains');
   if (req.vAuthAccount) {
 
     const pagination = new PaginationInfo();
@@ -54,11 +56,59 @@ const procGetDomains: RequestHandler = async (req: Request, resp: Response, next
   next();
 };
 
+const procPostDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  if (req.body && req.body.domain && req.body.domain.label) {
+    const newDomainName = req.body.domain.label;
+    if (domainFields.name.validate(domainFields.name, 'name', newDomainName)) {
+      const generatedAPIkey: string = GenUUID();
+
+      const newDomain = Domains.createDomain();
+      newDomain.name = newDomainName;
+      newDomain.apiKey = generatedAPIkey;
+      if (req.vSenderKey) {
+        newDomain.iPAddrOfFirstContact = req.vSenderKey;
+      };
+
+      // Creating a domain also creates a Place for that domain
+      const newPlace = Places.createPlace();
+      newPlace.domainId = newDomain.domainId;
+      newPlace.name = newDomain.name;
+      newPlace.iPAddrOfFirstContact = req.vSenderKey;
+
+      // If the requestor is logged in, associate that account with the new domain/place
+      if (req.vAuthToken) {
+        newDomain.sponsorAccountId = req.vAuthToken.accountId;
+        newPlace.accountId = req.vAuthToken.accountId;
+      };
+
+      // Now that the local structures are updated, store the new entries
+      Domains.addDomain(newDomain);
+      Places.addPlace(newPlace);
+
+      req.vRestResp.Data.domain.api_key = newDomain.apiKey;
+      // some legacy requests want the domain information at the top level
+      req.vRestResp.addAdditionalField('domain', buildDomainInfo(newDomainName));
+    }
+    else {
+      req.vRestResp.respondFailure('name contains not allowed characters');
+
+    };
+  }
+  else {
+    req.vRestResp.respondFailure('no label');
+  }
+  next();
+};
+
 export const name = '/api/v1/domains';
 
 export const router = Router();
 
-router.get(   '/api/v1/domains',                [ setupMetaverseAPI,
-                                                  accountFromAuthToken,
-                                                  procGetDomains,
-                                                  finishMetaverseAPI ] );
+router.get(   '/api/v1/domains',  [ setupMetaverseAPI,
+                                    accountFromAuthToken,
+                                    procGetDomains,
+                                    finishMetaverseAPI ] );
+router.post(   '/api/v1/domains', [ setupMetaverseAPI,
+                                    accountFromAuthToken,
+                                    procPostDomains,
+                                    finishMetaverseAPI ] );
