@@ -70,16 +70,10 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
         // Collect the specific values set. Cannot just accept all because the
         //     requestor could do things like set the password hash or other bad things.
         for (const field of ['version', 'protocol', 'network_addr', 'network_port', 'automatic_networking',
-                    'restricted', 'capacity', 'description', 'maturity', 'restriction' ]) {
+                    'restricted', 'capacity', 'description', 'maturity', 'restriction', 'hosts', 'tags' ]) {
           if (valuesToSet.hasOwnProperty(field)) {
             await setDomainField(req.vAuthToken, req.vDomain, field, valuesToSet[field], req.vAuthAccount, updated);
           };
-        };
-        if (valuesToSet.hasOwnProperty('hosts')) {
-          await setDomainField(req.vAuthToken, req.vDomain, 'hosts', { 'set': CleanedStringArray(valuesToSet.hosts)}, req.vAuthAccount, updated);
-        };
-        if (valuesToSet.hasOwnProperty('tags')) {
-          await setDomainField(req.vAuthToken, req.vDomain, 'tags', { 'set': CleanedStringArray(valuesToSet.tags)}, req.vAuthAccount, updated);
         };
         if (valuesToSet.hasOwnProperty('heartbeat')) {
           await setDomainField(req.vAuthToken, req.vDomain, 'num_users', valuesToSet.heartbeat.num_users, req.vAuthAccount, updated);
@@ -89,8 +83,8 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
         if (valuesToSet.meta) {
           // Setting the domain specs with the domain settings pages returns 'meta' informtion
           valuesToSet = valuesToSet.meta;
-          for (const field of [ 'capacity', 'contact_info', 'description', 'images', 'managers',
-                        'maturity', 'restriction', 'tags', 'thumbnail', 'world_name' ]) {
+          for (const field of [ 'capacity', 'contact_info', 'description', 'managers', 'tags', 'images',
+                        'maturity', 'restriction', 'thumbnail', 'world_name' ]) {
             if (valuesToSet.hasOwnProperty(field)) {
               await setDomainField(req.vAuthToken, req.vDomain, field, valuesToSet[field], req.vAuthAccount, updated);
             };
@@ -99,7 +93,6 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
 
         // This 'POST" is used as the domain heartbeat. Remember it's alive.
         updated.timeOfLastHeartbeat = new Date();
-
         Logger.debug('procPutDomains. updating=' + JSON.stringify(updated));
         Domains.updateEntityFields(req.vDomain, updated);
       }
@@ -143,20 +136,6 @@ const procDeleteDomains: RequestHandler = async (req: Request, resp: Response, n
     req.vRestResp.respondFailure('Not authorized');
   }
   next();
-};
-
-// We are passed a thing that should be just an array of strings
-//    but make sure the caller isn't messing with us
-function CleanedStringArray(pValues: any): string[] {
-  const ret: string[] = [];
-  if (Array.isArray(pValues)) {
-    for (const val of pValues) {
-      if (typeof(val) === 'string') {
-        ret.push(val);
-      };
-    };
-  };
-  return ret;
 };
 
 export const name = '/api/v1/domains/:domainId';

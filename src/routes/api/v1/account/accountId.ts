@@ -52,32 +52,6 @@ const procGetAccountId: RequestHandler = async (req: Request, resp: Response, ne
 const procPostAccountId: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vRestResp) {
     if (req.vAuthAccount && req.vAccount) {
-      /*
-      if ( Accounts.isAdmin(req.vAuthAccount)
-            || req.vAuthAccount.accountId === req.vAccount.accountId) {
-        const updated: VKeyedCollection = {};
-        if (req.body.accounts) {
-          const valuesToSet = req.body.accounts;
-          if (valuesToSet.hasOwnProperty('username')) updated.username = valuesToSet.username;
-          if (valuesToSet.hasOwnProperty('email')) updated.email = valuesToSet.email;
-          if (valuesToSet.hasOwnProperty('public_key')) updated.sessionPublicKey = valuesToSet.public_key;
-          if (valuesToSet.hasOwnProperty('images')) {
-            updated.images = {};
-            if (valuesToSet.images.hasOwnProperty('hero')) updated.images.hero = valuesToSet.images.hero;
-            if (valuesToSet.images.hasOwnProperty('thumbnail')) updated.images.hero = valuesToSet.images.thumbnail;
-            if (valuesToSet.images.hasOwnProperty('tiny')) updated.images.hero = valuesToSet.images.tiny;
-          };
-          await Accounts.updateEntityFields(req.vAuthAccount, updated);
-
-        };
-      }
-      else {
-        req.vRestResp.respondFailure(req.vAccountError ?? 'Unauthorized');
-      };
-      */
-      // Alternate account update code using the 'setAccountField' routines.
-      // This is better at checking for permissions and value validation but not tested.
-      // It is expected that future Vircadia code would use the individual fieldname operations to change settings.
       const valuesToSet = req.body.accounts;
       const updates: VKeyedCollection = {};
       for (const field of [ 'email', 'public_key' ]) {

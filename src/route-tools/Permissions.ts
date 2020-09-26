@@ -71,22 +71,28 @@ export function isDateValidator(pField: FieldDefn, pEntity: Entity, pValue: any)
 // verify the value is a string or a set/add/remove collection of string arrays
 export function isSArraySet(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
   let ret = false;
-  if (pValue && (pValue.set || pValue.add || pValue.remove)) {
-    Logger.cdebug('field-setting', `isSArraySet: object with one of the fields`);
-    let eachIsOk = true;
-    if (eachIsOk && pValue.set) {
-      eachIsOk = typeof(pValue.set) === 'string' || isSArray(pField, pEntity, pValue.set);
-      Logger.cdebug('field-setting', `isSArraySet: pValue.set is ${eachIsOk}`);
+  if (isSArray) {
+    // if we're passed an SArray, just presume a 'set'
+    ret = true;
+  }
+  else {
+    if (pValue && (pValue.set || pValue.add || pValue.remove)) {
+      Logger.cdebug('field-setting', `isSArraySet: object with one of the fields`);
+      let eachIsOk = true;
+      if (eachIsOk && pValue.set) {
+        eachIsOk = typeof(pValue.set) === 'string' || isSArray(pField, pEntity, pValue.set);
+        Logger.cdebug('field-setting', `isSArraySet: pValue.set is ${eachIsOk}`);
+      };
+      if (eachIsOk && pValue.add) {
+        eachIsOk = typeof(pValue.add) === 'string' || isSArray(pField, pEntity, pValue.add);
+        Logger.cdebug('field-setting', `isSArraySet: pValue.add is ${eachIsOk}`);
+      };
+      if (eachIsOk && pValue.remove) {
+        eachIsOk = typeof(pValue.remove) === 'string' || isSArray(pField, pEntity, pValue.remove);
+        Logger.cdebug('field-setting', `isSArraySet: pValue.remove is ${eachIsOk}`);
+      };
+      ret = eachIsOk;
     };
-    if (eachIsOk && pValue.add) {
-      eachIsOk = typeof(pValue.add) === 'string' || isSArray(pField, pEntity, pValue.add);
-      Logger.cdebug('field-setting', `isSArraySet: pValue.add is ${eachIsOk}`);
-    };
-    if (eachIsOk && pValue.remove) {
-      eachIsOk = typeof(pValue.remove) === 'string' || isSArray(pField, pEntity, pValue.remove);
-      Logger.cdebug('field-setting', `isSArraySet: pValue.remove is ${eachIsOk}`);
-    };
-    ret = eachIsOk;
   };
   return ret;
 };
@@ -133,6 +139,10 @@ export function dateStringGetter(pField: FieldDefn, pEntity: Entity): string {
 // SArray setting. The passed value can be a string (which is added to the SValue)
 //     or an object with the field 'set', 'add' or 'remove'. The values of  the
 //     latter fields can be a string or an array of strings.
+// NOTE: there are many adaptations to different values being passed in.
+//  The value should be a 'manipulator' "{ "set": SArray, "add": [ add vals ], "remove": [ remove vals ] }"
+//  but this also accepts a string (presumes an "add")
+//                        a string array (presumes a "set")
 export function sArraySetter(pField: FieldDefn, pEntity: Entity, pVal: any): void {
   let val = (pEntity as any)[pField.entity_field];
   if (IsNullOrEmpty(val)) {
@@ -147,43 +157,67 @@ export function sArraySetter(pField: FieldDefn, pEntity: Entity, pVal: any): voi
   };
 
   if (typeof(pVal) === 'string') {
+    // If just passed a string, add it to the value SArray
     Logger.cdebug('field-setting', `sArraySetting: adding string ${pField.entity_field}`);
     SArray.add(val, pVal);
   }
   else {
-    if (pVal && (pVal.set || pVal.add || pVal.remove)) {
-      if (pVal.set) {
-        // this relies on the validator to make sure we're passed clean values
-        val = (typeof(pVal.set) === 'string') ? [ pVal.set ] : pVal.set;
-      };
-      if (pVal.add) {
-        if (Array.isArray(pVal.add)) {
-          Logger.cdebug('field-setting', `sArraySetting: adding array ${pField.entity_field}=>${JSON.stringify(pVal.add)}`);
-          for (const aVal of pVal.add) {
-            SArray.add(val, aVal);
-          };
-        }
-        else {
-          Logger.cdebug('field-setting', `sArraySetting: adding one ${pField.entity_field}=>${JSON.stringify(pVal.add)}`);
-          SArray.add(val, pVal.add);
+    if (isSArray(pField, pEntity, pVal)) {
+      // If we're passed just an SArray, presume a 'set' operation
+      val = pVal;
+    }
+    else {
+      if (typeof(pVal) === 'object' && (pVal.set || pVal.add || pVal.remove)) {
+        if (pVal.set) {
+          // this relies on the validator to make sure we're passed clean values
+          val = (typeof(pVal.set) === 'string') ? [ pVal.set ] : pVal.set;
         };
-      };
-      if (pVal.remove) {
-        if (Array.isArray(pVal.remove)) {
-          Logger.cdebug('field-setting', `sArraySetting: removing array ${pField.entity_field}=>${JSON.stringify(pVal.remove)}`);
-          for (const aVal of pVal.remove) {
-            SArray.remove(val, aVal);
+        if (pVal.add) {
+          if (Array.isArray(pVal.add)) {
+            Logger.cdebug('field-setting', `sArraySetting: adding array ${pField.entity_field}=>${JSON.stringify(pVal.add)}`);
+            for (const aVal of pVal.add) {
+              SArray.add(val, aVal);
+            };
+          }
+          else {
+            Logger.cdebug('field-setting', `sArraySetting: adding one ${pField.entity_field}=>${JSON.stringify(pVal.add)}`);
+            SArray.add(val, pVal.add);
           };
-        }
-        else {
-          Logger.cdebug('field-setting', `sArraySetting: removing one ${pField.entity_field}=>${JSON.stringify(pVal.remove)}`);
-          SArray.remove(val, pVal.remove);
         };
+        if (pVal.remove) {
+          if (Array.isArray(pVal.remove)) {
+            Logger.cdebug('field-setting', `sArraySetting: removing array ${pField.entity_field}=>${JSON.stringify(pVal.remove)}`);
+            for (const aVal of pVal.remove) {
+              SArray.remove(val, aVal);
+            };
+          }
+          else {
+            Logger.cdebug('field-setting', `sArraySetting: removing one ${pField.entity_field}=>${JSON.stringify(pVal.remove)}`);
+            SArray.remove(val, pVal.remove);
+          };
+        };
+      }
+      else {
+        Logger.cdebug('field-setting', `sArraySetting: passed value that is not string, SArray, or manipulation object`);
       };
     };
   };
   Logger.cdebug('field-setting', `sArraySetting: resulting ${pField.entity_field}=>${JSON.stringify(val)}`);
-  (pEntity as any)[pField.entity_field] = val;
+  (pEntity as any)[pField.entity_field] = cleanStringArray(val);
+};
+
+// Clean up the object and make sure it is just an array of strings.
+// Passed what should be an array of strings and returns an array of only strings.
+function cleanStringArray(pValues: any): string[] {
+  const ret: string[] = [];
+  if (Array.isArray(pValues)) {
+    for (const val of pValues) {
+      if (typeof(val) === 'string') {
+        ret.push(val);
+      };
+    };
+  };
+  return ret;
 };
 
 // Get the value of a entity field with the fieldname.
