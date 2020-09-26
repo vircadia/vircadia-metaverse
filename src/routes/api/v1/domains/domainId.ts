@@ -64,7 +64,7 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
     // Either the domain itself or an admin can update the domain information
     if (await checkAccessToEntity(req.vAuthToken, req.vDomain, [ Perm.DOMAIN, Perm.SPONSOR, Perm.ADMIN ])) {
       const updated: VKeyedCollection = {};
-      const valuesToSet = req.body.domain;
+      let valuesToSet = req.body.domain;
       if (valuesToSet) {
         // 'valuesToSet' are the values sent to use in the request.
         // Collect the specific values set. Cannot just accept all because the
@@ -86,6 +86,18 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
           await setDomainField(req.vAuthToken, req.vDomain, 'num_anon_users', valuesToSet.heartbeat.num_anon_users, req.vAuthAccount, updated);
         };
 
+        if (valuesToSet.meta) {
+          // Setting the domain specs with the domain settings pages returns 'meta' informtion
+          valuesToSet = valuesToSet.meta;
+          for (const field of [ 'capacity', 'contact_info', 'description', 'images', 'managers',
+                        'maturity', 'restriction', 'tags', 'thumbnail', 'world_name' ]) {
+            if (valuesToSet.hasOwnProperty(field)) {
+              await setDomainField(req.vAuthToken, req.vDomain, field, valuesToSet[field], req.vAuthAccount, updated);
+            };
+          };
+        };
+
+        // This 'POST" is used as the domain heartbeat. Remember it's alive.
         updated.timeOfLastHeartbeat = new Date();
 
         Logger.debug('procPutDomains. updating=' + JSON.stringify(updated));

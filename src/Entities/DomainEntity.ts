@@ -53,6 +53,7 @@ export class DomainEntity implements Entity {
   public images: string[];     // collection of images for the domain
   public maturity: string;     // Maturity rating
   public restriction: string;  // Access restrictions ("open")
+  public managers: string[];   // Usernames of people who are domain admins
   public hosts: string[];      // Usernames of people who can be domain "hosts"
   public tags: string[];       // Categories for describing the domain
 
@@ -109,6 +110,21 @@ export const domainFields: { [key: string]: FieldDefn } = {
   'name': {
     entity_field: 'name',
     request_field_name: 'name',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'domain', 'sponsor', 'admin' ],
+    validate: (pField: FieldDefn, pEntity: Entity, pVal: any): any => {
+      if (typeof(pVal) === 'string') {
+        return /^[A-Za-z0-9+\-_\.]*$/.test(pVal);
+      };
+      return false;
+    },
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  // An alternate way of setting domain name
+  'world_name': {
+    entity_field: 'name',
+    request_field_name: 'world_name',
     get_permissions: [ 'all' ],
     set_permissions: [ 'domain', 'sponsor', 'admin' ],
     validate: (pField: FieldDefn, pEntity: Entity, pVal: any): any => {
@@ -271,6 +287,15 @@ export const domainFields: { [key: string]: FieldDefn } = {
     set_permissions: [ 'domain', 'sponsor', 'admin' ],
     validate: isStringValidator,
     setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'managers': {
+    entity_field: 'managers',
+    request_field_name: 'managers',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'domain', 'sponsor', 'admin' ],
+    validate: isSArraySet,
+    setter: sArraySetter,
     getter: simpleGetter
   },
   'hosts': {

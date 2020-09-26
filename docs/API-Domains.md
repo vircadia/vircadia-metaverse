@@ -20,8 +20,10 @@ A request returns an array of domain descriptions:
       "data": {
           "domains": [
               {
-                  "domainid": stringDomainId,
+                  "domainId": stringDomainId,
+                  "id": stringDomainId,
                   "name": stringName,
+                  "label": stringName,
                   "public_key": stringPublicKey,
                   "sponsor_account_id": stringAccountIdAssociated,
                   "ice_server_address": stringAddrIceServerBeingUsed,
@@ -37,8 +39,10 @@ A request returns an array of domain descriptions:
                   "description": stringDescription,
                   "maturity": stringMaturity,
                   "restriction": string,
-                  "hosts": [ hostname, hostname, ... ],
+                  "managers": [ username, username, ... ],
+                  "hosts": [ username, username, ... ],
                   "tags": [ stringTag, stringTag, ... ],
+                  "owner_places": [ placeInfo, placeInfo, ... ],
                   "meta": {
                         "capacity": intMaxCapacity,
                         "contact_info": string,
@@ -65,6 +69,9 @@ A request returns an array of domain descriptions:
       }
   }
 ```
+
+The "placeInfo" returned in the "owner_places" array is the fields returned by [/api/v1/places](./API-Places.md#GET-apiv1places)
+but without the "domain" information.
 
 ## GET /api/v1/domains/:domainId
 

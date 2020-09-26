@@ -234,6 +234,17 @@ export async function buildAccountInfo(pReq: Request, pAccount: AccountEntity): 
 // Return an object with the formatted place information
 // Pass the PlaceEntity and the place's domain if known.
 export async function buildPlaceInfo(pPlace: PlaceEntity, pDomain?: DomainEntity): Promise<any> {
+  const ret = await buildPlaceInfoSmall(pPlace);
+
+  // if the place points to a domain, add that information also
+  if (IsNotNullOrEmpty(pPlace.domainId)) {
+    const aDomain = pDomain ?? await Domains.getDomainWithId(pPlace.domainId);
+    ret.domain = await buildDomainInfo(aDomain);
+  };
+  return ret;
+};
+// Return the basic information block for a Place
+export async function buildPlaceInfoSmall(pPlace: PlaceEntity): Promise<any> {
   const ret: VKeyedCollection =  {
     'placeId': pPlace.placeId,
     'name': pPlace.name,
@@ -243,16 +254,13 @@ export async function buildPlaceInfo(pPlace: PlaceEntity, pDomain?: DomainEntity
     'thumbnail': pPlace.thumbnail,
     'images': pPlace.images
   };
-  if (IsNotNullOrEmpty(pPlace.domainId)) {
-    const aDomain = pDomain ?? await Domains.getDomainWithId(pPlace.domainId);
-    ret.domain = await buildDomainInfo(aDomain);
-  };
   return ret;
 };
+// Return an array of Places names that are associated with the passed domain
 export async function buildPlacesForDomain(pDomain: DomainEntity): Promise<any[]> {
   const ret: any[] = [];
   for await (const aPlace of Places.enumerateAsync(new GenericFilter({ 'domainId': pDomain.domainId }))) {
-    ret.push(await buildPlaceInfo(aPlace));
+    ret.push(await buildPlaceInfoSmall(aPlace));
   };
   return ret;
 };
