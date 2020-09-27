@@ -20,6 +20,6 @@ export class AuthToken {
   public refreshToken: string;
   public scope: string[];         // a array of symbols in Scope class
   public accountId: string;       // AccountId of associated account
-  public tokenCreationTime: Date;
-  public tokenExpirationTime: Date;
+  public whenCreated: Date;
+  public expirationTime: Date;
 };

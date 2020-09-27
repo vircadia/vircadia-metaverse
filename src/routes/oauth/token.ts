@@ -134,10 +134,10 @@ export function buildOAuthResponseBody(pAcct: AccountEntity, pToken: AuthToken):
   const body: VKeyedCollection = {
     'access_token': pToken.token,
     'token_type': 'Bearer',
-    'expires_in': pToken.tokenExpirationTime.valueOf()/1000 - pToken.tokenCreationTime.valueOf()/1000,
+    'expires_in': pToken.expirationTime.valueOf()/1000 - pToken.whenCreated.valueOf()/1000,
     'refresh_token': pToken.refreshToken,
     'scope': pToken.scope[0],
-    'created_at': pToken.tokenCreationTime.valueOf() / 1000,
+    'created_at': pToken.whenCreated.valueOf() / 1000,
   };
   if (pAcct) {
     body.account_id = pAcct.id,

@@ -253,6 +253,8 @@ async function DoDatabaseFormatChanges() {
   await RenameDbField(placeCollection, 'whenPlaceEntryCreated', 'whenCreated');
 
   await RenameDbField(tokenCollection, 'tokenId', 'id');
+  await RenameDbField(tokenCollection, 'tokenExpirationTime', 'expirationTime');
+  await RenameDbField(tokenCollection, 'tokenCreationTime', 'whenCreated');
 };
 
 // Scan the collection for entities with the 'from' field. Rename to 'to' if found.

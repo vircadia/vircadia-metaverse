@@ -25,8 +25,8 @@ import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 import { createObject, getObject, getObjects, updateObjectFields, deleteOne, noCaseCollation } from '@Tools/Db';
 import { GenUUID, genRandomString, IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 
-import { Logger } from '@Tools/Logging';
 import { VKeyedCollection, SArray } from '@Tools/vTypes';
+import { Logger } from '@Tools/Logging';
 
 export let accountCollection = 'accounts';
 

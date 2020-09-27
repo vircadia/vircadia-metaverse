@@ -34,6 +34,7 @@ import morgan from 'morgan';
 import { Logger, morganOptions } from '@Tools/Logging';
 import { initTokens } from '@Entities/Tokens';
 import { initSessions } from '@Entities/Sessions';
+import { initRequests } from '@Entities/Requests';
 import { IsNotNullOrEmpty } from '@Tools/Misc';
 
 initializeConfiguration()
@@ -43,6 +44,7 @@ initializeConfiguration()
 .then( () => {
   initSessions();
   initTokens();
+  initRequests();
   return setupDB();
 })
 .catch( err => {

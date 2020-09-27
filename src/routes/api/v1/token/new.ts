@@ -39,7 +39,7 @@ const procPostTokenNew: RequestHandler = async (req: Request, resp: Response, ne
         'token': tokenInfo.token,
         'token_id': tokenInfo.id,
         'refresh_token': tokenInfo.refreshToken,
-        'token_expiration_seconds': (tokenInfo.tokenExpirationTime.valueOf() - tokenInfo.tokenCreationTime.valueOf()) / 1000,
+        'token_expiration_seconds': (tokenInfo.expirationTime.valueOf() - tokenInfo.whenCreated.valueOf()) / 1000,
         'account_name': req.vAuthAccount.username,
         'account_roles': req.vAuthAccount.roles,
         'account_id': req.vAuthAccount.id

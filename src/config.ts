@@ -45,9 +45,11 @@ export let Config = {
       'heartbeat-seconds-until-offline': 300,
       'metaverse-info-addition-file': './metaverse_info.json',
       'session-timeout-minutes': 5,
+      'connection-request-expiration-minutes': 1,
+      'friend-request-expiration-minutes': 60 * 24 * 4,
       // redirection URL used for initial domain token generation
       'tokengen_url': '/static/DomainTokenLogin.html',
-      // The first administration account
+      // When account of this name is created, add 'admin' role to it
       'base-admin-account': 'adminer'
     },
     'database': {
