@@ -40,6 +40,13 @@ Finally, `finishMetaverseAPI` builds the status/data response for the request.
 
 ## Other Implimentation Nodes
 
+BEWARE! All "entity" classes are really just Objects that are read out
+of the database. Even though they are defined as classes, when read from the
+database, the underlying structure is not converted from the returned
+database object into a class instance. Therefore, operations like "instanceOf"
+will not work. This is why the entity class definitions don't have constructors
+and other instance properties. At best, they have associated const variables.
+
 So that the import statements don't have relative file references, this uses path
 aliases. These start with at-signs and are defined in `tsconfig.json`
 and `package.json`. The [module-alias] package is used to set the paths
