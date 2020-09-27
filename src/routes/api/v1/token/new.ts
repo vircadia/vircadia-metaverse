@@ -33,16 +33,16 @@ const procPostTokenNew: RequestHandler = async (req: Request, resp: Response, ne
       scope = TokenScope.OWNER;
     };
     if (TokenScope.KnownScope(scope)) {
-      const tokenInfo = await Tokens.createToken(req.vAuthAccount.accountId, [ scope ]);
+      const tokenInfo = await Tokens.createToken(req.vAuthAccount.id, [ scope ]);
       Tokens.addToken(tokenInfo);
       req.vRestResp.Data = {
         'token': tokenInfo.token,
-        'token_id': tokenInfo.tokenId,
+        'token_id': tokenInfo.id,
         'refresh_token': tokenInfo.refreshToken,
         'token_expiration_seconds': (tokenInfo.tokenExpirationTime.valueOf() - tokenInfo.tokenCreationTime.valueOf()) / 1000,
         'account_name': req.vAuthAccount.username,
         'account_roles': req.vAuthAccount.roles,
-        'account_id': req.vAuthAccount.accountId
+        'account_id': req.vAuthAccount.id
       };
     }
     else {

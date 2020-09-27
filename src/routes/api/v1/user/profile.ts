@@ -28,7 +28,7 @@ const procGetUserProfile: RequestHandler = async (req: Request, resp: Response, 
     req.vRestResp.Data = {
       'user': {
         'username': req.vAuthAccount.username,
-        'accountid': req.vAuthAccount.accountId,
+        'accountid': req.vAuthAccount.id,
         'xmpp_password': req.vAuthAccount.xmppPassword,
         'discourse_api_key': req.vAuthAccount.discourseApiKey,
         'wallet_id': req.vAuthAccount.walletId

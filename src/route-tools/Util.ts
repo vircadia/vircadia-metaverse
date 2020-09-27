@@ -107,7 +107,7 @@ export async function buildLocationInfo(pReq: Request, pAcct: AccountEntity): Pr
     const aDomain = await Domains.getDomainWithId(pAcct.locationDomainId);
     if (IsNotNullOrEmpty(aDomain)) {
       return {
-        'node_id': pReq.vSession.sessionId,
+        'node_id': pReq.vSession.id,
         'root': {
           'domain': await buildDomainInfo(aDomain),
         },
@@ -118,7 +118,7 @@ export async function buildLocationInfo(pReq: Request, pAcct: AccountEntity): Pr
     else {
       // The domain doesn't have an ID
       return {
-        'node_id': pReq.vSession.sessionId,
+        'node_id': pReq.vSession.id,
         'online': Accounts.isOnline(pAcct),
         'root': {
           'domain': {
@@ -129,14 +129,14 @@ export async function buildLocationInfo(pReq: Request, pAcct: AccountEntity): Pr
       };
     };
   };
-  ret.node_id = pReq.vSession.sessionId,
+  ret.node_id = pReq.vSession.id,
   ret.online = Accounts.isOnline(pAcct)
   return ret;
 };
 
 export async function buildDomainInfo(pDomain: DomainEntity): Promise<any> {
   return {
-    'id': pDomain.domainId,
+    'id': pDomain.id,
     'name': pDomain.name,
     'label': pDomain.name,
     'network_address': pDomain.networkAddr,
@@ -149,8 +149,8 @@ export async function buildDomainInfo(pDomain: DomainEntity): Promise<any> {
 // Return a structure with the usual domain information.
 export async function buildDomainInfoV1(pDomain: DomainEntity): Promise<any> {
   return {
-    'domainId': pDomain.domainId,
-    'id': pDomain.domainId,       // legacy
+    'domainId': pDomain.id,
+    'id': pDomain.id,       // legacy
     'name': pDomain.name,
     'label': pDomain.name,        // legacy
     'public_key': pDomain.publicKey ? createSimplifiedPublicKey(pDomain.publicKey) : undefined,
@@ -197,7 +197,8 @@ export async function buildDomainInfoV1(pDomain: DomainEntity): Promise<any> {
 // Return the limited "user" info.. used by /api/v1/users
 export async function buildUserInfo(pReq: Request, pAccount: AccountEntity): Promise<any> {
   return {
-    'accountId': pAccount.accountId,
+    'accountId': pAccount.id,
+    'id': pAccount.id,
     'username': pAccount.username,
     'images': {
       'tiny': pAccount.imagesTiny,
@@ -212,7 +213,8 @@ export async function buildUserInfo(pReq: Request, pAccount: AccountEntity): Pro
 // Used by several of the requests to return the complete account information.
 export async function buildAccountInfo(pReq: Request, pAccount: AccountEntity): Promise<any> {
   return {
-    'accountId': pAccount.accountId,
+    'accountId': pAccount.id,
+    'id': pAccount.id,
     'username': pAccount.username,
     'email': pAccount.email,
     'administrator': Accounts.isAdmin(pAccount),
@@ -246,7 +248,8 @@ export async function buildPlaceInfo(pPlace: PlaceEntity, pDomain?: DomainEntity
 // Return the basic information block for a Place
 export async function buildPlaceInfoSmall(pPlace: PlaceEntity): Promise<any> {
   const ret: VKeyedCollection =  {
-    'placeId': pPlace.placeId,
+    'placeId': pPlace.id,
+    'id': pPlace.id,
     'name': pPlace.name,
     'address': pPlace.address,
     'description': pPlace.description,
@@ -259,7 +262,7 @@ export async function buildPlaceInfoSmall(pPlace: PlaceEntity): Promise<any> {
 // Return an array of Places names that are associated with the passed domain
 export async function buildPlacesForDomain(pDomain: DomainEntity): Promise<any[]> {
   const ret: any[] = [];
-  for await (const aPlace of Places.enumerateAsync(new GenericFilter({ 'domainId': pDomain.domainId }))) {
+  for await (const aPlace of Places.enumerateAsync(new GenericFilter({ 'domainId': pDomain.id }))) {
     ret.push(await buildPlaceInfoSmall(aPlace));
   };
   return ret;

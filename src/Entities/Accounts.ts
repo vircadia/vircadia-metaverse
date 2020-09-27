@@ -32,7 +32,7 @@ export let accountCollection = 'accounts';
 
 export const Accounts = {
   async getAccountWithId(pAccountId: string): Promise<AccountEntity> {
-    return IsNullOrEmpty(pAccountId) ? null : getObject(accountCollection, { 'accountId': pAccountId });
+    return IsNullOrEmpty(pAccountId) ? null : getObject(accountCollection, { 'id': pAccountId });
   },
   async getAccountWithAuthToken(pAuthToken: string): Promise<AccountEntity> {
     if (IsNotNullOrEmpty(pAuthToken)) {
@@ -68,15 +68,15 @@ export const Accounts = {
     return createObject(accountCollection, pAccountEntity);
   },
   async removeAccount(pAccountEntity: AccountEntity) : Promise<boolean> {
-    return deleteOne(accountCollection, { 'accountId': pAccountEntity.accountId } );
+    return deleteOne(accountCollection, { 'id': pAccountEntity.id } );
   },
   // The contents of this entity have been updated
   async updateEntityFields(pEntity: AccountEntity, pFields: VKeyedCollection): Promise<AccountEntity> {
-    return updateObjectFields(accountCollection, { 'accountId': pEntity.accountId }, pFields);
+    return updateObjectFields(accountCollection, { 'id': pEntity.id }, pFields);
   },
   createAccount(pUsername: string, pPassword: string, pEmail: string): AccountEntity {
     const newAcct = new AccountEntity();
-    newAcct.accountId= GenUUID();
+    newAcct.id= GenUUID();
     newAcct.username = pUsername;
     newAcct.email = pEmail.toLowerCase();
     newAcct.roles = [AccountRoles.USER];

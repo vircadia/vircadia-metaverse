@@ -49,7 +49,7 @@ const procGetUsers: RequestHandler = async (req: Request, resp: Response, next: 
     const accts: any[] = [];
     for await (const acct of Accounts.enumerateAsync(scoper, infoer, pager)) {
       const userInfo = await buildUserInfo(req, acct);
-      if (req.vAuthAccount.accountId === acct.accountId) {
+      if (req.vAuthAccount.id === acct.id) {
         // Add a tag to denote the requestor's entry
         userInfo.connection = "self";
       };

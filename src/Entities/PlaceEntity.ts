@@ -27,7 +27,7 @@ import { Logger } from '@Tools/Logging';
 
 // NOTE: this class cannot have functions in them as they are just JSON to and from the database
 export class PlaceEntity implements Entity {
-  public placeId: string;       // globally unique place identifier
+  public id: string;            // globally unique place identifier
   public name: string;          // Human friendly name of the place
   public description: string;   // Human friendly description of the place
   public accountId: string;     // the 'owner' of the place (should be sponsor of the domain)
@@ -73,9 +73,9 @@ export function getPlaceUpdateForField(pPlace: PlaceEntity,
 // Naming and access for the fields in a PlaceEntity.
 // Indexed by request_field_name.
 export const placeFields: { [key: string]: FieldDefn } = {
-  'placeId': {
-    entity_field: 'placeId',
-    request_field_name: 'placeId',
+  'id': {
+    entity_field: 'id',
+    request_field_name: 'id',
     get_permissions: [ 'all' ],
     set_permissions: [ 'none' ],
     validate: isStringValidator,

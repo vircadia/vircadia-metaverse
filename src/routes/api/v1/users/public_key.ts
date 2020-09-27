@@ -31,7 +31,7 @@ const procGetUsersPublicKey: RequestHandler = async (req: Request, resp: Respons
     req.vRestResp.Data = {
       'public_key': createSimplifiedPublicKey(req.vAccount.sessionPublicKey),
       'username': req.vAccount.username,
-      'accountid': req.vAccount.accountId
+      'accountid': req.vAccount.id
     };
   };
   next();

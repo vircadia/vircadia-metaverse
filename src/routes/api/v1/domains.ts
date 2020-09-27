@@ -71,7 +71,7 @@ const procPostDomains: RequestHandler = async (req: Request, resp: Response, nex
 
       // Creating a domain also creates a Place for that domain
       const newPlace = Places.createPlace();
-      newPlace.domainId = newDomain.domainId;
+      newPlace.domainId = newDomain.id;
       newPlace.name = newDomain.name;
       newPlace.iPAddrOfFirstContact = req.vSenderKey;
 

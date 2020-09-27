@@ -27,7 +27,7 @@ import { Logger } from '@Tools/Logging';
 
 // NOTE: this class cannot have functions in them as they are just JSON to and from the database
 export class AccountEntity implements Entity {
-  public accountId: string;
+  public id: string;
   public username: string;
   public email: string;
   public accountSettings: string; // JSON of client settings
@@ -104,9 +104,9 @@ export function getAccountUpdateForField(pAccount: AccountEntity,
 // Naming and access for the fields in a AccountEntity.
 // Indexed by request_field_name.
 export const accountFields: { [key: string]: FieldDefn } = {
-  'accountId': {
-    entity_field: 'accountId',
-    request_field_name: 'accountId',
+  'id': {
+    entity_field: 'id',
+    request_field_name: 'id',
     get_permissions: [ 'all' ],
     set_permissions: [ 'none' ],
     validate: isStringValidator,

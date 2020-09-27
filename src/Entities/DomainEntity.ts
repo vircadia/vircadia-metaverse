@@ -27,7 +27,7 @@ import { Logger } from '@Tools/Logging';
 
 // NOTE: this class cannot have functions in them as they are just JSON to and from the database
 export class DomainEntity implements Entity {
-  public domainId: string;     // globally unique domain identifier
+  public id: string;           // globally unique domain identifier
   public name: string;         // domain name/label
   public publicKey: string;    // DomainServers's public key in multi-line PEM format
   public apiKey: string;       // Access key if a temp domain
@@ -98,9 +98,9 @@ export function getDomainUpdateForField(pDomain: DomainEntity,
 // Naming and access for the fields in a DomainEntity.
 // Indexed by request_field_name.
 export const domainFields: { [key: string]: FieldDefn } = {
-  'domainId': {
-    entity_field: 'domainId',
-    request_field_name: 'domainId',
+  'id': {
+    entity_field: 'id',
+    request_field_name: 'id',
     get_permissions: [ 'all' ],
     set_permissions: [ 'none' ],
     validate: isStringValidator,

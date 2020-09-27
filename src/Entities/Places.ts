@@ -26,7 +26,7 @@ export let placeCollection = 'places';
 
 export const Places = {
   async getPlaceWithId(pPlaceId: string): Promise<PlaceEntity> {
-    return IsNullOrEmpty(pPlaceId) ? null : getObject(placeCollection, { 'placeId': pPlaceId });
+    return IsNullOrEmpty(pPlaceId) ? null : getObject(placeCollection, { 'id': pPlaceId });
   },
   async getPlaceWithName(pPlacename: string): Promise<PlaceEntity> {
     return IsNullOrEmpty(pPlacename) ? null : getObject(placeCollection, { 'name': pPlacename },  noCaseCollation);
@@ -36,14 +36,14 @@ export const Places = {
   },
   createPlace(): PlaceEntity {
     const newPlace = new PlaceEntity();
-    newPlace.placeId = GenUUID();
+    newPlace.id = GenUUID();
     newPlace.name = 'UNKNOWN-' + genRandomString(5);
     newPlace.address = '/0,0,0/0,0,0,0/';
     newPlace.whenCreated = new Date();
     return newPlace;
   },
   removePlace(pPlaceEntity: PlaceEntity) : Promise<boolean> {
-    return deleteOne(placeCollection, { 'placeId': pPlaceEntity.placeId } );
+    return deleteOne(placeCollection, { 'id': pPlaceEntity.id } );
   },
   async *enumerateAsync(pPager: CriteriaFilter,
               pInfoer?: CriteriaFilter, pScoper?: CriteriaFilter): AsyncGenerator<PlaceEntity> {
@@ -54,6 +54,6 @@ export const Places = {
   },
   // The contents of this entity have been updated
   async updateEntityFields(pEntity: PlaceEntity, pFields: VKeyedCollection): Promise<PlaceEntity> {
-    return updateObjectFields(placeCollection, { placeId: pEntity.placeId }, pFields);
+    return updateObjectFields(placeCollection, { 'id': pEntity.id }, pFields);
   }
 };

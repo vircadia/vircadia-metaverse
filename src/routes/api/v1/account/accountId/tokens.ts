@@ -36,7 +36,7 @@ const procGetAccountTokens: RequestHandler = async (req: Request, resp: Response
     const scoper = new AccountScopeFilter(req.vAuthAccount);
     pager.parametersFromRequest(req);
     scoper.parametersFromRequest(req);
-    const acctFilter = new GenericFilter( { 'accountId': req.vAccount.accountId } );
+    const acctFilter = new GenericFilter( { 'accountId': req.vAccount.id } );
 
     const toks: AuthToken[] = [];
     for await (const tok of Tokens.enumerateAsync(acctFilter, pager, scoper)) {

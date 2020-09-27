@@ -132,14 +132,11 @@ export const accountFromParams: RequestHandler = async (req: Request, resp: Resp
   if (req.vRestResp) {
     if (req.params && req.params.accountId && typeof(req.params.accountId) === 'string') {
       const accountId = req.params.accountId;
-      if (accountId) {
-        // Most of the account references are by username
-        req.vAccount = await Accounts.getAccountWithUsername(accountId);
-        if (IsNullOrEmpty(req.vAccount)) {
-          // If username didn't work, try by the accountId
-          req.vAccount = await Accounts.getAccountWithId(accountId);
-        };
-
+      // Most of the account references are by username
+      req.vAccount = await Accounts.getAccountWithUsername(accountId);
+      if (IsNullOrEmpty(req.vAccount)) {
+        // If username didn't work, try by the accountId
+        req.vAccount = await Accounts.getAccountWithId(accountId);
       };
     };
   };
@@ -156,7 +153,7 @@ export const verifyDomainAccess: RequestHandler = async (req: Request, resp: Res
       let verified: boolean = false;
 
       const authToken = req.vRestResp.getAuthToken();
-      // Logger.debug(`verifyDomainAccess: domainId: ${req.vDomain.domainId}, authT: ${authToken}, apikey: ${req.vDomainAPIKey}`);
+      // Logger.debug(`verifyDomainAccess: domainId: ${req.vDomain.id}, authT: ${authToken}, apikey: ${req.vDomainAPIKey}`);
 
       if (IsNullOrEmpty(authToken)) {
         // Auth token not available. See if APIKey does the trick
@@ -177,16 +174,16 @@ export const verifyDomainAccess: RequestHandler = async (req: Request, resp: Res
             if (IsNullOrEmpty(req.vDomain.sponsorAccountId)) {
               const aAccount: AccountEntity = await Accounts.getAccountWithId(aToken.accountId);
               if (aAccount) {
-                Logger.debug(`verifyDomainAccess: assigning domain ${req.vDomain.domainId} to account ${aAccount.accountId}`);
-                req.vDomain.sponsorAccountId = aAccount.accountId;
-                await Domains.updateEntityFields(req.vDomain, { 'sponsorAccountId': aAccount.accountId } );
+                Logger.debug(`verifyDomainAccess: assigning domain ${req.vDomain.id} to account ${aAccount.id}`);
+                req.vDomain.sponsorAccountId = aAccount.id;
+                await Domains.updateEntityFields(req.vDomain, { 'sponsorAccountId': aAccount.id } );
               };
               // If associating a domain with an account, make sure the domain places also point to this account
-              for await (const place of Places.enumerateAsync(new GenericFilter({ 'domainId': req.vDomain.domainId }))) {
+              for await (const place of Places.enumerateAsync(new GenericFilter({ 'domainId': req.vDomain.id }))) {
                 const updates: VKeyedCollection = {};
                 // Not using "setPlaceField" since this field should not ever be set except by this code
-                place.accountId = aAccount.accountId;
-                await Places.updateEntityFields(place, { 'accountId': aAccount.accountId });
+                place.accountId = aAccount.id;
+                await Places.updateEntityFields(place, { 'accountId': aAccount.id });
               };
             };
             if (req.vDomain.sponsorAccountId === aToken.accountId) {
@@ -226,12 +223,7 @@ export const domainFromParams: RequestHandler = async (req: Request, resp: Respo
   if (req.params && req.params.domainId) {
     if (typeof(req.params.domainId) === 'string') {
       domainId = req.params.domainId;
-      if (domainId) {
-        req.vDomain = await Domains.getDomainWithId(domainId);
-      }
-      else {
-        Logger.error(`domainFromParams: wanted domain but none specified`);
-      };
+      req.vDomain = await Domains.getDomainWithId(domainId);
     };
   };
   if (IsNullOrEmpty(req.vDomain)) {

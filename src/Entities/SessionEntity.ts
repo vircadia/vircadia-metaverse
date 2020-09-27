@@ -20,7 +20,7 @@ import { pseudoRandomBytes } from "crypto";
 // Class to manage the manipulations on entities scope of application
 // Note: *Entity classes cannot have instance functions because they are created from the database
 export class SessionEntity {
-  public sessionId: string;
+  public id: string;
   public senderKey: string;
 
   public whenSessionCreated: Date;

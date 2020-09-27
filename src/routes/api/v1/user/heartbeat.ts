@@ -32,7 +32,7 @@ const procPutUserHeartbeat: RequestHandler = async (req: Request, resp: Response
       updates.timeOfLastHeartbeat = new Date();
       await Accounts.updateEntityFields(req.vAuthAccount, updates);
       req.vRestResp.Data = {
-        'session_id': req.vSession.sessionId
+        'session_id': req.vSession.id
       };
     };
   }

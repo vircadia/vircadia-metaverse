@@ -38,8 +38,8 @@ const procDeleteToken: RequestHandler = async (req: Request, resp: Response, nex
     const tok = await Tokens.getTokenWithTokenId(req.vTokenId);
     if (tok) {
       if ( scoper.AsAdmin() && Accounts.isAdmin(req.vAuthAccount)
-            || req.vAuthAccount.accountId === tok.accountId) {
-        if (req.vAccount.accountId === tok.accountId) {
+            || req.vAuthAccount.id === tok.accountId) {
+        if (req.vAccount.id === tok.accountId) {
           await Tokens.removeToken(tok);
         }
         else {

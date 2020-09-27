@@ -87,7 +87,7 @@ export const procPostPlaces: RequestHandler = async (req: Request, resp: Respons
             newPlace.description = requestedDesc;
             newPlace.address = requestedAddr;
             newPlace.accountId = aDomain.sponsorAccountId;
-            newPlace.domainId = aDomain.domainId;
+            newPlace.domainId = aDomain.id;
             Places.addPlace(newPlace);
 
             req.vRestResp.Data = buildPlaceInfo(newPlace, aDomain);

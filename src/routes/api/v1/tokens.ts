@@ -36,7 +36,8 @@ const procGetTokens: RequestHandler = async (req: Request, resp: Response, next:
     const toks: any[] = [];
     for await (const tok of Tokens.enumerateAsync(pager, scoper)) {
       toks.push({
-        'tokenId': tok.tokenId,
+        'tokenId': tok.id,
+        'id': tok.id,
         'token': tok.token,
         'accountId': tok.accountId,
         'refresh_token': tok.refreshToken,

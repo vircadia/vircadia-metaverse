@@ -374,8 +374,8 @@ export async function checkAccessToEntity(pAuthToken: AuthToken,  // token being
           break;
         case Perm.OWNER:
           // The requestor is the target entity
-          if (pTargetEntity.hasOwnProperty('accountId')) {
-            canAccess = pAuthToken.accountId === (pTargetEntity as any).accountId;
+          if (pTargetEntity.hasOwnProperty('id')) {
+            canAccess = pAuthToken.accountId === (pTargetEntity as any).id;
           };
           break;
         case Perm.FRIEND:

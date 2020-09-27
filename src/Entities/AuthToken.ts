@@ -15,7 +15,7 @@
 
 // NOTE: these cannot have instance functions in them as they are just JSON to and from the database
 export class AuthToken {
-  public tokenId: string;
+  public id: string;
   public token: string;
   public refreshToken: string;
   public scope: string[];         // a array of symbols in Scope class

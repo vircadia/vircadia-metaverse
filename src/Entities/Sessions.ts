@@ -54,7 +54,7 @@ export const Sessions = {
   // Create a new AuthToken.
   createSession(pSenderKey?: string): SessionEntity {
     const aSession = new SessionEntity();
-    aSession.sessionId = GenUUID();
+    aSession.id = GenUUID();
     aSession.senderKey = pSenderKey;
     aSession.whenSessionCreated = new Date();
     aSession.timeOfLastReference = new Date();
@@ -62,7 +62,7 @@ export const Sessions = {
   },
   getSessionWithSessionId(pSessionId: string): SessionEntity {
     _currentSessions.forEach( sess => {
-      if (pSessionId === sess.sessionId) {
+      if (pSessionId === sess.id) {
         return sess;
       }
     });

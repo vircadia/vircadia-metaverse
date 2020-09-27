@@ -120,7 +120,7 @@ const procDeleteDomains: RequestHandler = async (req: Request, resp: Response, n
         Domains.removeDomain(req.vDomain);
 
         // if deleting the domain, also delete its places
-        for await (const place of Places.enumerateAsync(new GenericFilter({ 'domainId': req.vDomain.domainId }))) {
+        for await (const place of Places.enumerateAsync(new GenericFilter({ 'domainId': req.vDomain.id }))) {
           Places.removePlace(place);
         };
       }

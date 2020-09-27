@@ -197,6 +197,7 @@ export async function *getObjects(pCollection: string,
 const domainCollection = 'domains';
 const accountCollection = 'accounts';
 const placeCollection = 'places';
+const tokenCollection = 'tokens';
 
 export let noCaseCollation: any = {
   locale: 'en_US',
@@ -210,7 +211,7 @@ async function BuildIndexes() {
   //    'locationNodeId'
   //    'email'
   //    what is needed for friends?
-  await Datab.createIndex(accountCollection, { 'accountId': 1 } );
+  await Datab.createIndex(accountCollection, { 'id': 1 } );
   await Datab.createIndex(accountCollection, { 'username': 1 },
                     { collation: noCaseCollation } );
   await Datab.createIndex(accountCollection, { 'locationNodeId': 1 } );
@@ -220,13 +221,13 @@ async function BuildIndexes() {
   //    'domainId'
   //    'apiKey'
   //    'lastSenderKey'
-  await Datab.createIndex(domainCollection, { 'domainId': 1 } );
+  await Datab.createIndex(domainCollection, { 'id': 1 } );
   await Datab.createIndex(domainCollection, { 'apiKey': 1 } );
   await Datab.createIndex(domainCollection, { 'lastSenderKey': 1 } );
   // Places:
   //    'placeId'
   //    'name'
-  await Datab.createIndex(placeCollection, { 'placeId': 1 } );
+  await Datab.createIndex(placeCollection, { 'id': 1 } );
   await Datab.createIndex(placeCollection, { 'name': 1 },
                     { collation: { locale: 'en_US', strength: 2 } } );
 };
@@ -236,80 +237,37 @@ async function BuildIndexes() {
 //    but, to keep things running, just do the updates needed for now.
 async function DoDatabaseFormatChanges() {
 
+  await RenameDbField(domainCollection, 'domainId', 'id');
   // Domain naming changed a little when place_names were added.
   //    so domain.placeName changed to domain.name.
   // If any domain entry exists with 'place_name', replace it with 'name'
-  // await RenameDbField(domainCollection, 'placeName', 'name');
-  let updateCount = 0;
-  await Datab.collection(domainCollection).find({ 'placeName': { '$exists': true }})
-  .forEach( doc => {
-    updateCount++;
-    Datab.collection(domainCollection).updateOne(
-            { _id: doc._id},
-            { '$rename': { 'placeName': 'name' } }
-    );
-  });
-  Logger.debug(`Db.DoDatabaseFormatChanges: ${updateCount} ${domainCollection}.placeName renames`);
+  await RenameDbField(domainCollection, 'placeName', 'name');
 
-  // Domain naming changed 'sponserAccountId' =? 'sponsorAccountId'
-  // await RenameDbField(domainCollection, 'sponserAccountId', 'sponsorAccountId');
-  updateCount = 0;
-  await Datab.collection(domainCollection).find({ 'sponserAccountId': { '$exists': true }})
-  .forEach( doc => {
-    updateCount++;
-    Datab.collection(domainCollection).updateOne(
-            { _id: doc._id},
-            { '$rename': { 'sponserAccountId': 'sponsorAccountId' } }
-    );
-  });
-  Logger.debug(`Db.DoDatabaseFormatChanges: ${updateCount} ${domainCollection}.sponserAccountId renames`);
+  await RenameDbField(domainCollection, 'sponserAccountId', 'sponsorAccountId');
+  await RenameDbField(domainCollection, 'whenDomainEntryCreated', 'whenCreated');
 
-  // await RenameDbField(domainCollection, 'whenDomainEntryCreated', 'whenCreated');
-  updateCount = 0;
-  await Datab.collection(domainCollection).find({ 'whenDomainEntryCreated': { '$exists': true }})
-  .forEach( doc => {
-    updateCount++;
-    Datab.collection(domainCollection).updateOne(
-            { _id: doc._id},
-            { '$rename': { 'whenDomainEntryCreated': 'whenCreated' } }
-    );
-  });
-  Logger.debug(`Db.DoDatabaseFormatChanges: ${updateCount} ${domainCollection}.whenDomainEntryCreated renames`);
+  await RenameDbField(accountCollection, 'accountId', 'id');
+  await RenameDbField(accountCollection, 'whenAccountCreated', 'whenCreated');
 
-  // await RenameDbField(accountCollection, 'whenAccountCreated', 'whenCreated');
-  updateCount = 0;
-  await Datab.collection(accountCollection).find({ 'whenAccountCreated': { '$exists': true }})
-  .forEach( doc => {
-    updateCount++;
-    Datab.collection(accountCollection).updateOne(
-            { _id: doc._id},
-            { '$rename': { 'whenAccountCreated': 'whenCreated' } }
-    );
-  });
-  Logger.debug(`Db.DoDatabaseFormatChanges: ${updateCount} ${accountCollection}.whenAccountCreated renames`);
+  await RenameDbField(placeCollection, 'placeId', 'id');
+  await RenameDbField(placeCollection, 'whenPlaceEntryCreated', 'whenCreated');
 
-  // await RenameDbField(placeCollection, 'whenPlaceEntryCreated', 'whenCreated');
-  updateCount = 0;
-  await Datab.collection(placeCollection).find({ 'whenPlaceEntryCreated': { '$exists': true }})
-  .forEach( doc => {
-    updateCount++;
-    Datab.collection(placeCollection).updateOne(
-            { _id: doc._id},
-            { '$rename': { 'whenPlaceEntryCreated': 'whenCreated' } }
-    );
-  });
-  Logger.debug(`Db.DoDatabaseFormatChanges: ${updateCount} ${placeCollection}.whenPlaceEntryCreated renames`);
+  await RenameDbField(tokenCollection, 'tokenId', 'id');
 };
-// For unknown reasons, this function does not work. It doesn't find anything to rename.
-// The explicit versions above work but calling this sub-routine does not. Wierd.
+
+// Scan the collection for entities with the 'from' field. Rename to 'to' if found.
 async function RenameDbField(pCollection: string, pFrom: string, pTo: string) {
   let updateCount = 0;
-  await Datab.collection(pCollection).find({ pFrom: { '$exists': true }})
+  const findCriteria: any = {};
+  findCriteria[pFrom] = { '$exists': true };
+  const renamer:any = {};
+  renamer[pFrom] = pTo;
+  await Datab.collection(pCollection).find(findCriteria)
   .forEach( doc => {
     updateCount++;
     Datab.collection(pCollection).updateOne(
             { _id: doc._id},
-            { '$rename': { pFrom: pTo } }
+            { '$rename': renamer }
     );
   });
   Logger.debug(`Db.DoDatabaseFormatChanges: ${updateCount} ${pCollection}.${pFrom} renames`);

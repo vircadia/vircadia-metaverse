@@ -65,7 +65,7 @@ const procPostOauthToken: RequestHandler = async (req: Request, resp: Response, 
           if (aAccount) {
             if (await Accounts.validatePassword(aAccount, userPassword)) {
               Logger.debug(`procPostOAuthToken: login of user ${userName}`);
-              const tokenInfo = await Tokens.createToken(aAccount.accountId, [ userScope ]);
+              const tokenInfo = await Tokens.createToken(aAccount.id, [ userScope ]);
               await Tokens.addToken(tokenInfo);
               respBody = buildOAuthResponseBody(aAccount, tokenInfo);
             }
@@ -95,9 +95,9 @@ const procPostOauthToken: RequestHandler = async (req: Request, resp: Response, 
         const refreshToken = await Tokens.getTokenWithRefreshToken(refreshingToken);
         if (Tokens.hasNotExpired(refreshToken)) {
           const requestingAccount = await Accounts.getAccountWithAuthToken(req.vRestResp.getAuthToken());
-          if (requestingAccount && refreshToken.accountId === requestingAccount.accountId) {
+          if (requestingAccount && refreshToken.accountId === requestingAccount.id) {
             // refresh token has not expired and requestor is owner of the token so make new
-            const newToken = await Tokens.createToken(req.vAuthAccount.accountId, refreshToken.scope);
+            const newToken = await Tokens.createToken(req.vAuthAccount.id, refreshToken.scope);
             Tokens.addToken(newToken);
             respBody = buildOAuthResponseBody(requestingAccount, newToken);
           }
@@ -140,7 +140,7 @@ export function buildOAuthResponseBody(pAcct: AccountEntity, pToken: AuthToken):
     'created_at': pToken.tokenCreationTime.valueOf() / 1000,
   };
   if (pAcct) {
-    body.account_id = pAcct.accountId,
+    body.account_id = pAcct.id,
     body.account_name = pAcct.username,
     body.account_roles = pAcct.roles;
   };

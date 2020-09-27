@@ -33,7 +33,7 @@ export class AccountScopeFilter extends CriteriaFilter {
   //     field in target entity to check for match.
   // "accountId" works for most things but scoping domains by their owners
   //     requires checking "sponsorAccountId">
-  public constructor(pRequestorAccount: AccountEntity, pField: string = 'accountId') {
+  public constructor(pRequestorAccount: AccountEntity, pField: string = 'id') {
     super();
     this._accessingAcct = pRequestorAccount;
     this._field = pField;
@@ -75,7 +75,7 @@ export class AccountScopeFilter extends CriteriaFilter {
         return true;
       };
       return typeof(pToTest.accountId) !== 'undefined'
-              && pToTest.accountId === this._accessingAcct.accountId;
+              && pToTest.accountId === this._accessingAcct.id;
     }
     return true;
   };
@@ -85,7 +85,7 @@ export class AccountScopeFilter extends CriteriaFilter {
     const criteria: any = {};
     // If not an admin, the found items must match the id of the requestor
     if (! this._asAdmin) {
-      criteria[this._field] = this._accessingAcct.accountId;
+      criteria[this._field] = this._accessingAcct.id;
       // Logger.debug(`AccountScopeFilter.criteriaParameters: not admin so limiting to account ${this._accessingAcct.username}`);
     };
     // If an admin and requested scope of target account, do that check

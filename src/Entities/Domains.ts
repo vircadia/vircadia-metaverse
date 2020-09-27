@@ -28,7 +28,7 @@ export let domainCollection = 'domains';
 
 export const Domains = {
   async getDomainWithId(pDomainId: string): Promise<DomainEntity> {
-    return IsNullOrEmpty(pDomainId) ? null : getObject(domainCollection, { 'domainId': pDomainId });
+    return IsNullOrEmpty(pDomainId) ? null : getObject(domainCollection, { 'id': pDomainId });
   },
   async getDomainWithAPIKey(pApiKey: string): Promise<DomainEntity> {
     return IsNullOrEmpty(pApiKey) ? null : getObject(domainCollection, { 'apiKey': pApiKey });
@@ -41,12 +41,12 @@ export const Domains = {
   },
   createDomain(): DomainEntity {
     const newDomain = new DomainEntity();
-    newDomain.domainId = GenUUID();
+    newDomain.id = GenUUID();
     newDomain.whenCreated = new Date();
     return newDomain;
   },
   removeDomain(pDomainEntity: DomainEntity) : Promise<boolean> {
-    return deleteOne(domainCollection, { 'domainId': pDomainEntity.domainId } );
+    return deleteOne(domainCollection, { 'id': pDomainEntity.id } );
   },
   async *enumerateAsync(pPager: CriteriaFilter,
               pInfoer?: CriteriaFilter, pScoper?: CriteriaFilter): AsyncGenerator<DomainEntity> {
@@ -57,7 +57,7 @@ export const Domains = {
   },
   // The contents of this entity have been updated
   async updateEntityFields(pEntity: DomainEntity, pFields: VKeyedCollection): Promise<DomainEntity> {
-    return updateObjectFields(domainCollection, { domainId: pEntity.domainId }, pFields);
+    return updateObjectFields(domainCollection, { 'id': pEntity.id }, pFields);
   },
   // Return 'true' if the passed string could be a domainId. Used as a precheck before querying the Db.
   // For the moment, do a simple check to see if it is probably a GUID.

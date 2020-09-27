@@ -247,6 +247,7 @@ be an administrative account.
         "data": {
             "tokens": [
                 {
+                    "id": stringTokenIdentifier,
                     "tokenid": stringTokenIdentifier,
                     "token": stringToken,
                     "refresh_token": stringTokenForRefreshingToken,
