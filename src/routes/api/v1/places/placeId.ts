@@ -22,7 +22,7 @@ import { checkAccessToEntity, Perm } from '@Route-Tools/Permissions';
 
 import { buildPlaceInfo } from '@Route-Tools/Util';
 
-import { Domains } from '@Entities/Domains';
+import { Accounts } from '@Entities/Accounts';
 import { Places } from '@Entities/Places';
 
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
@@ -79,17 +79,11 @@ export const procDeletePlacesPlaceId: RequestHandler = async (req: Request, resp
   if (req.vAuthAccount && req.vParam1) {
     const aPlace = await Places.getPlaceWithId(req.vParam1);
     if (aPlace) {
-      const aDomain = await Domains.getDomainWithId(aPlace.domainId);
-      if (aDomain) {
-        if (await checkAccessToEntity(req.vAuthToken, aDomain, [ Perm.SPONSOR, Perm.ADMIN ], req.vAuthAccount)) {
+      if (req.vAuthAccount.id === aPlace.accountId || Accounts.isAdmin(req.vAuthAccount)) {
           await Places.removePlace(aPlace);
-        }
-        else {
-          req.vRestResp.respondFailure('unauthorized');
-        };
       }
       else {
-        req.vRestResp.respondFailure('associated domain not found');
+        req.vRestResp.respondFailure('unauthorized');
       };
     }
     else {
