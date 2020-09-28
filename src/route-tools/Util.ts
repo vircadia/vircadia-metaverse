@@ -241,7 +241,9 @@ export async function buildPlaceInfo(pPlace: PlaceEntity, pDomain?: DomainEntity
   // if the place points to a domain, add that information also
   if (IsNotNullOrEmpty(pPlace.domainId)) {
     const aDomain = pDomain ?? await Domains.getDomainWithId(pPlace.domainId);
-    ret.domain = await buildDomainInfo(aDomain);
+    if (aDomain) {
+      ret.domain = await buildDomainInfo(aDomain);
+    };
   };
   return ret;
 };
