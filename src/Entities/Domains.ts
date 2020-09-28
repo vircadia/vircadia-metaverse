@@ -14,13 +14,16 @@
 'use strict'
 
 import { DomainEntity } from '@Entities/DomainEntity';
+import { Places } from '@Entities/Places';
 
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
+import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
 
 import { createObject, getObject, getObjects, updateObjectFields, deleteOne } from '@Tools/Db';
 
 import { GenUUID, IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 import { VKeyedCollection } from '@Tools/vTypes';
+import { Logger } from '@Tools/Logging';
 
 export type DomainTestFunction = (domain: DomainEntity) => boolean;
 
@@ -45,8 +48,16 @@ export const Domains = {
     newDomain.whenCreated = new Date();
     return newDomain;
   },
-  removeDomain(pDomainEntity: DomainEntity) : Promise<boolean> {
+  async removeDomain(pDomainEntity: DomainEntity) : Promise<boolean> {
+    Logger.info(`Domains: removing domain ${pDomainEntity.name}, id=${pDomainEntity.id}`);
     return deleteOne(domainCollection, { 'id': pDomainEntity.id } );
+  },
+  // When removing a domain, other tables need cleaning up
+  async removeDomainContext(pDomainEntity: DomainEntity): Promise<void> {
+    Logger.info(`Domains: removing relationships for domain ${pDomainEntity.name}, id=${pDomainEntity.id}`);
+    // if deleting the domain, also delete its places
+    await Places.removeMany(new GenericFilter({ 'domainId': pDomainEntity.id }));
+    return;
   },
   async *enumerateAsync(pPager: CriteriaFilter,
               pInfoer?: CriteriaFilter, pScoper?: CriteriaFilter): AsyncGenerator<DomainEntity> {

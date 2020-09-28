@@ -19,8 +19,12 @@ import crypto from 'crypto';
 
 import { AccountEntity } from '@Entities/AccountEntity';
 import { AccountRoles } from '@Entities/AccountRoles';
+import { Domains } from '@Entities/Domains';
+import { Places } from '@Entities/Places';
+import { Relationships } from '@Entities/Relationships';
 import { Tokens } from '@Entities/Tokens';
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
+import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
 
 import { createObject, getObject, getObjects, updateObjectFields, deleteOne, noCaseCollation } from '@Tools/Db';
 import { GenUUID, genRandomString, IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
@@ -65,10 +69,25 @@ export const Accounts = {
     return IsNullOrEmpty(email) ? null : getObject(accountCollection, { 'email': email }, noCaseCollation );
   },
   async addAccount(pAccountEntity: AccountEntity) : Promise<AccountEntity> {
+    Logger.info(`Accounts: creating account ${pAccountEntity.username}, id=${pAccountEntity.id}`);
     return createObject(accountCollection, pAccountEntity);
   },
   async removeAccount(pAccountEntity: AccountEntity) : Promise<boolean> {
+    Logger.info(`Accounts: removing account ${pAccountEntity.username}, id=${pAccountEntity.id}`);
     return deleteOne(accountCollection, { 'id': pAccountEntity.id } );
+  },
+  async removeAccountContext(pAccountEntity: AccountEntity) : Promise<void> {
+    Logger.info(`Accounts: removing relationships for account ${pAccountEntity.username}, id=${pAccountEntity.id}`);
+    // When deleting an account, remove all the stuff that points to it
+    await Relationships.removeMany(new GenericFilter( { 'fromId': pAccountEntity.id }));
+    await Relationships.removeMany(new GenericFilter( { 'toId': pAccountEntity.id }));
+    // The domains associated with this account are removed also
+    for await (const aDomain of Domains.enumerateAsync(new GenericFilter({ 'sponsorAccountId': pAccountEntity.id }))) {
+      await Domains.removeDomain(aDomain);
+      await Domains.removeDomainContext(aDomain);
+    };
+    // Also, any places
+    await Places.removeMany(new GenericFilter( { 'accountId': pAccountEntity.id }));
   },
   // The contents of this entity have been updated
   async updateEntityFields(pEntity: AccountEntity, pFields: VKeyedCollection): Promise<AccountEntity> {
