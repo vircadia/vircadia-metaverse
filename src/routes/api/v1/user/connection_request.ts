@@ -17,8 +17,17 @@
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
+
+import { Requests, RequestType } from '@Entities/Requests';
+import { RequestEntity } from '@Entities/RequestEntity';
+import { RequestEntityConnection, RequestEntityConnectionOp } from '@Entities/RequestEntityConnection';
+import { Relationships, RelationshipTypes } from '@Entities/Relationships';
+
 import { accountFromAuthToken, usernameFromParams } from '@Route-Tools/middleware';
+
+import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
+import { Accounts } from '@Entities/Accounts';
 
 const procPostUserConnectionRequest: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
@@ -54,14 +63,50 @@ const procPostUserConnectionRequest: RequestHandler = async (req: Request, resp:
       else {
         Logger.debug(`procPostUserConnectionRequest: request from ${req.vAuthAccount.username} and no nodeID info`);
       };
-
       // END sanity check DEBUG DEBUG
 
-      // TODO: somewhere record the request and wait for both sides to accept.
+      let pending = true;   // assume request is still pending
 
-      // For the moment, just say 'pending' and let the client time out
-      req.vRestResp.Data = {
-        'connection': 'pending'
+      const previousAsk = (await Requests.getWithRequestBetween(thisNode, otherNode, RequestType.CONNECTION) as RequestEntityConnection);
+      if (IsNotNullOrEmpty(previousAsk)) {
+        // There is an existing connection request
+        if (previousAsk.requesterId === thisNode) {
+          // This is a request that I've made. See if the other side has accepted
+          if (previousAsk.targetAccepted) {
+            // They have accepted! We have a connection!
+            await BuildNewConnection(previousAsk);
+            await BuildConnectionResponse(req, previousAsk.targetAccountId);
+            pending = false;
+            // The request itself will timeout and expire
+          };
+        }
+        else {
+          // There is an existing request to me.
+          // Since I'm making the same request, we are mutually involved
+          previousAsk.targetAccepted = true;
+          previousAsk.targetAccountId = req.vAuthAccount.id;
+          Requests.update(previousAsk, { 'targetAccepted': true,
+                                         'targetAccountId': req.vAuthAccount.id })
+
+          await BuildNewConnection(previousAsk);
+          await BuildConnectionResponse(req, previousAsk.requestingAccountId);
+          pending = false;
+          // The request itself will timeout and expire
+        };
+      }
+      else {
+        // There is not a pending request between us. Create one
+        const newRequest = await RequestEntityConnectionOp.create(thisNode,otherNode);
+        newRequest.requesterAccepted = true;
+        newRequest.requestingAccountId = req.vAuthAccount.id;
+        Requests.add((newRequest as RequestEntity));
+      };
+
+      if (pending) {
+        // The above didn't create a response so we're just waiting
+        req.vRestResp.Data = {
+          'connection': 'pending'
+        };
       };
     }
     else {
@@ -72,6 +117,27 @@ const procPostUserConnectionRequest: RequestHandler = async (req: Request, resp:
     req.vRestResp.respondFailure('unauthorized');
   };
   next();
+};
+
+// Build a new Connection based on the request
+async function BuildNewConnection(pRequest: RequestEntityConnection): Promise<void> {
+  const newRelationship = Relationships.create();
+  newRelationship.relationshipType = RelationshipTypes.CONNECTION;
+  newRelationship.fromId = pRequest.requestingAccountId;
+  newRelationship.toId = pRequest.targetAccountId;
+  newRelationship.isFriend = false;
+  await Relationships.add(newRelationship);
+  return;
+};
+// Build the response that says a connection has been made
+async function BuildConnectionResponse(req: Request, pOtherAccountId: string): Promise<void> {
+  const otherAccount = await Accounts.getAccountWithId(pOtherAccountId);
+  req.vRestResp.Data = {
+    'connection': {
+      'new_connection': true,
+      'username': otherAccount ? otherAccount.username : 'UNKNOWN'
+    }
+  };
 };
 
 export const name = '/api/v1/user/connection_request';

@@ -27,6 +27,12 @@ import { Logger } from '@Tools/Logging';
 
 export let requestCollection = 'requests';
 
+export class RequestType {
+  public static CONNECTION = 'connection';
+  public static FRIEND = 'friend';
+  public static FOLLOW = 'follow';
+};
+
 // Initialize request management.
 // Mostly starts a periodic function that deletes expired requests.
 export function initRequests(): void {
@@ -45,14 +51,41 @@ export const Requests = {
   async getWithId(pRequestId: string): Promise<RequestEntity> {
     return IsNullOrEmpty(pRequestId) ? null : getObject(requestCollection, { 'id': pRequestId });
   },
+  // Return all Requests that have the passed Id as either the requester or target
+  async getWithRequesterOrTarget(pRequestId: string, pType: string): Promise<RequestEntity> {
+    return IsNullOrEmpty(pRequestId) ? null : getObject(requestCollection,
+          { '$or': [ { 'requesterId': pRequestId },
+                     { 'targetId': pRequestId } ],
+            'requestType': pType
+          });
+  },
+  // Return a Request between the two specified id's
+  async getWithRequestBetween(pRequestId: string, pTargetId: string, pType: string): Promise<RequestEntity> {
+    return IsNullOrEmpty(pRequestId) ? null : getObject(requestCollection,
+          { '$or': [ { '$and': [ { 'requesterId': pRequestId },
+                                 { 'targetId': pTargetId }
+                               ]
+                     },
+                     { '$and': [ { 'requesterId': pTargetId },
+                                 { 'targetId': pRequestId }
+                               ]
+                     }
+              ],
+            'requestType': pType
+          });
+  },
   create(): RequestEntity {
     const aRequest = new RequestEntity();
     aRequest.id = GenUUID();
     aRequest.expirationTime = new Date(Date.now() + 1000 * 60);
+    aRequest.whenCreated = new Date();
     return aRequest;
   },
   add(pRequestEntity: RequestEntity) : Promise<RequestEntity> {
     return createObject(requestCollection, pRequestEntity);
+  },
+  async update(pEntity: RequestEntity, pFields: VKeyedCollection): Promise<RequestEntity> {
+    return updateObjectFields(requestCollection, { 'id': pEntity.id }, pFields);
   },
   async remove(pRequestEntity: RequestEntity) : Promise<boolean> {
     return deleteOne(requestCollection, { 'id': pRequestEntity.id } );

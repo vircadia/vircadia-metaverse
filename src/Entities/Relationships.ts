@@ -28,7 +28,7 @@ import { Logger } from '@Tools/Logging';
 export let relationshipCollection = 'relationships';
 
 export class RelationshipTypes {
-  public CONNECTION = 'connection';
+  public static CONNECTION = 'connection';
 };
 
 export const Relationships = {
@@ -38,10 +38,14 @@ export const Relationships = {
   create(): RelationshipEntity {
     const aRelationship = new RelationshipEntity();
     aRelationship.id = GenUUID();
+    aRelationship.whenCreated = new Date();
     return aRelationship;
   },
-  add(pRequestEntity: RelationshipEntity) : Promise<RelationshipEntity> {
+  async add(pRequestEntity: RelationshipEntity) : Promise<RelationshipEntity> {
     return createObject(relationshipCollection, pRequestEntity);
+  },
+  async update(pEntity: RelationshipEntity, pFields: VKeyedCollection): Promise<RelationshipEntity> {
+    return updateObjectFields(relationshipCollection, { 'id': pEntity.id }, pFields);
   },
   async remove(pRequestEntity: RelationshipEntity) : Promise<boolean> {
     return deleteOne(relationshipCollection, { 'id': pRequestEntity.id } );

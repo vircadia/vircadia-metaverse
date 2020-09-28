@@ -16,7 +16,7 @@
 
 import { Config } from '@Base/config';
 
-import { Requests } from '@Entities/Requests';
+import { Requests, RequestType } from '@Entities/Requests';
 import { RequestEntity } from '@Entities/RequestEntity';
 
 import { IsNotNullOrEmpty } from "@Tools/Misc";
@@ -25,19 +25,26 @@ import { IsNotNullOrEmpty } from "@Tools/Misc";
 // Note: *Entity classes cannot have instance functions because they are created from the database
 export class RequestEntityConnection extends RequestEntity {
   public requestingAccountId: string;
+  public requesterAccepted: boolean;
   public targetAccountId: string;
+  public targetAccepted: boolean;
 };
 
-export async function create(pRequesterId: string, pTargetId: string): Promise<RequestEntityConnection> {
-  const newRequest = (Requests.create() as RequestEntityConnection);
-  newRequest.requesterId = pRequesterId;
-  newRequest.targetId = pTargetId;
+export const RequestEntityConnectionOp = {
+  async create(pRequesterId: string, pTargetId: string): Promise<RequestEntityConnection> {
+    const newRequest = (Requests.create() as RequestEntityConnection);
+    newRequest.requestType = RequestType.CONNECTION;
+    newRequest.requesterId = pRequesterId;
+    newRequest.requesterAccepted = false;
+    newRequest.targetId = pTargetId;
+    newRequest.targetAccepted = false;
 
-  // A connection request lasts only for so long
-  const expirationMinutes = Config["metaverse-server"]["connection-request-expiration-minutes"];
-  newRequest.expirationTime = new Date(Date.now() + 1000 * 60 * expirationMinutes);
+    // A connection request lasts only for so long
+    const expirationMinutes = Config["metaverse-server"]["connection-request-expiration-minutes"];
+    newRequest.expirationTime = new Date(Date.now() + 1000 * 60 * expirationMinutes);
 
-  return newRequest;
-}
+    return newRequest;
+  }
+};
 
 
