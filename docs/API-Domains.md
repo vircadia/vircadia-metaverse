@@ -228,4 +228,5 @@ that friend to the list.
 
 Delete the specified domain.
 
-The requestor must supply an account token of an administrator.
+The requestor must supply an account token of either an administrator or the sponsor
+account for the domain.
