@@ -50,6 +50,9 @@ export const Relationships = {
   async remove(pRequestEntity: RelationshipEntity) : Promise<boolean> {
     return deleteOne(relationshipCollection, { 'id': pRequestEntity.id } );
   },
+  async removeMany(pCritera: CriteriaFilter) : Promise<number> {
+    return deleteMany(relationshipCollection, pCritera);
+  },
   // TODO: add scope (admin) and filter criteria filtering
   //    It's push down to this routine so we could possibly use DB magic for the queries
   async *enumerateAsync(pPager: CriteriaFilter,

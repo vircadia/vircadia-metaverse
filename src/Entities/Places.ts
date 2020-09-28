@@ -17,10 +17,11 @@ import { PlaceEntity } from '@Entities/PlaceEntity';
 
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 
-import { createObject, getObject, getObjects, updateObjectFields, deleteOne, noCaseCollation } from '@Tools/Db';
+import { createObject, getObject, getObjects, updateObjectFields, deleteOne, deleteMany, noCaseCollation } from '@Tools/Db';
 
 import { GenUUID, IsNullOrEmpty, IsNotNullOrEmpty, genRandomString } from '@Tools/Misc';
 import { VKeyedCollection } from '@Tools/vTypes';
+import { Logger } from '@Tools/Logging';
 
 export let placeCollection = 'places';
 
@@ -32,18 +33,23 @@ export const Places = {
     return IsNullOrEmpty(pPlacename) ? null : getObject(placeCollection, { 'name': pPlacename },  noCaseCollation);
   },
   async addPlace(pPlaceEntity: PlaceEntity) : Promise<PlaceEntity> {
+    Logger.info(`Places: creating account ${pPlaceEntity.name}, id=${pPlaceEntity.id}`);
     return IsNullOrEmpty(pPlaceEntity) ? null : createObject(placeCollection, pPlaceEntity);
   },
   createPlace(): PlaceEntity {
     const newPlace = new PlaceEntity();
     newPlace.id = GenUUID();
     newPlace.name = 'UNKNOWN-' + genRandomString(5);
-    newPlace.address = '/0,0,0/0,0,0,0/';
+    newPlace.address = '/0,0,0/0,0,0,0';
     newPlace.whenCreated = new Date();
     return newPlace;
   },
-  removePlace(pPlaceEntity: PlaceEntity) : Promise<boolean> {
+  async removePlace(pPlaceEntity: PlaceEntity) : Promise<boolean> {
+    Logger.info(`Places: removing place ${pPlaceEntity.name}, id=${pPlaceEntity.id}`);
     return deleteOne(placeCollection, { 'id': pPlaceEntity.id } );
+  },
+  async removeMany(pCriteria: CriteriaFilter) : Promise<number> {
+    return deleteMany(placeCollection, pCriteria);
   },
   async *enumerateAsync(pPager: CriteriaFilter,
               pInfoer?: CriteriaFilter, pScoper?: CriteriaFilter): AsyncGenerator<PlaceEntity> {
