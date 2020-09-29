@@ -55,8 +55,9 @@ export const Domains = {
   // When removing a domain, other tables need cleaning up
   async removeDomainContext(pDomainEntity: DomainEntity): Promise<void> {
     Logger.info(`Domains: removing relationships for domain ${pDomainEntity.name}, id=${pDomainEntity.id}`);
-    // if deleting the domain, also delete its places
-    await Places.removeMany(new GenericFilter({ 'domainId': pDomainEntity.id }));
+    // Don't delete the associated Places. Issue #27 was a requests to keep Places.
+    //     This creates places that point at domains that don't exist
+    // await Places.removeMany(new GenericFilter({ 'domainId': pDomainEntity.id }));
     return;
   },
   async *enumerateAsync(pPager: CriteriaFilter,

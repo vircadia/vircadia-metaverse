@@ -33,7 +33,7 @@ export const Places = {
     return IsNullOrEmpty(pPlacename) ? null : getObject(placeCollection, { 'name': pPlacename },  noCaseCollation);
   },
   async addPlace(pPlaceEntity: PlaceEntity) : Promise<PlaceEntity> {
-    Logger.info(`Places: creating account ${pPlaceEntity.name}, id=${pPlaceEntity.id}`);
+    Logger.info(`Places: creating place ${pPlaceEntity.name}, id=${pPlaceEntity.id}`);
     return IsNullOrEmpty(pPlaceEntity) ? null : createObject(placeCollection, pPlaceEntity);
   },
   createPlace(): PlaceEntity {
