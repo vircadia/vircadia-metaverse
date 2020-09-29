@@ -26,7 +26,7 @@ const procGetUserLocation: RequestHandler = async (req: Request, resp: Response,
     if (req.vAccount) {
       if (Accounts.CanAccess(req.vAuthAccount, req.vAccount)) {
         req.vRestResp.Data = {
-          'location': await buildLocationInfo(req, req.vAccount)
+          'location': await buildLocationInfo(req.vAccount)
         };
       }
       else {

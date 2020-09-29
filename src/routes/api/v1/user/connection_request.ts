@@ -20,14 +20,13 @@ import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 
 import { Requests, RequestType } from '@Entities/Requests';
 import { RequestEntity } from '@Entities/RequestEntity';
-import { RequestEntityConnection, RequestEntityConnectionOp } from '@Entities/RequestEntityConnection';
 import { Relationships, RelationshipTypes } from '@Entities/Relationships';
 
+import { Accounts } from '@Entities/Accounts';
 import { accountFromAuthToken, usernameFromParams } from '@Route-Tools/middleware';
 
 import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
-import { Accounts } from '@Entities/Accounts';
 
 const procPostUserConnectionRequest: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
@@ -67,7 +66,7 @@ const procPostUserConnectionRequest: RequestHandler = async (req: Request, resp:
 
       let pending = true;   // assume request is still pending
 
-      const previousAsk = (await Requests.getWithRequestBetween(thisNode, otherNode, RequestType.CONNECTION) as RequestEntityConnection);
+      const previousAsk = await Requests.getWithRequestBetween(thisNode, otherNode, RequestType.CONNECTION);
       if (IsNotNullOrEmpty(previousAsk)) {
         // There is an existing connection request
         if (previousAsk.requesterId === thisNode) {
@@ -96,10 +95,10 @@ const procPostUserConnectionRequest: RequestHandler = async (req: Request, resp:
       }
       else {
         // There is not a pending request between us. Create one
-        const newRequest = await RequestEntityConnectionOp.create(thisNode,otherNode);
+        const newRequest = await Requests.createConnectionRequest(thisNode, otherNode);
         newRequest.requesterAccepted = true;
         newRequest.requestingAccountId = req.vAuthAccount.id;
-        Requests.add((newRequest as RequestEntity));
+        Requests.add(newRequest);
       };
 
       if (pending) {
@@ -120,15 +119,25 @@ const procPostUserConnectionRequest: RequestHandler = async (req: Request, resp:
 };
 
 // Build a new Connection based on the request
-async function BuildNewConnection(pRequest: RequestEntityConnection): Promise<void> {
+async function BuildNewConnection(pRequest: RequestEntity): Promise<void> {
   const newRelationship = Relationships.create();
   newRelationship.relationshipType = RelationshipTypes.CONNECTION;
   newRelationship.fromId = pRequest.requestingAccountId;
   newRelationship.toId = pRequest.targetAccountId;
-  newRelationship.isFriend = false;
   await Relationships.add(newRelationship);
+
+  // Now that there is a new relationship, cached lists of friends, etc has changed
+  const fromAcct = await Accounts.getAccountWithId(pRequest.requestingAccountId);
+  if (fromAcct) {
+    await Accounts.recomputeRelationships(fromAcct);
+  };
+  const toAcct = await Accounts.getAccountWithId(pRequest.requestingAccountId);
+  if (toAcct) {
+    await Accounts.recomputeRelationships(toAcct);
+  };
   return;
 };
+
 // Build the response that says a connection has been made
 async function BuildConnectionResponse(req: Request, pOtherAccountId: string): Promise<void> {
   const otherAccount = await Accounts.getAccountWithId(pOtherAccountId);

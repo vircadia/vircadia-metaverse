@@ -69,13 +69,13 @@ export class AccountScopeFilter extends CriteriaFilter {
     if (! this._doingQuery) {
       if (this._asAdmin) {
         if (this._targetAcct) {
-          return typeof(pToTest.accountId) !== 'undefined'
-                && pToTest.accountId === this._targetAcct;
+          return typeof(pToTest[this._field]) !== 'undefined'
+                && pToTest[this._field] === this._targetAcct;
         }
         return true;
       };
-      return typeof(pToTest.accountId) !== 'undefined'
-              && pToTest.accountId === this._accessingAcct.id;
+      return typeof(pToTest[this._field]) !== 'undefined'
+              && pToTest[this._field] === this._accessingAcct.id;
     }
     return true;
   };

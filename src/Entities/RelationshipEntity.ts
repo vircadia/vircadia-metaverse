@@ -24,8 +24,6 @@ export class RelationshipEntity {
   public fromId: string;
   public toId: string;
 
-  public isFriend: boolean;
-
   // administration
   public expirationTime: Date;
   public whenCreated: Date;

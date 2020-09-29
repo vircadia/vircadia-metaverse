@@ -29,5 +29,11 @@ export class RequestEntity {
   // administration
   public expirationTime: Date;
   public whenCreated: Date;
+
+  // requestType == CONNECTION
+  public requestingAccountId: string;
+  public requesterAccepted: boolean;
+  public targetAccountId: string;
+  public targetAccepted: boolean;
 };
 

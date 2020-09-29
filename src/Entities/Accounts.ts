@@ -21,7 +21,7 @@ import { AccountEntity } from '@Entities/AccountEntity';
 import { AccountRoles } from '@Entities/AccountRoles';
 import { Domains } from '@Entities/Domains';
 import { Places } from '@Entities/Places';
-import { Relationships } from '@Entities/Relationships';
+import { Relationships, RelationshipTypes } from '@Entities/Relationships';
 import { Tokens } from '@Entities/Tokens';
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
@@ -88,6 +88,35 @@ export const Accounts = {
     };
     // Also, any places
     await Places.removeMany(new GenericFilter( { 'accountId': pAccountEntity.id }));
+  },
+  // Account relationships are in the 'Relationships' table but, for searching, easy reference,
+  //    and legacy compatibility, there is a 'friends' and 'connections' field in the
+  //    AccountEntity. This updates those with fields with the appropriate data.
+  async recomputeRelationships(pAccountEntity: AccountEntity): Promise<void> {
+    const connectionsList: string[] = [];
+    for await (const relation of Relationships.enumerateAsync(new GenericFilter({
+            '$or': [ { 'fromId': pAccountEntity.id }, { 'toId': pAccountEntity.id } ],
+            'relationshipType': RelationshipTypes.CONNECTION }))) {
+      // TODO: this is best done with an aggregation pipeline
+      const otherAccountId = pAccountEntity.id === relation.fromId ? relation.toId : relation.fromId;
+      const otherAccount = await Accounts.getAccountWithId(otherAccountId);
+      if (otherAccount) {
+        connectionsList.push(otherAccount.username);
+      };
+    };
+    pAccountEntity.connections = connectionsList;
+    const friendsList: string[] = [];
+    for await (const relation of Relationships.enumerateAsync(new GenericFilter({
+            '$or': [ { 'fromId': pAccountEntity.id }, { 'toId': pAccountEntity.id } ],
+            'relationshipType': RelationshipTypes.FRIEND }))) {
+      // TODO: this is best done with an aggregation pipeline
+      const otherAccountId = pAccountEntity.id === relation.fromId ? relation.toId : relation.fromId;
+      const otherAccount = await Accounts.getAccountWithId(otherAccountId);
+      if (otherAccount) {
+        friendsList.push(otherAccount.username);
+      };
+    };
+    pAccountEntity.friends = friendsList;
   },
   // The contents of this entity have been updated
   async updateEntityFields(pEntity: AccountEntity, pFields: VKeyedCollection): Promise<AccountEntity> {

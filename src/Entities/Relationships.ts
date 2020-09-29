@@ -29,6 +29,7 @@ export let relationshipCollection = 'relationships';
 
 export class RelationshipTypes {
   public static CONNECTION = 'connection';
+  public static FRIEND = 'friend';
 };
 
 export const Relationships = {

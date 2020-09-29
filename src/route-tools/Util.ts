@@ -101,13 +101,13 @@ export function updateLocationInfo(pReq: Request): VKeyedCollection {
 // The returned location info has many options depending on whether
 //    the account has set location and/or has an associated domain.
 // Return a structure that represents the target account's domain
-export async function buildLocationInfo(pReq: Request, pAcct: AccountEntity): Promise<any> {
+export async function buildLocationInfo(pAcct: AccountEntity): Promise<any> {
   const ret: any = {};
   if (pAcct.locationDomainId) {
     const aDomain = await Domains.getDomainWithId(pAcct.locationDomainId);
     if (IsNotNullOrEmpty(aDomain)) {
       return {
-        'node_id': pReq.vSession.id,
+        'node_id': pAcct.locationNodeId,
         'root': {
           'domain': await buildDomainInfo(aDomain),
         },
@@ -118,7 +118,7 @@ export async function buildLocationInfo(pReq: Request, pAcct: AccountEntity): Pr
     else {
       // The domain doesn't have an ID
       return {
-        'node_id': pReq.vSession.id,
+        'node_id': pAcct.locationNodeId,
         'online': Accounts.isOnline(pAcct),
         'root': {
           'domain': {
@@ -129,7 +129,7 @@ export async function buildLocationInfo(pReq: Request, pAcct: AccountEntity): Pr
       };
     };
   };
-  ret.node_id = pReq.vSession.id,
+  ret.node_id = pAcct.locationNodeId;
   ret.online = Accounts.isOnline(pAcct)
   return ret;
 };
@@ -195,7 +195,7 @@ export async function buildDomainInfoV1(pDomain: DomainEntity): Promise<any> {
 };
 
 // Return the limited "user" info.. used by /api/v1/users
-export async function buildUserInfo(pReq: Request, pAccount: AccountEntity): Promise<any> {
+export async function buildUserInfo(pAccount: AccountEntity): Promise<any> {
   return {
     'accountId': pAccount.id,
     'id': pAccount.id,
@@ -205,7 +205,7 @@ export async function buildUserInfo(pReq: Request, pAccount: AccountEntity): Pro
       'hero': pAccount.imagesHero,
       'thumbnail': pAccount.imagesThumbnail
     },
-    'location': await buildLocationInfo(pReq, pAccount),
+    'location': await buildLocationInfo(pAccount),
   };
 };
 
@@ -225,7 +225,7 @@ export async function buildAccountInfo(pReq: Request, pAccount: AccountEntity): 
       'tiny': pAccount.imagesTiny,
       'thumbnail': pAccount.imagesThumbnail
     },
-    'location': await buildLocationInfo(pReq, pAccount),
+    'location': await buildLocationInfo(pAccount),
     'friends': pAccount.friends,
     'connections': pAccount.connections,
     'when_account_created': pAccount.whenCreated ? pAccount.whenCreated.toISOString() : undefined,

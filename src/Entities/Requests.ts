@@ -81,6 +81,20 @@ export const Requests = {
     aRequest.whenCreated = new Date();
     return aRequest;
   },
+  createConnectionRequest(pRequesterId: string, pTargetId: string): RequestEntity {
+    const newRequest = Requests.create();
+    newRequest.requestType = RequestType.CONNECTION;
+    newRequest.requesterId = pRequesterId;
+    newRequest.requesterAccepted = false;
+    newRequest.targetId = pTargetId;
+    newRequest.targetAccepted = false;
+
+    // A connection request lasts only for so long
+    const expirationMinutes = Config["metaverse-server"]["connection-request-expiration-minutes"];
+    newRequest.expirationTime = new Date(Date.now() + 1000 * 60 * expirationMinutes);
+
+    return newRequest;
+  },
   add(pRequestEntity: RequestEntity) : Promise<RequestEntity> {
     return createObject(requestCollection, pRequestEntity);
   },
