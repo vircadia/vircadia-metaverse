@@ -55,7 +55,15 @@ export const setupMetaverseAPI: RequestHandler = async (req: Request, resp: Resp
       Logger.debug('setupMetaverseAPI: created new session for ' + req.vSenderKey);
     };
 
-    const authToken = req.vRestResp.getAuthToken();
+    let authToken = req.vRestResp.getAuthToken();
+    // If an authToken is not supplied in the header, it can be supplied in the query
+    if (IsNullOrEmpty(authToken)) {
+      if (req.query && req.query.access_token) {
+        if (typeof(req.query.access_token) === 'string') {
+          authToken = (req.query.access_token as string);
+        };
+      };
+    };
     if (IsNotNullOrEmpty(authToken)) {
       try {
         req.vAuthToken = await Tokens.getTokenWithToken(authToken);
