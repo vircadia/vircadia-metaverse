@@ -63,6 +63,7 @@ export function isBooleanValidator(pField: FieldDefn, pEntity: Entity, pValue: a
 };
 export function isPathValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
   // TODO: Add regexp to check format of "domainname/float,float,float/float,float,float,float"
+  // [\w +_-]*\/-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?\/-?\d+(\.\d*)?-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?
   return typeof(pValue) === 'string';
 };
 export function isDateValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
@@ -374,8 +375,8 @@ export async function checkAccessToEntity(pAuthToken: AuthToken,  // token being
           break;
         case Perm.OWNER:
           // The requestor is the target entity
-          if (pTargetEntity.hasOwnProperty('id')) {
-            canAccess = pAuthToken.accountId === (pTargetEntity as any).id;
+          if (pTargetEntity.hasOwnProperty('accountId')) {
+            canAccess = pAuthToken.accountId === (pTargetEntity as any).accountId;
           };
           break;
         case Perm.FRIEND:
