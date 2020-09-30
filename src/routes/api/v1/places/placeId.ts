@@ -24,10 +24,13 @@ import { buildPlaceInfo } from '@Route-Tools/Util';
 
 import { Accounts } from '@Entities/Accounts';
 import { Places } from '@Entities/Places';
+import { setPlaceField } from '@Entities/PlaceEntity';
 
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
 import { IsNullOrEmpty } from '@Tools/Misc';
+import { VKeyedCollection } from '@Tools/vTypes';
+import { Logger } from '@Tools/Logging';
 
 const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
@@ -74,6 +77,47 @@ export const procGetPlacesPlaceId: RequestHandler = async (req: Request, resp: R
   next();
 };
 
+// Update place information
+// This request happens when a domain is being assigned to another domain
+export const procPutPlacesPlaceId: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  if (req.vAuthAccount && req.vParam1) {
+    const aPlace = await Places.getPlaceWithId(req.vParam1);
+    if (aPlace) {
+      if (req.vAuthAccount.id === aPlace.accountId || Accounts.isAdmin(req.vAuthAccount)) {
+        if (req.body.place) {
+          const updates: VKeyedCollection = {};
+          if (req.body.place.pointee_query) {
+            // The caller specified a domain. Either the same domain or changing
+            if (req.body.place.pointee_query !== aPlace.domainId) {
+              Logger.info(`procPutPlacesPlaceId: domain changing from ${aPlace.domainId} to ${req.body.place.pointee_query}`)
+              aPlace.domainId = req.body.place.pointee_query;
+              updates.domainId = aPlace.domainId;
+            };
+          };
+          for (const field of [ 'path', 'address', 'description', 'thumbnail' ]) {
+            if (req.body.place.hasOwnProperty(field)) {
+              await setPlaceField(req.vAuthToken, aPlace, field, req.body.place[field], req.vAuthAccount, updates);
+            };
+          };
+          Places.updateEntityFields(aPlace, updates);
+        }
+        else {
+          req.vRestResp.respondFailure('badly formed data');
+        };
+      }
+      else {
+        req.vRestResp.respondFailure('unauthorized');
+      };
+    }
+    else {
+      req.vRestResp.respondFailure('no such place');
+    };
+  }
+  else {
+    req.vRestResp.respondFailure('no account');
+  };
+  next();
+};
 // Delete a Place
 export const procDeletePlacesPlaceId: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount && req.vParam1) {
@@ -104,6 +148,12 @@ router.get(   '/api/v1/places/:param1',
                                      [ setupMetaverseAPI,   // req.vRESTResp
                                       param1FromParams,     // req.vParam1
                                       procGetPlacesPlaceId,
+                                      finishMetaverseAPI ] );
+router.put( '/api/v1/places/:param1',
+                                     [ setupMetaverseAPI,   // req.vRESTResp
+                                      accountFromAuthToken, // req.vAuthAccount
+                                      param1FromParams,     // req.vParam1
+                                      procPutPlacesPlaceId,
                                       finishMetaverseAPI ] );
 router.delete( '/api/v1/places/:param1',
                                      [ setupMetaverseAPI,   // req.vRESTResp

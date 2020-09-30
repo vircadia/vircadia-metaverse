@@ -127,6 +127,15 @@ export const placeFields: { [key: string]: FieldDefn } = {
     setter: simpleSetter,
     getter: simpleGetter
   },
+  'path': { // alternate external name for 'address'
+    entity_field: 'address',
+    request_field_name: 'path',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'domain', 'owner', 'admin' ],
+    validate: isPathValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
   'thumbnail': {
     entity_field: 'thumbnail',
     request_field_name: 'thumbnail',

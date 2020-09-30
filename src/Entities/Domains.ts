@@ -40,6 +40,7 @@ export const Domains = {
     return IsNullOrEmpty(pSenderKey) ? null : getObject(domainCollection, { 'lastSenderKey': pSenderKey });
   },
   async addDomain(pDomainEntity: DomainEntity) : Promise<DomainEntity> {
+    Logger.info(`Domains: creating domain ${pDomainEntity.name}, id=${pDomainEntity.id}`);
     return IsNullOrEmpty(pDomainEntity) ? null : createObject(domainCollection, pDomainEntity);
   },
   createDomain(): DomainEntity {

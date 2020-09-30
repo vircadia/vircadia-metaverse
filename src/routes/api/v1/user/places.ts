@@ -30,7 +30,7 @@ import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
 
 const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
-    const scoper = new AccountScopeFilter(req.vAuthAccount);
+    const scoper = new AccountScopeFilter(req.vAuthAccount, 'accountId');
     const pager = new PaginationInfo();
 
     scoper.parametersFromRequest(req);

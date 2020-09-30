@@ -55,6 +55,7 @@ const procPostDomainsTemporary: RequestHandler = async (req: Request, resp: Resp
   const newPlace = Places.createPlace();
   newPlace.domainId = newDomain.id;
   newPlace.name = newDomain.name;
+  newPlace.description = 'A place in ' + newDomain.name;
   newPlace.iPAddrOfFirstContact = req.vSenderKey;
   Places.addPlace(newPlace);
 

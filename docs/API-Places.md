@@ -140,6 +140,28 @@ Delete the place entry.
 The requestor must be either an admin account or the
 account associated with the domain.
 
+## PUT /api/v1/places/:placeId
+
+Legacy request that changes values in a place.
+
+The requestor must be the account associated with the domain or an admin.
+
+If the field "place.pointee_query" is passed, that is presumed to be the ID
+of the domain that should be associated with the Place.
+
+Setting fields is optional so only have to send those one wants to change.
+
+```
+    {
+        'place': {
+            'pointee_query': domainId,
+            'path': stringAddress,
+            'description': string,
+            'thumbnail': stringURL
+        }
+    }
+```
+
 ## GET /api/v1/places/{placeId}/field/{fieldname}
 
 Get the value of an place field. The result returned is just the value of
