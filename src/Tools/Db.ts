@@ -108,9 +108,14 @@ export async function updateObjectFields(pCollection: string, pCriteria: any, pF
   const unset: VKeyedCollection = {};
   const op: VKeyedCollection = {};
 
+  // If not updating anything, just return
+  if (Object.keys(pFields).length === 0) {
+    return;
+  };
+
   // Go through all the passed values that are to be updated in the target object
   for (const [key, value] of Object.entries(pFields)) {
-    if (key === 'id') continue;
+    if (key === 'id') continue; // never change an id
     if (value === null) {
       doUnset = true;
       unset[key] = '';
