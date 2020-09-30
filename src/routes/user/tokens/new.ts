@@ -36,8 +36,10 @@ const procGetUserTokensNew: RequestHandler = async (req: Request, resp: Response
   }
   else {
     // if the user is not logged in, go to a page to login and set things up
+    const tokengen_url = Config["metaverse-server"].tokengen_url.replace('METAVERSE_SERVER_URL', Config.metaverse["metaverse-server-url"]);
+
     resp.statusCode = HTTPStatusCode.Found;
-    resp.setHeader('Location', Config.metaverse["metaverse-server-url"] + Config["metaverse-server"].tokengen_url),
+    resp.setHeader('Location', tokengen_url);
     resp.setHeader('content-type', 'text/html');
     resp.send();
   };

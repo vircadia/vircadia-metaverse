@@ -47,8 +47,8 @@ export let Config = {
       'session-timeout-minutes': 5,
       'connection-request-expiration-minutes': 1,
       'friend-request-expiration-minutes': 60 * 24 * 4,
-      // redirection URL used for initial domain token generation
-      'tokengen_url': '/static/DomainTokenLogin.html',
+      // redirection URL used for initial domain token generation, use "METAVERSE_SERVER_URL" as a base if using the static folder.
+      'tokengen_url': 'METAVERSE_SERVER_URL/static/DomainTokenLogin.html',
       // When account of this name is created, add 'admin' role to it
       'base-admin-account': 'adminer'
     },
