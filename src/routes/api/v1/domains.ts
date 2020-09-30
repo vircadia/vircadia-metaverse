@@ -28,7 +28,7 @@ import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
 import { HTTPStatusCode } from '@Route-Tools/RESTResponse';
 
-import { GenUUID } from '@Tools/Misc';
+import { GenUUID, IsNotNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
 
 // GET /api/v1/domains
@@ -57,52 +57,63 @@ const procGetDomains: RequestHandler = async (req: Request, resp: Response, next
 };
 
 const procPostDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.body && req.body.domain && req.body.domain.label) {
-    const newDomainName = req.body.domain.label;
-    if (domainFields.name.validate(domainFields.name, 'name', newDomainName)) {
-      const generatedAPIkey: string = GenUUID();
+  if (req.vAuthAccount) {
+    if (req.body && req.body.domain && req.body.domain.label) {
+      const newDomainName = req.body.domain.label;
+      if (IsNotNullOrEmpty(newDomainName)) {
+        if (domainFields.name.validate(domainFields.name, 'name', newDomainName)) {
+          const generatedAPIkey: string = GenUUID();
 
-      const newDomain = Domains.createDomain();
-      newDomain.name = newDomainName;
-      newDomain.apiKey = generatedAPIkey;
-      if (req.vSenderKey) {
-        newDomain.iPAddrOfFirstContact = req.vSenderKey;
+          const newDomain = Domains.createDomain();
+          newDomain.name = newDomainName;
+          newDomain.apiKey = generatedAPIkey;
+          if (req.vSenderKey) {
+            newDomain.iPAddrOfFirstContact = req.vSenderKey;
+          };
+
+          // Creating a domain also creates a Place for that domain
+          const newPlace = Places.createPlace();
+          newPlace.domainId = newDomain.id;
+          newPlace.name = newDomain.name;
+          newPlace.description = 'A place in ' + newDomain.name;
+          newPlace.iPAddrOfFirstContact = req.vSenderKey;
+
+          // If the requestor is logged in, associate that account with the new domain/place
+          if (req.vAuthToken) {
+            Logger.debug(`procPostDomains: associating account ${req.vAuthToken.accountId} with new domain ${newDomain.id}`)
+            newDomain.sponsorAccountId = req.vAuthToken.accountId;
+            newPlace.accountId = req.vAuthToken.accountId;
+          };
+
+          // Now that the local structures are updated, store the new entries
+          Domains.addDomain(newDomain);
+          Places.addPlace(newPlace);
+
+          const domainInfo = await buildDomainInfo(newDomain);
+          domainInfo.api_key = newDomain.apiKey;
+
+          req.vRestResp.Data = {
+            'domain': domainInfo
+          };
+
+          // some legacy requests want the domain information at the top level
+          req.vRestResp.addAdditionalField('domain', domainInfo);
+        }
+        else {
+          req.vRestResp.respondFailure('name contains not allowed characters');
+        };
+      }
+      else {
+        req.vRestResp.respondFailure('label was empty');
       };
-
-      // Creating a domain also creates a Place for that domain
-      const newPlace = Places.createPlace();
-      newPlace.domainId = newDomain.id;
-      newPlace.name = newDomain.name;
-      newPlace.iPAddrOfFirstContact = req.vSenderKey;
-
-      // If the requestor is logged in, associate that account with the new domain/place
-      if (req.vAuthToken) {
-        newDomain.sponsorAccountId = req.vAuthToken.accountId;
-        newPlace.accountId = req.vAuthToken.accountId;
-      };
-
-      // Now that the local structures are updated, store the new entries
-      Domains.addDomain(newDomain);
-      Places.addPlace(newPlace);
-
-      const domainInfo = await buildDomainInfo(newDomain);
-      domainInfo.api_key = newDomain.apiKey;
-
-      req.vRestResp.Data = {
-        'domain': domainInfo
-      };
-
-      // some legacy requests want the domain information at the top level
-      req.vRestResp.addAdditionalField('domain', domainInfo);
     }
     else {
-      req.vRestResp.respondFailure('name contains not allowed characters');
-
+      req.vRestResp.respondFailure('no label supplied');
     };
   }
   else {
-    req.vRestResp.respondFailure('no label');
-  }
+    req.vRestResp.respondFailure('unauthorized');
+  };
   next();
 };
 
