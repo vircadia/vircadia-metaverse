@@ -56,7 +56,7 @@ const procPostAccountId: RequestHandler = async (req: Request, resp: Response, n
       const updates: VKeyedCollection = {};
       for (const field of [ 'email', 'public_key' ]) {
         if (valuesToSet.hasOwnProperty(field)) {
-          await setAccountField(req.vAuthToken, req.vAccount, field, valuesToSet.username, req.vAuthAccount, updates);
+          await setAccountField(req.vAuthToken, req.vAccount, field, valuesToSet.field, req.vAuthAccount, updates);
         };
       };
       if (valuesToSet.hasOwnProperty('images')) {
