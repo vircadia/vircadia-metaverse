@@ -61,7 +61,7 @@ const procPostDomains: RequestHandler = async (req: Request, resp: Response, nex
     if (req.body && req.body.domain && req.body.domain.label) {
       const newDomainName = req.body.domain.label;
       if (IsNotNullOrEmpty(newDomainName)) {
-        if (domainFields.name.validate(domainFields.name, 'name', newDomainName)) {
+        if (await domainFields.name.validate(domainFields.name, 'name', newDomainName)) {
           const generatedAPIkey: string = GenUUID();
 
           const newDomain = Domains.createDomain();

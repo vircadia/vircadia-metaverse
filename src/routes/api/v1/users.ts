@@ -75,8 +75,8 @@ const procPostUsers: RequestHandler = async (req: Request, resp: Response, next:
       const userEmail: string = req.body.user.email;
       Logger.debug(`procPostUsers: request to create account for ${userName} with email ${userEmail}`);
       // Precheck format of username and email before trying to set them
-      if (accountFields.username.validate(accountFields.username, 'username', userName)) {
-        if (accountFields.email.validate(accountFields.email, 'email', userEmail)) {
+      if (await accountFields.username.validate(accountFields.username, 'username', userName)) {
+        if (await accountFields.email.validate(accountFields.email, 'email', userEmail)) {
           // See if account already exists
           const prevAccount = await Accounts.getAccountWithUsername(userName);
           if (IsNullOrEmpty(prevAccount)) {
