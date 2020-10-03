@@ -21,6 +21,7 @@ import { accountFromAuthToken, param1FromParams } from '@Route-Tools/middleware'
 
 import { getAccountField, setAccountField, getAccountUpdateForField } from '@Entities/AccountEntity';
 import { Accounts } from '@Entities/Accounts';
+import { VKeyedCollection } from '@Tools/vTypes';
 
 // Get the scope of the logged in account
 const procGetField: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
@@ -38,10 +39,10 @@ const procGetField: RequestHandler = async (req: Request, resp: Response, next: 
 const procPostField: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount && req.vAccount) {
     if (req.body.hasOwnProperty('set')) {
-      if (await setAccountField(req.vAuthToken, req.vAccount, req.vParam1, req.body.set, req.vAuthAccount)) {
+      const updates: VKeyedCollection = {};
+      if (await setAccountField(req.vAuthToken, req.vAccount, req.vParam1, req.body.set, req.vAuthAccount, updates)) {
         // Setting worked so update the database
-        const update = getAccountUpdateForField(req.vAccount, req.vParam1);
-        Accounts.updateEntityFields(req.vAccount, update);
+        Accounts.updateEntityFields(req.vAccount, updates);
       }
       else {
         req.vRestResp.respondFailure('value could not be set');

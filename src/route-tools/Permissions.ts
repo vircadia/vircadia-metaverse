@@ -374,23 +374,29 @@ export async function checkAccessToEntity(pAuthToken: AuthToken,  // token being
           };
           break;
         case Perm.OWNER:
-          // The requestor is the target entity
-          if (pTargetEntity.hasOwnProperty('accountId')) {
-            canAccess = pAuthToken.accountId === (pTargetEntity as any).accountId;
+          // The requestor wants to be the same account as the target entity
+          if (pTargetEntity.hasOwnProperty('id')) {
+            canAccess = pAuthToken.accountId === (pTargetEntity as AccountEntity).id;
           };
           break;
         case Perm.FRIEND:
           // The requestor is a 'friend' of the target entity
           if (pTargetEntity.hasOwnProperty('friends')) {
-            requestingAccount = requestingAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
-            canAccess = SArray.hasNoCase((pTargetEntity as any).friends, requestingAccount.username);
+            const targetFriends: string[] = (pTargetEntity as AccountEntity).friends;
+            if (targetFriends) {
+              requestingAccount = requestingAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
+              canAccess = SArray.hasNoCase(targetFriends, requestingAccount.username);
+            };
           };
           break;
         case Perm.CONNECTION:
           // The requestor is a 'connection' of the target entity
           if (pTargetEntity.hasOwnProperty('connections')) {
-            requestingAccount = requestingAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
-            canAccess = SArray.hasNoCase((pTargetEntity as any).connections, requestingAccount.username);
+            const targetConnections: string[] = (pTargetEntity as AccountEntity).connections;
+            if (targetConnections) {
+              requestingAccount = requestingAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
+              canAccess = SArray.hasNoCase(targetConnections, requestingAccount.username);
+            };
           };
           break;
         case Perm.ADMIN:
@@ -406,7 +412,7 @@ export async function checkAccessToEntity(pAuthToken: AuthToken,  // token being
           if (SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
             if (pTargetEntity.hasOwnProperty('sponsorAccountId')) {
               Logger.cdebug('field-setting', `checkAccessToEntity: authToken is domain. auth.AccountId=${pAuthToken.accountId}, sponsor=${(pTargetEntity as any).sponsorAccountId}`);
-              canAccess = pAuthToken.accountId === (pTargetEntity as any).sponsorAccountId;
+              canAccess = pAuthToken.accountId === (pTargetEntity as DomainEntity).sponsorAccountId;
             };
           };
           break;
