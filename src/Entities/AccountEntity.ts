@@ -118,7 +118,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
     request_field_name: 'username',
     get_permissions: [ 'all' ],
     set_permissions: [ 'owner', 'admin' ],
-    validate: (pField: FieldDefn, pEntity: Entity, pVal: any): any => {
+    validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<boolean> => {
       if (typeof(pVal) === 'string') {
         // Check username for latin alpha-numeric
         return /^[A-Za-z][A-Za-z0-9+\-_\.]*$/.test(pVal);
@@ -132,7 +132,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
     request_field_name: 'email',
     get_permissions: [ 'all' ],
     set_permissions: [ 'owner', 'admin' ],
-    validate: (pField: FieldDefn, pEntity: Entity, pVal: any): any => {
+    validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<boolean> => {
       if (typeof(pVal) === 'string') {
         // Check email for sanity
         return /^[A-Za-z0-9+\-_\.]+@[A-Za-z0-9-\.]+$/.test(pVal);
@@ -225,7 +225,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
     get_permissions: [ 'none' ],
     set_permissions: [ 'owner', 'admin' ],
     validate: isStringValidator,
-    setter: (pField: FieldDefn, pEntity: Entity, pVal: any): any => {
+    setter: (pField: FieldDefn, pEntity: Entity, pVal: any): void => {
       Accounts.storePassword((pEntity as AccountEntity), pVal);
     },
     getter: undefined,

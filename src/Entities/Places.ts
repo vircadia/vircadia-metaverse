@@ -44,6 +44,16 @@ export const Places = {
     newPlace.whenCreated = new Date();
     return newPlace;
   },
+  // Verify the passed placename is unique and return the unique name
+  async uniqifyPlaceName(pPlaceName: string): Promise<string> {
+    let newPlacename = pPlaceName;
+    const existingPlace = await Places.getPlaceWithName(newPlacename);
+    if (existingPlace) {
+      newPlacename = newPlacename + ' ' + genRandomString(5);
+      Logger.info(`uniqifyPlaceName: non-unique place name ${pPlaceName}. Creating ${newPlacename}`);
+    };
+    return newPlacename;
+  },
   async removePlace(pPlaceEntity: PlaceEntity) : Promise<boolean> {
     Logger.info(`Places: removing place ${pPlaceEntity.name}, id=${pPlaceEntity.id}`);
     return deleteOne(placeCollection, { 'id': pPlaceEntity.id } );

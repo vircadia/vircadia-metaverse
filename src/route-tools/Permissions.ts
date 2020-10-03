@@ -35,7 +35,7 @@ import { Logger } from '@Tools/Logging';
 //    for the 'updated' field (since the 'set' could be a merge type operation).
 export type getterFunction = (pDfd: FieldDefn, pD: Entity) => any;
 export type setterFunction = (pDfd: FieldDefn, pD: Entity, pV: any) => void;
-export type validateFunction = (pDfd: FieldDefn, pD: Entity, pV: any) => boolean;
+export type validateFunction = (pDfd: FieldDefn, pD: Entity, pV: any) => Promise<boolean>;
 export type updaterFunction = (pDfd: FieldDefn, pD: Entity, pUpdates: VKeyedCollection) => void;
 export interface FieldDefn {
     entity_field: string,
@@ -52,25 +52,25 @@ export type EntityFieldsDefn = { [ key: string]: FieldDefn };
 export function noValidation(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
   return true;
 };
-export function isStringValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
+export async function isStringValidator(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<boolean> {
   return typeof(pValue) === 'string';
 };
-export function isNumberValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
+export async function isNumberValidator(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<boolean> {
   return typeof(pValue) === 'number';
 };
-export function isBooleanValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
+export async function isBooleanValidator(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<boolean> {
   return typeof(pValue) === 'boolean';
 };
-export function isPathValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
+export async function isPathValidator(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<boolean> {
   // TODO: Add regexp to check format of "domainname/float,float,float/float,float,float,float"
   // [\w +_-]*\/-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?\/-?\d+(\.\d*)?-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?
   return typeof(pValue) === 'string';
 };
-export function isDateValidator(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
+export async function isDateValidator(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<boolean> {
   return pValue instanceof Date;
 };
 // verify the value is a string or a set/add/remove collection of string arrays
-export function isSArraySet(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
+export async function isSArraySet(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<boolean> {
   let ret = false;
   if (isSArray) {
     // if we're passed an SArray, just presume a 'set'
@@ -79,17 +79,17 @@ export function isSArraySet(pField: FieldDefn, pEntity: Entity, pValue: any): bo
   else {
     if (pValue && (pValue.set || pValue.add || pValue.remove)) {
       Logger.cdebug('field-setting', `isSArraySet: object with one of the fields`);
-      let eachIsOk = true;
+      let eachIsOk: boolean = true;
       if (eachIsOk && pValue.set) {
-        eachIsOk = typeof(pValue.set) === 'string' || isSArray(pField, pEntity, pValue.set);
+        eachIsOk = typeof(pValue.set) === 'string' || await isSArray(pField, pEntity, pValue.set);
         Logger.cdebug('field-setting', `isSArraySet: pValue.set is ${eachIsOk}`);
       };
       if (eachIsOk && pValue.add) {
-        eachIsOk = typeof(pValue.add) === 'string' || isSArray(pField, pEntity, pValue.add);
+        eachIsOk = typeof(pValue.add) === 'string' || await isSArray(pField, pEntity, pValue.add);
         Logger.cdebug('field-setting', `isSArraySet: pValue.add is ${eachIsOk}`);
       };
       if (eachIsOk && pValue.remove) {
-        eachIsOk = typeof(pValue.remove) === 'string' || isSArray(pField, pEntity, pValue.remove);
+        eachIsOk = typeof(pValue.remove) === 'string' || await isSArray(pField, pEntity, pValue.remove);
         Logger.cdebug('field-setting', `isSArraySet: pValue.remove is ${eachIsOk}`);
       };
       ret = eachIsOk;
@@ -98,7 +98,7 @@ export function isSArraySet(pField: FieldDefn, pEntity: Entity, pValue: any): bo
   return ret;
 };
 // Return 'true' is pValue is an array of strings
-export function isSArray(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
+export async function isSArray(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<boolean> {
   let ret = false;
   if (pValue) {
     if (Array.isArray(pValue)) {
@@ -266,7 +266,7 @@ export async function setEntityField(
     Logger.cdebug('field-setting', `setEntityField: ${pField}=>${JSON.stringify(pVal)}`);
     if (await checkAccessToEntity(pAuthToken, pEntity, perms.set_permissions, pRequestingAccount)) {
       Logger.cdebug('field-setting', `setEntityField: access passed`);
-      if (perms.validate(perms, pEntity, pVal)) {
+      if (await perms.validate(perms, pEntity, pVal)) {
         Logger.cdebug('field-setting', `setEntityField: value validated`);
         if (typeof(perms.setter) === 'function') {
           perms.setter(perms, pEntity, pVal);
@@ -304,7 +304,9 @@ export function getEntityUpdateForField(
   return ret;
 };
 
-// if the field has an updater, do that, elas just create an update for the base named field
+// if the field has an updater, do that, else just create an update for the base named field.
+// This modifies the passed VKeyedCollection with the field and new value to pass to
+//     the database.
 function makeEntityFieldUpdate(pPerms: FieldDefn, pEntity: Entity, pRet: VKeyedCollection): void {
   if (pPerms) {
     if (pPerms.updater) {
@@ -326,12 +328,12 @@ function makeEntityFieldUpdate(pPerms: FieldDefn, pEntity: Entity, pRet: VKeyedC
 export class Perm {
   public static NONE     = 'none';
   public static ALL      = 'all';
-  public static DOMAIN   = 'domain';
-  public static OWNER    = 'owner';
-  public static FRIEND   = 'friend';
-  public static CONNECTION = 'connection';
-  public static ADMIN    = 'admin';
-  public static SPONSOR  = 'sponsor';
+  public static DOMAIN   = 'domain';      // check against .sponsorId
+  public static OWNER    = 'owner';       // check against .id or .accountId
+  public static FRIEND   = 'friend';      // check member of .friends
+  public static CONNECTION = 'connection';// check member of .connections
+  public static ADMIN    = 'admin';       // check if isAdmin
+  public static SPONSOR  = 'sponsor';     // check against .sponsorAccountId
 };
 
 // Check if the passed AuthToken has access to the passed Entity.
@@ -377,6 +379,9 @@ export async function checkAccessToEntity(pAuthToken: AuthToken,  // token being
           // The requestor wants to be the same account as the target entity
           if (pTargetEntity.hasOwnProperty('id')) {
             canAccess = pAuthToken.accountId === (pTargetEntity as AccountEntity).id;
+          };
+          if (!canAccess && pTargetEntity.hasOwnProperty('accountId')) {
+            canAccess = pAuthToken.accountId === (pTargetEntity as any).accountId;
           };
           break;
         case Perm.FRIEND:

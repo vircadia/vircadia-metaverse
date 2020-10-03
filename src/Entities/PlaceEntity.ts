@@ -16,6 +16,7 @@
 import { Entity } from '@Entities/Entity';
 import { AccountEntity } from '@Entities/AccountEntity';
 import { AuthToken } from '@Entities/AuthToken';
+import { Places } from '@Entities/Places';
 
 import { FieldDefn } from '@Route-Tools/Permissions';
 import { isStringValidator, isSArraySet, isPathValidator, isDateValidator } from '@Route-Tools/Permissions';
@@ -23,6 +24,7 @@ import { simpleGetter, simpleSetter, sArraySetter, dateStringGetter } from '@Rou
 import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/Permissions';
 
 import { VKeyedCollection } from '@Tools/vTypes';
+import { IsNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
 
 // NOTE: this class cannot have functions in them as they are just JSON to and from the database
@@ -87,7 +89,18 @@ export const placeFields: { [key: string]: FieldDefn } = {
     request_field_name: 'name',
     get_permissions: [ 'all' ],
     set_permissions: [ 'domain', 'owner', 'admin' ],
-    validate: isStringValidator,
+    validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<any> => {
+      // Verify that the placename is unique
+      let valid: boolean = false;
+      if (typeof(pVal) === 'string') {
+        const maybePlace = await Places.getPlaceWithName(pVal);
+        // If no other place with this name or we're setting our own name
+        if (IsNullOrEmpty(maybePlace) || (pEntity as PlaceEntity).id === maybePlace.id) {
+          valid = true;
+        };
+      };
+      return valid;
+    },
     setter: simpleSetter,
     getter: simpleGetter
   },

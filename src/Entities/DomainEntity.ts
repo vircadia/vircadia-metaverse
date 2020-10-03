@@ -112,7 +112,7 @@ export const domainFields: { [key: string]: FieldDefn } = {
     request_field_name: 'name',
     get_permissions: [ 'all' ],
     set_permissions: [ 'domain', 'sponsor', 'admin' ],
-    validate: (pField: FieldDefn, pEntity: Entity, pVal: any): any => {
+    validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<boolean> => {
       if (typeof(pVal) === 'string') {
         return /^[A-Za-z0-9+\-_\.]*$/.test(pVal);
       };
@@ -127,7 +127,7 @@ export const domainFields: { [key: string]: FieldDefn } = {
     request_field_name: 'world_name',
     get_permissions: [ 'all' ],
     set_permissions: [ 'domain', 'sponsor', 'admin' ],
-    validate: (pField: FieldDefn, pEntity: Entity, pVal: any): any => {
+    validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<boolean> => {
       if (typeof(pVal) === 'string') {
         return /^[A-Za-z0-9+\-_\.]*$/.test(pVal);
       };
