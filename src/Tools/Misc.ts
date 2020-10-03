@@ -20,7 +20,7 @@ import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
 
 import { Logger } from '@Tools/Logging';
-import { VKeyValue } from '@Tools/vTypes';
+import { VKeyedCollection } from '@Tools/vTypes';
 
 // Clamp the passed value between a high and low
 export function Clamp(pVal: number, pLow: number, pHigh: number): number {
@@ -39,6 +39,14 @@ export function IsNullOrEmpty(pVal: any): boolean {
 // Return 'true' if the passed value is not null or empty
 export function IsNotNullOrEmpty(pVal: any): boolean {
   return !IsNullOrEmpty(pVal);
+};
+
+// Create an object with the passed property value.
+// This is often used to make queries where the property name is a value string.
+export function SimpleObject(pProperty: string, pValue: any): VKeyedCollection {
+  const ret:VKeyedCollection = {};
+  ret[pProperty] = pValue;
+  return ret;
 };
 
 // Take apart an URL query string and return an object of key/value pairs

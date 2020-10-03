@@ -21,7 +21,6 @@ import { AccountEntity } from '@Entities/AccountEntity';
 import { AccountRoles } from '@Entities/AccountRoles';
 import { Domains } from '@Entities/Domains';
 import { Places } from '@Entities/Places';
-import { Relationships, RelationshipTypes } from '@Entities/Relationships';
 import { Tokens } from '@Entities/Tokens';
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
@@ -77,10 +76,24 @@ export const Accounts = {
     return deleteOne(accountCollection, { 'id': pAccountEntity.id } );
   },
   async removeAccountContext(pAccountEntity: AccountEntity) : Promise<void> {
+    // Friends and Connections
     Logger.info(`Accounts: removing relationships for account ${pAccountEntity.username}, id=${pAccountEntity.id}`);
-    // When deleting an account, remove all the stuff that points to it
-    await Relationships.removeMany(new GenericFilter( { 'fromId': pAccountEntity.id }));
-    await Relationships.removeMany(new GenericFilter( { 'toId': pAccountEntity.id }));
+    if (pAccountEntity.connections) {
+      for (const aConnectionName of pAccountEntity.connections) {
+        const aConnection = await Accounts.getAccountWithUsername(aConnectionName);
+        if (aConnection && aConnection.connections) {
+          SArray.remove(aConnection.connections, pAccountEntity.username);
+        };
+      };
+    };
+    if (pAccountEntity.friends) {
+      for (const aFriendName of pAccountEntity.friends) {
+        const aFriend = await Accounts.getAccountWithUsername(aFriendName);
+        if (aFriend && aFriend.friends) {
+          SArray.remove(aFriend.friends, pAccountEntity.username);
+        };
+      };
+    };
     // The domains associated with this account are removed also
     for await (const aDomain of Domains.enumerateAsync(new GenericFilter({ 'sponsorAccountId': pAccountEntity.id }))) {
       await Domains.removeDomain(aDomain);
@@ -88,35 +101,6 @@ export const Accounts = {
     };
     // Also, any places
     await Places.removeMany(new GenericFilter( { 'accountId': pAccountEntity.id }));
-  },
-  // Account relationships are in the 'Relationships' table but, for searching, easy reference,
-  //    and legacy compatibility, there is a 'friends' and 'connections' field in the
-  //    AccountEntity. This updates those with fields with the appropriate data.
-  async recomputeRelationships(pAccountEntity: AccountEntity): Promise<void> {
-    const connectionsList: string[] = [];
-    for await (const relation of Relationships.enumerateAsync(new GenericFilter({
-            '$or': [ { 'fromId': pAccountEntity.id }, { 'toId': pAccountEntity.id } ],
-            'relationshipType': RelationshipTypes.CONNECTION }))) {
-      // TODO: this is best done with an aggregation pipeline
-      const otherAccountId = pAccountEntity.id === relation.fromId ? relation.toId : relation.fromId;
-      const otherAccount = await Accounts.getAccountWithId(otherAccountId);
-      if (otherAccount) {
-        connectionsList.push(otherAccount.username);
-      };
-    };
-    pAccountEntity.connections = connectionsList;
-    const friendsList: string[] = [];
-    for await (const relation of Relationships.enumerateAsync(new GenericFilter({
-            '$or': [ { 'fromId': pAccountEntity.id }, { 'toId': pAccountEntity.id } ],
-            'relationshipType': RelationshipTypes.FRIEND }))) {
-      // TODO: this is best done with an aggregation pipeline
-      const otherAccountId = pAccountEntity.id === relation.fromId ? relation.toId : relation.fromId;
-      const otherAccount = await Accounts.getAccountWithId(otherAccountId);
-      if (otherAccount) {
-        friendsList.push(otherAccount.username);
-      };
-    };
-    pAccountEntity.friends = friendsList;
   },
   // The contents of this entity have been updated
   async updateEntityFields(pEntity: AccountEntity, pFields: VKeyedCollection): Promise<AccountEntity> {
@@ -158,7 +142,16 @@ export const Accounts = {
       const val = hash.digest('hex');
       return val;
   },
-
+  // Create whatever datastructure is needed to make these accounts friends
+  makeAccountsFriends(pRequestingAccount: AccountEntity, pTargetAccount: AccountEntity) {
+    SArray.add(pRequestingAccount.friends, pTargetAccount.username);
+    SArray.add(pTargetAccount.friends, pRequestingAccount.username);
+  },
+  // Create whatever datastructure is needed to make these accounts friends
+  makeAccountsConnected(pRequestingAccount: AccountEntity, pTargetAccount: AccountEntity) {
+    SArray.add(pRequestingAccount.connections, pTargetAccount.username);
+    SArray.add(pTargetAccount.connections, pRequestingAccount.username);
+  },
   // getter property that is 'true' if the user has been heard from recently
   isOnline(pAcct: AccountEntity): boolean {
     if (pAcct && pAcct.timeOfLastHeartbeat) {
@@ -174,15 +167,9 @@ export const Accounts = {
           - (Config["metaverse-server"]["heartbeat-seconds-until-offline"] * 1000)
     );
     return whenOffline.toISOString();
-
   },
   // getter property that is 'true' if the user is a grid administrator
   isAdmin(pAcct: AccountEntity): boolean {
     return SArray.has(pAcct.roles, AccountRoles.ADMIN);
-  },
-  // Return whether accessing account can access info about target account
-  CanAccess(pAccessingAcct: AccountEntity, pTargetAcct: AccountEntity): boolean {
-    // TODO:
-    return true;
   }
 };

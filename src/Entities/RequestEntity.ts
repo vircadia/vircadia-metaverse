@@ -23,17 +23,17 @@ export class RequestEntity {
   public requestType: string;
 
   // requestor and target
-  public requesterId: string;
-  public targetId: string;
+  public requestingAccountId: string;
+  public targetAccountId: string;
 
   // administration
   public expirationTime: Date;
   public whenCreated: Date;
 
-  // requestType == CONNECTION
-  public requestingAccountId: string;
+  // requestType == HANDSHAKE
+  public requesterId: string;
+  public targetId: string;
   public requesterAccepted: boolean;
-  public targetAccountId: string;
   public targetAccepted: boolean;
 };
 

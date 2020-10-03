@@ -36,7 +36,7 @@ export let Config = {
       }
     },
     'auth': {
-      'domain-token-expire-hours': 8760,  // one year
+      'domain-token-expire-hours': 24 * 365,  // one year
       'owner-token-expire-hours': 12
     },
     'metaverse-server': {
@@ -45,8 +45,9 @@ export let Config = {
       'heartbeat-seconds-until-offline': 300,
       'metaverse-info-addition-file': './metaverse_info.json',
       'session-timeout-minutes': 5,
-      'connection-request-expiration-minutes': 1,
-      'friend-request-expiration-minutes': 60 * 24 * 4,
+      'handshake-request-expiration-minutes': 1,
+      'connection-request-expiration-minutes': 60 * 24 * 4, // 4 days
+      'friend-request-expiration-minutes': 60 * 24 * 4,     // 4 days
       // redirection URL used for initial domain token generation, use "METAVERSE_SERVER_URL" as a base if using the static folder.
       'tokengen_url': 'METAVERSE_SERVER_URL/static/DomainTokenLogin.html',
       // When account of this name is created, add 'admin' role to it

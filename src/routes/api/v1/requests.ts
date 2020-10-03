@@ -21,13 +21,13 @@ import { accountFromAuthToken } from '@Route-Tools/middleware';
 import { Requests, RequestType } from '@Entities/Requests';
 
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
-import { RelationshipScopeFilter } from '@Entities/EntityFilters/RelationshipScopeFilter';
+import { RequestScopeFilter } from '@Entities/EntityFilters/RequestScopeFilter';
 import { Logger } from '@Tools/Logging';
 
 const procGetRequests: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
     const pager = new PaginationInfo();
-    const scoper = new RelationshipScopeFilter(req.vAuthAccount, 'requestingAccountId', 'targetAccountId');
+    const scoper = new RequestScopeFilter(req.vAuthAccount);
     pager.parametersFromRequest(req);
     scoper.parametersFromRequest(req);
 
@@ -37,17 +37,17 @@ const procGetRequests: RequestHandler = async (req: Request, resp: Response, nex
       const thisReq: any = {
         'id': aReq.id,
         'type': aReq.requestType,
-        'requester_id': aReq.requesterId,
-        'target_id': aReq.targetId,
+        'requesting_account_id': aReq.requestingAccountId,
+        'target_account_id': aReq.targetAccountId,
         'when_created': aReq.whenCreated ? aReq.whenCreated.toISOString() : undefined,
         'expiration_time': aReq.expirationTime ? aReq.expirationTime.toISOString() : undefined
       };
       switch (aReq.requestType) {
         case RequestType.CONNECTION:
           thisReq.connection = {
-            'requesting_account_id': aReq.requestingAccountId,
+            'requester_id': aReq.requesterId,
+            'target_id': aReq.targetId,
             'requester_accepted': aReq.requesterAccepted,
-            'target_account_id': aReq.targetAccountId,
             'target_accepted': aReq.targetAccepted
           };
       };

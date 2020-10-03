@@ -20,7 +20,6 @@ import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 
 import { Requests, RequestType } from '@Entities/Requests';
 import { RequestEntity } from '@Entities/RequestEntity';
-import { Relationships, RelationshipTypes } from '@Entities/Relationships';
 
 import { Accounts } from '@Entities/Accounts';
 import { accountFromAuthToken, usernameFromParams } from '@Route-Tools/middleware';
@@ -66,7 +65,8 @@ const procPostUserConnectionRequest: RequestHandler = async (req: Request, resp:
 
       let pending = true;   // assume request is still pending
 
-      const previousAsk = await Requests.getWithRequestBetween(thisNode, otherNode, RequestType.CONNECTION);
+      const previousAsk = await Requests.getWithRequestBetween(thisNode, otherNode, RequestType.CONNECTION,
+                                      'requesterAccountId', 'targetAccountId');
       if (IsNotNullOrEmpty(previousAsk)) {
         // There is an existing connection request
         if (previousAsk.requesterId === thisNode) {
@@ -95,7 +95,7 @@ const procPostUserConnectionRequest: RequestHandler = async (req: Request, resp:
       }
       else {
         // There is not a pending request between us. Create one
-        const newRequest = await Requests.createConnectionRequest(thisNode, otherNode);
+        const newRequest = await Requests.createHandshakeRequest(thisNode, otherNode);
         newRequest.requesterAccepted = true;
         newRequest.requestingAccountId = req.vAuthAccount.id;
         Requests.add(newRequest);
@@ -120,20 +120,14 @@ const procPostUserConnectionRequest: RequestHandler = async (req: Request, resp:
 
 // Build a new Connection based on the request
 async function BuildNewConnection(pRequest: RequestEntity): Promise<void> {
-  const newRelationship = Relationships.create();
-  newRelationship.relationshipType = RelationshipTypes.CONNECTION;
-  newRelationship.fromId = pRequest.requestingAccountId;
-  newRelationship.toId = pRequest.targetAccountId;
-  await Relationships.add(newRelationship);
-
-  // Now that there is a new relationship, cached lists of friends, etc has changed
-  const fromAcct = await Accounts.getAccountWithId(pRequest.requestingAccountId);
-  if (fromAcct) {
-    await Accounts.recomputeRelationships(fromAcct);
-  };
-  const toAcct = await Accounts.getAccountWithId(pRequest.requestingAccountId);
-  if (toAcct) {
-    await Accounts.recomputeRelationships(toAcct);
+  const requestingAccount = await Accounts.getAccountWithId(pRequest.requestingAccountId);
+  const targetAccount = await Accounts.getAccountWithId(pRequest.targetAccountId);
+  if (requestingAccount && targetAccount) {
+    Accounts.makeAccountsConnected(requestingAccount, targetAccount);
+  }
+  else {
+    Logger.error(`connection_request: acceptance for connection but accounts not found`);
+    Logger.error(`connection_request:   reqAccId=${pRequest.requestingAccountId}, tgtAccId=${pRequest.targetAccountId}`);
   };
   return;
 };

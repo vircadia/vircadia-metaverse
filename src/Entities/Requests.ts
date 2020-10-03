@@ -21,13 +21,14 @@ import { createObject, getObject, getObjects, updateObjectFields, deleteOne, del
 
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 
-import { GenUUID, genRandomString, IsNullOrEmpty } from '@Tools/Misc';
+import { GenUUID, SimpleObject, IsNullOrEmpty } from '@Tools/Misc';
 import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
 
 export let requestCollection = 'requests';
 
 export class RequestType {
+  public static HANDSHAKE = 'handshake';
   public static CONNECTION = 'connection';
   public static FRIEND = 'friend';
   public static FOLLOW = 'follow';
@@ -51,23 +52,28 @@ export const Requests = {
   async getWithId(pRequestId: string): Promise<RequestEntity> {
     return IsNullOrEmpty(pRequestId) ? null : getObject(requestCollection, { 'id': pRequestId });
   },
-  // Return all Requests that have the passed Id as either the requester or target
-  async getWithRequesterOrTarget(pRequestId: string, pType: string): Promise<RequestEntity> {
+  // Return all Requests that have the passed Id as either the requester or target.
+  // Normally matches the accountId fields but can change it to others (usually for connection NodeId).
+  async getWithRequesterOrTarget(pRequestId: string, pType: string,
+                  pRequesterField: string = 'requestingAccountId',
+                  pTargetField: string = 'targetAccountId'): Promise<RequestEntity> {
     return IsNullOrEmpty(pRequestId) ? null : getObject(requestCollection,
-          { '$or': [ { 'requesterId': pRequestId },
-                     { 'targetId': pRequestId } ],
+          { '$or': [ SimpleObject(pRequesterField, pRequestId), SimpleObject(pTargetField, pRequestId) ],
             'requestType': pType
           });
   },
   // Return a Request between the two specified id's
-  async getWithRequestBetween(pRequestId: string, pTargetId: string, pType: string): Promise<RequestEntity> {
+  // Normally matches the accountId fields but can change it to others (usually for connection NodeId).
+  async getWithRequestBetween(pRequestId: string, pTargetId: string, pType: string,
+                  pRequesterField: string = 'requestingAccountId',
+                  pTargetField: string = 'targetAccountId'): Promise<RequestEntity> {
     return IsNullOrEmpty(pRequestId) ? null : getObject(requestCollection,
-          { '$or': [ { '$and': [ { 'requesterId': pRequestId },
-                                 { 'targetId': pTargetId }
+          { '$or': [ { '$and': [ SimpleObject(pRequesterField, pRequestId),
+                                 SimpleObject(pTargetField, pTargetId)
                                ]
                      },
-                     { '$and': [ { 'requesterId': pTargetId },
-                                 { 'targetId': pRequestId }
+                     { '$and': [ SimpleObject(pRequesterField, pTargetId),
+                                 SimpleObject(pTargetField, pRequestId)
                                ]
                      }
               ],
@@ -81,16 +87,17 @@ export const Requests = {
     aRequest.whenCreated = new Date();
     return aRequest;
   },
-  createConnectionRequest(pRequesterId: string, pTargetId: string): RequestEntity {
+  // A 'handshake' request is special request between session NodeIds
+  createHandshakeRequest(pRequesterId: string, pTargetId: string): RequestEntity {
     const newRequest = Requests.create();
-    newRequest.requestType = RequestType.CONNECTION;
+    newRequest.requestType = RequestType.HANDSHAKE;
     newRequest.requesterId = pRequesterId;
     newRequest.requesterAccepted = false;
     newRequest.targetId = pTargetId;
     newRequest.targetAccepted = false;
 
     // A connection request lasts only for so long
-    const expirationMinutes = Config["metaverse-server"]["connection-request-expiration-minutes"];
+    const expirationMinutes = Config["metaverse-server"]["handshake-request-expiration-minutes"];
     newRequest.expirationTime = new Date(Date.now() + 1000 * 60 * expirationMinutes);
 
     return newRequest;

@@ -19,12 +19,15 @@ import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken, accountFromParams } from '@Route-Tools/middleware';
 import { buildLocationInfo } from '@Route-Tools/Util';
 
+import { Perm, checkAccessToEntity } from '@Route-Tools/Permissions';
+
 import { Accounts } from '@Entities/Accounts';
 
 const procGetUserLocation: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
     if (req.vAccount) {
-      if (Accounts.CanAccess(req.vAuthAccount, req.vAccount)) {
+      if (checkAccessToEntity(req.vAuthToken, req.vAccount,
+                          [ Perm.OWNER, Perm.FRIEND, Perm.CONNECTION, Perm.ADMIN ], req.vAuthAccount)) {
         req.vRestResp.Data = {
           'location': await buildLocationInfo(req.vAccount)
         };
