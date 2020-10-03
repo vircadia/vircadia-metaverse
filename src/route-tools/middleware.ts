@@ -139,7 +139,7 @@ export const accountFromAuthToken: RequestHandler = async (req: Request, resp: R
 export const accountFromParams: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vRestResp) {
     if (req.params && req.params.accountId && typeof(req.params.accountId) === 'string') {
-      const accountId = req.params.accountId;
+      const accountId = decodeURIComponent(req.params.accountId);
       // Most of the account references are by username
       req.vAccount = await Accounts.getAccountWithUsername(accountId);
       if (IsNullOrEmpty(req.vAccount)) {
@@ -216,7 +216,7 @@ export const verifyDomainAccess: RequestHandler = async (req: Request, resp: Res
 export const usernameFromParams: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.params && req.params.username) {
     if (typeof(req.params.username) === 'string') {
-      req.vUsername = req.params.username;
+      req.vUsername = decodeURIComponent(req.params.username);
     };
   };
   next();

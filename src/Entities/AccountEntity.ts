@@ -123,6 +123,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
         // Check username for latin alpha-numeric
         return /^[A-Za-z][A-Za-z0-9+\-_\.]*$/.test(pVal);
       };
+      return false;
     },
     setter: simpleSetter,
     getter: simpleGetter
