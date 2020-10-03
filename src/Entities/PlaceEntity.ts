@@ -16,6 +16,7 @@
 import { Entity } from '@Entities/Entity';
 import { AccountEntity } from '@Entities/AccountEntity';
 import { AuthToken } from '@Entities/AuthToken';
+import { Domains } from '@Entities/Domains';
 import { Places } from '@Entities/Places';
 
 import { FieldDefn } from '@Route-Tools/Permissions';
@@ -24,7 +25,7 @@ import { simpleGetter, simpleSetter, sArraySetter, dateStringGetter } from '@Rou
 import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/Permissions';
 
 import { VKeyedCollection } from '@Tools/vTypes';
-import { IsNullOrEmpty } from '@Tools/Misc';
+import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
 
 // NOTE: this class cannot have functions in them as they are just JSON to and from the database
@@ -89,7 +90,7 @@ export const placeFields: { [key: string]: FieldDefn } = {
     request_field_name: 'name',
     get_permissions: [ 'all' ],
     set_permissions: [ 'domain', 'owner', 'admin' ],
-    validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<any> => {
+    validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<boolean> => {
       // Verify that the placename is unique
       let valid: boolean = false;
       if (typeof(pVal) === 'string') {
@@ -126,8 +127,29 @@ export const placeFields: { [key: string]: FieldDefn } = {
     entity_field: 'domainId',
     request_field_name: 'domainId',
     get_permissions: [ 'all' ],
-    set_permissions: [ 'none' ],
-    validate: isStringValidator,
+    set_permissions: [ 'owner', 'admin' ],
+    validate: async (pField: FieldDefn, pEntity: Entity, pVal: any, pAuth: AuthToken): Promise<boolean> => {
+      // This is setting a place to a new domainId. Make sure the domain exists
+      //         and requestor has access to that domain.
+      let valid = false;
+      if (typeof(pVal) === 'string') {
+        const maybeDomain = await Domains.getDomainWithId(pVal);
+        if (IsNotNullOrEmpty(maybeDomain)) {
+          if (IsNotNullOrEmpty(pAuth)) {
+            if (pAuth.accountId === maybeDomain.sponsorAccountId) {
+              valid = true;
+            }
+            else {
+              Logger.error(`PlaceEntity:domainId.validate: attempt to set to non-owned domain. RequesterId=${pAuth.accountId}, DomainId=${pVal}`);
+            };
+          };
+        }
+        else {
+          Logger.error(`PlaceEntity:domainId.validate: attempt to set to non-existant domain. RequesterId=${pAuth.accountId}, DomainId=${pVal}`);
+        };
+      };
+      return valid;
+    },
     setter: simpleSetter,
     getter: simpleGetter
   },
