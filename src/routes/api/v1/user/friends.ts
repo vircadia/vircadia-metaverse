@@ -19,25 +19,30 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken, usernameFromParams } from '@Route-Tools/middleware';
 import { Accounts } from '@Entities/Accounts';
-import { getAccountField } from '@Entities/AccountEntity';
+import { getAccountField, setAccountField } from '@Entities/AccountEntity';
 
-import { SArray, VKeyedCollection } from '@Tools/vTypes';
-import { IsNotNullOrEmpty } from '@Tools/Misc';
+import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
+
+import { VKeyedCollection } from '@Tools/vTypes';
+import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 
 // Get the friends of the logged in account
 const procGetUserFriends: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
+    const pager = new PaginationInfo();
+    pager.parametersFromRequest(req);
+
     let friends = await getAccountField(req.vAuthToken, req.vAuthAccount, 'friends', req.vAuthAccount);
-    friends = typeof(friends) === 'undefined'
+    friends = IsNullOrEmpty(friends)
               ? []        // if no friends info, return empty list
-              : req.vAuthAccount.friends;
+              : friends;
     req.vRestResp.Data = {
       'friends': friends
     };
   }
   else {
     req.vRestResp.respondFailure('account token did not work');
-  }
+  };
   next();
 };
 
@@ -51,19 +56,19 @@ const procPostUserFriends: RequestHandler = async (req: Request, resp: Response,
 // Remove a friend from my friend list.
 const procDeleteUserFriends: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
-    if (IsNotNullOrEmpty(req.vAuthAccount.friends)) {
-      if (SArray.has(req.vAuthAccount.friends, req.vUsername)) {
-        SArray.remove(req.vAuthAccount.friends, req.vUsername);
-
-        const updates: VKeyedCollection = {
-          'friends': req.vAuthAccount.friends
-        };
-        Accounts.updateEntityFields(req.vAuthAccount, updates);
-      };
+    const removeVal: any = {
+      'remove': [ req.vUsername ]
+    };
+    const updates:VKeyedCollection = {};
+    if (await setAccountField(req.vAuthToken, req.vAuthAccount, 'friends', removeVal, req.vAuthAccount, updates)) {
+      Accounts.updateEntityFields(req.vAuthAccount, updates);
+    }
+    else {
+      req.vRestResp.respondFailure('field could not be modified');
     };
   }
   else {
-    req.vRestResp.respondFailure('account token did not work');
+    req.vRestResp.respondFailure('unauthorized');
   };
   next();
 };

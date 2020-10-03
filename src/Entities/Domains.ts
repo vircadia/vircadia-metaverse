@@ -46,6 +46,10 @@ export const Domains = {
   createDomain(): DomainEntity {
     const newDomain = new DomainEntity();
     newDomain.id = GenUUID();
+    newDomain.tags = [];
+    newDomain.hosts = [];
+    newDomain.managers = [];
+    newDomain.images = [];
     newDomain.whenCreated = new Date();
     return newDomain;
   },

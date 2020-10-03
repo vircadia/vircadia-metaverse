@@ -112,6 +112,8 @@ export const Accounts = {
     newAcct.username = pUsername;
     newAcct.email = pEmail.toLowerCase();
     newAcct.roles = [AccountRoles.USER];
+    newAcct.friends = []
+    newAcct.connections = []
     newAcct.whenCreated = new Date();
 
     // Remember the password
