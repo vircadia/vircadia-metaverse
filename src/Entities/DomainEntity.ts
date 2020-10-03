@@ -19,7 +19,7 @@ import { AuthToken } from '@Entities/AuthToken';
 
 import { FieldDefn } from '@Route-Tools/Permissions';
 import { isStringValidator, isNumberValidator, isBooleanValidator, isSArraySet, isDateValidator } from '@Route-Tools/Permissions';
-import { simpleGetter, simpleSetter, sArraySetter, dateStringGetter } from '@Route-Tools/Permissions';
+import { simpleGetter, simpleSetter, noOverwriteSetter, sArraySetter, dateStringGetter } from '@Route-Tools/Permissions';
 import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/Permissions';
 
 import { VKeyedCollection } from '@Tools/vTypes';
@@ -118,7 +118,7 @@ export const domainFields: { [key: string]: FieldDefn } = {
       };
       return false;
     },
-    setter: simpleSetter,
+    setter: noOverwriteSetter,
     getter: simpleGetter
   },
   // An alternate way of setting domain name
@@ -128,12 +128,12 @@ export const domainFields: { [key: string]: FieldDefn } = {
     get_permissions: [ 'all' ],
     set_permissions: [ 'domain', 'sponsor', 'admin' ],
     validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<boolean> => {
-      if (typeof(pVal) === 'string') {
+      if (typeof(pVal) === 'string' && (pVal as string).length > 0) {
         return /^[A-Za-z0-9+\-_\.]*$/.test(pVal);
       };
       return false;
     },
-    setter: simpleSetter,
+    setter: noOverwriteSetter,
     getter: simpleGetter
   },
   'public_key': {
@@ -241,7 +241,7 @@ export const domainFields: { [key: string]: FieldDefn } = {
     get_permissions: [ 'all' ],
     set_permissions: [ 'domain', 'sponsor', 'admin' ],
     validate: isStringValidator,
-    setter: simpleSetter,
+    setter: noOverwriteSetter,
     getter: simpleGetter
   },
   'contact_info': {
@@ -250,7 +250,7 @@ export const domainFields: { [key: string]: FieldDefn } = {
     get_permissions: [ 'all' ],
     set_permissions: [ 'domain', 'sponsor', 'admin' ],
     validate: isStringValidator,
-    setter: simpleSetter,
+    setter: noOverwriteSetter,
     getter: simpleGetter
   },
   'thumbnail': {
@@ -259,7 +259,7 @@ export const domainFields: { [key: string]: FieldDefn } = {
     get_permissions: [ 'all' ],
     set_permissions: [ 'domain', 'sponsor', 'admin' ],
     validate: isStringValidator,
-    setter: simpleSetter,
+    setter: noOverwriteSetter,
     getter: simpleGetter
   },
   'images': {

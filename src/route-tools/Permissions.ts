@@ -35,7 +35,7 @@ import { Logger } from '@Tools/Logging';
 //    for the 'updated' field (since the 'set' could be a merge type operation).
 export type getterFunction = (pDfd: FieldDefn, pD: Entity) => any;
 export type setterFunction = (pDfd: FieldDefn, pD: Entity, pV: any) => void;
-export type validateFunction = (pDfd: FieldDefn, pD: Entity, pV: any) => Promise<boolean>;
+export type validateFunction = (pDfd: FieldDefn, pD: Entity, pV: any, pAuth?: AuthToken) => Promise<boolean>;
 export type updaterFunction = (pDfd: FieldDefn, pD: Entity, pUpdates: VKeyedCollection) => void;
 export interface FieldDefn {
     entity_field: string,
@@ -128,6 +128,19 @@ export function simpleSetter(pField: FieldDefn, pEntity: Entity, pVal: any): voi
   }
   else {
     Logger.cdebug('field-setting', `simpleSetter: Entity does not have ${pField.entity_field}`);
+  };
+};
+export function noOverwriteSetter(pField: FieldDefn, pEntity: Entity, pVal: any): void {
+  // Don't overwrite a value with a null or empty value.
+  if (IsNotNullOrEmpty(pVal)) {
+    if (Array.isArray(pVal)) {
+      if (pVal.length > 0) {
+        simpleSetter(pField, pEntity, pVal);
+      };
+    }
+    else {
+      simpleSetter(pField, pEntity, pVal);
+    };
   };
 };
 export function dateStringGetter(pField: FieldDefn, pEntity: Entity): string {
@@ -266,7 +279,7 @@ export async function setEntityField(
     Logger.cdebug('field-setting', `setEntityField: ${pField}=>${JSON.stringify(pVal)}`);
     if (await checkAccessToEntity(pAuthToken, pEntity, perms.set_permissions, pRequestingAccount)) {
       Logger.cdebug('field-setting', `setEntityField: access passed`);
-      if (await perms.validate(perms, pEntity, pVal)) {
+      if (await perms.validate(perms, pEntity, pVal, pAuthToken)) {
         Logger.cdebug('field-setting', `setEntityField: value validated`);
         if (typeof(perms.setter) === 'function') {
           perms.setter(perms, pEntity, pVal);
