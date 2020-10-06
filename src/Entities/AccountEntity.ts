@@ -16,10 +16,12 @@
 import { Entity } from '@Entities/Entity';
 import { AuthToken } from '@Entities/AuthToken';
 import { Accounts } from '@Entities/Accounts';
+import { AccountRoles } from '@Entities/AccountRoles';
 
 import { FieldDefn } from '@Route-Tools/Permissions';
 import { isStringValidator, isNumberValidator, isSArraySet, isDateValidator } from '@Route-Tools/Permissions';
 import { simpleGetter, simpleSetter, sArraySetter, dateStringGetter } from '@Route-Tools/Permissions';
+import { verifyAllSArraySetValues } from '@Route-Tools/Permissions';
 import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/Permissions';
 
 import { VKeyedCollection } from '@Tools/vTypes';
@@ -42,7 +44,7 @@ export class AccountEntity implements Entity {
   public locationNetworkAddress: string;
   public locationNetworkPort: number;
   public locationNodeId: string;      // sessionId
-  public availability: string;  // on of 'none', 'friends', 'connections', 'all'
+  public availability: string[];      // contains 'none', 'friends', 'connections', 'all'
 
   public connections: string[];
   public friends: string[];
@@ -203,7 +205,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
   'friends': {
     entity_field: 'friends',
     request_field_name: 'friends',
-    get_permissions: [ 'owner', 'admin', 'friend', 'connection' ],
+    get_permissions: [ 'owner', 'admin', 'friend' ],
     set_permissions: [ 'none' ],
     validate: isSArraySet,
     setter: sArraySetter,
@@ -281,7 +283,9 @@ export const accountFields: { [key: string]: FieldDefn } = {
     request_field_name: 'roles',
     get_permissions: [ 'all' ],
     set_permissions: [ 'admin' ],
-    validate: isSArraySet,
+    validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<boolean> => {
+      return verifyAllSArraySetValues(pVal, AccountRoles.KnownRole);
+    },
     setter: sArraySetter,
     getter: simpleGetter
   },
