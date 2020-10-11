@@ -94,7 +94,8 @@ const procPostDomains: RequestHandler = async (req: Request, resp: Response, nex
           domainInfo.api_key = newDomain.apiKey;
 
           req.vRestResp.Data = {
-            'domain': domainInfo
+            'domain': domainInfo,
+            'place': await buildPlaceInfo(newPlace, newDomain)
           };
 
           // some legacy requests want the domain information at the top level

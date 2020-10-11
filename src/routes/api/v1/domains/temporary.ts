@@ -15,7 +15,7 @@
 'use strict';
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
+import { setupMetaverseAPI, accountFromAuthToken, finishMetaverseAPI } from '@Route-Tools/middleware';
 
 import { Domains } from '@Entities/Domains';
 import { Places } from '@Entities/Places';
@@ -49,7 +49,6 @@ const procPostDomainsTemporary: RequestHandler = async (req: Request, resp: Resp
   if (req.vSenderKey) {
     newDomain.iPAddrOfFirstContact = req.vSenderKey;
   };
-  await Domains.addDomain(newDomain);
 
   // Creating a domain also creates a Place for that domain
   const newPlacename = await Places.uniqifyPlaceName(newDomain.name);
@@ -58,6 +57,16 @@ const procPostDomainsTemporary: RequestHandler = async (req: Request, resp: Resp
   newPlace.name = newPlacename;
   newPlace.description = 'A place in ' + newDomain.name;
   newPlace.iPAddrOfFirstContact = req.vSenderKey;
+
+  // If the requestor is logged in, associate that account with the new domain/place
+  if (req.vAuthToken) {
+    Logger.debug(`procPostDomainsTemporary: associating account ${req.vAuthToken.accountId} with new domain ${newDomain.id}`)
+    newDomain.sponsorAccountId = req.vAuthToken.accountId;
+    newPlace.accountId = req.vAuthToken.accountId;
+  };
+
+  // Now that the local structures are updated, store the new entries
+  await Domains.addDomain(newDomain);
   await Places.addPlace(newPlace);
 
   Logger.info(`procPostDomainsTemporary: creating temporary domain "${newDomain.name}" and place "${newPlace.name}"`);
@@ -74,6 +83,7 @@ export const name = '/api/v1/domains/temporary';
 
 export const router = Router();
 
-router.post(  '/api/v1/domains/temporary',      [ setupMetaverseAPI,
+router.post(  '/api/v1/domains/temporary',      [ setupMetaverseAPI,        // req.vRestResp
+                                                  accountFromAuthToken,     // req.vAuthToken, req.vAuthAccount
                                                   procPostDomainsTemporary,
                                                   finishMetaverseAPI ] );

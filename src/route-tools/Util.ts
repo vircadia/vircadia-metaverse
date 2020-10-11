@@ -137,6 +137,7 @@ export async function buildLocationInfo(pAcct: AccountEntity): Promise<any> {
 export async function buildDomainInfo(pDomain: DomainEntity): Promise<any> {
   return {
     'id': pDomain.id,
+    'domainId': pDomain.id,
     'name': pDomain.name,
     'label': pDomain.name,
     'network_address': pDomain.networkAddr,
