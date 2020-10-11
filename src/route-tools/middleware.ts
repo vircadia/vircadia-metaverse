@@ -58,10 +58,8 @@ export const setupMetaverseAPI: RequestHandler = async (req: Request, resp: Resp
     let authToken = req.vRestResp.getAuthToken();
     // If an authToken is not supplied in the header, it can be supplied in the query
     if (IsNullOrEmpty(authToken)) {
-      if (req.query && req.query.access_token) {
-        if (typeof(req.query.access_token) === 'string') {
-          authToken = (req.query.access_token as string);
-        };
+      if (req.query && req.query.access_token && typeof(req.query.access_token) === 'string') {
+        authToken = (req.query.access_token as string);
       };
     };
     if (IsNotNullOrEmpty(authToken)) {

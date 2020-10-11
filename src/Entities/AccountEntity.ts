@@ -17,8 +17,9 @@ import { Entity } from '@Entities/Entity';
 import { AuthToken } from '@Entities/AuthToken';
 import { Accounts } from '@Entities/Accounts';
 import { AccountRoles } from '@Entities/AccountRoles';
+import { AccountAvailability } from '@Entities/AccountAvailability';
 
-import { FieldDefn } from '@Route-Tools/Permissions';
+import { FieldDefn, Perm } from '@Route-Tools/Permissions';
 import { isStringValidator, isNumberValidator, isSArraySet, isDateValidator } from '@Route-Tools/Permissions';
 import { simpleGetter, simpleSetter, sArraySetter, dateStringGetter } from '@Route-Tools/Permissions';
 import { verifyAllSArraySetValues } from '@Route-Tools/Permissions';
@@ -189,7 +190,9 @@ export const accountFields: { [key: string]: FieldDefn } = {
     request_field_name: 'availability',
     get_permissions: [ 'all' ],
     set_permissions: [ 'owner', 'admin' ],
-    validate: isSArraySet,
+    validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<boolean> => {
+      return verifyAllSArraySetValues(pVal, AccountAvailability.KnownAvailability);
+    },
     setter: sArraySetter,
     getter: simpleGetter
   },
@@ -197,7 +200,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
     entity_field: 'connections',
     request_field_name: 'connections',
     get_permissions: [ 'owner', 'admin', 'friend', 'connection' ],
-    set_permissions: [ 'none' ],
+    set_permissions: [ 'none' ],  // not set as a field but through other mechanisms
     validate: isSArraySet,
     setter: sArraySetter,
     getter: simpleGetter
@@ -206,7 +209,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
     entity_field: 'friends',
     request_field_name: 'friends',
     get_permissions: [ 'owner', 'admin', 'friend' ],
-    set_permissions: [ 'none' ],
+    set_permissions: [ 'none' ],// not set as a field but through other mechanisms
     validate: isSArraySet,
     setter: sArraySetter,
     getter: simpleGetter

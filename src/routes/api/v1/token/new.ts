@@ -28,9 +28,9 @@ const procPostTokenNew: RequestHandler = async (req: Request, resp: Response, ne
   if (req.vAuthAccount) {
 
     // The user passes the scope but make sure we know it's one we know
-    let scope = req.query.scope as string;
-    if (IsNullOrEmpty(scope)) {
-      scope = TokenScope.OWNER;
+    let scope = TokenScope.OWNER;
+    if (req.query && req.query.scope && typeof(req.query.scope) === 'string') {
+      scope = req.query.scope as string;
     };
     if (TokenScope.KnownScope(scope)) {
       const tokenInfo = await Tokens.createToken(req.vAuthAccount.id, [ scope ]);
