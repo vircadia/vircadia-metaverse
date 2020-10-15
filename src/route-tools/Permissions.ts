@@ -18,7 +18,7 @@ import { Entity } from '@Entities/Entity';
 import { AccountEntity, checkAvailability } from '@Entities/AccountEntity';
 import { DomainEntity } from '@Entities/DomainEntity';
 import { AuthToken } from '@Entities/AuthToken';
-import { TokenScope } from '@Entities/Tokens';
+import { Tokens, TokenScope } from '@Entities/Tokens';
 import { Accounts } from '@Entities/Accounts';
 import { Domains } from '@Entities/Domains';
 
@@ -485,11 +485,16 @@ export async function checkAccessToEntity(pAuthToken: AuthToken,  // token being
           };
           break;
         case Perm.ADMIN:
-          // If the authToken is an account, has access if admin
-          if (SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
-            Logger.cdebug('field-setting', `checkAccessToEntity: admin. auth.AccountId=${pAuthToken.accountId}`);
-            requestingAccount = requestingAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
-            canAccess = Accounts.isAdmin(requestingAccount);
+          if (Tokens.isSpecialAdminToken(pAuthToken)) {
+            canAccess = true;
+          }
+          else {
+            // If the authToken is an account, has access if admin
+            if (SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
+              Logger.cdebug('field-setting', `checkAccessToEntity: admin. auth.AccountId=${pAuthToken.accountId}`);
+              requestingAccount = requestingAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
+              canAccess = Accounts.isAdmin(requestingAccount);
+            }
           };
           break;
         case Perm.SPONSOR:

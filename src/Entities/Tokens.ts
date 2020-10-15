@@ -115,5 +115,23 @@ export const Tokens = {
     return IsNullOrEmpty(pAuthToken)
         ? false
         : pAuthToken.expirationTime.valueOf() > new Date().valueOf();
+  },
+  // Creates a special token that is used internally to do admin stuff
+  // This only lasts one second and points to a non-existant account.
+  createSpecialAdminToken(): AuthToken {
+    const aToken = new AuthToken();
+    aToken.id = GenUUID();
+    aToken.token = specialAdminTokenToken;
+    aToken.refreshToken = GenUUID();
+    aToken.accountId = GenUUID();     // account that doesn't exist
+    // Verify that passed scopes are known scope codes
+    aToken.scope = [ TokenScope.OWNER ];
+    aToken.whenCreated = new Date();
+    aToken.expirationTime = new Date( Date().valueOf() + 1000); // only lasts one second
+    return aToken;
+  },
+  isSpecialAdminToken(pAuthToken: AuthToken): boolean {
+    return pAuthToken.token === specialAdminTokenToken && Tokens.hasNotExpired(pAuthToken);
   }
 };
+const specialAdminTokenToken = GenUUID();

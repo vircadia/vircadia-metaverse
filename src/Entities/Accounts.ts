@@ -17,7 +17,7 @@ import { Config } from '@Base/config';
 
 import crypto from 'crypto';
 
-import { AccountEntity } from '@Entities/AccountEntity';
+import { AccountEntity, setAccountField } from '@Entities/AccountEntity';
 import { AccountRoles } from '@Entities/AccountRoles';
 import { Domains } from '@Entities/Domains';
 import { Places } from '@Entities/Places';
@@ -145,14 +145,24 @@ export const Accounts = {
       return val;
   },
   // Create whatever datastructure is needed to make these accounts friends
-  makeAccountsFriends(pRequestingAccount: AccountEntity, pTargetAccount: AccountEntity) {
-    SArray.add(pRequestingAccount.friends, pTargetAccount.username);
-    SArray.add(pTargetAccount.friends, pRequestingAccount.username);
+  async makeAccountsFriends(pRequestingAccount: AccountEntity, pTargetAccount: AccountEntity): Promise<void> {
+    // Make sure that the requestor has the target as a connection
+    if (SArray.hasNoCase(pRequestingAccount.connections, pTargetAccount.username)) {
+      const adminToken = Tokens.createSpecialAdminToken();
+      const updates: VKeyedCollection = {};
+      await setAccountField(adminToken, pRequestingAccount, 'friends', { 'add': pTargetAccount.username }, pRequestingAccount, updates);
+      await Accounts.updateEntityFields(pRequestingAccount, updates);
+    }
   },
   // Create whatever datastructure is needed to make these accounts friends
-  makeAccountsConnected(pRequestingAccount: AccountEntity, pTargetAccount: AccountEntity) {
-    SArray.add(pRequestingAccount.connections, pTargetAccount.username);
-    SArray.add(pTargetAccount.connections, pRequestingAccount.username);
+  async makeAccountsConnected(pRequestingAccount: AccountEntity, pTargetAccount: AccountEntity): Promise<void> {
+    const adminToken = Tokens.createSpecialAdminToken();
+    let updates: VKeyedCollection = {};
+    await setAccountField(adminToken, pRequestingAccount, 'connections', { 'add': pTargetAccount.username }, pRequestingAccount, updates);
+    await Accounts.updateEntityFields(pRequestingAccount, updates);
+    updates = {};
+    await setAccountField(adminToken, pTargetAccount, 'connections', { 'add': pRequestingAccount.username }, pTargetAccount, updates);
+    await Accounts.updateEntityFields(pTargetAccount, updates);
   },
   // getter property that is 'true' if the user has been heard from recently
   isOnline(pAcct: AccountEntity): boolean {
