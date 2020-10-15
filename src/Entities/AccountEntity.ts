@@ -26,6 +26,7 @@ import { verifyAllSArraySetValues } from '@Route-Tools/Permissions';
 import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/Permissions';
 
 import { VKeyedCollection } from '@Tools/vTypes';
+import { IsNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
 
 // NOTE: this class cannot have functions in them as they are just JSON to and from the database
@@ -120,13 +121,19 @@ export const accountFields: { [key: string]: FieldDefn } = {
     entity_field: 'username',
     request_field_name: 'username',
     get_permissions: [ 'all' ],
-    set_permissions: [ 'owner', 'admin' ],
+    set_permissions: [ 'none' ],
     validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<boolean> => {
+      let valid: boolean = false;
       if (typeof(pVal) === 'string') {
         // Check username for latin alpha-numeric
-        return /^[A-Za-z][A-Za-z0-9+\-_\.]*$/.test(pVal);
+        valid = /^[A-Za-z][A-Za-z0-9+\-_\.]*$/.test(pVal);
       };
-      return false;
+      // Make sure no other account is using this username
+      if (valid) {
+        const otherAccount = await Accounts.getAccountWithUsername(pVal);
+        valid = IsNullOrEmpty(otherAccount) || otherAccount.id === (pEntity as AccountEntity).id;
+      };
+      return valid;
     },
     setter: simpleSetter,
     getter: simpleGetter
@@ -137,11 +144,17 @@ export const accountFields: { [key: string]: FieldDefn } = {
     get_permissions: [ 'all' ],
     set_permissions: [ 'owner', 'admin' ],
     validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<boolean> => {
+      let valid: boolean = false;
       if (typeof(pVal) === 'string') {
         // Check email for sanity
-        return /^[A-Za-z0-9+\-_\.]+@[A-Za-z0-9-\.]+$/.test(pVal);
+        valid = /^[A-Za-z0-9+\-_\.]+@[A-Za-z0-9-\.]+$/.test(pVal);
       };
-      return false;
+      // Make sure no other account is using this email address
+      if (valid) {
+        const otherAccount = await Accounts.getAccountWithEmail(pVal);
+        valid = IsNullOrEmpty(otherAccount) || otherAccount.id === (pEntity as AccountEntity).id;
+      };
+      return valid;
     },
     setter: (pField: FieldDefn, pEntity: Entity, pVal: any): any => {
       // emails are stored in lower-case
