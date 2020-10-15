@@ -98,7 +98,7 @@ const procPostUserConnectionRequest: RequestHandler = async (req: Request, resp:
         const newRequest = await Requests.createHandshakeRequest(thisNode, otherNode);
         newRequest.requesterAccepted = true;
         newRequest.requestingAccountId = req.vAuthAccount.id;
-        Requests.add(newRequest);
+        await Requests.add(newRequest);
       };
 
       if (pending) {
@@ -123,7 +123,7 @@ async function BuildNewConnection(pRequest: RequestEntity): Promise<void> {
   const requestingAccount = await Accounts.getAccountWithId(pRequest.requestingAccountId);
   const targetAccount = await Accounts.getAccountWithId(pRequest.targetAccountId);
   if (requestingAccount && targetAccount) {
-    Accounts.makeAccountsConnected(requestingAccount, targetAccount);
+    await Accounts.makeAccountsConnected(requestingAccount, targetAccount);
   }
   else {
     Logger.error(`connection_request: acceptance for connection but accounts not found`);
