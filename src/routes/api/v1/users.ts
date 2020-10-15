@@ -78,29 +78,35 @@ const procPostUsers: RequestHandler = async (req: Request, resp: Response, next:
       if (await accountFields.username.validate(accountFields.username, 'username', userName)) {
         if (await accountFields.email.validate(accountFields.email, 'email', userEmail)) {
           // See if account already exists
-          const prevAccount = await Accounts.getAccountWithUsername(userName);
+          let prevAccount = await Accounts.getAccountWithUsername(userName);
           if (IsNullOrEmpty(prevAccount)) {
-            const newAcct = await Accounts.createAccount(userName, userPassword, userEmail);
-            if (newAcct) {
-              try {
-                const adminAccountName =  Config["metaverse-server"]["base-admin-account"] ?? 'wilma';
-                // If we're creating the admin account, assign it admin privilages
-                if (newAcct.username === adminAccountName) {
-                  if (IsNullOrEmpty(newAcct.roles)) newAcct.roles = [];
-                  SArray.add(newAcct.roles, AccountRoles.ADMIN);
-                  Logger.info(`procPostUsers: setting new account ${adminAccountName} as admin`);
+            prevAccount = await Accounts.getAccountWithEmail(userEmail);
+            if (IsNullOrEmpty(prevAccount)) {
+              const newAcct = await Accounts.createAccount(userName, userPassword, userEmail);
+              if (newAcct) {
+                try {
+                  const adminAccountName =  Config["metaverse-server"]["base-admin-account"] ?? 'wilma';
+                  // If we're creating the admin account, assign it admin privilages
+                  if (newAcct.username === adminAccountName) {
+                    if (IsNullOrEmpty(newAcct.roles)) newAcct.roles = [];
+                    SArray.add(newAcct.roles, AccountRoles.ADMIN);
+                    Logger.info(`procPostUsers: setting new account ${adminAccountName} as admin`);
+                  }
+                  newAcct.IPAddrOfCreator = req.vSenderKey;
+                  await Accounts.addAccount(newAcct);
                 }
-                newAcct.IPAddrOfCreator = req.vSenderKey;
-                await Accounts.addAccount(newAcct);
+                catch (err) {
+                  Logger.error('procPostUsers: exception adding user: ' + err);
+                  req.vRestResp.respondFailure('Exception adding user: ' + err);
+                }
               }
-              catch (err) {
-                Logger.error('procPostUsers: exception adding user: ' + err);
-                req.vRestResp.respondFailure('Exception adding user: ' + err);
-              }
+              else {
+                Logger.debug('procPostUsers: error creating account for ' + userName);
+                req.vRestResp.respondFailure('could not create account');
+              };
             }
             else {
-              Logger.debug('procPostUsers: error creating account for ' + userName);
-              req.vRestResp.respondFailure('could not create account');
+              req.vRestResp.respondFailure('Email already exists');
             };
           }
           else {
