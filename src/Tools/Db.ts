@@ -19,6 +19,8 @@ import { MongoClient, Db } from 'mongodb';
 
 import deepmerge from 'deepmerge';
 
+import { SimpleObject, IsNullOrEmpty } from '@Tools/Misc';
+
 // This seems to create a circular reference  that causes variables to not be initialized
 // import { domainCollection } from '@Entities/Domains';
 
@@ -109,7 +111,7 @@ export async function updateObjectFields(pCollection: string, pCriteria: any, pF
   const op: VKeyedCollection = {};
 
   // If not updating anything, just return
-  if (Object.keys(pFields).length === 0) {
+  if (IsNullOrEmpty(pFields) || Object.keys(pFields).length === 0) {
     return;
   };
 
@@ -265,17 +267,15 @@ async function DoDatabaseFormatChanges() {
 // Scan the collection for entities with the 'from' field. Rename to 'to' if found.
 async function RenameDbField(pCollection: string, pFrom: string, pTo: string) {
   let updateCount = 0;
-  const findCriteria: any = {};
-  findCriteria[pFrom] = { '$exists': true };
-  const renamer:any = {};
-  renamer[pFrom] = pTo;
-  await Datab.collection(pCollection).find(findCriteria)
+  await Datab.collection(pCollection).find(SimpleObject(pFrom, { '$exists': true }))
   .forEach( doc => {
     updateCount++;
     Datab.collection(pCollection).updateOne(
             { _id: doc._id},
-            { '$rename': renamer }
+            { '$rename': SimpleObject(pFrom, pTo) }
     );
   });
-  Logger.debug(`Db.DoDatabaseFormatChanges: ${updateCount} ${pCollection}.${pFrom} renames`);
+  if (updateCount > 0) {
+    Logger.debug(`Db.DoDatabaseFormatChanges: ${updateCount} ${pCollection}.${pFrom} renames`);
+  };
 };
