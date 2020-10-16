@@ -62,9 +62,9 @@ export async function isBooleanValidator(pField: FieldDefn, pEntity: Entity, pVa
   return typeof(pValue) === 'boolean';
 };
 export async function isPathValidator(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<boolean> {
-  // TODO: Add regexp to check format of "domainname/float,float,float/float,float,float,float"
-  // [\w +_-]*\/-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?\/-?\d+(\.\d*)?-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?
-  return typeof(pValue) === 'string';
+  // Regexp to check format of "domainname/float,float,float/float,float,float,float"
+  return /^[\w +_-]*\/-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?\/-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?$/.test(pValue);
+  // return typeof(pValue) === 'string';
 };
 export async function isDateValidator(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<boolean> {
   return pValue instanceof Date;
@@ -75,14 +75,14 @@ export async function isDateValidator(pField: FieldDefn, pEntity: Entity, pValue
 export async function isSArraySet(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<boolean> {
   return isValidSArraySet(pValue);
 };
-export async function isValidSArraySet(pValue: any): Promise<boolean> {
+export function isValidSArraySet(pValue: any): boolean {
   let ret = false;
   if (typeof(pValue) === 'string') {
     // If passed a string, setter will assume an 'add' operation
     ret = true;
   }
   else {
-    if (await isValidSArray(pValue)) {
+    if (isValidSArray(pValue)) {
       // if we're passed an SArray, just presume a 'set'
       ret = true;
     }
@@ -91,15 +91,15 @@ export async function isValidSArraySet(pValue: any): Promise<boolean> {
         Logger.cdebug('field-setting', `isSArraySet: object with one of the fields`);
         let eachIsOk: boolean = true;
         if (eachIsOk && pValue.set) {
-          eachIsOk = typeof(pValue.set) === 'string' || await isValidSArray(pValue.set);
+          eachIsOk = typeof(pValue.set) === 'string' || isValidSArray(pValue.set);
           Logger.cdebug('field-setting', `isSArraySet: pValue.set is ${eachIsOk}`);
         };
         if (eachIsOk && pValue.add) {
-          eachIsOk = typeof(pValue.add) === 'string' || await isValidSArray(pValue.add);
+          eachIsOk = typeof(pValue.add) === 'string' || isValidSArray(pValue.add);
           Logger.cdebug('field-setting', `isSArraySet: pValue.add is ${eachIsOk}`);
         };
         if (eachIsOk && pValue.remove) {
-          eachIsOk = typeof(pValue.remove) === 'string' || await isValidSArray(pValue.remove);
+          eachIsOk = typeof(pValue.remove) === 'string' || isValidSArray(pValue.remove);
           Logger.cdebug('field-setting', `isSArraySet: pValue.remove is ${eachIsOk}`);
         };
         ret = eachIsOk;
@@ -109,11 +109,11 @@ export async function isValidSArraySet(pValue: any): Promise<boolean> {
   return ret;
 };
 // Return 'true' is pValue is an array of strings
-export async function isSArray(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<boolean> {
+export function isSArray(pField: FieldDefn, pEntity: Entity, pValue: any): boolean {
   return isValidSArray(pValue);
 };
 // Verify that the passed value is just an array of strings
-export async function isValidSArray(pValue: any): Promise<boolean> {
+export function isValidSArray(pValue: any): boolean {
   let ret = false;
   if (pValue) {
     if (Array.isArray(pValue)) {
@@ -167,7 +167,7 @@ export function *walkSArraySetter(pValue:any): Generator<string> {
 export type ValidCheckFunction = (pVal: string) => boolean;
 export async function verifyAllSArraySetValues(pValue: any, pCheckFunction: ValidCheckFunction): Promise<boolean> {
   let ret = false;
-  if (IsNotNullOrEmpty(pCheckFunction) && await isValidSArraySet(pValue)) {
+  if (IsNotNullOrEmpty(pCheckFunction) && isValidSArraySet(pValue)) {
     ret = true;
     for (const aVal of walkSArraySetter(pValue)) {
       if (!pCheckFunction(aVal)) {
@@ -224,26 +224,30 @@ export function dateStringGetter(pField: FieldDefn, pEntity: Entity): string {
 //                        a string array (presumes a "set")
 export function sArraySetter(pField: FieldDefn, pEntity: Entity, pVal: any): void {
   if (pEntity.hasOwnProperty(pField.entity_field)) {
-    let val = (pEntity as any)[pField.entity_field];
+    const fieldName = pField.entity_field;
+    Logger.cdebug('field-setting', `sArraySetter: setting ${fieldName} with ${JSON.stringify(pVal)}`);
+    let val: string[] = (pEntity as any)[fieldName];
     if (IsNullOrEmpty(val)) {
-      Logger.cdebug('field-setting', `sArraySetting: setting "${pField.entity_field}" Starting with null value`);
+      Logger.cdebug('field-setting', `sArraySetter: setting "${fieldName}" Starting with null value`);
       val = [];
     }
     else {
-      // Kludge for old entiries that are just a string rather than a prople SArray
+      // Kludge for old entiries that are just a string rather than a proper SArray
       if (typeof(val) === 'string') {
+        Logger.cdebug('field-setting', `sArraySetter: old value of ${fieldName} is just string. Making array`);
         val = [ val ];
       };
     };
 
     if (typeof(pVal) === 'string') {
       // If just passed a string, add it to the value SArray
-      Logger.cdebug('field-setting', `sArraySetting: adding string ${pField.entity_field}`);
+      Logger.cdebug('field-setting', `sArraySetter: adding string ${fieldName}`);
       SArray.add(val, pVal);
     }
     else {
       if (isSArray(pField, pEntity, pVal)) {
         // If we're passed just an SArray, presume a 'set' operation
+        Logger.cdebug('field-setting', `sArraySetter: just passed SArray for ${fieldName}. Assuming set`);
         val = pVal;
       }
       else {
@@ -254,35 +258,35 @@ export function sArraySetter(pField: FieldDefn, pEntity: Entity, pVal: any): voi
           };
           if (pVal.add) {
             if (Array.isArray(pVal.add)) {
-              Logger.cdebug('field-setting', `sArraySetting: adding array ${pField.entity_field}=>${JSON.stringify(pVal.add)}`);
+              Logger.cdebug('field-setting', `sArraySetter: adding array ${fieldName}=>${JSON.stringify(pVal.add)}`);
               for (const aVal of pVal.add) {
                 SArray.add(val, aVal);
               };
             }
             else {
-              Logger.cdebug('field-setting', `sArraySetting: adding one ${pField.entity_field}=>${JSON.stringify(pVal.add)}`);
+              Logger.cdebug('field-setting', `sArraySetter: adding one ${fieldName}=>${JSON.stringify(pVal.add)}`);
               SArray.add(val, pVal.add);
             };
           };
           if (pVal.remove) {
             if (Array.isArray(pVal.remove)) {
-              Logger.cdebug('field-setting', `sArraySetting: removing array ${pField.entity_field}=>${JSON.stringify(pVal.remove)}`);
+              Logger.cdebug('field-setting', `sArraySetter: removing array ${fieldName}=>${JSON.stringify(pVal.remove)}`);
               for (const aVal of pVal.remove) {
                 SArray.remove(val, aVal);
               };
             }
             else {
-              Logger.cdebug('field-setting', `sArraySetting: removing one ${pField.entity_field}=>${JSON.stringify(pVal.remove)}`);
+              Logger.cdebug('field-setting', `sArraySetter: removing one ${fieldName}=>${JSON.stringify(pVal.remove)}`);
               SArray.remove(val, pVal.remove);
             };
           };
         }
         else {
-          Logger.cdebug('field-setting', `sArraySetting: passed value that is not string, SArray, or manipulation object`);
+          Logger.cdebug('field-setting', `sArraySetter: passed value that is not string, SArray, or manipulation object`);
         };
       };
     };
-    Logger.cdebug('field-setting', `sArraySetting: resulting ${pField.entity_field}=>${JSON.stringify(val)}`);
+    Logger.cdebug('field-setting', `sArraySetter: resulting ${fieldName}=>${JSON.stringify(val)}`);
     (pEntity as any)[pField.entity_field] = cleanStringArray(val);
   };
 };
@@ -486,6 +490,7 @@ export async function checkAccessToEntity(pAuthToken: AuthToken,  // token being
           break;
         case Perm.ADMIN:
           if (Tokens.isSpecialAdminToken(pAuthToken)) {
+            Logger.cdebug('field-setting', `checkAccessToEntity: isSpecialAdminToken`);
             canAccess = true;
           }
           else {

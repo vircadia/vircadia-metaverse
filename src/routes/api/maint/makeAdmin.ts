@@ -21,10 +21,12 @@ import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 
 import { Logger } from '@Tools/Logging';
 import { Accounts } from '@Entities/Accounts';
+import { Tokens } from '@Entities/Tokens';
 import { IsNotNullOrEmpty } from '@Tools/Misc';
+import { setAccountField } from '@Entities/AccountEntity';
 import { AccountRoles } from '@Entities/AccountRoles';
 
-import { SArray } from '@Tools/vTypes';
+import { SArray, VKeyedCollection } from '@Tools/vTypes';
 
 // Temporary maint function to create the first admin account
 const procMakeAdmin: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
@@ -36,12 +38,15 @@ const procMakeAdmin: RequestHandler = async (req: Request, resp: Response, next:
         Logger.debug(`procMakeAdmin: ${adminAccountName} already has role "admin"`);
       }
       else {
-        SArray.add(adminAccount.roles, AccountRoles.ADMIN);
-        Logger.debug(`procMakeAdmin: added role ADMIN to ${adminAccountName}: ${adminAccount.roles}`);
-        const update = {
-          'roles': adminAccount.roles
+        const updates: VKeyedCollection = {};
+        const adminToken = Tokens.createSpecialAdminToken();
+        const success = await setAccountField(adminToken, adminAccount, 'roles', { 'add': AccountRoles.ADMIN }, adminAccount, updates);
+        if (success) {
+          await Accounts.updateEntityFields(adminAccount, updates);
+        }
+        else {
+          req.vRestResp.respondFailure('could not set admin');
         };
-        Accounts.updateEntityFields(adminAccount, update);
       };
     }
     else {
