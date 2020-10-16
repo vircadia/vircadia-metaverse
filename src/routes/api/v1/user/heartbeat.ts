@@ -27,7 +27,7 @@ import { Logger } from '@Tools/Logging';
 
 const procPutUserHeartbeat: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
-    const updates = updateLocationInfo(req);
+    const updates = await updateLocationInfo(req);
     if (IsNotNullOrEmpty(updates)) {
       updates.timeOfLastHeartbeat = new Date();
       await Accounts.updateEntityFields(req.vAuthAccount, updates);

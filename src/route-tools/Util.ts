@@ -17,7 +17,7 @@
 import { Request } from 'express';
 
 import { Accounts } from '@Entities/Accounts';
-import { checkAvailability, AccountEntity } from '@Entities/AccountEntity';
+import { checkAvailability, AccountEntity, setAccountField } from '@Entities/AccountEntity';
 
 import { Domains } from '@Entities/Domains';
 import { DomainEntity } from '@Entities/DomainEntity';
@@ -66,26 +66,16 @@ export function createSimplifiedPublicKey(pPubKey: string): string {
 // Process the user request data and update fields fields in the account.
 // This is infomation from the user from heartbeats or location updates.
 // Return a VKeyedCollection of the updates made so it can be used to update the database.
-export function updateLocationInfo(pReq: Request): VKeyedCollection {
+export async function updateLocationInfo(pReq: Request): Promise<VKeyedCollection> {
   let newLoc: VKeyedCollection = {};
-  if (pReq.body.location) {
+  if (pReq.vAuthAccount && pReq.body.location) {
     try {
       // build location from what is in the account already
       const loc = pReq.body.location;
-      if (loc.hasOwnProperty('connected'))       newLoc.locationConnected = loc.connected;
-      if (loc.hasOwnProperty('path'))            newLoc.locationPath = loc.path;
-      if (loc.hasOwnProperty('place_id'))        newLoc.locationPlaceId = loc.place_id;
-      if (loc.hasOwnProperty('domain_id'))       newLoc.locationDomainId = loc.domain_id;
-      if (loc.hasOwnProperty('network_address')) newLoc.locationNetworkAddress = loc.network_address;
-      if (loc.hasOwnProperty('network_port'))    newLoc.locationNetworkPort = loc.network_port;
-      if (loc.hasOwnProperty('node_id'))         newLoc.locationNodeId = loc.node_id;
-      if (loc.hasOwnProperty('availablity')) {
-        if (checkAvailability(loc.availablity)) {
-          newLoc.availablity = loc.availablity;
-        }
-        else {
-          Logger.debug(`procPutUserLocation: defaulting availability to "none" because passed odd value ${loc.availablity} by ${pReq.vAuthAccount.username}`);
-          newLoc.availablity = 'none';
+      for (const field of ['connected', 'path', 'place_id', 'domain_id', 'network_address',
+                            'node_id', 'availability']) {
+        if (loc.hasOwnProperty(field)) {
+          await setAccountField(pReq.vAuthToken, pReq.vAuthAccount, field, loc[field], pReq.vAuthAccount, newLoc);
         };
       };
     }

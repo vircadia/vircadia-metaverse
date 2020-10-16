@@ -28,10 +28,8 @@ import { Logger } from '@Tools/Logging';
 
 const procPutUserLocation: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
-    const updates = updateLocationInfo(req);
-    if (IsNotNullOrEmpty(updates)) {
-        await Accounts.updateEntityFields(req.vAuthAccount, updates);
-    };
+    const updates = await updateLocationInfo(req);
+    await Accounts.updateEntityFields(req.vAuthAccount, updates);
   }
   else {
     req.vRestResp.respondFailure('auth token did not work');

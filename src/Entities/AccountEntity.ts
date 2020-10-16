@@ -20,7 +20,7 @@ import { AccountRoles } from '@Entities/AccountRoles';
 import { AccountAvailability } from '@Entities/AccountAvailability';
 
 import { FieldDefn, Perm } from '@Route-Tools/Permissions';
-import { isStringValidator, isNumberValidator, isSArraySet, isDateValidator } from '@Route-Tools/Permissions';
+import { isStringValidator, isBooleanValidator, isPathValidator, isNumberValidator, isSArraySet, isDateValidator } from '@Route-Tools/Permissions';
 import { simpleGetter, simpleSetter, sArraySetter, dateStringGetter } from '@Route-Tools/Permissions';
 import { verifyAllSArraySetValues } from '@Route-Tools/Permissions';
 import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/Permissions';
@@ -192,6 +192,69 @@ export const accountFields: { [key: string]: FieldDefn } = {
   'images_thumbnail': {
     entity_field: 'imagesThumbnail',
     request_field_name: 'images_thumbnail',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'owner', 'admin' ],
+    validate: isStringValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'connected': {
+    entity_field: 'locationConnected',
+    request_field_name: 'connected',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'owner', 'admin' ],
+    validate: isBooleanValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'path': {
+    entity_field: 'locationPath',
+    request_field_name: 'path',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'owner', 'admin' ],
+    validate: isPathValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'place_id': {
+    entity_field: 'locationPlaceId',
+    request_field_name: 'place_id',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'owner', 'admin' ],
+    validate: isStringValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'domain_id': {
+    entity_field: 'locationDomainId',
+    request_field_name: 'domain_id',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'owner', 'admin' ],
+    validate: isStringValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'network_address': {
+    entity_field: 'locationNetworkAddress',
+    request_field_name: 'network_address',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'owner', 'admin' ],
+    validate: isStringValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'network_port': {
+    entity_field: 'locationNetworkPort',
+    request_field_name: 'network_port',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'owner', 'admin' ],
+    validate: isNumberValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'node_id': {
+    entity_field: 'locationNodeId',
+    request_field_name: 'node_id',
     get_permissions: [ 'all' ],
     set_permissions: [ 'owner', 'admin' ],
     validate: isStringValidator,
