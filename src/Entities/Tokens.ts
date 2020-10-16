@@ -127,7 +127,7 @@ export const Tokens = {
     // Verify that passed scopes are known scope codes
     aToken.scope = [ TokenScope.OWNER ];
     aToken.whenCreated = new Date();
-    aToken.expirationTime = new Date( Date().valueOf() + 1000); // only lasts one second
+    aToken.expirationTime = new Date( new Date().valueOf() + 1000 ); // only lasts one second
     return aToken;
   },
   isSpecialAdminToken(pAuthToken: AuthToken): boolean {
