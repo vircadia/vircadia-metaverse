@@ -31,8 +31,11 @@ const procPutUserHeartbeat: RequestHandler = async (req: Request, resp: Response
     if (IsNotNullOrEmpty(updates)) {
       updates.timeOfLastHeartbeat = new Date();
       await Accounts.updateEntityFields(req.vAuthAccount, updates);
-      req.vRestResp.Data = {
-        'session_id': req.vSession.id
+      if (IsNotNullOrEmpty(req.vAuthAccount.locationNodeId)) {
+        req.vRestResp.Data = {
+          // 'session_id': req.vSession.id
+          'session_id': req.vAuthAccount.locationNodeId
+        };
       };
     };
   }

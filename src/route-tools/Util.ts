@@ -72,8 +72,8 @@ export async function updateLocationInfo(pReq: Request): Promise<VKeyedCollectio
     try {
       // build location from what is in the account already
       const loc = pReq.body.location;
-      for (const field of ['connected', 'path', 'place_id', 'domain_id', 'network_address',
-                            'node_id', 'availability']) {
+      for (const field of ['connected', 'path', 'place_id', 'domain_id',
+                            'network_address', 'node_id', 'availability']) {
         if (loc.hasOwnProperty(field)) {
           await setAccountField(pReq.vAuthToken, pReq.vAuthAccount, field, loc[field], pReq.vAuthAccount, newLoc);
         };
