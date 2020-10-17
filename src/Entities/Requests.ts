@@ -20,18 +20,20 @@ import { RequestEntity } from '@Entities/RequestEntity';
 import { createObject, getObject, getObjects, updateObjectFields, deleteOne, deleteMany } from '@Tools/Db';
 
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
+import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
 
-import { GenUUID, SimpleObject, IsNullOrEmpty } from '@Tools/Misc';
+import { GenUUID, SimpleObject, IsNotNullOrEmpty, IsNullOrEmpty } from '@Tools/Misc';
 import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
 
 export let requestCollection = 'requests';
 
 export class RequestType {
-  public static HANDSHAKE = 'handshake';
-  public static CONNECTION = 'connection';
-  public static FRIEND = 'friend';
-  public static FOLLOW = 'follow';
+  public static HANDSHAKE = 'handshake';      // doing handshake to make a connection
+  public static CONNECTION = 'connection';    // asking to make a connection
+  public static FRIEND = 'friend';            // asking to be a friend
+  public static FOLLOW = 'follow';            // asking to follow
+  public static VERIFYEMAIL = 'verifyEmail';  // verifying email request
 };
 
 // Initialize request management.
@@ -110,6 +112,17 @@ export const Requests = {
   },
   async remove(pRequestEntity: RequestEntity) : Promise<boolean> {
     return deleteOne(requestCollection, { 'id': pRequestEntity.id } );
+  },
+  // Remove all requests for specified account of the specified type
+  // If type not specified, remove them all
+  async removeAllMyRequests(pAccountId: string, pRequestType?: string): Promise<number>{
+    const criteria: VKeyedCollection = {
+      'requestingAccount': pAccountId
+    };
+    if (IsNotNullOrEmpty(pRequestType)) {
+      criteria.requestType = pRequestType;
+    };
+    return deleteMany(requestCollection, new GenericFilter(criteria));
   },
   // TODO: add scope (admin) and filter criteria filtering
   //    It's push down to this routine so we could possibly use DB magic for the queries

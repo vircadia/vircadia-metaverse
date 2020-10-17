@@ -143,6 +143,17 @@ async function BuildConnectionResponse(req: Request, pOtherAccountId: string): P
   };
 };
 
+// A user is asking for all it's handshake requests to be removed
+const procDeleteUserConnectionRequest: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  if (req.vAuthAccount) {
+    await Requests.removeAllMyRequests(req.vAuthAccount.id, RequestType.HANDSHAKE);
+  }
+  else {
+    req.vRestResp.respondFailure('unauthorized');
+  };
+  next();
+};
+
 export const name = '/api/v1/user/connection_request';
 
 export const router = Router();
@@ -150,4 +161,8 @@ export const router = Router();
 router.post(  '/api/v1/user/connection_request', [ setupMetaverseAPI,
                                                   accountFromAuthToken,
                                                   procPostUserConnectionRequest,
+                                                  finishMetaverseAPI ] );
+router.delete('/api/v1/user/connection_request', [ setupMetaverseAPI,
+                                                  accountFromAuthToken,
+                                                  procDeleteUserConnectionRequest,
                                                   finishMetaverseAPI ] );
