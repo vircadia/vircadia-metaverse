@@ -67,7 +67,7 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
         // Collect the specific values set. Cannot just accept all because the
         //     requestor could do things like set the password hash or other bad things.
         for (const field of ['version', 'protocol', 'network_addr', 'network_port', 'automatic_networking',
-                    'restricted', 'capacity', 'description', 'maturity', 'restriction', 'hosts', 'tags' ]) {
+                    'restricted', 'capacity', 'description', 'maturity', 'restriction', 'managers', 'tags' ]) {
           if (valuesToSet.hasOwnProperty(field)) {
             await setDomainField(req.vAuthToken, req.vDomain, field, valuesToSet[field], req.vAuthAccount, updated);
           };

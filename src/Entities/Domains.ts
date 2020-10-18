@@ -50,7 +50,6 @@ export const Domains = {
     const newDomain = new DomainEntity();
     newDomain.id = GenUUID();
     newDomain.tags = [];
-    newDomain.hosts = [];
     newDomain.managers = [];
     newDomain.images = [];
     newDomain.whenCreated = new Date();

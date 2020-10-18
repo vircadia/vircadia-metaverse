@@ -40,7 +40,6 @@ A request returns an array of domain descriptions:
                   "maturity": stringMaturity,
                   "restriction": string,
                   "managers": [ username, username, ... ],
-                  "hosts": [ username, username, ... ],
                   "tags": [ stringTag, stringTag, ... ],
                   "owner_places": [ placeInfo, placeInfo, ... ],
                   "meta": {
@@ -110,7 +109,7 @@ not included, the value is not set.
           "description": stringDescription,
           "maturity": stringMaturity,
           "restriction": string,
-          "hosts": [ hostUsername1, hostUsername1, ... ],
+          "managers": [ hostUsername1, hostUsername1, ... ],
           "tags": [ stringTag, stringTag, ... ],
           "heartbeat": {
               "num_users": intUsers,
@@ -151,7 +150,7 @@ The domain fields that can be fetched:
 | contact_info  |    all   | domain sponsor admin | string |
 | maturity      |    all   | domain sponsor admin | string |
 | restriction   |    all   | domain sponsor admin | string |
-| hosts         |    all   | domain sponsor admin | stringArray |
+| managers      |    all   | domain sponsor admin | stringArray |
 | tags          |    all   | domain sponsor admin | stringArray |
 | thumbnail     |    all   | domain sponsor admin | string |
 | images        |    all   | domain sponsor admin | stringArray |

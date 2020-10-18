@@ -54,7 +54,6 @@ export class DomainEntity implements Entity {
   public maturity: string;     // Maturity rating
   public restriction: string;  // Access restrictions ("open")
   public managers: string[];   // Usernames of people who are domain admins
-  public hosts: string[];      // Usernames of people who can be domain "hosts"
   public tags: string[];       // Categories for describing the domain
 
   // admin stuff
@@ -292,15 +291,6 @@ export const domainFields: { [key: string]: FieldDefn } = {
   'managers': {
     entity_field: 'managers',
     request_field_name: 'managers',
-    get_permissions: [ 'all' ],
-    set_permissions: [ 'domain', 'sponsor', 'admin' ],
-    validate: isSArraySet,
-    setter: sArraySetter,
-    getter: simpleGetter
-  },
-  'hosts': {
-    entity_field: 'hosts',
-    request_field_name: 'hosts',
     get_permissions: [ 'all' ],
     set_permissions: [ 'domain', 'sponsor', 'admin' ],
     validate: isSArraySet,
