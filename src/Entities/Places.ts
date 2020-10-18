@@ -16,6 +16,7 @@
 import { PlaceEntity } from '@Entities/PlaceEntity';
 
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
+import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
 
 import { createObject, getObject, getObjects, updateObjectFields, deleteOne, deleteMany, noCaseCollation } from '@Tools/Db';
 
@@ -27,10 +28,13 @@ export let placeCollection = 'places';
 
 export const Places = {
   async getPlaceWithId(pPlaceId: string): Promise<PlaceEntity> {
-    return IsNullOrEmpty(pPlaceId) ? null : getObject(placeCollection, { 'id': pPlaceId });
+    return IsNullOrEmpty(pPlaceId) ? null : getObject(placeCollection,
+                                              new GenericFilter({ 'id': pPlaceId }));
   },
   async getPlaceWithName(pPlacename: string): Promise<PlaceEntity> {
-    return IsNullOrEmpty(pPlacename) ? null : getObject(placeCollection, { 'name': pPlacename },  noCaseCollation);
+    return IsNullOrEmpty(pPlacename) ? null : getObject(placeCollection,
+                                              new GenericFilter({ 'name': pPlacename }),
+                                              noCaseCollation);
   },
   async addPlace(pPlaceEntity: PlaceEntity) : Promise<PlaceEntity> {
     Logger.info(`Places: creating place ${pPlaceEntity.name}, id=${pPlaceEntity.id}`);
@@ -56,7 +60,7 @@ export const Places = {
   },
   async removePlace(pPlaceEntity: PlaceEntity) : Promise<boolean> {
     Logger.info(`Places: removing place ${pPlaceEntity.name}, id=${pPlaceEntity.id}`);
-    return deleteOne(placeCollection, { 'id': pPlaceEntity.id } );
+    return deleteOne(placeCollection, new GenericFilter({ 'id': pPlaceEntity.id }) );
   },
   async removeMany(pCriteria: CriteriaFilter) : Promise<number> {
     return deleteMany(placeCollection, pCriteria);
@@ -70,6 +74,7 @@ export const Places = {
   },
   // The contents of this entity have been updated
   async updateEntityFields(pEntity: PlaceEntity, pFields: VKeyedCollection): Promise<PlaceEntity> {
-    return updateObjectFields(placeCollection, { 'id': pEntity.id }, pFields);
+    return updateObjectFields(placeCollection,
+                              new GenericFilter({ 'id': pEntity.id }), pFields);
   }
 };

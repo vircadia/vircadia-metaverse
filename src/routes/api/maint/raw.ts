@@ -19,12 +19,12 @@ import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
 import { param1FromParams, param2FromParams, param3FromParams } from '@Route-Tools/middleware';
 
+import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
 import { getObject } from '@Tools/Db';
 
-import { Logger } from '@Tools/Logging';
 import { Accounts } from '@Entities/Accounts';
-import { IsNotNullOrEmpty } from '@Tools/Misc';
-import { AccountRoles } from '@Entities/AccountRoles';
+import { SimpleObject } from '@Tools/Misc';
+import { Logger } from '@Tools/Logging';
 
 // A maint function for admin account that lets one get any object in any collection
 const procMaintRaw: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
@@ -34,8 +34,7 @@ const procMaintRaw: RequestHandler = async (req: Request, resp: Response, next: 
         const collection = req.vParam1;
         const field = req.vParam2;
         const value = req.vParam3;
-        const criteria: any = {};
-        criteria[field] = value;
+        const criteria = new GenericFilter(SimpleObject(field, value));
         req.vRestResp.Data = await getObject(collection, criteria);
       }
       else {

@@ -43,7 +43,8 @@ export function initRequests(): void {
   // Expire requests that have pased their prime
   setInterval( async () => {
     const nowtime = new Date();
-    const numDeleted = await deleteMany(requestCollection, { 'expirationTime': { $lt: nowtime } } );
+    const numDeleted = await deleteMany(requestCollection,
+                              new GenericFilter({ 'expirationTime': { $lt: nowtime } }) );
     if (numDeleted > 0) {
       Logger.debug(`Requests.Expiration: expired ${numDeleted} requests`);
     };
@@ -52,7 +53,8 @@ export function initRequests(): void {
 
 export const Requests = {
   async getWithId(pRequestId: string): Promise<RequestEntity> {
-    return IsNullOrEmpty(pRequestId) ? null : getObject(requestCollection, { 'id': pRequestId });
+    return IsNullOrEmpty(pRequestId) ? null : getObject(requestCollection,
+                                                new GenericFilter({ 'id': pRequestId }));
   },
   // Return all Requests that have the passed Id as either the requester or target.
   // Normally matches the accountId fields but can change it to others (usually for connection NodeId).
@@ -60,27 +62,29 @@ export const Requests = {
                   pRequesterField: string = 'requestingAccountId',
                   pTargetField: string = 'targetAccountId'): Promise<RequestEntity> {
     return IsNullOrEmpty(pRequestId) ? null : getObject(requestCollection,
-          { '$or': [ SimpleObject(pRequesterField, pRequestId), SimpleObject(pTargetField, pRequestId) ],
-            'requestType': pType
-          });
+            new GenericFilter(
+                { '$or': [ SimpleObject(pRequesterField, pRequestId),
+                          SimpleObject(pTargetField, pRequestId)
+                        ],
+                  'requestType': pType
+                }) );
   },
   // Return a Request between the two specified id's
   // Normally matches the accountId fields but can change it to others (usually for connection NodeId).
   async getWithRequestBetween(pRequestId: string, pTargetId: string, pType: string,
                   pRequesterField: string = 'requestingAccountId',
                   pTargetField: string = 'targetAccountId'): Promise<RequestEntity> {
+    const wayone: VKeyedCollection = {};
+    wayone[pRequesterField] = pRequestId;
+    wayone[pTargetField] = pTargetId;
+    const waytwo: VKeyedCollection = {};
+    waytwo[pRequesterField] = pTargetId;
+    waytwo[pTargetField] = pRequestId;
     return IsNullOrEmpty(pRequestId) ? null : getObject(requestCollection,
-          { '$or': [ { '$and': [ SimpleObject(pRequesterField, pRequestId),
-                                 SimpleObject(pTargetField, pTargetId)
-                               ]
-                     },
-                     { '$and': [ SimpleObject(pRequesterField, pTargetId),
-                                 SimpleObject(pTargetField, pRequestId)
-                               ]
-                     }
-              ],
-            'requestType': pType
-          });
+            new GenericFilter(
+                { '$or': [ wayone, waytwo ],
+                  'requestType': pType
+                }) );
   },
   create(): RequestEntity {
     const aRequest = new RequestEntity();
@@ -108,10 +112,11 @@ export const Requests = {
     return createObject(requestCollection, pRequestEntity);
   },
   async update(pEntity: RequestEntity, pFields: VKeyedCollection): Promise<RequestEntity> {
-    return updateObjectFields(requestCollection, { 'id': pEntity.id }, pFields);
+    return updateObjectFields(requestCollection,
+                              new GenericFilter({ 'id': pEntity.id }), pFields);
   },
   async remove(pRequestEntity: RequestEntity) : Promise<boolean> {
-    return deleteOne(requestCollection, { 'id': pRequestEntity.id } );
+    return deleteOne(requestCollection, new GenericFilter({ 'id': pRequestEntity.id }) );
   },
   // Remove all requests for specified account of the specified type
   // If type not specified, remove them all

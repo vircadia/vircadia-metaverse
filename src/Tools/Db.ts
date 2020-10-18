@@ -88,22 +88,29 @@ export async function createObject(pCollection: string, pObject: any): Promise<a
 // Low level access to database to fetch the first instance of an object matching the criteria
 // Throws exception if anything wrong with the fetch.
 // You can optionally pass a collation which is used to select index (usually for case-insensitive queries)..
-export async function getObject(pCollection: string, pCriteria: any, pCollation?: any): Promise<any> {
+export async function getObject(pCollection: string,
+                                pCriteria: CriteriaFilter,
+                                pCollation?: any): Promise<any> {
   if (pCollation) {
-    const cursor = Datab.collection(pCollection).find(pCriteria).collation(pCollation);
+    const cursor = Datab.collection(pCollection)
+                        .find(pCriteria.criteriaParameters())
+                        .collation(pCollation);
     if (await cursor.hasNext()) {
       return cursor.next();
     };
     return null;
   };
-  return Datab.collection(pCollection).findOne(pCriteria);
+  return Datab.collection(pCollection)
+              .findOne(pCriteria.criteriaParameters());
 };
 
 // Low level access to database to update the passed object in the passed collection.
 // Note that the passed source object has only the fields to update in the target object.
 // Throws exception if anything wrong with the fetch.
 // Returns the complete updated object.
-export async function updateObjectFields(pCollection: string, pCriteria: any, pFields: VKeyedCollection): Promise<any> {
+export async function updateObjectFields(pCollection: string,
+                                         pCriteria: CriteriaFilter,
+                                         pFields: VKeyedCollection): Promise<any> {
   let doSet = false;
   let doUnset = false;
   const set: VKeyedCollection = {};
@@ -138,19 +145,19 @@ export async function updateObjectFields(pCollection: string, pCriteria: any, pF
 
   Logger.cdebug('db-query-detail', `Db.updateObjectFields: collection=${pCollection}, criteria=${JSON.stringify(pCriteria)}, op=${JSON.stringify(op)}`);
   return Datab.collection(pCollection)
-    .findOneAndUpdate(pCriteria, op, {
+    .findOneAndUpdate(pCriteria.criteriaParameters(), op, {
        returnOriginal: false    // return the updated entity
     } );
 };
 
-export async function deleteMany(pCollection: string, pCriteria: any): Promise<number> {
-  const result = await Datab.collection(pCollection).deleteMany(pCriteria);
+export async function deleteMany(pCollection: string, pCriteria: CriteriaFilter): Promise<number> {
+  const result = await Datab.collection(pCollection).deleteMany(pCriteria.criteriaParameters());
   return result.deletedCount ?? 0;
 };
 
-export async function deleteOne(pCollection: string, pCriteria: any): Promise<boolean> {
+export async function deleteOne(pCollection: string, pCriteria: CriteriaFilter): Promise<boolean> {
   let ret = false;
-  const result = await Datab.collection(pCollection).deleteOne( pCriteria );
+  const result = await Datab.collection(pCollection).deleteOne( pCriteria.criteriaParameters() );
   if ( result.result && result.result.ok) {
     ret = result.result.ok === 1
   }
@@ -164,7 +171,9 @@ export async function deleteOne(pCollection: string, pCriteria: any): Promise<bo
 // Page number starts at 1.
 // Throws exception if anything wrong with the fetch.
 export async function *getObjects(pCollection: string,
-        pPager?: CriteriaFilter, pInfoer?: CriteriaFilter, pScoper?: CriteriaFilter): AsyncGenerator<any> {
+                                  pPager?: CriteriaFilter,
+                                  pInfoer?: CriteriaFilter,
+                                  pScoper?: CriteriaFilter): AsyncGenerator<any> {
 
   // If a paging filter is passed, incorporate it's search criteria
   let criteria:any = {};

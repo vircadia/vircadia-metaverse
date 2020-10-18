@@ -35,7 +35,8 @@ export let accountCollection = 'accounts';
 
 export const Accounts = {
   async getAccountWithId(pAccountId: string): Promise<AccountEntity> {
-    return IsNullOrEmpty(pAccountId) ? null : getObject(accountCollection, { 'id': pAccountId });
+    return IsNullOrEmpty(pAccountId) ? null : getObject(accountCollection,
+                                              new GenericFilter({ 'id': pAccountId }));
   },
   async getAccountWithAuthToken(pAuthToken: string): Promise<AccountEntity> {
     if (IsNotNullOrEmpty(pAuthToken)) {
@@ -56,16 +57,19 @@ export const Accounts = {
       // build username query with case-insensitive Regex.
       // When indexes are added, create a 'username' case-insensitive index.
       // Need to clean the username of search characters since we're just passing it to the database
-      return getObject(accountCollection, { 'username': pUsername }, noCaseCollation );
+      return getObject(accountCollection,
+                        new GenericFilter({ 'username': pUsername }), noCaseCollation );
                 // { 'username': new RegExp(['^', pUsername.replace('[\\\*]', ''), '$'].join(''), 'i') } );
     };
     return null;
   },
   async getAccountWithNodeId(pNodeId: string): Promise<AccountEntity> {
-    return IsNullOrEmpty(pNodeId) ? null : getObject(accountCollection, { 'locationNodeid': pNodeId });
+    return IsNullOrEmpty(pNodeId) ? null : getObject(accountCollection,
+                        new GenericFilter({ 'locationNodeid': pNodeId }));
   },
   async getAccountWithEmail(email: string): Promise<AccountEntity> {
-    return IsNullOrEmpty(email) ? null : getObject(accountCollection, { 'email': email }, noCaseCollation );
+    return IsNullOrEmpty(email) ? null : getObject(accountCollection,
+                        new GenericFilter({ 'email': email }), noCaseCollation );
   },
   async addAccount(pAccountEntity: AccountEntity) : Promise<AccountEntity> {
     Logger.info(`Accounts: creating account ${pAccountEntity.username}, id=${pAccountEntity.id}`);
@@ -73,7 +77,7 @@ export const Accounts = {
   },
   async removeAccount(pAccountEntity: AccountEntity) : Promise<boolean> {
     Logger.info(`Accounts: removing account ${pAccountEntity.username}, id=${pAccountEntity.id}`);
-    return deleteOne(accountCollection, { 'id': pAccountEntity.id } );
+    return deleteOne(accountCollection, new GenericFilter({ 'id': pAccountEntity.id }) );
   },
   async removeAccountContext(pAccountEntity: AccountEntity) : Promise<void> {
     // Friends and Connections
@@ -104,7 +108,8 @@ export const Accounts = {
   },
   // The contents of this entity have been updated
   async updateEntityFields(pEntity: AccountEntity, pFields: VKeyedCollection): Promise<AccountEntity> {
-    return updateObjectFields(accountCollection, { 'id': pEntity.id }, pFields);
+    return updateObjectFields(accountCollection,
+                                new GenericFilter({ 'id': pEntity.id }), pFields);
   },
   createAccount(pUsername: string, pPassword: string, pEmail: string): AccountEntity {
     const newAcct = new AccountEntity();

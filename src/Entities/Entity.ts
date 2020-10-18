@@ -28,7 +28,8 @@ export abstract class Entity {
   public collection: string;
 
   async getWithId(pId: string): Promise<Entity> {
-    return IsNullOrEmpty(pId) ? null : getObject(this.collection, { 'id': pId });
+    return IsNullOrEmpty(pId) ? null : getObject(this.collection,
+                                        new GenericFilter({ 'id': pId }));
   };
   async create(pId: string): Promise<Entity> {
     return undefined;
@@ -37,7 +38,7 @@ export abstract class Entity {
     return createObject(this.collection, pEntity);
   };
   async remove(pEntity: Entity): Promise<boolean> {
-    return deleteOne(this.collection, { 'id': pEntity.id } );
+    return deleteOne(this.collection, new GenericFilter({ 'id': pEntity.id }) );
   };
   async *enumerateAsync(pPager: CriteriaFilter,
                pInfoer: CriteriaFilter, pScoper: CriteriaFilter): AsyncGenerator<Entity> {

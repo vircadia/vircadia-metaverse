@@ -31,13 +31,16 @@ export let domainCollection = 'domains';
 
 export const Domains = {
   async getDomainWithId(pDomainId: string): Promise<DomainEntity> {
-    return IsNullOrEmpty(pDomainId) ? null : getObject(domainCollection, { 'id': pDomainId });
+    return IsNullOrEmpty(pDomainId) ? null : getObject(domainCollection,
+                                          new GenericFilter({ 'id': pDomainId }));
   },
   async getDomainWithAPIKey(pApiKey: string): Promise<DomainEntity> {
-    return IsNullOrEmpty(pApiKey) ? null : getObject(domainCollection, { 'apiKey': pApiKey });
+    return IsNullOrEmpty(pApiKey) ? null : getObject(domainCollection,
+                                          new GenericFilter({ 'apiKey': pApiKey }));
   },
   async getDomainWithSenderKey(pSenderKey: string): Promise<DomainEntity> {
-    return IsNullOrEmpty(pSenderKey) ? null : getObject(domainCollection, { 'lastSenderKey': pSenderKey });
+    return IsNullOrEmpty(pSenderKey) ? null : getObject(domainCollection,
+                                          new GenericFilter({ 'lastSenderKey': pSenderKey }));
   },
   async addDomain(pDomainEntity: DomainEntity) : Promise<DomainEntity> {
     Logger.info(`Domains: creating domain ${pDomainEntity.name}, id=${pDomainEntity.id}`);
@@ -55,7 +58,7 @@ export const Domains = {
   },
   async removeDomain(pDomainEntity: DomainEntity) : Promise<boolean> {
     Logger.info(`Domains: removing domain ${pDomainEntity.name}, id=${pDomainEntity.id}`);
-    return deleteOne(domainCollection, { 'id': pDomainEntity.id } );
+    return deleteOne(domainCollection, new GenericFilter({ 'id': pDomainEntity.id }) );
   },
   // When removing a domain, other tables need cleaning up
   async removeDomainContext(pDomainEntity: DomainEntity): Promise<void> {
@@ -74,7 +77,8 @@ export const Domains = {
   },
   // The contents of this entity have been updated
   async updateEntityFields(pEntity: DomainEntity, pFields: VKeyedCollection): Promise<DomainEntity> {
-    return updateObjectFields(domainCollection, { 'id': pEntity.id }, pFields);
+    return updateObjectFields(domainCollection,
+                              new GenericFilter({ 'id': pEntity.id }), pFields);
   },
   // Return 'true' if the passed string could be a domainId. Used as a precheck before querying the Db.
   // For the moment, do a simple check to see if it is probably a GUID.

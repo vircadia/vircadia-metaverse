@@ -26,9 +26,6 @@ import { buildDomainInfoV1 } from '@Route-Tools/Util';
 import { Domains } from '@Entities/Domains';
 import { setDomainField } from '@Entities/DomainEntity';
 import { Accounts } from '@Entities/Accounts';
-import { Places } from '@Entities/Places';
-
-import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
 
 import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
