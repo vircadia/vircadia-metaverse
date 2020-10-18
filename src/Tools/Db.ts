@@ -92,6 +92,7 @@ export async function getObject(pCollection: string,
                                 pCriteria: CriteriaFilter,
                                 pCollation?: any): Promise<any> {
   if (pCollation) {
+    Logger.cdebug('db-query-detail', `Db.getObject: collection=${pCollection}, criteria=${JSON.stringify(pCriteria.criteriaParameters())}`);
     const cursor = Datab.collection(pCollection)
                         .find(pCriteria.criteriaParameters())
                         .collation(pCollation);
@@ -100,6 +101,7 @@ export async function getObject(pCollection: string,
     };
     return null;
   };
+  Logger.cdebug('db-query-detail', `Db.getObject: collection=${pCollection}, criteria=${JSON.stringify(pCriteria.criteriaParameters())}`);
   return Datab.collection(pCollection)
               .findOne(pCriteria.criteriaParameters());
 };
@@ -143,7 +145,7 @@ export async function updateObjectFields(pCollection: string,
     op.$unset = unset
   };
 
-  Logger.cdebug('db-query-detail', `Db.updateObjectFields: collection=${pCollection}, criteria=${JSON.stringify(pCriteria)}, op=${JSON.stringify(op)}`);
+  Logger.cdebug('db-query-detail', `Db.updateObjectFields: collection=${pCollection}, criteria=${JSON.stringify(pCriteria.criteriaParameters())}, op=${JSON.stringify(op)}`);
   return Datab.collection(pCollection)
     .findOneAndUpdate(pCriteria.criteriaParameters(), op, {
        returnOriginal: false    // return the updated entity
