@@ -43,8 +43,8 @@ const procGetRequests: RequestHandler = async (req: Request, resp: Response, nex
         'expiration_time': aReq.expirationTime ? aReq.expirationTime.toISOString() : undefined
       };
       switch (aReq.requestType) {
-        case RequestType.CONNECTION:
-          thisReq.connection = {
+        case RequestType.HANDSHAKE:
+          thisReq.handshake = {
             'requester_id': aReq.requesterId,
             'target_id': aReq.targetId,
             'requester_accepted': aReq.requesterAccepted,
