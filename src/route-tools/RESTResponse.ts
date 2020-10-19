@@ -105,9 +105,10 @@ export class RESTResponse {
         const errorAction = this._request.get(errorHeader);
         if (errorAction && errorAction.toLowerCase() === "badrequest") {
           this._response.statusCode = HTTPStatusCode.BadRequest;
-        }
-      }
+        };
+      };
       // Set status to 'failure'. Any additional error info is added by _additionalFields.
+      Logger.cdebug('metaverseapi-response-detail', `buildRESTResponse: failing to ${this._response.statusCode}`);
       responseData = {
         'status': 'failure'
       };
