@@ -16,6 +16,9 @@ import { IsNullOrEmpty, IsNotNullOrEmpty, getMyExternalIPAddress } from '@Tools/
 import { httpRequest, httpsRequest } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
 
+// All the possible configuration parameters.
+// This sets defaults values and is over-written by environment variables and
+//     supplied configuration file contents.
 export let Config = {
     'metaverse': {
       'metaverse-name': 'Vircadia noobie',
@@ -37,7 +40,7 @@ export let Config = {
     },
     'auth': {
       'domain-token-expire-hours': 24 * 365,  // one year
-      'owner-token-expire-hours': 12
+      'owner-token-expire-hours': 24 * 7      // one week
     },
     'metaverse-server': {
       'http-error-on-failure': true,  // whether to include x-vircadia error header
@@ -45,7 +48,7 @@ export let Config = {
       'heartbeat-seconds-until-offline': 300,
       'metaverse-info-addition-file': './metaverse_info.json',
       'session-timeout-minutes': 5,
-      'handshake-request-expiration-minutes': 1,
+      'handshake-request-expiration-minutes': 1,            // one minute handshake
       'connection-request-expiration-minutes': 60 * 24 * 4, // 4 days
       'friend-request-expiration-minutes': 60 * 24 * 4,     // 4 days
       // redirection URL used for initial domain token generation, use "METAVERSE_SERVER_URL" as a base if using the static folder.
@@ -61,12 +64,6 @@ export let Config = {
       'db-pw': 'nooneknowsit',
       'db-authdb': 'admin',
       'db-connection': ''   // connection string replaces above if supplied
-    },
-    'activitypub': {
-      // NOTE: there shouldn't be a trailing slash
-      'url-base': '/v',
-      // This becomes the base of all object permanent URLs
-      'external-hostname': 'localhost'
     },
     'debug': {
       'loglevel': 'info',
@@ -100,9 +97,6 @@ export async function initializeConfiguration(): Promise<void> {
 
   const envPort = process.env.IAMUS_LISTEN_PORT;
   if (IsNotNullOrEmpty(envPort)) Config.server['listen-port'] = Number(envPort);
-
-  const envExternalHostname = process.env.IAMUS_EXTERNAL_HOSTNAME;
-  if (IsNotNullOrEmpty(envExternalHostname)) Config.activitypub['external-hostname'] = envExternalHostname;
 
   const envConfigFile = process.env.IAMUS_CONFIG_FILE;
   if (IsNotNullOrEmpty(envConfigFile)) Config.server["user-config-file"] = envConfigFile;
