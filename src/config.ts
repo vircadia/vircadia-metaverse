@@ -51,8 +51,11 @@ export let Config = {
       'handshake-request-expiration-minutes': 1,            // one minute handshake
       'connection-request-expiration-minutes': 60 * 24 * 4, // 4 days
       'friend-request-expiration-minutes': 60 * 24 * 4,     // 4 days
-      // redirection URL used for initial domain token generation, use "METAVERSE_SERVER_URL" as a base if using the static folder.
+      // redirection URL used for initial domain token generation,
+      // "METAVERSE_SERVER_URL" is replaced (from Config.metaverse.metaverse-server-url)
+      // "DASHBOARD_URL" is replaced (from Config.metaverse.dashboard-url)
       'tokengen_url': 'METAVERSE_SERVER_URL/static/DomainTokenLogin.html',
+      // 'tokengen_url': 'DASHBOARD_URL?metaverse=METAVERSE_SERVER_URL&page=domain',
       // When account of this name is created, add 'admin' role to it
       'base-admin-account': 'adminer'
     },
