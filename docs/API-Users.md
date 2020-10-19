@@ -43,8 +43,8 @@ The response body is an "applicaton/json" structure that contains an array of us
                     "username": username,
                     "accountid": stringAccountId,
                     "images": {
-                        "Hero": heroImageURL,
-                        "Thumbnail": thumbnailImageURL,
+                        "hero": heroImageURL,
+                        "thumbnail": thumbnailImageURL,
                         "tiny": tinyImageURL
                     },
                     "location": {
