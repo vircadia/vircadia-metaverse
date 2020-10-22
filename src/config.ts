@@ -70,19 +70,27 @@ export let Config = {
     },
     'debug': {
       'loglevel': 'info',
+
+      // Winston logging configuration
+      'log-to-files': true,         // if to log to files
+      'log-filename': 'iamus.log',  // filename for log files
+      'log-directory': './logs',    // directory to place logs
+      'log-max-size-megabytes': 100,// max mega-bytes per log file
+      'log-max-files': 10,          // number of log files to create
+      'log-tailable': true,         // if to always output to main named log file
+      'log-compress': false,        // if to compress old log files
+
+      'log-to-console': false,      // if to additionally log to the console
+
       'devel': false,
-      // output the received request info when received
-      'request-detail': false,
-      // output the received request body when received
-      'request-body': false,
-      // output the response sent back from MetaverseAPI requests
-      'metaverseapi-response-detail': false,
-      // outputs details when selecting query parameters
-      'query-detail': false,
-      // outputs details about DB queries
-      'db-query-detail': false,
-      // Details of entity field getting and setting
-      'field-setting': false
+
+      // Control of what debug information is logged
+      'request-detail': false,  // output the received request info when received
+      'request-body': false,    // output the received request body when received
+      'metaverseapi-response-detail': false, // output the response sent back from MetaverseAPI requests
+      'query-detail': false,    // outputs details when selecting query parameters
+      'db-query-detail': false, // outputs details about DB queries
+      'field-setting': false    // Details of entity field getting and setting
     }
 };
 
@@ -93,7 +101,6 @@ export async function initializeConfiguration(): Promise<void> {
   // Tweek some of the values based on environment variables
   const envLogLevel = process.env.IAMUS_LOGLEVEL;
   if (IsNotNullOrEmpty(envLogLevel)) Config.debug.loglevel = envLogLevel;
-  Logger.setLogLevel(Config.debug.loglevel);
 
   const envHost = process.env.IAMUS_LISTEN_HOST;
   if (IsNotNullOrEmpty(envHost)) Config.server['listen-host'] = envHost;
@@ -113,7 +120,6 @@ export async function initializeConfiguration(): Promise<void> {
       if (IsNotNullOrEmpty(userConfig)) {
         // this overlays all the Config values with values from the user's file
         Config = deepmerge(Config, userConfig);
-        Logger.setLogLevel(Config.debug.loglevel);  // it could have changed the logLevel
         // Logger.debug(`initializeConfiguration: processed configuration file ${userConfigFile}`);
       };
     };

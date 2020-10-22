@@ -31,7 +31,7 @@ import { setupDB } from '@Tools/Db';
 
 import glob from 'glob';
 import morgan from 'morgan';
-import { Logger, morganOptions } from '@Tools/Logging';
+import { Logger, initLogging, morganOptions } from '@Tools/Logging';
 import { initTokens } from '@Entities/Tokens';
 import { initSessions } from '@Entities/Sessions';
 import { initRequests } from '@Entities/Requests';
@@ -42,6 +42,8 @@ initializeConfiguration()
   Logger.error('main: failured configuration: ' + err);
 })
 .then( () => {
+  Logger.info('=== starting');
+  initLogging();
   initSessions();
   initTokens();
   initRequests();

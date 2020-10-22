@@ -13,11 +13,14 @@
 //   limitations under the License.
 'use strict'
 
-import * as loglevel from 'loglevel';
-
 import { Config } from '@Base/config';
-import { Options } from 'morgan';
+
+import fs from 'fs';
+
 import http from 'http';
+import winston, { transports } from 'winston';
+import { Options } from 'morgan';
+import { config } from 'process';
 
 interface ALogger {
   info( msg: string ): void,
@@ -28,46 +31,109 @@ interface ALogger {
   setLogLevel( level: string ): void
 };
 
+// This is an initial logger that exists before configuration is complete.
+// The later 'initializeLogger' will reset the logger to be to files or whatever.
+export let logger = winston.createLogger( {
+  'level': 'debug',
+  'format': winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.printf(info => { return `${info.timestamp} ${info.level} ${info.message}` })
+  ),
+  'transports': [
+    new winston.transports.Console( {
+      'level': 'debug'
+    })
+  ]
+});
+
+// Switch the logger from the startup console logger to the file logger.
+export function initLogging() {
+  // Create the logging directory if it doesn't exist
+  let logDir = Config.debug["log-directory"];
+  if (!fs.existsSync(logDir)) {
+    try {
+      fs.mkdirSync(logDir);
+    }
+    catch (e) {
+      logger.error(`Logger: could not create log directory "${logDir}": ${e}`);
+      logDir = '.';
+    }
+  };
+
+  // Create the ways we're going to log. Files and/or console
+  const logTransports: any[] = [];
+  if (Config.debug["log-to-files"]) {
+    logTransports.push(
+      new winston.transports.File( {
+        'level': Config.debug.loglevel,
+        'filename': Config.debug['log-filename'],
+        'dirname': logDir,
+        'maxsize': Config.debug['log-max-size-megabytes']*1000000, // max size in bytes
+        'maxFiles': Config.debug['log-max-files'],  // number of files to keep
+        'tailable': Config.debug["log-tailable"],
+        'zippedArchive': Config.debug["log-compress"] // ZIP the previous files
+      })
+    );
+  };
+  if (Config.debug["log-to-console"]) {
+    logTransports.push(
+      new winston.transports.Console( {
+        'level': Config.debug.loglevel
+      })
+    );
+  };
+
+  // Create the Winston logger
+  logger = winston.createLogger( {
+    'level': Config.debug.loglevel,
+    'format': winston.format.combine(
+      winston.format.timestamp(),
+      winston.format.printf(info => { return `${info.timestamp} ${info.level} ${info.message}` })
+    ),
+    'transports': logTransports,
+  });
+};
+
 export const Logger : ALogger = {
   info: (msg: string) => {
-    loglevel.info(msg);
+    logger.log('info', msg);
   },
   warn: (msg: string) => {
-    loglevel.warn(msg);
+    logger.log('warn', msg);
   },
   debug: (msg: string) => {
-    loglevel.debug(msg);
+    logger.log('debug', msg);
   },
   // Conditional debug. Looks for "debug.flag" in configuration.
   cdebug: (flag: string, msg: string) => {
     if ((Config.debug as any)[flag]) {
-      loglevel.debug(msg);
+      logger.log('debug', msg);
     };
   },
   error: (msg: string) => {
-    loglevel.error(msg);
+    logger.log('error', msg);
   },
   setLogLevel: ( level: string) => {
     if (level) {
-      switch(level.toLowerCase()) {
-        case 'silent': loglevel.setLevel(loglevel.levels.SILENT); break;
-        case 'info': loglevel.setLevel(loglevel.levels.INFO); break;
-        case 'warn': loglevel.setLevel(loglevel.levels.WARN); break;
-        case 'debug': loglevel.setLevel(loglevel.levels.DEBUG); break;
-        case 'error': loglevel.setLevel(loglevel.levels.ERROR); break;
-        default:
-          Logger.error(`Logger.setLogLevel: unknown level name: ${level}`);
-          loglevel.setLevel(loglevel.levels.DEBUG);
-          break;
+      const aLevel = level.toLowerCase();
+      if ([ 'info', 'warn', 'debug', 'error'].includes(aLevel)) {
+        transports.File.level = aLevel;
+        transports.Console.level = aLevel;
+      }
+      else {
+        Logger.error(`Logger.setLogLevel: unknown level name: ${level}`);
+        Logger.setLogLevel('info');
       };
     }
     else {
       Logger.error(`Logger.setLogLevel: false level name: ${level}`);
-      loglevel.setLevel(loglevel.levels.DEBUG);
+      transports.File.level = 'debug';
     };
   }
 };
 
+// The morgan logger for ExpressJS logs the API requests made.
+// This adds a stream processor so it will log to the above configured logger.
 export const morganOptions: Options<http.IncomingMessage, http.ServerResponse> = {
   stream: {
     write (msg: string) {

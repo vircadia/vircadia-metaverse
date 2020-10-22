@@ -179,6 +179,26 @@ security:
 
 then do `sudo systemctl restart mongod`.
 
+## Logging
+
+My default, Iamus logs to a file named `iamus.log` in the directory `./logs`.
+Previous versions of the log file are rotated here and 
+this directory can eventually hold up to 10, 100MB files.
+These parameters can be changed with the config file.
+
+| Config value | default | description |
+| ------------ | ------- | ----------- |
+| debug.log-to-files | true | whether to log to filesystem |
+| debug.log-filename | "iamus.log" | base name of the log files |
+| debug.log-directory | "./logs" | directory to store logs into |
+| debug.log-max-size-megabytes | 100 | the maximum size of the individual log files |
+| debug.log-max-files | 10 | number of old log files to keep |
+| debug.log-compress | false | if to compress old versions of the log files |
+| debug.log-to-console | false | whether to additionlly log to the console |
+
+When running with Docker, one often changes the logging directory to point
+into a mounted volume for easy reference.
+
 ## Troubleshooting
 
 [Running Docker Image]: ./RunningDockerImage.md
