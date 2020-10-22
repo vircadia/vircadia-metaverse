@@ -53,7 +53,7 @@ export const Places = {
     let newPlacename = pPlaceName;
     const existingPlace = await Places.getPlaceWithName(newPlacename);
     if (existingPlace) {
-      newPlacename = newPlacename + ' ' + genRandomString(5);
+      newPlacename = newPlacename + '-' + genRandomString(5);
       Logger.info(`uniqifyPlaceName: non-unique place name ${pPlaceName}. Creating ${newPlacename}`);
     };
     return newPlacename;
