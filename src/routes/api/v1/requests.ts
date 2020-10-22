@@ -45,8 +45,8 @@ const procGetRequests: RequestHandler = async (req: Request, resp: Response, nex
       switch (aReq.requestType) {
         case RequestType.HANDSHAKE:
           thisReq.handshake = {
-            'requester_id': aReq.requesterId,
-            'target_id': aReq.targetId,
+            'requester_id': aReq.requesterNodeId,
+            'target_id': aReq.targetNodeId,
             'requester_accepted': aReq.requesterAccepted,
             'target_accepted': aReq.targetAccepted
           };

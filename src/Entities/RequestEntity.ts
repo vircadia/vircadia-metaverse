@@ -31,8 +31,8 @@ export class RequestEntity {
   public whenCreated: Date;
 
   // requestType == HANDSHAKE
-  public requesterId: string;
-  public targetId: string;
+  public requesterNodeId: string;
+  public targetNodeId: string;
   public requesterAccepted: boolean;
   public targetAccepted: boolean;
 };

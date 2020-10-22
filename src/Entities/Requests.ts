@@ -94,12 +94,12 @@ export const Requests = {
     return aRequest;
   },
   // A 'handshake' request is special request between session NodeIds
-  createHandshakeRequest(pRequesterId: string, pTargetId: string): RequestEntity {
+  createHandshakeRequest(pRequesterNodeId: string, pTargetNodeId: string): RequestEntity {
     const newRequest = Requests.create();
     newRequest.requestType = RequestType.HANDSHAKE;
-    newRequest.requesterId = pRequesterId;
+    newRequest.requesterNodeId = pRequesterNodeId;
     newRequest.requesterAccepted = false;
-    newRequest.targetId = pTargetId;
+    newRequest.targetNodeId = pTargetNodeId;
     newRequest.targetAccepted = false;
 
     // A connection request lasts only for so long

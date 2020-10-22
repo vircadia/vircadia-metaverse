@@ -65,11 +65,14 @@ const procPostUserConnectionRequest: RequestHandler = async (req: Request, resp:
 
       let pending = true;   // assume request is still pending
 
-      const previousAsk = await Requests.getWithRequestBetween(thisNode, otherNode, RequestType.CONNECTION,
-                                      'requesterAccountId', 'targetAccountId');
+      // Find if there is another requests between these two nodes
+      // Note: this is not the accountID but the session nodeId of the avatars
+      const previousAsk = await Requests.getWithRequestBetween(thisNode, otherNode,
+                                      RequestType.CONNECTION,
+                                      'requesterNodeId', 'targetNodeId');
       if (IsNotNullOrEmpty(previousAsk)) {
         // There is an existing connection request
-        if (previousAsk.requesterId === thisNode) {
+        if (previousAsk.requesterNodeId === thisNode) {
           // This is a request that I've made. See if the other side has accepted
           if (previousAsk.targetAccepted) {
             // They have accepted! We have a connection!
@@ -87,9 +90,14 @@ const procPostUserConnectionRequest: RequestHandler = async (req: Request, resp:
           Requests.update(previousAsk, { 'targetAccepted': true,
                                          'targetAccountId': req.vAuthAccount.id })
 
-          await BuildNewConnection(previousAsk);
-          await BuildConnectionResponse(req, previousAsk.requestingAccountId);
-          pending = false;
+          const areConnected = await BuildNewConnection(previousAsk);
+          if (areConnected) {
+            await BuildConnectionResponse(req, previousAsk.requestingAccountId);
+            pending = false;
+          }
+          else {
+            req.vRestResp.respondFailure('error making connection');
+          };
           // The request itself will timeout and expire
         };
       }
@@ -119,17 +127,19 @@ const procPostUserConnectionRequest: RequestHandler = async (req: Request, resp:
 };
 
 // Build a new Connection based on the request
-async function BuildNewConnection(pRequest: RequestEntity): Promise<void> {
+async function BuildNewConnection(pRequest: RequestEntity): Promise<boolean> {
+  let wasConnected = false;
   const requestingAccount = await Accounts.getAccountWithId(pRequest.requestingAccountId);
   const targetAccount = await Accounts.getAccountWithId(pRequest.targetAccountId);
   if (requestingAccount && targetAccount) {
     await Accounts.makeAccountsConnected(requestingAccount, targetAccount);
+    wasConnected = true;
   }
   else {
     Logger.error(`connection_request: acceptance for connection but accounts not found`);
     Logger.error(`connection_request:   reqAccId=${pRequest.requestingAccountId}, tgtAccId=${pRequest.targetAccountId}`);
   };
-  return;
+  return wasConnected;
 };
 
 // Build the response that says a connection has been made

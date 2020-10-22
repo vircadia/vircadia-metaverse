@@ -140,12 +140,12 @@ export const placeFields: { [key: string]: FieldDefn } = {
               valid = true;
             }
             else {
-              Logger.error(`PlaceEntity:domainId.validate: attempt to set to non-owned domain. RequesterId=${pAuth.accountId}, DomainId=${pVal}`);
+              Logger.error(`PlaceEntity:domainId.validate: attempt to set to non-owned domain. RequesterAId=${pAuth.accountId}, DomainId=${pVal}`);
             };
           };
         }
         else {
-          Logger.error(`PlaceEntity:domainId.validate: attempt to set to non-existant domain. RequesterId=${pAuth.accountId}, DomainId=${pVal}`);
+          Logger.error(`PlaceEntity:domainId.validate: attempt to set to non-existant domain. RequesterAId=${pAuth.accountId}, DomainId=${pVal}`);
         };
       };
       return valid;
