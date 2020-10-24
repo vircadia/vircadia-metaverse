@@ -1,4 +1,14 @@
 # Iamus Changelog
+## Version 2.2.18
+
+<ul>
+<li><a href="http://github.com/kasenvr/Iamus/commit/379f3a5a2e1348b1b6874ac4cf1b963c81b34bf6">view &bull;</a> Initial version of ChangeLog.md and generating script.     Will get improved over time.</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/104d6ea7c86405cc62bc4ab26b32374176c228ba">view &bull;</a> Tuning to ChangeLog generation. Comments and formatting.</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/8c113716027c141a08e3f59da439b11496332581">view &bull;</a> Add monitoring/statistic infrastructure and initial categories 'os' and 'server'.     New requests under /api/v1/stats/...</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/dbec702e1e21f09e9c7c30874bd2343735c5ae97">view &bull;</a> Add documentation for Monitoring feature.</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/5f5ea9a427a3dfcce1a32df34178476cb5993f17">view &bull;</a> Bump version to 2.2.18</li> 
+</ul>
+
 ## Version 2.2.17
 
 <ul>
