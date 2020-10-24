@@ -18,6 +18,8 @@ import Config from '../config';
 
 import { Request, Response } from 'express';
 
+import { Monitoring } from '@Monitoring/Monitoring';
+
 import { IsNotNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
 
@@ -113,6 +115,7 @@ export class RESTResponse {
       responseData = {
         'status': 'failure'
       };
+      Monitoring.event('apiErrors', 1);
     }
     else {
       responseData = {

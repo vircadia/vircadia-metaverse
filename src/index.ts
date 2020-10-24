@@ -36,14 +36,15 @@ import { initTokens } from '@Entities/Tokens';
 import { initSessions } from '@Entities/Sessions';
 import { initRequests } from '@Entities/Requests';
 import { IsNotNullOrEmpty } from '@Tools/Misc';
+import { initMonitoring } from '@Monitoring/Monitoring';
 
 initializeConfiguration()
 .catch ( err => {
   Logger.error('main: failured configuration: ' + err);
 })
 .then( () => {
-  Logger.info('=== starting');
   initLogging();
+  initMonitoring();
   initSessions();
   initTokens();
   initRequests();
@@ -68,6 +69,12 @@ initializeConfiguration()
 
   // Most of the requests are JSON in an out
   expr.use(express.json({ 'strict': false }));
+
+  // There is a problem with some of the domain-server requests that don't
+  //    include  the final closing curly-bracket on the JSON. Until that
+  //    is fixed, this kludge re-parses the body with the closing curly-bracket
+  //    if there is a JSON parse error.
+  // In general, a JSON parse error returns HTTP status 400.
   expr.use( (err:Error, req:Request, resp:Response, next:NextFunction) => {
     if (err instanceof SyntaxError) {
       if ('body' in err) {
@@ -107,11 +114,6 @@ initializeConfiguration()
 
   // If all the other routing didn't work, finally make errors
   expr.use(createAPIRouter('routes-last'));
-
-  // custom side-effects for your app
-  // expr.on('apex-create', (msg: string) => {
-  //   console.log(`New ${msg.object.type} from ${msg.actor} to ${msg.recipient}`)
-  // });
 
   // Build server to listen for requests
   // If certificates are provided, create an https server

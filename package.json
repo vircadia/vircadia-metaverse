@@ -21,6 +21,7 @@
     "main": "dist/index.js",
     "_moduleAliases": {
         "@Entities": "dist/Entities",
+        "@Monitoring": "dist/Monitoring",
         "@Route-Tools": "dist/route-tools",
         "@Tools": "dist/Tools",
         "@Base": "dist"

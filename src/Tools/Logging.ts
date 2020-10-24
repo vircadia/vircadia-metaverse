@@ -20,7 +20,6 @@ import fs from 'fs';
 import http from 'http';
 import winston, { transports } from 'winston';
 import { Options } from 'morgan';
-import { config } from 'process';
 
 interface ALogger {
   info( msg: string ): void,

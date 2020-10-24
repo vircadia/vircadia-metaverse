@@ -59,6 +59,10 @@ export let Config = {
       // When account of this name is created, add 'admin' role to it
       'base-admin-account': 'adminer'
     },
+    'monitoring': {
+      'enable': true,           // enable value monitoring
+      'history': true           // whether to keep value history
+    },
     'database': {
       'db-host': 'localhost',
       'db-port': 27017,

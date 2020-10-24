@@ -11,6 +11,7 @@
         "baseUrl": ".",
         "paths": {
             "@Entities/*": ["./src/Entities/*"],
+            "@Monitoring/*": ["./src/Monitoring/*"],
             "@Route-Tools/*": ["./src/route-tools/*"],
             "@Tools/*": ["./src/Tools/*"],
             "@Base/*": ["./src/*"],
