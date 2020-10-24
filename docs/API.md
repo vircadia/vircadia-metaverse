@@ -24,8 +24,11 @@ Documentation referenced below is available for the
 [Accounts](./API-Accounts.md),
 [Domains](./API-Domains.md),
 [Places](./API-Places.md),
-[Tokens](./API-Tokens.md), and
-[User](./API-Users.md) categories.
+[Tokens](./API-Tokens.md),
+[User](./API-Users.md),
+and
+[Monitoring](./API-Monitoring.md),
+categories.
 
 The API requests to the metaverse-server are:
 

@@ -33,7 +33,7 @@ export class StatsServer extends Stat {
     const apiStat = new CounterStat('apiRequests', 'server', 'request');
     if (Config.monitoring.history) {
       apiStat.AddHistogram('perHour', new EventHistogram(60, 60*1000));   // 60 one minute buckets
-      apiStat.AddHistogram('perDay', new EventHistogram(24*6, 5*60*1000));// one day's worth of 5 minute buckets
+      apiStat.AddHistogram('perDay', new EventHistogram(24*12, 5*60*1000));// one day's worth of 5 minute buckets
     };
     Monitoring.addStat(apiStat);
 
@@ -41,7 +41,7 @@ export class StatsServer extends Stat {
     const apiErrors = new CounterStat('apiErrors', 'server', 'request');
     if (Config.monitoring.history) {
       apiStat.AddHistogram('perHour', new EventHistogram(60, 60*1000));   // 60 one minute buckets
-      apiStat.AddHistogram('perDay', new EventHistogram(24*6, 5*60*1000));// one day's worth of 5 minute buckets
+      apiStat.AddHistogram('perDay', new EventHistogram(24*12, 5*60*1000));// one day's worth of 5 minute buckets
     };
     Monitoring.addStat(apiErrors);
   };

@@ -74,12 +74,13 @@ export class EventHistogram extends Histogram {
     };
 
     return {
-      "Buckets": this._numBuckets,
-      "BucketMilliseconds": this._bucketMilliseconds,
-      "TotalMilliseconds": this._totalHistogramMilliseconds,
-      "TimeBase": this._timeBase + this._totalHistogramMilliseconds * (this._lastBucket - 1),
-      "BaseNumber": Math.floor((this._timeBase / this._bucketMilliseconds)) + this._lastBucket + 1,
-      "Values": values
+      "buckets": this._numBuckets,
+      "bucketMilliseconds": this._bucketMilliseconds,
+      "totalMilliseconds": this._totalHistogramMilliseconds,
+      "timeBase": this._timeBase + this._totalHistogramMilliseconds * (this._lastBucket - 1),
+      "baseNumber": Math.floor((this._timeBase / this._bucketMilliseconds)) + this._lastBucket + 1,
+      "type": "accumulation",
+      "values": values
     };
   };
 

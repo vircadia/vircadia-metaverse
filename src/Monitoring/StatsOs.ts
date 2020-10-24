@@ -43,7 +43,7 @@ export class StatsOs extends Stat {
     if (Config.monitoring.history) {
       cpuBusy.AddHistogram('5mins', new ValueHistogram(60, 5 * 1000));    // 60 five second buckets
       cpuBusy.AddHistogram('perHour', new ValueHistogram(60, 60*1000));   // 60 one minute buckets
-      cpuBusy.AddHistogram('perDay', new ValueHistogram(24*6, 5*60*1000));// one day's worth of 5 minute buckets
+      cpuBusy.AddHistogram('perDay', new ValueHistogram(24*12, 5*60*1000));// one day's worth of 5 minute buckets
     };
     Monitoring.addStat(cpuBusy);
 
@@ -52,7 +52,7 @@ export class StatsOs extends Stat {
       stat.Event( os.freemem() / os.totalmem() * 100 );
     });
     if (Config.monitoring.history) {
-      memUsage.AddHistogram('perDay', new ValueHistogram(24*6, 5*60*1000));// one day's worth of 5 minute buckets
+      memUsage.AddHistogram('perDay', new ValueHistogram(24*12, 5*60*1000));// one day's worth of 5 minute buckets
       memUsage.AddHistogram('perWeek', new ValueHistogram(7*24, 60*60*1000));// one weeks's worth of hour buckets
     };
     Monitoring.addStat(memUsage);
