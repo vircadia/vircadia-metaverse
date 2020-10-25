@@ -105,13 +105,13 @@ export class RESTResponse {
       if (Config["metaverse-server"]["http-error-on-failure"]) {
         const errorHeader = Config["metaverse-server"]["error-header"];
         const errorAction = this._request.get(errorHeader);
-        Logger.cdebug('metaverseapi-response-detail', `buildRESTResponse: failing. errorAction=${errorAction}`);
+        // Logger.cdebug('metaverseapi-response-detail', `buildRESTResponse: failing. errorAction=${errorAction}`);
         if (errorAction && errorAction.toLowerCase() === "badrequest") {
           this._response.statusCode = HTTPStatusCode.BadRequest;
         };
       };
       // Set status to 'failure'. Any additional error info is added by _additionalFields.
-      Logger.cdebug('metaverseapi-response-detail', `buildRESTResponse: failing to ${this._response.statusCode}`);
+      // Logger.cdebug('metaverseapi-response-detail', `buildRESTResponse: failing to ${this._response.statusCode}`);
       responseData = {
         'status': 'failure'
       };
