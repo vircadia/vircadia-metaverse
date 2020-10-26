@@ -48,7 +48,6 @@ This request return JSON formatted as:
                         "time_of_last_heartbeat": ISOStringDate,
                         "num_users": integer
                     },
-                    "accountId": string,
                     "thumbnail": URL,
                     "images": [ URL, URL, ... ]
                 },
@@ -84,7 +83,6 @@ domains the requestor is the associated account of.
                         "time_of_last_heartbeat": ISOStringDate,
                         "num_users": integer
                     },
-                    "accountId": string,
                     "thumbnail": URL,
                     "images": [ URL, URL, ... ]
                 },
@@ -180,7 +178,6 @@ The place fields that can be fetched:
 | placeId    |   all    |    none     | string |
 | name       |   all    | domain, owner, admin | string |
 | description |  all    | domain, owner, admin | string |
-| accountId  |   all    |    none     | string |
 | domainId   |   all    |    none     | string |
 | address    |   all    | domain, owner, admin | addressString |
 | thumbnail  |   all    | domain, owner, admin | string |

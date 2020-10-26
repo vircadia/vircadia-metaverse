@@ -17,6 +17,7 @@
 import { RESTResponse } from './route-tools/RESTResponse';
 import { AccountEntity } from './Entities/AccountEntity';
 import { DomainEntity } from './Entities/DomainEntity';
+import { PlaceEntity } from './Entities/PlaceEntity';
 import { SessionEntity } from './Entities/SessionEntity';
 import { AuthToken } from '@Entities/AuthToken';
 
@@ -34,6 +35,7 @@ declare global {
             vAccountError?: string;     // if vAccount is not set, the reason why
             vUsername?: string;         // parameter ':username'
             vDomain?: DomainEntity;     // pointer to verified DomainEntity
+            vPlace?: PlaceEntity;       // pointer to place entity
             vDomainError?: string;      // if vDomain is not set, the reason why
             vDomainAPIKey?: string;     // if domain APIkey supplied in the request, it is passed here
             vTokenId?: string;          // value from :tokenId

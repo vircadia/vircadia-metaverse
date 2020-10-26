@@ -16,7 +16,7 @@
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
-import { setupMetaverseAPI, finishMetaverseAPI, tokenFromParams, accountFromParams } from '@Route-Tools/middleware';
+import { setupMetaverseAPI, finishMetaverseAPI, tokenFromParams, accountFromParams, placeFromParams } from '@Route-Tools/middleware';
 import { accountFromAuthToken, param1FromParams, param2FromParams } from '@Route-Tools/middleware';
 
 import { Places } from '@Entities/Places';
@@ -28,44 +28,26 @@ import { VKeyedCollection } from '@Tools/vTypes';
 import { IsNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
 
-// Get the scope of the logged in account
+// Get a field from a place entry
 const procGetField: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vParam1 && req.vParam2) {
-    let aPlace = await Places.getPlaceWithId(req.vParam1);
-    if (IsNullOrEmpty(aPlace)) {
-      // Places can be looked up by their name as well as their ID.
-      Logger.debug(`procPostField: couldn't find with placeId. Trying name of "${req.vParam1}"`);
-      aPlace = await Places.getPlaceWithName(req.vParam1);
-    };
-    if (aPlace) {
-      req.vRestResp.Data = await getPlaceField(req.vAuthToken, aPlace, req.vParam2, req.vAuthAccount);
-    }
-    else {
-        req.vRestResp.respondFailure('no such place');
-    };
+  if (req.vPlace && req.vParam1) {
+    req.vRestResp.Data = await getPlaceField(req.vAuthToken, req.vPlace, req.vParam1, req.vAuthAccount);
   }
   else {
-    req.vRestResp.respondFailure('bad format');
+    req.vRestResp.respondFailure('no such place');
   };
   next();
 };
 
-// Add a role to my roles collection.
-// Not implemented as something needs to be done with request_connection, etc
+// Change a field in a place
 const procPostField: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount && req.vParam1 && req.vParam2) {
-    let aPlace = await Places.getPlaceWithId(req.vParam1);
-    if (IsNullOrEmpty(aPlace)) {
-      // Places can be looked up by their name as well as their ID.
-      Logger.debug(`procPostField: couldn't find with placeId. Trying name of "${req.vParam1}"`);
-      aPlace = await Places.getPlaceWithName(req.vParam1);
-    };
-    if (aPlace) {
+  if (req.vAuthAccount) {
+    if (req.vPlace && req.vParam1) {
       if (req.body.hasOwnProperty('set')) {
         const updates: VKeyedCollection = {};
-        if (await setPlaceField(req.vAuthToken, aPlace, req.vParam2, req.body.set, req.vAuthAccount, updates)) {
+        if (await setPlaceField(req.vAuthToken, req.vPlace, req.vParam1, req.body.set, req.vAuthAccount, updates)) {
           // Setting worked so update the database
-          Places.updateEntityFields(aPlace, updates);
+          Places.updateEntityFields(req.vPlace, updates);
         }
         else {
           req.vRestResp.respondFailure('value could not be set');
@@ -89,18 +71,18 @@ export const name = '/api/v1/places/:placeId/field/:fieldname';
 
 export const router = Router();
 
-router.get( '/api/v1/places/:param1/field/:param2',
+router.get( '/api/v1/places/:placeId/field/:param1',
                                           [ setupMetaverseAPI,    // req.vRestResp
-                                            param1FromParams,     // req.vParam1
-                                            param2FromParams,     // req.vParam2
+                                            placeFromParams,      // req.vPlace, req.vDomain
+                                            param1FromParams,     // req.vParam1 (field name)
                                             procGetField,
                                             finishMetaverseAPI
                                           ] );
-router.post('/api/v1/places/:param1/field/:param2',
+router.post('/api/v1/places/:placeId/field/:param1',
                                           [ setupMetaverseAPI,    // req.vRestResp
                                             accountFromAuthToken, // req.vAuthAccount
-                                            param1FromParams,     // req.vParam1
-                                            param2FromParams,     // req.vParam2
+                                            placeFromParams,      // req.vPlace, req.vDomain
+                                            param1FromParams,     // req.vParam1 (field name)
                                             procPostField,
                                             finishMetaverseAPI
                                           ] );

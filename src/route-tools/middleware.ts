@@ -184,13 +184,6 @@ export const verifyDomainAccess: RequestHandler = async (req: Request, resp: Res
                 req.vDomain.sponsorAccountId = aAccount.id;
                 await Domains.updateEntityFields(req.vDomain, { 'sponsorAccountId': aAccount.id } );
               };
-              // If associating a domain with an account, make sure the domain places also point to this account
-              for await (const place of Places.enumerateAsync(new GenericFilter({ 'domainId': req.vDomain.id }))) {
-                const updates: VKeyedCollection = {};
-                // Not using "setPlaceField" since this field should not ever be set except by this code
-                place.accountId = aAccount.id;
-                await Places.updateEntityFields(place, { 'accountId': aAccount.id });
-              };
             };
             if (req.vDomain.sponsorAccountId === aToken.accountId) {
               verified = true;
@@ -220,7 +213,6 @@ export const usernameFromParams: RequestHandler = async (req: Request, resp: Res
   next();
 };
 
-// MetaverseAPI middleware.
 // The request has a :domainId label that needs to be looked up and verified.
 // Decorate the passed Request with 'vDoamin' which points to a DomainEntity.
 // If domain cannot be found or verified, 'vDomainError' is set with text explaining the error.
@@ -235,6 +227,30 @@ export const domainFromParams: RequestHandler = async (req: Request, resp: Respo
   if (IsNullOrEmpty(req.vDomain)) {
     req.vDomainError = 'DomainId does not match a domain';
     Logger.error(`domainFromParams: wanted domain ${domainId} but not found`);
+  };
+  next();
+};
+
+// Look for :placeId label and lookup and set req.vPlace and req.vDomain.
+// The accepts either the 'placeId' or the name of the place
+export const placeFromParams: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+  if (req.params && req.params.placeId) {
+    if (typeof(req.params.placeId) === 'string') {
+      let aPlace = await Places.getPlaceWithId(req.params.placeId);
+      if (IsNullOrEmpty(aPlace)) {
+        aPlace = await Places.getPlaceWithName(decodeURIComponent(req.params.placeId));
+      };
+      if (aPlace) {
+        const aDomain = await Domains.getDomainWithId(aPlace.domainId);
+        if (aDomain) {
+          req.vPlace = aPlace;
+          req.vDomain = aDomain;
+        }
+        else {
+          Logger.error(`placeFromParams: lookup Place with bad domain. placeId=${req.params.placeId}, domainId=${aPlace.domainId}`);
+        };
+      };
+    };
   };
   next();
 };

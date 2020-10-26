@@ -75,6 +75,7 @@ const proctestsarray: RequestHandler = async (req: Request, resp: Response, next
       'good path 2': await isPathValidator(undefined, undefined, '/23.5,-44.6,22/0.5639,-0.3355,0.32,0.33'),
       'good path 3': await isPathValidator(undefined, undefined, 'domainname/23.5,-44.6,22/0.5639,-0.3355,0.32,0.33'),
       'good path 4': await isPathValidator(undefined, undefined, '/-33,20,44/-0.447,0.3232,0.031,1'),
+      'good path 5': await isPathValidator(undefined, undefined, '/4,5,6/0.343,0.444,-34,1.0'),
       'bad path 1': await isPathValidator(undefined, undefined, '0,0,0/0,0,0,1'),
       'bad path 2': await isPathValidator(undefined, undefined, '/X,0,0/0,0,0,1'),
       'bad path 3': await isPathValidator(undefined, undefined, '/0,0,0/0,0,0,1/'),

@@ -62,7 +62,6 @@ const procPostDomainsTemporary: RequestHandler = async (req: Request, resp: Resp
   if (req.vAuthToken) {
     Logger.debug(`procPostDomainsTemporary: associating account ${req.vAuthToken.accountId} with new domain ${newDomain.id}`)
     newDomain.sponsorAccountId = req.vAuthToken.accountId;
-    newPlace.accountId = req.vAuthToken.accountId;
   };
 
   // Now that the local structures are updated, store the new entries

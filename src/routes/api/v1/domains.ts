@@ -56,6 +56,7 @@ const procGetDomains: RequestHandler = async (req: Request, resp: Response, next
   next();
 };
 
+// Create a domain entry
 const procPostDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
     if (req.body && req.body.domain && req.body.domain.label) {
@@ -72,6 +73,7 @@ const procPostDomains: RequestHandler = async (req: Request, resp: Response, nex
           };
 
           // Creating a domain also creates a Place for that domain
+          // Note that place names are unique so we modify the place name if there is already one.
           const newPlacename = await Places.uniqifyPlaceName(newDomain.name);
           const newPlace = Places.createPlace();
           newPlace.domainId = newDomain.id;
@@ -83,7 +85,6 @@ const procPostDomains: RequestHandler = async (req: Request, resp: Response, nex
           if (req.vAuthToken) {
             Logger.debug(`procPostDomains: associating account ${req.vAuthToken.accountId} with new domain ${newDomain.id}`)
             newDomain.sponsorAccountId = req.vAuthToken.accountId;
-            newPlace.accountId = req.vAuthToken.accountId;
           };
 
           // Now that the local structures are updated, store the new entries

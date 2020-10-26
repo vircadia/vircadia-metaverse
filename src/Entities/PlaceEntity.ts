@@ -19,7 +19,7 @@ import { AuthToken } from '@Entities/AuthToken';
 import { Domains } from '@Entities/Domains';
 import { Places } from '@Entities/Places';
 
-import { FieldDefn } from '@Route-Tools/Permissions';
+import { checkAccessToEntity, FieldDefn, Perm } from '@Route-Tools/Permissions';
 import { isStringValidator, isSArraySet, isPathValidator, isDateValidator } from '@Route-Tools/Permissions';
 import { simpleGetter, simpleSetter, sArraySetter, dateStringGetter } from '@Route-Tools/Permissions';
 import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/Permissions';
@@ -33,7 +33,6 @@ export class PlaceEntity implements Entity {
   public id: string;            // globally unique place identifier
   public name: string;          // Human friendly name of the place
   public description: string;   // Human friendly description of the place
-  public accountId: string;     // the 'owner' of the place (should be sponsor of the domain)
   public domainId: string;      // domain the place is in
   public address: string;       // Address within the domain
   public thumbnail: string;     // thumbnail for place
@@ -114,15 +113,6 @@ export const placeFields: { [key: string]: FieldDefn } = {
     setter: simpleSetter,
     getter: simpleGetter
   },
-  'accountId': {
-    entity_field: 'accountId',
-    request_field_name: 'accountId',
-    get_permissions: [ 'all' ],
-    set_permissions: [ 'none' ],
-    validate: isStringValidator,
-    setter: simpleSetter,
-    getter: simpleGetter
-  },
   'domainId': {
     entity_field: 'domainId',
     request_field_name: 'domainId',
@@ -136,7 +126,7 @@ export const placeFields: { [key: string]: FieldDefn } = {
         const maybeDomain = await Domains.getDomainWithId(pVal);
         if (IsNotNullOrEmpty(maybeDomain)) {
           if (IsNotNullOrEmpty(pAuth)) {
-            if (pAuth.accountId === maybeDomain.sponsorAccountId) {
+            if (checkAccessToEntity(pAuth, maybeDomain, [ Perm.SPONSOR, Perm.ADMIN ])) {
               valid = true;
             }
             else {
