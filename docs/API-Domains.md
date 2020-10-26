@@ -29,7 +29,7 @@ A request returns an array of domain descriptions:
                   "ice_server_address": stringAddrIceServerBeingUsed,
                   "version": stringSoftwareVersion,
                   "protocol_version": stringProtocolVersion,
-                  "network_addr": stringNetworkAddress,
+                  "network_address": stringNetworkAddress,
                   "networking_mode": stringMode,  // one of "full", ...
                   "restricted": boolWhetherRestricted,
                   "num_users": intCurrentLoggedInUsers,
@@ -103,7 +103,7 @@ not included, the value is not set.
           "name": stringName,
           "version": stringSoftwareVersion,
           "protocol": stringProtocolVersion,
-          "network_addr": stringNetworkAddress,
+          "network_address": stringNetworkAddress,
           "restricted": boolWhetherRestricted,
           "capacity": intMaxCapacity,
           "description": stringDescription,
