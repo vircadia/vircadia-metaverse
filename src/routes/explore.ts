@@ -29,47 +29,43 @@ import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
 
 const procGetExplore: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    const pager = new PaginationInfo();
+  const pager = new PaginationInfo();
 
-    pager.parametersFromRequest(req);
+  pager.parametersFromRequest(req);
 
-    const allPlaces: any[] = [];
-    for await (const place of Places.enumerateAsync(pager)) {
-      const aDomain = await Domains.getDomainWithId(place.domainId);
-      if (aDomain && IsNotNullOrEmpty(aDomain.networkAddr)) {
-        const placeDesc: VKeyedCollection = {
-          'Domain Name': place.name,
-        };
-        // Build redirection URL for getting to the place
-        let visit = 'hifi://' + aDomain.networkAddr;
-        if (IsNotNullOrEmpty(aDomain.networkPort)) {
-          visit += ':' + aDomain.networkPort;
-        };
-        visit += '/' + place.address;
-        placeDesc.Visit = visit;
-
-        placeDesc.DomainId = aDomain.id;
-        placeDesc['Network Address'] = aDomain.networkAddr;
-        placeDesc['Network Port'] = aDomain.networkPort;
-
-        if (IsNotNullOrEmpty(aDomain.sponsorAccountId)) {
-          const aAccount = await Accounts.getAccountWithId(aDomain.sponsorAccountId);
-          if (IsNotNullOrEmpty(aAccount)) {
-            placeDesc.Owner = aAccount.username;
-          };
-        };
-
-        placeDesc.People = aDomain.numUsers + aDomain.anonUsers;
-
-        allPlaces.push(placeDesc);
+  const allPlaces: any[] = [];
+  for await (const place of Places.enumerateAsync(pager)) {
+    const aDomain = await Domains.getDomainWithId(place.domainId);
+    if (aDomain && IsNotNullOrEmpty(aDomain.networkAddr)) {
+      const placeDesc: VKeyedCollection = {
+        'Domain Name': place.name,
       };
+      // Build redirection URL for getting to the place
+      let visit = 'hifi://' + aDomain.networkAddr;
+      if (IsNotNullOrEmpty(aDomain.networkPort)) {
+        visit += ':' + aDomain.networkPort;
+      };
+      visit += '/' + place.address;
+      placeDesc.Visit = visit;
+
+      placeDesc.DomainId = aDomain.id;
+      placeDesc['Network Address'] = aDomain.networkAddr;
+      placeDesc['Network Port'] = aDomain.networkPort;
+
+      if (IsNotNullOrEmpty(aDomain.sponsorAccountId)) {
+        const aAccount = await Accounts.getAccountWithId(aDomain.sponsorAccountId);
+        if (IsNotNullOrEmpty(aAccount)) {
+          placeDesc.Owner = aAccount.username;
+        };
+      };
+
+      placeDesc.People = aDomain.numUsers + aDomain.anonUsers;
+
+      allPlaces.push(placeDesc);
     };
-    req.vRestResp.Data = allPlaces;
-  }
-  else {
-    req.vRestResp.respondFailure('unauthorized');
   };
+  req.vRestResp.Data = allPlaces;
+
   next();
 };
 
