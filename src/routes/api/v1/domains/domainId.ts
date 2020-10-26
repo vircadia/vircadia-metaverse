@@ -29,6 +29,8 @@ import { Accounts } from '@Entities/Accounts';
 
 import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
+import Config from '@Base/config';
+import { IsNullOrEmpty } from '@Tools/Misc';
 
 // GET /api/v1/domains/:domainId
 // Return a small snippet if domain data for the domainId specified in the request
@@ -85,6 +87,17 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
             if (valuesToSet.hasOwnProperty(field)) {
               await setDomainField(req.vAuthToken, req.vDomain, field, valuesToSet[field], req.vAuthAccount, updated);
             };
+          };
+        };
+
+        // If domain doesn't have a network_address, assume the sender is the domain
+        if (Config["metaverse-server"]["fix-domain-network-address"]) {
+          if (IsNullOrEmpty(req.vDomain.networkAddr)) {
+            req.vDomain.networkAddr = req.socket.remoteAddress;
+            req.vDomain.networkPort = "40102";
+            updated.networkAddr = req.vDomain.networkAddr;
+            updated.networkPort = req.vDomain.networkPort;
+            Logger.info(`Assuming domain address of "${req.vDomain.name}" to ${req.vDomain.networkAddr}:${req.vDomain.networkPort}`);
           };
         };
 

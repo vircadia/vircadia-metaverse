@@ -57,7 +57,9 @@ export let Config = {
       'tokengen_url': 'METAVERSE_SERVER_URL/static/DomainTokenLogin.html',
       // 'tokengen_url': 'DASHBOARD_URL?metaverse=METAVERSE_SERVER_URL&page=domain',
       // When account of this name is created, add 'admin' role to it
-      'base-admin-account': 'adminer'
+      'base-admin-account': 'adminer',
+      // If to assume domain network_address if on is not set
+      'fix-domain-network-address': true
     },
     'monitoring': {
       'enable': true,           // enable value monitoring
