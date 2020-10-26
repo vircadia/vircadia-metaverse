@@ -12,7 +12,7 @@ cat > "${CHANGELOG}" << EOFFFF
 EOFFFF
 
 for majorver in "2.2" ; do
-    for ver in $(seq 18 -1 10) ; do
+    for ver in $(seq 19 -1 10) ; do
         echo "## Version ${majorver}.${ver}" >> "${CHANGELOG}"
         echo "" >> "${CHANGELOG}"
         echo "<ul>" >> "${CHANGELOG}"

@@ -1,4 +1,17 @@
 # Iamus Changelog
+## Version 2.2.19
+
+<ul>
+<li><a href="http://github.com/kasenvr/Iamus/commit/76fd7ffc1ef865f8913daa8bf4c088ab76225653">view &bull;</a> Update ChangeLog.md</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/6fc75b342899ab69fe330f9449bc86ee23145b21">view &bull;</a> Add week history for apiRequests</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/ead079973b6918de016abb05697b6056c427b80c">view &bull;</a> Fix line endings to be consistant Linux form</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/48e048fd3e3e97a027bf7202f3994c50e170371b">view &bull;</a> Remove some chatty debug messages for errors in RESTResponse.</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/36c6a25c16246cedb7e05ce51d6232567ea80808">view &bull;</a> Remove 'accountId' from PlaceEntity to simplify place linkage management     Update API-Place documentation Add middleware.placeFromParams to map :placeId to req.vPlace     Add req.vPlace to ExpressJS.Request     Centralize code to look up place with both id and name     Lookup domain when fetching place by parameter id Update /api/v1/places/* to use :placeId     Use permissions.checkEntityAccess rather than checking fields for permissions</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/8da9cc25998042e4cad5279bb0e9754d637c1066">view &bull;</a> Correct domain address variable naming from "network_addr" to "network_address"     Updates names on POST input and GET responses.     Update documentation.</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/357bf894d90b2bbfa34a0f143b35aa31a86eec54">view &bull;</a> Add /explore API point that returns Place information with location info</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/e5099e082c996dd0406b8782e20f5286fa6e9f07">view &bull;</a> Add function to assume a domain server's addr if not saved.     Add Config.metaverse-server.fix-domain-network-address defaulting to 'true'</li> 
+</ul>
+
 ## Version 2.2.18
 
 <ul>
