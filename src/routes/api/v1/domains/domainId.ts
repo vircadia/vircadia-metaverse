@@ -95,8 +95,8 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
           if (IsNullOrEmpty(req.vDomain.networkAddr)) {
             req.vDomain.networkAddr = req.socket.remoteAddress;
             req.vDomain.networkPort = "40102";
-            updated.networkAddr = req.vDomain.networkAddr;
-            updated.networkPort = req.vDomain.networkPort;
+            updated['networkAddr'] = req.vDomain.networkAddr;
+            updated['networkPort'] = req.vDomain.networkPort;
             Logger.info(`Assuming domain address of "${req.vDomain.name}" to ${req.vDomain.networkAddr}:${req.vDomain.networkPort}`);
           };
         };
