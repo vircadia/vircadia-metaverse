@@ -52,6 +52,7 @@ const procGetExplore: RequestHandler = async (req: Request, resp: Response, next
       placeDesc['Network Address'] = aDomain.networkAddr;
       placeDesc['Network Port'] = aDomain.networkPort;
 
+      placeDesc.Owner = '';
       if (IsNotNullOrEmpty(aDomain.sponsorAccountId)) {
         const aAccount = await Accounts.getAccountWithId(aDomain.sponsorAccountId);
         if (IsNotNullOrEmpty(aAccount)) {
