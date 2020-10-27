@@ -45,7 +45,8 @@ const procGetExplore: RequestHandler = async (req: Request, resp: Response, next
       if (IsNotNullOrEmpty(aDomain.networkPort)) {
         visit += ':' + aDomain.networkPort;
       };
-      visit += '/' + place.address;
+      // visit += '/' + place.address;
+      visit += place.address;
       placeDesc.Visit = visit;
 
       placeDesc.DomainId = aDomain.id;
