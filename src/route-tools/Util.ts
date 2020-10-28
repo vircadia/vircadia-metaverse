@@ -193,13 +193,17 @@ export async function buildUserInfo(pAccount: AccountEntity): Promise<any> {
     'accountId': pAccount.id,
     'id': pAccount.id,
     'username': pAccount.username,
-    'images': {
-      'tiny': pAccount.imagesTiny,
-      'hero': pAccount.imagesHero,
-      'thumbnail': pAccount.imagesThumbnail
-    },
+    'images': await buildImageInfo(pAccount),
     'location': await buildLocationInfo(pAccount),
   };
+};
+
+export async function buildImageInfo(pAccount: AccountEntity): Promise<any> {
+  const ret: VKeyedCollection = {};
+  if (pAccount.imagesTiny) ret.tiny = pAccount.imagesTiny;
+  if (pAccount.imagesHero) ret.hero = pAccount.imagesHero;
+  if (pAccount.imagesThumbnail) ret.thumbnail = pAccount.imagesThumbnail;
+  return ret;
 };
 
 // Return the block of account information.
