@@ -75,7 +75,8 @@ export const name = '/explore';
 
 export const router = Router();
 
-router.get(   '/explore', [ setupMetaverseAPI,    // req.vRESTResp
-                            accountFromAuthToken, // req.vAuthToken, req.vAuthAccount
-                            procGetExplore,
-                            finishReturnData ] );
+router.get(   '/explore.json', [ setupMetaverseAPI,    // req.vRESTResp
+                                 accountFromAuthToken, // req.vAuthToken, req.vAuthAccount
+                                 procGetExplore,
+                                 finishReturnData
+                                ] );

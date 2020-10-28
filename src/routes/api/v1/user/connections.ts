@@ -41,7 +41,7 @@ const procGetUserConnections: RequestHandler = async (req: Request, resp: Respon
     };
   }
   else {
-    req.vRestResp.respondFailure('account token did not work');
+    req.vRestResp.respondFailure('unauthorized');
   };
   next();
 };
