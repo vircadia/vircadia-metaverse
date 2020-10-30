@@ -45,7 +45,8 @@ export let Config = {
     'metaverse-server': {
       'http-error-on-failure': true,  // whether to include x-vircadia error header
       'error-header': 'x-vircadia-error-handle',
-      'heartbeat-seconds-until-offline': 300,
+      'heartbeat-seconds-until-offline': 5 * 60,  // five minutes
+      'domain-seconds-until-offline': 10 * 60,    // ten minutes
       'metaverse-info-addition-file': './metaverse_info.json',
       'session-timeout-minutes': 5,
       'handshake-request-expiration-minutes': 1,            // one minute handshake

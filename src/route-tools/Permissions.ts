@@ -360,6 +360,9 @@ export async function setEntityField(
             getEntityUpdateForField(pPerms, pEntity, pField, pUpdates);
           };
         };
+      }
+      else {
+        Logger.cdebug('field-setting', `value did not validate`);
       };
     };
   };

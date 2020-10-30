@@ -32,6 +32,7 @@ import { setupDB } from '@Tools/Db';
 import glob from 'glob';
 import morgan from 'morgan';
 import { Logger, initLogging, morganOptions } from '@Tools/Logging';
+import { initDomains } from '@Entities/Domains';
 import { initTokens } from '@Entities/Tokens';
 import { initSessions } from '@Entities/Sessions';
 import { initRequests } from '@Entities/Requests';
@@ -48,6 +49,7 @@ initializeConfiguration()
   initSessions();
   initTokens();
   initRequests();
+  initDomains();
   return setupDB();
 })
 .catch( err => {

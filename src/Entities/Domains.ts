@@ -13,8 +13,9 @@
 //   limitations under the License.
 'use strict'
 
+import Config from '@Base/config';
+
 import { DomainEntity } from '@Entities/DomainEntity';
-import { Places } from '@Entities/Places';
 
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
@@ -28,6 +29,30 @@ import { Logger } from '@Tools/Logging';
 export type DomainTestFunction = (domain: DomainEntity) => boolean;
 
 export let domainCollection = 'domains';
+
+// Initialize domain management.
+// Periodic checks on liveness of domains and resetting of values if not talking
+export function initDomains(): void {
+
+  setInterval( async () => {
+    const notActiveTime = new Date(Date.now() - 1000 * Config["metaverse-server"]["domain-seconds-until-offline"]);
+    // Find domains that are not heartbeating and reset activity if not talking
+    for await (const aDomain of Domains.enumerateAsync(new GenericFilter(
+                    { 'timeOfLastHeartbeat': { '$lt': notActiveTime },
+                      '$or': [ { 'numUsers': { '$gt': 0 } }, { 'anonUsers': { '$gt': 0 } } ]
+                    }) ) ) {
+      Logger.info(`Domains: domain ${aDomain.name} not heartbeating. Zeroing users.`);
+      aDomain.numUsers = 0;
+      aDomain.anonUsers = 0;
+      const updates: VKeyedCollection = {
+        'numUsers': 0,
+        'anonUsers': 0
+      };
+      await Domains.updateEntityFields(aDomain, updates);
+    };
+  }, 1000 * 60 * 2 );
+};
+
 
 export const Domains = {
   async getDomainWithId(pDomainId: string): Promise<DomainEntity> {

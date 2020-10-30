@@ -202,7 +202,7 @@ export const domainFields: { [key: string]: FieldDefn } = {
     entity_field: 'numUsers',
     request_field_name: 'num_users',
     get_permissions: [ 'all' ],
-    set_permissions: [ 'domain' ],
+    set_permissions: [ 'domain', 'admin' ],
     validate: isNumberValidator,
     setter: simpleSetter,
     getter: simpleGetter
@@ -211,7 +211,7 @@ export const domainFields: { [key: string]: FieldDefn } = {
     entity_field: 'anonUsers',
     request_field_name: 'num_anon_users',
     get_permissions: [ 'all' ],
-    set_permissions: [ 'domain' ],
+    set_permissions: [ 'domain', 'admin' ],
     validate: isNumberValidator,
     setter: simpleSetter,
     getter: simpleGetter
