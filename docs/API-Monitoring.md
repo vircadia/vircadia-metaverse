@@ -20,6 +20,9 @@ but they can be changed to eliminate any collection overhead.
 Some of the statistics collect a history of their values. This is returned in the `history`
 section of a statistic's report.
 
+To suppress the return of history information for a
+particular stat, add "?history=no" to the GET request.
+
 The history is given as a set of buckets over time. A history is reported as a set of "buckets"
 that are each of some milliseconds in length. A history description is:
 

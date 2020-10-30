@@ -28,8 +28,10 @@ const procGetCategoryStats: RequestHandler = async (req: Request, resp: Response
   if (req.vAuthAccount) {
     if (req.vParam1) {
       let includeHistory = true;
-      if (req.params.history) {
-        includeHistory = [ 'false', 'no' ].includes(req.params.history) ? false : true;
+      if (req.query.history) {
+        if (typeof(req.query.history) === 'string') {
+          includeHistory = [ 'false', 'no' ].includes(req.query.history) ? false : true;
+        };
       };
 
       if (['os', 'server', 'metaverse'].includes(req.vParam1)) {

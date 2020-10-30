@@ -35,8 +35,8 @@ export class CounterStat extends Stat {
     return;
   };
 
-  Report(): any {
-    const report = super.Report();
+  Report(pReturnHistogram: boolean = true): any {
+    const report = super.Report(pReturnHistogram);
     return report;
   };
 }

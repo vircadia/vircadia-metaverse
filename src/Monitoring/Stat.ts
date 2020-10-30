@@ -16,6 +16,7 @@
 import { Config } from '@Base/config';
 
 import { Histogram } from '@Monitoring/Histogram';
+import { Logger } from '@Tools/Logging';
 import { VKeyedCollection } from '@Tools/vTypes';
 
 // Function that is called for a statistic when pulling its value

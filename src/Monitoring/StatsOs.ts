@@ -64,7 +64,7 @@ export class StatsOs extends Stat {
   Gather(): void {
     return;
   }
-  Report(pReturnHistogram: boolean = true) {
+  Report(pReturnHistogram: boolean = true): any {
     return {
       'cpus': os.cpus(),
       'freemem': os.freemem(),
