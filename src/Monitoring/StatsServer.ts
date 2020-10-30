@@ -53,10 +53,10 @@ export class StatsServer extends Stat {
   Gather(): void {
     return;
   }
-  Report() {
+  Report(pReturnHistogram: boolean = true) {
     return {
-      'apiRequests': Monitoring.getStat('apiRequests').Report(),
-      'apiErrors': Monitoring.getStat('apiErrors').Report(),
+      'apiRequests': Monitoring.getStat('apiRequests')?.Report(pReturnHistogram),
+      'apiErrors': Monitoring.getStat('apiErrors')?.Report(pReturnHistogram),
     };
   }
 };

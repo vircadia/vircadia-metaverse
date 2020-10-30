@@ -20,16 +20,21 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 import { setupMetaverseAPI, finishMetaverseAPI, param1FromParams } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
 
-import { Logger } from '@Tools/Logging';
 import { Monitoring } from '@Monitoring/Monitoring';
+
+import { Logger } from '@Tools/Logging';
 
 const procGetStat: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
     if (req.vParam1) {
+      let includeHistory = true;
+      if (req.params.history) {
+        includeHistory = [ 'false', 'no' ].includes(req.params.history) ? false : true;
+      };
       const stat = Monitoring.getStat(req.vParam1);
       if (stat) {
         req.vRestResp.Data = {
-          'stat': stat.Report()
+          'stat': stat.Report(includeHistory)
         };
       }
       else {

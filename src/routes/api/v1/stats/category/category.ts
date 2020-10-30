@@ -20,15 +20,21 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 import { setupMetaverseAPI, finishMetaverseAPI, param1FromParams } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
 
-import { Logger } from '@Tools/Logging';
 import { Monitoring } from '@Monitoring/Monitoring';
+
+import { Logger } from '@Tools/Logging';
 
 const procGetCategoryStats: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
     if (req.vParam1) {
+      let includeHistory = true;
+      if (req.params.history) {
+        includeHistory = [ 'false', 'no' ].includes(req.params.history) ? false : true;
+      };
+
       if (['os', 'server', 'metaverse'].includes(req.vParam1)) {
         const data:any = {};
-        data[req.vParam1] = Monitoring.getStat(req.vParam1)?.Report()
+        data[req.vParam1] = Monitoring.getStat(req.vParam1)?.Report(includeHistory);
 
         req.vRestResp.Data = data;
       }
@@ -51,7 +57,7 @@ export const name = '/api/v1/stats/category/:category';
 export const router = Router();
 
 router.get('/api/v1/stats/category/:param1', [ setupMetaverseAPI,      // req.vRestResp
-                                         accountFromAuthToken,   // req.vAuthAccount
-                                         param1FromParams,       // req.vParam1
-                                         procGetCategoryStats,
-                                         finishMetaverseAPI ] );
+                                               accountFromAuthToken,   // req.vAuthAccount
+                                               param1FromParams,       // req.vParam1
+                                               procGetCategoryStats,
+                                               finishMetaverseAPI ] );

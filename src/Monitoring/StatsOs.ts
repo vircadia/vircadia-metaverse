@@ -64,15 +64,15 @@ export class StatsOs extends Stat {
   Gather(): void {
     return;
   }
-  Report() {
+  Report(pReturnHistogram: boolean = true) {
     return {
       'cpus': os.cpus(),
       'freemem': os.freemem(),
       'totalmem': os.totalmem(),
       'loadavg': os.loadavg(),
       'uptime': os.uptime(),
-      'cpuBusy': Monitoring.getStat('cpuBusy')?.Report(),
-      'memUsage': Monitoring.getStat('memUsage')?.Report()
+      'cpuBusy': Monitoring.getStat('cpuBusy')?.Report(pReturnHistogram),
+      'memUsage': Monitoring.getStat('memUsage')?.Report(pReturnHistogram)
     };
   }
 };

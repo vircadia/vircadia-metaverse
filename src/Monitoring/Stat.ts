@@ -67,14 +67,14 @@ export abstract class Stat {
   // Called once a second to do any gathering operation
   abstract Gather(): void;
   // Return an object containing the values in this stat
-  Report(): any {
+  Report(pReturnHistogram: boolean = true): any {
     const report: VKeyedCollection = {
       'name': this.name,
       'category': this.category,
       'unit': this.unit,
       'value': this.value
     };
-    if (this._histograms.size > 0) {
+    if (pReturnHistogram && this._histograms.size > 0) {
       const history: any = {};
       this._histograms.forEach( (histo, name) => {
         history[name] = histo.GetHistogram();
