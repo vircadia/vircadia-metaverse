@@ -39,7 +39,6 @@ export class StatsMetaverse extends Stat {
       const numOnline = await Accounts.accountCount(
                 new GenericFilter( { 'timeOfLastHeartbeat': { '$gte': Accounts.dateWhenNotOnline() }})
       );
-      Logger.debug(`StatsMetaverse.totalOnline: counting ${numOnline}`);
       stat.Event(numOnline);
     });
     if (Config.monitoring.history) {
