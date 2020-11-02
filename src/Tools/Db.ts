@@ -172,6 +172,7 @@ export async function deleteOne(pCollection: string, pCriteria: CriteriaFilter):
 // Return a count of the documents that match the passed filter
 export async function countObjects(pCollection: string,
                                   pFilter: CriteriaFilter): Promise<number> {
+  Logger.cdebug('db-query-detail', `Db.countObjects: collection=${pCollection}, criteria=${JSON.stringify(pFilter.criteriaParameters)}`);
   return await Datab.collection(pCollection).countDocuments(pFilter);
 };
 
