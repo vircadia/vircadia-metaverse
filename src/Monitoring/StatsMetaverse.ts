@@ -37,7 +37,7 @@ export class StatsMetaverse extends Stat {
     // Count of all accounts that are sending heartbeats
     const totalOnline = new ValueStat('totalOnline', 'metaverse', 'count', async (stat) => {
       const numOnline = await Accounts.accountCount(
-                new GenericFilter( { 'timeOfLastHeartbeat': { '$gte': Accounts.dateWhenNotOnline }})
+                new GenericFilter( { 'timeOfLastHeartbeat': { '$gte': Accounts.dateWhenNotOnline() }})
       );
       Logger.debug(`StatsMetaverse.totalOnline: counting ${numOnline}`);
       stat.Event(numOnline);
@@ -80,7 +80,7 @@ export class StatsMetaverse extends Stat {
     // Number of domains that are sending heartbeats
     const activeDomains = new ValueStat('activeDomains', 'metaverse', 'count', async (stat) => {
       const numDomains = await Domains.domainCount(
-                new GenericFilter( { 'timeOfLastHeartbeat': { '$gte': Domains.dateWhenNotActive }})
+                new GenericFilter( { 'timeOfLastHeartbeat': { '$gte': Domains.dateWhenNotActive() }})
       );
       stat.Event(numDomains);
     });
