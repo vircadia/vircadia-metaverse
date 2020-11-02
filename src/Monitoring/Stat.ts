@@ -20,7 +20,7 @@ import { Logger } from '@Tools/Logging';
 import { VKeyedCollection } from '@Tools/vTypes';
 
 // Function that is called for a statistic when pulling its value
-export type updateValueFunction = ( pStat: Stat ) => void;
+export type updateValueFunction = ( pStat: Stat ) => Promise<void>;
 
 export abstract class Stat {
   public name: string;      // the name of the statistic
@@ -50,16 +50,16 @@ export abstract class Stat {
   AddHistogram(pHistogramName: string, pHistogram: Histogram) {
     this._histograms.set(pHistogramName, pHistogram);
   };
-  DoPullAction(): void {
+  async DoPullAction(): Promise<void> {
     if (this.pullAction) {
       if (this.secondsBetweenPulls) {
         if (this.pullCount-- < 0) {
-          this.pullAction(this);
+          await this.pullAction(this);
           this.pullCount = this.secondsBetweenPulls;
         };
       }
       else {
-        this.pullAction(this);
+        await this.pullAction(this);
       };
     };
   };

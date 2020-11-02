@@ -25,7 +25,7 @@ import { Tokens } from '@Entities/Tokens';
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
 
-import { createObject, getObject, getObjects, updateObjectFields, deleteOne, noCaseCollation } from '@Tools/Db';
+import { createObject, getObject, getObjects, updateObjectFields, deleteOne, noCaseCollation, countObjects } from '@Tools/Db';
 import { GenUUID, genRandomString, IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 
 import { VKeyedCollection, SArray } from '@Tools/vTypes';
@@ -111,6 +111,10 @@ export const Accounts = {
     return updateObjectFields(accountCollection,
                                 new GenericFilter({ 'id': pEntity.id }), pFields);
   },
+  // Return the number of accounts that match the criteria
+  async accountCount(pCriteria: CriteriaFilter): Promise<number> {
+    return countObjects(accountCollection, pCriteria);
+  },
   createAccount(pUsername: string, pPassword: string, pEmail: string): AccountEntity {
     const newAcct = new AccountEntity();
     newAcct.id= GenUUID();
@@ -129,7 +133,7 @@ export const Accounts = {
   // TODO: add scope (admin) and filter criteria filtering
   //    It's push down to this routine so we could possibly use DB magic for the queries
   async *enumerateAsync(pPager: CriteriaFilter,
-              pInfoer: CriteriaFilter, pScoper: CriteriaFilter): AsyncGenerator<AccountEntity> {
+              pInfoer?: CriteriaFilter, pScoper?: CriteriaFilter): AsyncGenerator<AccountEntity> {
     for await (const acct of getObjects(accountCollection, pPager, pInfoer, pScoper)) {
       yield acct;
     };
@@ -178,12 +182,12 @@ export const Accounts = {
     return false;
   },
   // Return the ISODate when an account is considered offline
-  dateWhenNotOnline(): string {
+  dateWhenNotOnline(): Date {
     const whenOffline = new Date(
           Date.now()
           - (Config["metaverse-server"]["heartbeat-seconds-until-offline"] * 1000)
     );
-    return whenOffline.toISOString();
+    return whenOffline;
   },
   // getter property that is 'true' if the user is a grid administrator
   isAdmin(pAcct: AccountEntity): boolean {

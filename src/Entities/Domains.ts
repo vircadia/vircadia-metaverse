@@ -20,7 +20,7 @@ import { DomainEntity } from '@Entities/DomainEntity';
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
 
-import { createObject, getObject, getObjects, updateObjectFields, deleteOne } from '@Tools/Db';
+import { createObject, getObject, getObjects, countObjects, updateObjectFields, deleteOne } from '@Tools/Db';
 
 import { GenUUID, IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 import { VKeyedCollection } from '@Tools/vTypes';
@@ -35,10 +35,9 @@ export let domainCollection = 'domains';
 export function initDomains(): void {
 
   setInterval( async () => {
-    const notActiveTime = new Date(Date.now() - 1000 * Config["metaverse-server"]["domain-seconds-until-offline"]);
     // Find domains that are not heartbeating and reset activity if not talking
     for await (const aDomain of Domains.enumerateAsync(new GenericFilter(
-                    { 'timeOfLastHeartbeat': { '$lt': notActiveTime },
+                    { 'timeOfLastHeartbeat': { '$lt': Domains.dateWhenNotActive },
                       '$or': [ { 'numUsers': { '$gt': 0 } }, { 'anonUsers': { '$gt': 0 } } ]
                     }) ) ) {
       Logger.info(`Domains: domain ${aDomain.name} not heartbeating. Zeroing users.`);
@@ -92,6 +91,10 @@ export const Domains = {
     // await Places.removeMany(new GenericFilter({ 'domainId': pDomainEntity.id }));
     return;
   },
+  // Return the number of domains that match the criteria
+  async domainCount(pCriteria: CriteriaFilter): Promise<number> {
+    return countObjects(domainCollection, pCriteria);
+  },
   async *enumerateAsync(pPager: CriteriaFilter,
               pInfoer?: CriteriaFilter, pScoper?: CriteriaFilter): AsyncGenerator<DomainEntity> {
     for await (const domain of getObjects(domainCollection, pPager, pInfoer, pScoper)) {
@@ -103,6 +106,11 @@ export const Domains = {
   async updateEntityFields(pEntity: DomainEntity, pFields: VKeyedCollection): Promise<DomainEntity> {
     return updateObjectFields(domainCollection,
                               new GenericFilter({ 'id': pEntity.id }), pFields);
+  },
+  // Return the Date when an domain is considered inactive
+  dateWhenNotActive(): Date {
+    const notActiveTime = new Date(Date.now() - 1000 * Config["metaverse-server"]["domain-seconds-until-offline"]);
+    return notActiveTime;
   },
   // Return 'true' if the passed string could be a domainId. Used as a precheck before querying the Db.
   // For the moment, do a simple check to see if it is probably a GUID.

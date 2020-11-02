@@ -176,6 +176,100 @@ Percent mem used: freeMem / totalMem * 100
     }
 ```
 
+## Category "metaverse"
+
+Metaverse statistics.
+
+```
+    {
+        "totalOnline": { totalOnline statistic report },
+        "domainTotalUsers": { domainTotalUsers statistic report},
+        "domainAnonUsers": { domainAnonUsers statistic report},
+        "activeDomains": { activeDomains statistic report}
+    }
+```
+
+### totalOnline
+
+Number of accounts that are sending heartbeats.
+
+```
+    {
+        "name": "totalOnline",
+        "category": "metaverse",
+        "unit": "count",
+        "history": {
+            "perDay": {
+                history in 288, five minute buckets
+            },
+            "perWeek": {
+                history in 168, one hour buckets
+            }
+        }
+    }
+```
+
+### domainTotalUsers
+
+Number of users the domains are reporting.
+
+```
+    {
+        "name": "domainTotalUsers",
+        "category": "metaverse",
+        "unit": "count",
+        "history": {
+            "perDay": {
+                history in 288, five minute buckets
+            },
+            "perWeek": {
+                history in 168, one hour buckets
+            }
+        }
+    }
+```
+
+### domainAnonUsers
+
+Number of anonymous users reported by the domains.
+This count is included in "domainTotalUsers".
+
+```
+    {
+        "name": "domainAnonUsers",
+        "category": "metaverse",
+        "unit": "count",
+        "history": {
+            "perDay": {
+                history in 288, five minute buckets
+            },
+            "perWeek": {
+                history in 168, one hour buckets
+            }
+        }
+    }
+```
+
+### activeDomains
+
+Number of domains that are sending heartbeats to the metaverse-server.
+
+```
+    {
+        "name": "activeDomains",
+        "category": "metaverse",
+        "unit": "count",
+        "history": {
+            "perDay": {
+                history in 288, five minute buckets
+            },
+            "perWeek": {
+                history in 168, one hour buckets
+            }
+        }
+    }
+```
+
 ## Category "server"
 
 General server operation statistics.

@@ -32,8 +32,8 @@ export class ValueStat extends Stat {
   };
 
   // Called once a second. We don't gather numbers every time
-  Gather(): void {
-    this.DoPullAction();
+  async Gather(): Promise<void> {
+    await this.DoPullAction();
     return;
   };
 

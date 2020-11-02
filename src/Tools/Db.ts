@@ -169,6 +169,12 @@ export async function deleteOne(pCollection: string, pCriteria: CriteriaFilter):
   return ret;
 };
 
+// Return a count of the documents that match the passed filter
+export async function countObjects(pCollection: string,
+                                  pFilter: CriteriaFilter): Promise<number> {
+  return await Datab.collection(pCollection).countDocuments(pFilter);
+};
+
 // Low level generator to a stream of objects fitting a criteria.
 // Page number starts at 1.
 // Throws exception if anything wrong with the fetch.

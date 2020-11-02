@@ -32,9 +32,9 @@ export function initMonitoring(): void {
 
     // Stats are called once a second so they can gather histograms
     setInterval( async () => {
-      _statistics.forEach( (stat, name) => {
-          stat.Gather();
-      });
+      for (const stat of _statistics.values()) {
+          await stat.Gather();
+      };
     }, 1000 * 1 );
   };
 };

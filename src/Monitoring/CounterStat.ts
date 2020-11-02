@@ -30,8 +30,8 @@ export class CounterStat extends Stat {
       histo.Event(pCount);
     });
   };
-  Gather(): void {
-    this.DoPullAction();
+  async Gather(): Promise<void> {
+    await this.DoPullAction();
     return;
   };
 
