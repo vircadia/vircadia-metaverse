@@ -276,7 +276,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
     entity_field: 'connections',
     request_field_name: 'connections',
     get_permissions: [ 'owner', 'admin', 'friend', 'connection' ],
-    set_permissions: [ 'none' ],  // not set as a field but through other mechanisms
+    set_permissions: [ 'admin' ], // set internally with admin tokens
     validate: isSArraySet,
     setter: sArraySetter,
     getter: simpleGetter
@@ -285,7 +285,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
     entity_field: 'friends',
     request_field_name: 'friends',
     get_permissions: [ 'owner', 'admin', 'friend' ],
-    set_permissions: [ 'none' ],// not set as a field but through other mechanisms
+    set_permissions: [ 'admin' ],// set internally with admin tokens
     validate: isSArraySet,
     setter: sArraySetter,
     getter: simpleGetter
