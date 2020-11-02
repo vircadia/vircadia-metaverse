@@ -84,28 +84,30 @@ export function isValidSArraySet(pValue: any): boolean {
   let ret = false;
   if (typeof(pValue) === 'string') {
     // If passed a string, setter will assume an 'add' operation
+    Logger.cdebug('field-setting', `isValidSArraySet: value is string and assuming set`);
     ret = true;
   }
   else {
     if (isValidSArray(pValue)) {
+      Logger.cdebug('field-setting', `isValidSArraySet: value is an SArray`);
       // if we're passed an SArray, just presume a 'set'
       ret = true;
     }
     else {
       if (pValue && (pValue.set || pValue.add || pValue.remove)) {
-        Logger.cdebug('field-setting', `isSArraySet: object with one of the fields`);
+        Logger.cdebug('field-setting', `isValidSArraySet: object with one of the fields`);
         let eachIsOk: boolean = true;
         if (eachIsOk && pValue.set) {
           eachIsOk = typeof(pValue.set) === 'string' || isValidSArray(pValue.set);
-          Logger.cdebug('field-setting', `isSArraySet: pValue.set is ${eachIsOk}`);
+          Logger.cdebug('field-setting', `isValidSArraySet: pValue.set is ${eachIsOk}`);
         };
         if (eachIsOk && pValue.add) {
           eachIsOk = typeof(pValue.add) === 'string' || isValidSArray(pValue.add);
-          Logger.cdebug('field-setting', `isSArraySet: pValue.add is ${eachIsOk}`);
+          Logger.cdebug('field-setting', `isValidSArraySet: pValue.add is ${eachIsOk}`);
         };
         if (eachIsOk && pValue.remove) {
           eachIsOk = typeof(pValue.remove) === 'string' || isValidSArray(pValue.remove);
-          Logger.cdebug('field-setting', `isSArraySet: pValue.remove is ${eachIsOk}`);
+          Logger.cdebug('field-setting', `isValidSArraySet: pValue.remove is ${eachIsOk}`);
         };
         ret = eachIsOk;
       };
@@ -348,23 +350,32 @@ export async function setEntityField(
   let didSet = false;
   const perms = pPerms[pField];
   if (perms) {
-    Logger.cdebug('field-setting', `setEntityField: ${pField}=>${JSON.stringify(pVal)}`);
-    if (await checkAccessToEntity(pAuthToken, pEntity, perms.set_permissions, pRequestingAccount)) {
-      Logger.cdebug('field-setting', `setEntityField: access passed`);
-      if (await perms.validate(perms, pEntity, pVal, pAuthToken)) {
-        Logger.cdebug('field-setting', `setEntityField: value validated`);
-        if (typeof(perms.setter) === 'function') {
-          perms.setter(perms, pEntity, pVal);
-          didSet = true;
-          if (pUpdates) {
-            getEntityUpdateForField(pPerms, pEntity, pField, pUpdates);
+    try {
+      Logger.cdebug('field-setting', `setEntityField: ${pField}=>${JSON.stringify(pVal)}`);
+      if (await checkAccessToEntity(pAuthToken, pEntity, perms.set_permissions, pRequestingAccount)) {
+        Logger.cdebug('field-setting', `setEntityField: access passed`);
+        if (await perms.validate(perms, pEntity, pVal, pAuthToken)) {
+          Logger.cdebug('field-setting', `setEntityField: value validated`);
+          if (typeof(perms.setter) === 'function') {
+            perms.setter(perms, pEntity, pVal);
+            didSet = true;
+            if (pUpdates) {
+              getEntityUpdateForField(pPerms, pEntity, pField, pUpdates);
+            };
           };
+        }
+        else {
+          Logger.cdebug('field-setting', `value did not validate`);
         };
-      }
-      else {
-        Logger.cdebug('field-setting', `value did not validate`);
       };
+    }
+    catch (err) {
+      Logger.error(`setEntityField: exception: ${err}`);
+      didSet = false;
     };
+  }
+  else {
+    Logger.error(`setEntityField: no perms field. Field=${pField}`);
   };
   return didSet;
 };
