@@ -20,6 +20,9 @@ export abstract class CriteriaFilter {
   // Take a request and extract filter parameters
   abstract parametersFromRequest(pRequest: Request): void;
 
+  // Adds additional fields to the response
+  abstract addResponseFields(pRequest: Request): void;
+
   // Test a thing and return 'true' if it should be included in the set
   abstract criteriaTest(pThingy: any): boolean;
 

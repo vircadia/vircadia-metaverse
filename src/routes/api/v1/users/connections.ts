@@ -43,26 +43,30 @@ const procGetUsersConnections: RequestHandler = async (req: Request, resp: Respo
     Logger.debug(`procGetUsersConnections: user=${req.vAuthAccount.username}, connections=${JSON.stringify(connections)}`);
     const connectionInfo: any[] = [];
     for (const connectionUsername of connections) {
-      const aAccount = await Accounts.getAccountWithUsername(connectionUsername);
-      if (aAccount) {
-        connectionInfo.push( {
-          'username': connectionUsername,
-          'connection': SArray.has(req.vAuthAccount.friends, connectionUsername) ? 'is_friend' : 'is_connection',
-          'images': await buildImageInfo(aAccount),
-          'location': await buildLocationInfo(aAccount)
-        });
-      }
-      else {
-        Logger.error(`procGetUsersConnections: connection name with no account. acct=${req.vAuthAccount.id}, name=${connectionUsername}`);
-        connectionInfo.push( {
-          'username': connectionUsername,
-          'connection': 'unknown'
-        });
+      if (pager.criteriaTest(connectionUsername)) {
+        const aAccount = await Accounts.getAccountWithUsername(connectionUsername);
+        if (aAccount) {
+          connectionInfo.push( {
+            'username': connectionUsername,
+            'connection': SArray.has(req.vAuthAccount.friends, connectionUsername) ? 'is_friend' : 'is_connection',
+            'images': await buildImageInfo(aAccount),
+            'location': await buildLocationInfo(aAccount)
+          });
+        }
+        else {
+          Logger.error(`procGetUsersConnections: connection name with no account. acct=${req.vAuthAccount.id}, name=${connectionUsername}`);
+          connectionInfo.push( {
+            'username': connectionUsername,
+            'connection': 'unknown'
+          });
+        };
       };
     };
     req.vRestResp.Data = {
       'users': connectionInfo
     };
+    // Add the 'current_page' and 'total_pages' to the response
+    pager.addResponseFields(req);
   }
   else {
     req.vRestResp.respondFailure('unauthorized');

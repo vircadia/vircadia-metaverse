@@ -130,6 +130,11 @@ export class AccountFilterInfo extends CriteriaFilter {
     }
   };
 
+  // Add any parameters to the response
+  public addResponseFields(pRequest: Request) {
+    return;
+  };
+
   // Passed (what should be) an AccountEntity, test if the filters
   //    think it's passable.
   // Return 'true' of this account fits the search criteria.

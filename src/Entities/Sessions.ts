@@ -17,7 +17,7 @@ import { Config } from '@Base/config';
 
 import { SessionEntity } from '@Entities/SessionEntity';
 
-import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
+import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 
 import { VKeyedCollection } from '@Tools/vTypes';
 import { GenUUID, genRandomString, IsNullOrEmpty } from '@Tools/Misc';
@@ -87,10 +87,10 @@ export const Sessions = {
   clearCounts(pSession: SessionEntity): void {
     pSession.countReference = 0;
   },
-  *enumerate(pPager?: PaginationInfo): Generator<SessionEntity> {
+  *enumerate(pFilter?: CriteriaFilter): Generator<SessionEntity> {
     for (const sess of _currentSessions.values()) {
-      if (pPager) {
-         if (pPager.criteriaTest(sess)) {
+      if (pFilter) {
+         if (pFilter.criteriaTest(sess)) {
            yield sess;
          };
       }

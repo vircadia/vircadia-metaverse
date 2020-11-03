@@ -23,6 +23,8 @@ import { Logger } from '@Tools/Logging';
 export class PaginationInfo extends CriteriaFilter {
   public PageNum: number = 1;
   public PerPage: number = 20;
+  public TotalPages: number = 1;
+  public TotalEntries: number = 20;
 
   // results from as filter operation
   private _currentPage: number = 1;
@@ -35,6 +37,8 @@ export class PaginationInfo extends CriteriaFilter {
     super();
     this.PageNum = Clamp(pPageNum, 1, 1000);
     this.PerPage = Clamp(pPerPage, 1, 1000);
+    this.TotalPages = this.PageNum;
+    this.TotalEntries = 0;
   }
 
   public parametersFromRequest(pRequest: Request) : void {
@@ -44,6 +48,8 @@ export class PaginationInfo extends CriteriaFilter {
     if (pRequest.query.per_page) {
       this.PerPage = Clamp(Number(pRequest.query.per_page), 1, 1000);
     };
+    this.TotalPages = this.PageNum;
+    this.TotalEntries = 0;
     // Logger.debug(`PaginstationInfo: pageNum=${this.PageNum}, perPage=${this.PerPage}`);
   }
 
@@ -52,9 +58,18 @@ export class PaginationInfo extends CriteriaFilter {
   // "total_pages": num,
   // "per_page": num,
   // "total_entries": num
+  public addResponseFields(pRequest: Request): void {
+    if (pRequest.vRestResp) {
+      pRequest.vRestResp.addAdditionalField('current_page', this.PageNum);
+      pRequest.vRestResp.addAdditionalField('per_page', this.PerPage);
+      pRequest.vRestResp.addAdditionalField('total_pages', this.TotalPages);
+      pRequest.vRestResp.addAdditionalField('total_entries', this.TotalEntries);
+    };
+  };
 
   public criteriaTest(pThingy: any): boolean {
     if (! this._doingQuery) {
+      this.TotalEntries++;
       if (++this._currentItem > this.PerPage) {
         this._currentItem = 1;
         ++this._currentPage;

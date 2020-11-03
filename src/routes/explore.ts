@@ -68,6 +68,8 @@ const procGetExplore: RequestHandler = async (req: Request, resp: Response, next
   };
   req.vRestResp.Data = allPlaces;
 
+  pager.addResponseFields(req);
+
   next();
 };
 

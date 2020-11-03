@@ -72,6 +72,11 @@ export class RequestScopeFilter extends CriteriaFilter {
     };
   };
 
+  // Add any parameters to the response
+  public addResponseFields(pRequest: Request) {
+    return;
+  };
+
   // Return if we've found admin enabling parameters
   public AsAdmin(): boolean {
     return this._asAdmin;

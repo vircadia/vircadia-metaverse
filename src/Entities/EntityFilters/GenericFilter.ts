@@ -34,6 +34,11 @@ export class GenericFilter extends CriteriaFilter {
     return;
   };
 
+  // Add any parameters to the response
+  public addResponseFields(pRequest: Request) {
+    return;
+  };
+
   // Test a thing and return 'true' if it should be included in the set
   public criteriaTest(pThingy: any): boolean {
     return true;

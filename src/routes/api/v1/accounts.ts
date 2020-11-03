@@ -47,6 +47,7 @@ const procGetAccounts: RequestHandler = async (req: Request, resp: Response, nex
     req.vRestResp.Data = {
       accounts: accts
     };
+    pager.addResponseFields(req);
   }
   else {
     req.vRestResp.respondFailure('No account specified');
