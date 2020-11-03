@@ -17,7 +17,7 @@
 import { Config } from '@Base/config';
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI, param1FromParams } from '@Route-Tools/middleware';
+import { setupMetaverseAPI, finishMetaverseAPI, param1FromParams, accountFromAuthToken } from '@Route-Tools/middleware';
 
 import { Accounts } from '@Entities/Accounts';
 import { Domains } from '@Entities/Domains';
@@ -49,8 +49,9 @@ export const name = '/api/maint/fixDomainIP';
 
 export const router = Router();
 
-router.get('/api/maint/fixDomainIP/:param1',  [ setupMetaverseAPI,
-                                              param1FromParams,
+router.get('/api/maint/fixDomainIP/:param1',  [ setupMetaverseAPI,  // req.vRestResp, req.vAuthToken
+                                              accountFromAuthToken, // req.vAuthAccount
+                                              param1FromParams,     // req.vParam1
                                               procFixDomainIP,
                                               finishMetaverseAPI ] );
 
