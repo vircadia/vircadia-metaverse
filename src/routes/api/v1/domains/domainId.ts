@@ -90,6 +90,11 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
           };
         };
 
+        /* FOLLOWING CODE DOES NOT WORK: the socker.remoteAddress is the IP addr
+                    of the front end proxy server. Need to use 'x-forwarded-for:' header
+                    or whatever is  the right source.
+                    Could also have the domain-server send the information more often.
+                    Need to figure out what this IP address is used for.
         // If domain doesn't have a network_address, assume the sender is the domain
         if (Config["metaverse-server"]["fix-domain-network-address"]) {
           if (IsNullOrEmpty(req.vDomain.networkAddr)) {
@@ -100,6 +105,7 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
             Logger.info(`Assuming domain address of "${req.vDomain.name}" to ${req.vDomain.networkAddr}:${req.vDomain.networkPort}`);
           };
         };
+        */
 
         // This 'POST" is used as the domain heartbeat. Remember it's alive.
         updated.timeOfLastHeartbeat = new Date();
