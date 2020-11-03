@@ -1,4 +1,28 @@
 # Iamus Changelog
+## Version 2.2.21
+
+<ul>
+<li><a href="http://github.com/kasenvr/Iamus/commit/55271bbe7b37e7b5c9aae9fa8f30f0f4256fa351">view &bull;</a> Update ChangeLog.md</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/a64ea50eccdae4001d362b7523bc8caeb391c7b3">view &bull;</a> Add parameter to stats requests "history=no" which doesn't return histograms.</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/c124e8548d2e13f00999d1615ea52e5d72230ffa">view &bull;</a> Debug stat "?history=no" query parameter for categories. Add documentation on history suppression to API-Monitoring.md</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/a59452440edc2c93dd792b080395a8e9238d25f7">view &bull;</a> Add Domain timer to check for non-heartbeating domains and to zero reported users. Add Config.metaverse-server.domain-seconds-until-offline = 10*60 Allow 'admin' to set Domain num_users and num_anon_users (for debugging). Closes #43</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/fe70496ad98d0816c57097f7910cfe7d68ba501b">view &bull;</a> Add stats category 'metaverse'. Add Accounts.countAccouts and Domains.countDomains for collecting of number of filtered entities     Add Db.countObjects(criteria) to do database count operation Make stats.Gather operation async so it can do database operations. Add documentation for 'metaverse' stat category</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/918ae7717f7131e22e624570708490a1f8cf1c24">view &bull;</a> Add initialization of stats category 'metaverse'.</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/259c4d6fbcbef43e90e716ed4744940607d33d84">view &bull;</a> Add stats.metaverse debugging statements. Add debugging logging to Db.countObjects.</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/4296b939a4af475adec3ceab988c3042d185a01a">view &bull;</a> Fix line endings to Linux style.</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/9ff50dea5b5fb41c584ca732c005896db0885292">view &bull;</a> Fix Db.countObjects to use the passed criteria.</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/b6f928c07628f820ab35062fe1b31de7fa44a6ee">view &bull;</a> Return idle and inactive times as strings in Accounts and Domains</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/a7be99a9052988c41261cfcdaed1765889d10493">view &bull;</a> Return Date for idle and offline Account and Domain dates. Properly invoke date fetchers in monitoring code.</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/55c7c5da8699e2e4cf45380337a2d07de5b65000">view &bull;</a> Remove chatty debug logging in stats.metaverse.</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/548ed92935d7faf8d4ebc062fe0301a811c7af0d">view &bull;</a> Add 'admin' ability to set 'connections' and 'friends' in AccountEntity.     Was preventing handshakes from working.</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/da160e075b345fd24b960b8210367343816d6341">view &bull;</a> Add more error logging in setEntityField processing</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/2928148e8962b57e0d2be65f7b1d4c8f1e69d463">view &bull;</a> Split Permissions.ts into Permissions.ts and GetterSetter.ts to better modularize functions. Re-order module inclusion to "fix" (??) variables not getting initialized. Add code to Accounts and Domains to verify entity field structure is initialized     There is some ordering problem that causes the function to not get set in the const assignment Replace all instances of FieldDefn getters and setters with "noGetter" rather than "undefined" Add "automatic_networking" to DomainEntity</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/ec220c27add73c30d581d1ad6e0bd1c3f03a62e3">view &bull;</a> Rename Domains.network_mode to Domains.automatic_networking which is     what the existing domain-server code uses. Update documentation to remove "network_mode" and replace with "automatic_networking"</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/f58fdefbc47f37f9bcdaf314d14c970b4c358b17">view &bull;</a> Remove code that assumed domain-server network address was connection IP addr.     The immediate connection can be from a proxy server so it's often wrong.     More design and debugging is needed for this feature. Add /api/maint/fixDomainIP to allow an admin to clean out bad domain IP addresses.</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/9cd564701196f3b5fe118003b25bbe0c897c5135">view &bull;</a> Get login account info for fixDomainIP maint operation.</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/b515cd2c546dce221747410484e9415a4eb4be29">view &bull;</a> Bump version to 2.2.21</li> 
+</ul>
+
 ## Version 2.2.20
 
 <ul>
