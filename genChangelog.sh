@@ -11,19 +11,22 @@ cat > "${CHANGELOG}" << EOFFFF
 # Iamus Changelog
 EOFFFF
 
-for majorver in "2.2" ; do
-    for ver in $(seq 21 -1 10) ; do
-        echo "## Version ${majorver}.${ver}" >> "${CHANGELOG}"
+lastver=""
+
+for ver in $(git tag | grep '[^a-z]' | sort -g -t "." -k 3 -k 2 -r | head -10) ; do
+    if [[ ! -z "$lastver" ]] ; then
+        echo "## Version ${lastver}" >> "${CHANGELOG}"
         echo "" >> "${CHANGELOG}"
         echo "<ul>" >> "${CHANGELOG}"
-    
-        lastver=$((ver - 1))
-        git log ${majorver}.${lastver}..${majorver}.${ver} \
+
+        git log ${ver}..${lastver} \
             --pretty=format:'<li><a href="http://github.com/kasenvr/Iamus/commit/%H">view &bull;</a> %s</li> ' \
             --reverse | grep -v Merge >> "${CHANGELOG}"
 
         echo "</ul>" >> "${CHANGELOG}"
         echo "" >> "${CHANGELOG}"
-    done
+    fi
+
+    lastver=${ver}
 done
 
