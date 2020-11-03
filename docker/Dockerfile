@@ -1,9 +1,11 @@
 # Dockerfile for building a runable version of the Iamus metaverse-server
 FROM node:14 as iamus-build
 
+ARG BRANCH=master
+
 RUN mkdir -p /usr/local/src \
     && cd /usr/local/src \
-    && git clone --depth 1 https://github.com/Misterblue/Iamus.git
+    && git clone --depth 1 --branch ${BRANCH} https://github.com/Misterblue/Iamus.git
 
 RUN cd /usr/local/src/Iamus \
     && npm install
@@ -27,10 +29,15 @@ USER ${USER}:${USER}
 RUN mkdir -p /home/${USER}/Iamus/dist \
     mkdir -p /home/${USER}/config
 
+# Copy over the built files
 COPY --from=iamus-build --chown=${USER}:${USER} /usr/local/src/Iamus/package*.json /home/${USER}/Iamus/
 COPY --from=iamus-build --chown=${USER}:${USER} /usr/local/src/Iamus/dist /home/${USER}/Iamus/dist
-RUN cd /home/${USER}/Iamus && npm install --production
 
+# Install the production NPM packages
+RUN cd /home/${USER}/Iamus \
+    && npm install --production
+
+# The startup scripts
 COPY --chown=${USER}:${USER} ./files/run-iamus.sh /home/${USER}
 COPY --chown=${USER}:${USER} ./files/GetVersion.sh /home/${USER}
 
