@@ -17,7 +17,7 @@ import { Config } from '@Base/config';
 
 import crypto from 'crypto';
 
-import { AccountEntity, setAccountField } from '@Entities/AccountEntity';
+import { AccountEntity, accountFields, setAccountField } from '@Entities/AccountEntity';
 import { AccountRoles } from '@Entities/AccountRoles';
 import { Domains } from '@Entities/Domains';
 import { Places } from '@Entities/Places';
@@ -32,6 +32,24 @@ import { VKeyedCollection, SArray } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
 
 export let accountCollection = 'accounts';
+
+// Initialize account management.
+export function initAccounts(): void {
+  // DEBUG DEBUG: for unknown reasons some field ops end up 'undefined'
+  Object.keys(accountFields).forEach( fieldName => {
+    const defn = accountFields[fieldName];
+    if (typeof(defn.validate) !== 'function') {
+      Logger.error(`initAccounts: field ${defn.entity_field} validator is not a function`);
+    };
+    if (typeof(defn.getter) !== 'function') {
+      Logger.error(`initAccounts: field ${defn.entity_field} getter is not a function`);
+    };
+    if (typeof(defn.setter) !== 'function') {
+      Logger.error(`initAccounts: field ${defn.entity_field} setter is not a function`);
+    };
+  });
+  // END DEBUG DEBUG
+};
 
 export const Accounts = {
   async getAccountWithId(pAccountId: string): Promise<AccountEntity> {

@@ -154,6 +154,7 @@ export async function buildDomainInfoV1(pDomain: DomainEntity): Promise<any> {
     'network_address': pDomain.networkAddr,
     'network_port': pDomain.networkPort,
     'networking_mode': pDomain.networkingMode,
+    'automatic_networking': pDomain.automaticNetworking,
     'restricted': pDomain.restricted,
     'num_users': pDomain.numUsers,
     'anon_users': pDomain.anonUsers,

@@ -21,12 +21,11 @@ import { buildAccountInfo } from '@Route-Tools/Util';
 
 import { Accounts } from '@Entities/Accounts';
 
-import { Logger } from '@Tools/Logging';
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
 import { AccountFilterInfo } from '@Entities/EntityFilters/AccountFilterInfo';
 
-import { createSimplifiedPublicKey } from '@Route-Tools/Util';
+import { Logger } from '@Tools/Logging';
 
 // Return account information
 // The accounts returned depend on the scope (whether admin) and the search criteria (infoer)

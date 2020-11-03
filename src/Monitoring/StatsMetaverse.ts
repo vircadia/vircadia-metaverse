@@ -15,18 +15,16 @@
 
 import { Config } from '@Base/config';
 
-import os from 'os';
-
 import { Accounts } from '@Entities/Accounts';
 
 import { Monitoring } from '@Monitoring/Monitoring';
 import { Stat } from '@Monitoring/Stat';
 import { ValueStat } from '@Monitoring/ValueStat';
 import { ValueHistogram } from '@Monitoring/ValueHistogram';
-import { Logger } from '@Tools/Logging';
 import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
-import { Domain } from 'domain';
 import { Domains } from '@Entities/Domains';
+
+import { Logger } from '@Tools/Logging';
 
 // All the OS statistics
 export class StatsMetaverse extends Stat {

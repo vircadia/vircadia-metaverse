@@ -21,8 +21,6 @@ import { accountFromAuthToken } from '@Route-Tools/middleware';
 import { IsNullOrEmpty } from '@Tools/Misc';
 import { Accounts } from '@Entities/Accounts';
 
-// metaverseServerApp.use(express.urlencoded({ extended: false }));
-
 const procGetUserLocker: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
     if (IsNullOrEmpty(req.vAuthAccount.locker)) {

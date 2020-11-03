@@ -19,10 +19,11 @@ import { AuthToken } from '@Entities/AuthToken';
 import { Domains } from '@Entities/Domains';
 import { Places } from '@Entities/Places';
 
-import { checkAccessToEntity, FieldDefn, Perm } from '@Route-Tools/Permissions';
-import { isStringValidator, isSArraySet, isPathValidator, isDateValidator } from '@Route-Tools/Permissions';
-import { simpleGetter, simpleSetter, sArraySetter, dateStringGetter } from '@Route-Tools/Permissions';
-import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/Permissions';
+import { checkAccessToEntity, Perm } from '@Route-Tools/Permissions';
+import { FieldDefn } from '@Route-Tools/GetterSetter';
+import { isStringValidator, isSArraySet, isPathValidator, isDateValidator } from '@Route-Tools/GetterSetter';
+import { simpleGetter, simpleSetter, noSetter, sArraySetter, dateStringGetter } from '@Route-Tools/GetterSetter';
+import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/GetterSetter';
 
 import { VKeyedCollection } from '@Tools/vTypes';
 import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
@@ -195,7 +196,7 @@ export const placeFields: { [key: string]: FieldDefn } = {
     get_permissions: [ 'all' ],
     set_permissions: [ 'none' ],
     validate: isDateValidator,
-    setter: undefined,
+    setter: noSetter,
     getter: dateStringGetter
   }
 };

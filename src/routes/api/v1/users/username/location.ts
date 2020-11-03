@@ -21,8 +21,6 @@ import { buildLocationInfo } from '@Route-Tools/Util';
 
 import { Perm, checkAccessToEntity } from '@Route-Tools/Permissions';
 
-import { Accounts } from '@Entities/Accounts';
-
 const procGetUserLocation: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
     if (req.vAccount) {

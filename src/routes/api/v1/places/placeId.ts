@@ -22,7 +22,6 @@ import { checkAccessToEntity, Perm } from '@Route-Tools/Permissions';
 
 import { buildPlaceInfo } from '@Route-Tools/Util';
 
-import { Accounts } from '@Entities/Accounts';
 import { Places } from '@Entities/Places';
 import { setPlaceField } from '@Entities/PlaceEntity';
 

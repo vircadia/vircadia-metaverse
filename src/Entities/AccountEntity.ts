@@ -19,11 +19,10 @@ import { Accounts } from '@Entities/Accounts';
 import { AccountRoles } from '@Entities/AccountRoles';
 import { AccountAvailability } from '@Entities/AccountAvailability';
 
-import { FieldDefn, Perm } from '@Route-Tools/Permissions';
-import { isStringValidator, isBooleanValidator, isPathValidator, isNumberValidator, isSArraySet, isDateValidator } from '@Route-Tools/Permissions';
-import { simpleGetter, simpleSetter, sArraySetter, dateStringGetter } from '@Route-Tools/Permissions';
-import { verifyAllSArraySetValues } from '@Route-Tools/Permissions';
-import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/Permissions';
+import { isStringValidator, isBooleanValidator, isPathValidator, isNumberValidator, isSArraySet, isDateValidator } from '@Route-Tools/GetterSetter';
+import { simpleGetter, simpleSetter, sArraySetter, dateStringGetter } from '@Route-Tools/GetterSetter';
+import { FieldDefn, noGetter, noSetter, verifyAllSArraySetValues } from '@Route-Tools/GetterSetter';
+import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/GetterSetter';
 
 import { VKeyedCollection } from '@Tools/vTypes';
 import { IsNullOrEmpty } from '@Tools/Misc';
@@ -310,7 +309,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
     setter: (pField: FieldDefn, pEntity: Entity, pVal: any): void => {
       Accounts.storePassword((pEntity as AccountEntity), pVal);
     },
-    getter: undefined,
+    getter: noGetter,
     // An update to the password means updates to hash and salt fields.
     updater: (pField: FieldDefn, pEntity: Entity, pUpdates: VKeyedCollection): void => {
       pUpdates.passwordHash = (pEntity as AccountEntity).passwordHash;
@@ -374,7 +373,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
     get_permissions: [ 'all' ],
     set_permissions: [ 'none' ],
     validate: isStringValidator,
-    setter: undefined,
+    setter: noSetter,
     getter: simpleGetter
   },
   'when_account_created': {
@@ -383,7 +382,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
     get_permissions: [ 'all' ],
     set_permissions: [ 'none' ],
     validate: isDateValidator,
-    setter: undefined,
+    setter: noSetter,
     getter: dateStringGetter
   },
   'time_of_last_heartbeat': {
@@ -392,7 +391,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
     get_permissions: [ 'all' ],
     set_permissions: [ 'none' ],
     validate: isDateValidator,
-    setter: undefined,
+    setter: noSetter,
     getter: dateStringGetter
   },
 };

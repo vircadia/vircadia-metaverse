@@ -15,7 +15,7 @@
 
 import Config from '@Base/config';
 
-import { DomainEntity } from '@Entities/DomainEntity';
+import { DomainEntity, domainFields } from '@Entities/DomainEntity';
 
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
@@ -33,6 +33,20 @@ export let domainCollection = 'domains';
 // Initialize domain management.
 // Periodic checks on liveness of domains and resetting of values if not talking
 export function initDomains(): void {
+  // DEBUG DEBUG: for unknown reasons some field ops end up 'undefined'
+  Object.keys(domainFields).forEach( fieldName => {
+    const defn = domainFields[fieldName];
+    if (typeof(defn.validate) !== 'function') {
+      Logger.error(`initDomains: field ${defn.entity_field} validator is not a function`);
+    };
+    if (typeof(defn.getter) !== 'function') {
+      Logger.error(`initDomains: field ${defn.entity_field} getter is not a function`);
+    };
+    if (typeof(defn.setter) !== 'function') {
+      Logger.error(`initDomains: field ${defn.entity_field} setter is not a function`);
+    };
+  });
+  // END DEBUG DEBUG
 
   setInterval( async () => {
     // Find domains that are not heartbeating and reset activity if not talking
@@ -51,7 +65,6 @@ export function initDomains(): void {
     };
   }, 1000 * 60 * 2 );
 };
-
 
 export const Domains = {
   async getDomainWithId(pDomainId: string): Promise<DomainEntity> {

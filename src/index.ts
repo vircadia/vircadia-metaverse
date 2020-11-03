@@ -24,20 +24,21 @@ import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
 import crypto from 'crypto';
+import glob from 'glob';
+import morgan from 'morgan';
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
-import { setupDB } from '@Tools/Db';
-
-import glob from 'glob';
-import morgan from 'morgan';
-import { Logger, initLogging, morganOptions } from '@Tools/Logging';
+import { initAccounts } from '@Entities/Accounts';
 import { initDomains } from '@Entities/Domains';
 import { initTokens } from '@Entities/Tokens';
 import { initSessions } from '@Entities/Sessions';
 import { initRequests } from '@Entities/Requests';
-import { IsNotNullOrEmpty } from '@Tools/Misc';
 import { initMonitoring } from '@Monitoring/Monitoring';
+
+import { setupDB } from '@Tools/Db';
+import { IsNotNullOrEmpty } from '@Tools/Misc';
+import { Logger, initLogging, morganOptions } from '@Tools/Logging';
 
 initializeConfiguration()
 .catch ( err => {
@@ -49,6 +50,7 @@ initializeConfiguration()
   initSessions();
   initTokens();
   initRequests();
+  initAccounts();
   initDomains();
   return setupDB();
 })
