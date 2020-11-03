@@ -43,6 +43,8 @@ const procGetAccountTokens: RequestHandler = async (req: Request, resp: Response
     req.vRestResp.Data = {
       'tokens': toks
     };
+
+    pager.addResponseFields(req);
   };
   next();
   next();

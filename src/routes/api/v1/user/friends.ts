@@ -39,6 +39,8 @@ const procGetUserFriends: RequestHandler = async (req: Request, resp: Response, 
     req.vRestResp.Data = {
       'friends': friends
     };
+
+    pager.addResponseFields(req);
   }
   else {
     req.vRestResp.respondFailure('unauthorized');

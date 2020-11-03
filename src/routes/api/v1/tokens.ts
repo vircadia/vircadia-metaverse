@@ -50,6 +50,8 @@ const procGetTokens: RequestHandler = async (req: Request, resp: Response, next:
     req.vRestResp.Data = {
       tokens: toks
     };
+
+    pager.addResponseFields(req);
   }
   else {
     req.vRestResp.respondFailure('No account specified');

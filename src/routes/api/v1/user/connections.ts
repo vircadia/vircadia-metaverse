@@ -39,6 +39,8 @@ const procGetUserConnections: RequestHandler = async (req: Request, resp: Respon
     req.vRestResp.Data = {
       'connections': connections
     };
+
+    pager.addResponseFields(req);
   }
   else {
     req.vRestResp.respondFailure('unauthorized');

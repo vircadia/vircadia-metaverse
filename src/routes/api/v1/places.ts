@@ -46,6 +46,8 @@ const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next:
     req.vRestResp.Data = {
       'places': places
     };
+
+    pager.addResponseFields(req);
   }
   else {
     req.vRestResp.respondFailure('No account specified');

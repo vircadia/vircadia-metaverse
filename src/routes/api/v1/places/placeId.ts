@@ -47,6 +47,8 @@ const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next:
     req.vRestResp.Data = {
       'places': allPlaces
     };
+
+    pager.addResponseFields(req);
   }
   else {
     req.vRestResp.respondFailure('unauthorized');

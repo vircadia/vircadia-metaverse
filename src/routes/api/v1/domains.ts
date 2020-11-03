@@ -35,19 +35,21 @@ import { Logger } from '@Tools/Logging';
 const procGetDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
 
-    const pagination = new PaginationInfo();
+    const pager = new PaginationInfo();
     const scoper = new AccountScopeFilter(req.vAuthAccount, "sponsorAccountId");
 
-    pagination.parametersFromRequest(req);
+    pager.parametersFromRequest(req);
     scoper.parametersFromRequest(req);
 
     const domainArray: any[] = [];
-    for await (const aDomain of Domains.enumerateAsync(scoper, pagination)) {
+    for await (const aDomain of Domains.enumerateAsync(scoper, pager)) {
       domainArray.push( await buildDomainInfoV1(aDomain) );
     };
     req.vRestResp.Data = {
       'domains': domainArray
     };
+
+    pager.addResponseFields(req);
   }
   else {
     req.vRestResp.respondFailure("Unauthorized");
