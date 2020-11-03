@@ -23,7 +23,7 @@ import { getAccountField, setAccountField } from '@Entities/AccountEntity';
 
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 
-import { VKeyedCollection } from '@Tools/vTypes';
+import { SArray, VKeyedCollection } from '@Tools/vTypes';
 import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 
 // Get the friends of the logged in account
@@ -41,15 +41,34 @@ const procGetUserFriends: RequestHandler = async (req: Request, resp: Response, 
     };
   }
   else {
-    req.vRestResp.respondFailure('account token did not work');
+    req.vRestResp.respondFailure('unauthorized');
   };
   next();
 };
 
 // Upgrade a connection to a friend.
-// Not implemented as something needs to be done with request_connection, etc
 const procPostUserFriends: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  req.vRestResp.respondFailure('cannot add friends this way');
+  if (req.vAuthAccount) {
+    if (req.body.username && typeof(req.body.username) === 'string') {
+      const newFriend = req.body.username;
+      // Verify the username is a connection.
+      const connections: string[] = await getAccountField(req.vAuthToken, req.vAuthAccount, 'connections', req.vAuthAccount) ?? [];
+      if (SArray.hasNoCase(connections, newFriend)) {
+        const updates: VKeyedCollection = {};
+        await setAccountField(req.vAuthToken, req.vAuthAccount, 'friends', { "add": newFriend }, req.vAuthAccount, updates);
+        await Accounts.updateEntityFields(req.vAuthAccount, updates);
+      }
+      else {
+        req.vRestResp.respondFailure('cannot add friend who is not a connection');
+      };
+    }
+    else {
+      req.vRestResp.respondFailure('badly formed request');
+    };
+  }
+  else {
+    req.vRestResp.respondFailure('unauthorized');
+  };
   next();
 };
 

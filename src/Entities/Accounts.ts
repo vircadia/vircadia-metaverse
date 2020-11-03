@@ -126,8 +126,7 @@ export const Accounts = {
   },
   // The contents of this entity have been updated
   async updateEntityFields(pEntity: AccountEntity, pFields: VKeyedCollection): Promise<AccountEntity> {
-    return updateObjectFields(accountCollection,
-                                new GenericFilter({ 'id': pEntity.id }), pFields);
+    return updateObjectFields(accountCollection, new GenericFilter({ 'id': pEntity.id }), pFields);
   },
   // Return the number of accounts that match the criteria
   async accountCount(pCriteria: CriteriaFilter): Promise<number> {
