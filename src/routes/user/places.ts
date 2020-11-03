@@ -21,7 +21,7 @@ import { setupMetaverseAPI, finishMetaverseAPI, param1FromParams } from '@Route-
 import { HTTPStatusCode } from '@Route-Tools/RESTResponse';
 
 // When a user gots to "METAVERSE_URL/user/places", redirect to
-//        "https://dashboard.vircadia.com?metaverse=MEAVERSE_URL&page=places"
+//        "https://dashboard.vircadia.com?metaverse=METAVERSE_URL&page=places"
 const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   const dashboardURL = Config.metaverse["dashboard-url"];
   const metaverseURL = encodeURIComponent(Config.metaverse["metaverse-server-url"]);
