@@ -30,7 +30,7 @@ A request returns an array of domain descriptions:
                   "version": stringSoftwareVersion,
                   "protocol_version": stringProtocolVersion,
                   "network_address": stringNetworkAddress,
-                  "networking_mode": stringMode,  // one of "full", ...
+                  "automatic_networking": stringMode,  // one of "full", "ip", or "disabled"
                   "restricted": boolWhetherRestricted,
                   "num_users": intCurrentLoggedInUsers,
                   "anon_users": intCurrentAnonomousUsers,
@@ -141,7 +141,7 @@ The domain fields that can be fetched:
 | version       |    all   | domain     | string |
 | protocol      |    all   | domain     | string |
 | network_address |  all   | domain     | string |
-| networking_mode |  all   | domain     | string |
+| automatic_networking |  all   | domain     | string |
 | num_users     |    all   | domain     | string |
 | num_anon_users |   all   | domain     | string |
 | restricted    |    all   | domain sponsor admin | string |

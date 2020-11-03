@@ -39,8 +39,7 @@ export class DomainEntity implements Entity {
   public protocol: string;     // Protocol version
   public networkAddr: string;  // reported network address
   public networkPort: string;  // reported network address
-  public networkingMode: string;   // one of "full", ?
-  public automaticNetworking: string;   // one of "disabled", ?
+  public networkingMode: string;   // one of "full", "ip", "disabled"
   public restricted: boolean;  // 'true' if restricted to users with accounts
   public numUsers: number;     // regular users logged in
   public anonUsers: number;    // number of anonymous users
@@ -191,17 +190,8 @@ export const domainFields: { [key: string]: FieldDefn } = {
     getter: simpleGetter
   },
   'automatic_networking': {
-    entity_field: 'automaticNetworking',
-    request_field_name: 'automatic_networking',
-    get_permissions: [ 'all' ],
-    set_permissions: [ 'domain' ],
-    validate: isStringValidator,
-    setter: simpleSetter,
-    getter: simpleGetter
-  },
-  'networking_mode': {
     entity_field: 'networkingMode',
-    request_field_name: 'networking_mode',
+    request_field_name: 'automatic_networking',
     get_permissions: [ 'all' ],
     set_permissions: [ 'domain' ],
     validate: isStringValidator,
