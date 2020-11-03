@@ -49,7 +49,7 @@ const procGetUsersConnections: RequestHandler = async (req: Request, resp: Respo
           'username': connectionUsername,
           'connection': SArray.has(req.vAuthAccount.friends, connectionUsername) ? 'is_friend' : 'is_connection',
           'images': await buildImageInfo(aAccount),
-          'placeName': await buildLocationInfo(aAccount)
+          'location': await buildLocationInfo(aAccount)
         });
       }
       else {

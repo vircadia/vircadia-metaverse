@@ -149,6 +149,42 @@ Set a user as a friend. The other use must already have a "connection" with this
 ## DELETE /api/v1/user/connections/{username}
 ## GET /api/v1/user/connection_request
 
+## GET /api/v1/users/connections
+
+```
+    {
+        "status": "success",
+        "data": {
+            "users": [
+                {
+                    "username": string,
+                    "connection": string,   // either "is_friend" or "is_connection"
+                    "images": {
+                        "thumbnail": URLstring,
+                        "hero": URLstring,
+                        "tiny": URLstring
+                    },
+                    "location": {
+                        "node_id": locationNodeId,
+                        "root": {
+                            "id": stringDomainId,
+                            "name": stringDomainName,
+                            "network_address": stringNetworkAddress,
+                            "network_port": numberPort,
+                            "ice_server_address": stringNetworkAddress,
+                            "time_of_last_heartbeat": stringISODate,
+                            "num_users": numberUsers
+                        },
+                        "path": stringAddress,
+                        "online": boolean
+                    }
+                },
+                ...
+            ]
+        }
+    }
+```
+
 ---
 
 # Administrative
