@@ -158,7 +158,7 @@ Set a user as a friend. The other use must already have a "connection" with this
             "users": [
                 {
                     "username": string,
-                    "connection": string,   // either "is_friend" or "is_connection"
+                    "connection": string,   // either "friend" or "connection"
                     "images": {
                         "thumbnail": URLstring,
                         "hero": URLstring,
