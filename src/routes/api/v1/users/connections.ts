@@ -16,16 +16,18 @@
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
+import { Accounts } from '@Entities/Accounts';
+import { getAccountField } from '@Entities/AccountEntity';
+
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken, usernameFromParams } from '@Route-Tools/middleware';
-import { Accounts } from '@Entities/Accounts';
-import { getAccountField, setAccountField } from '@Entities/AccountEntity';
+import { buildLocationInfo, buildImageInfo } from '@Route-Tools/Util';
 
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 
 import { SArray, VKeyedCollection } from '@Tools/vTypes';
 import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
-import { buildLocationInfo, buildImageInfo } from '@Route-Tools/Util';
+import { Logger } from '@Tools/Logging';
 
 // Get the connections of the logged in account
 const procGetUsersConnections: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
@@ -37,23 +39,29 @@ const procGetUsersConnections: RequestHandler = async (req: Request, resp: Respo
     connections = IsNullOrEmpty(connections)
               ? []        // if no connections info, return empty list
               : connections;
-    req.vRestResp.Data = {
-      'users': connections.map( async (connectionUsername) => {
-        const aAccount = await Accounts.getAccountWithUsername(connectionUsername);
-        if (aAccount) {
-          return {
-            'username': connectionUsername,
-            'connection': SArray.has(req.vAuthAccount.friends, connectionUsername) ? 'is_friend' : 'is_connection',
-            'images': await buildImageInfo(aAccount),
-            'placeName': await buildLocationInfo(aAccount)
-          };
-        };
-        return {
+
+    Logger.debug(`procGetUsersConnections: user=${req.vAuthAccount.username}, connections=${JSON.stringify(connections)}`);
+    const connectionInfo: any[] = [];
+    for (const connectionUsername of connections) {
+      const aAccount = await Accounts.getAccountWithUsername(connectionUsername);
+      if (aAccount) {
+        connectionInfo.push( {
+          'username': connectionUsername,
+          'connection': SArray.has(req.vAuthAccount.friends, connectionUsername) ? 'is_friend' : 'is_connection',
+          'images': await buildImageInfo(aAccount),
+          'placeName': await buildLocationInfo(aAccount)
+        });
+      }
+      else {
+        Logger.error(`procGetUsersConnections: connection name with no account. acct=${req.vAuthAccount.id}, name=${connectionUsername}`);
+        connectionInfo.push( {
           'username': connectionUsername,
           'connection': 'unknown'
-        };
-
-      } )
+        });
+      };
+    };
+    req.vRestResp.Data = {
+      'users': connectionInfo
     };
   }
   else {
