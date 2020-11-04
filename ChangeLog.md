@@ -1,4 +1,13 @@
 # Iamus Changelog
+## Version 2.2.23
+
+<ul>
+<li><a href="http://github.com/kasenvr/Iamus/commit/1c51ba8f46832f70551d2802422cbb91c20a681d">view &bull;</a> Update ChangeLog.md Modify genChangelog.sh to get the tags from git and generating a list     of the last 10 version tags (tag form: major.minor.patch)</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/db36bccf9dd965cc66940ff839596249d94abe14">view &bull;</a> Add pagination response fields to API requests that handle pagination.</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/2b01b6bad64d0a7ceeb141befd5f6b0fb41db198">view &bull;</a> Implement redirection of /users/:username to Dashboard. Closes #58</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/4dcab7bbcbf4bf5bb2f02143c541fe88b9abe3ac">view &bull;</a> Bump version to 2.2.23</li> 
+</ul>
+
 ## Version 2.2.22
 
 <ul>
@@ -110,19 +119,5 @@
 <li><a href="http://github.com/kasenvr/Iamus/commit/117cf5aa7c70d6a42a5c9a5bc50380b708554484">view &bull;</a> Implement DELETE /api/v1/user/connection_requests Closes #41</li> 
 <li><a href="http://github.com/kasenvr/Iamus/commit/3fca72713689706104a4e37aeeaa88cfbaaa7381">view &bull;</a> For /api/v1/user/heartbeat, return the location node_id for 'session_id'.     This attempts to change the problem reported in kasenvr/project-athena:#776</li> 
 <li><a href="http://github.com/kasenvr/Iamus/commit/48de45bc760ae575c26e0332f3a31daf91e59ce0">view &bull;</a> Bump version to 2.2.15</li> 
-</ul>
-
-## Version 2.2.14
-
-<ul>
-<li><a href="http://github.com/kasenvr/Iamus/commit/468612165c203c76eeb360786139dc759a1e4e65">view &bull;</a> AccountEntity.username.validate: verify that the set username is unique     But, at the same time, fix things so one cannot change your username as     all connections would have to change. AccountEntity.email.validate: verify that the set email is unique</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/23282bf70662de02d92fae9305802977a0ca0df6">view &bull;</a> Add some awaits so request_connection waits for things to finish before returning.</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/a3e721dcd4ea9fd9ff81419a2ac2b4d97b601a16">view &bull;</a> Add check to POST /api/v1/users making sure created account has unique email Closes #42</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/84ef3f21c1fb6da564b6baed5f9ed18885074a3e">view &bull;</a> Rework Accounts.makeAccountFriends and Accounts.makeAccountsConnected to use     the set account field functions to check for dups, etc</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/c6e73908c98617a4df2e6151a5bb52e4344abf18">view &bull;</a> Fix user location reporting (wasn't working)     Add missing field definitions for location     Recode updateLocationInfo to use setAccountField and use new field definitions     Add missing awaits</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/881d5bd76a6caad6de059ef3b6551667d74c7625">view &bull;</a> lean up update code using Util.SimpleObject rather than inline objects Change so field rename message is only output if a field is renamed</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/00019b94a2f3f1a98fe91350cf9073dd9ff6d035">view &bull;</a> Correct expiration of special admin token     Caused some internal field sets to fail because token tested expired.</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/d825ef3d39d90e4f27517a178fa3551e68b61c5d">view &bull;</a> Validate path fields with regex for "domainname/float,float,float/float,float,float,float"     Add test routines for path validation. Remove async/await on simple SArray format checks</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/9cf99cc14ac1bdfc800db54fe18d3f00b5af0bb2">view &bull;</a> Bump to version 2.2.14</li> 
 </ul>
 
