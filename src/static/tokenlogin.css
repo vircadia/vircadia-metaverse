@@ -211,6 +211,7 @@
             font-size: larger;
             text-align: center;
             margin: 2em;
+            color: white;
         }
         #DEBUGG {
             font-size: smaller;
@@ -219,7 +220,7 @@
 		/* The Modal (background) */
         .modal {
           position: fixed; /* Stay in place */
-		  bottom: 0
+		  bottom: 0;
           z-index:1; /* Sit on top */
           left: 0;
           top: 50px;
