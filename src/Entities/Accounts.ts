@@ -190,6 +190,33 @@ export const Accounts = {
     await setAccountField(adminToken, pTargetAccount, 'connections', { 'add': pRequestingAccount.username }, pTargetAccount, updates);
     await Accounts.updateEntityFields(pTargetAccount, updates);
   },
+  // Remove the named account from the list of connections. Also cleans out the other side
+  async removeConnection(pAccount: AccountEntity, pConnectionName: string) {
+    let updates: VKeyedCollection = {};
+    const adminToken = Tokens.createSpecialAdminToken();
+      await setAccountField(adminToken, pAccount, 'connections', { 'remove': pConnectionName }, pAccount, updates);
+      await setAccountField(adminToken, pAccount, 'friends', { 'remove': pConnectionName }, pAccount, updates);
+      await Accounts.updateEntityFields(pAccount, updates);
+    const otherAccount = await Accounts.getAccountWithUsername(pConnectionName);
+    if (otherAccount) {
+      updates = {};
+      await setAccountField(adminToken, otherAccount, 'connections', { 'remove': pAccount.username }, otherAccount, updates);
+      await setAccountField(adminToken, otherAccount, 'friends', { 'remove': pAccount.username }, otherAccount, updates);
+      await Accounts.updateEntityFields(otherAccount, updates);
+    };
+  },
+  async removeFriend(pAccount: AccountEntity, pFriendName: string) {
+    let updates: VKeyedCollection = {};
+    const adminToken = Tokens.createSpecialAdminToken();
+      await setAccountField(adminToken, pAccount, 'friends', { 'remove': pFriendName }, pAccount, updates);
+      await Accounts.updateEntityFields(pAccount, updates);
+    const otherAccount = await Accounts.getAccountWithUsername(pFriendName);
+    if (otherAccount) {
+      updates = {};
+      await setAccountField(adminToken, otherAccount, 'friends', { 'remove': pAccount.username }, otherAccount, updates);
+      await Accounts.updateEntityFields(otherAccount, updates);
+    };
+  },
   // getter property that is 'true' if the user has been heard from recently
   isOnline(pAcct: AccountEntity): boolean {
     if (pAcct && pAcct.timeOfLastHeartbeat) {

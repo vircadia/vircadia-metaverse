@@ -17,7 +17,7 @@
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
-import { accountFromAuthToken, usernameFromParams } from '@Route-Tools/middleware';
+import { accountFromAuthToken, param1FromParams } from '@Route-Tools/middleware';
 import { Accounts } from '@Entities/Accounts';
 import { getAccountField, setAccountField } from '@Entities/AccountEntity';
 
@@ -58,16 +58,7 @@ const procPostUserConnections: RequestHandler = async (req: Request, resp: Respo
 // Remove a friend from my friend list.
 const procDeleteUserConnections: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
-    const removeVal: any = {
-      'remove': [ req.vUsername ]
-    };
-    const updates:VKeyedCollection = {};
-    if (await setAccountField(req.vAuthToken, req.vAuthAccount, 'connections', removeVal, req.vAuthAccount, updates)) {
-      Accounts.updateEntityFields(req.vAuthAccount, updates);
-    }
-    else {
-      req.vRestResp.respondFailure('field could not be modified');
-    };
+    await Accounts.removeConnection(req.vAuthAccount, req.vParam1);
   }
   else {
     req.vRestResp.respondFailure('unauthorized');
@@ -79,19 +70,19 @@ export const name = '/api/v1/user/connections';
 
 export const router = Router();
 
-router.get(   '/api/v1/user/connections',         [ setupMetaverseAPI,
-                                                accountFromAuthToken,
+router.get(   '/api/v1/user/connections',     [ setupMetaverseAPI,      // req.vRestResp, vAuthToken
+                                                accountFromAuthToken,   // req.vAuthAccount
                                                 procGetUserConnections,
                                                 finishMetaverseAPI
                                               ] );
-router.post(  '/api/v1/user/connections',         [ setupMetaverseAPI,
-                                                accountFromAuthToken,
+router.post(  '/api/v1/user/connections',         [ setupMetaverseAPI,  // req.vRestResp, vAuthToken
+                                                accountFromAuthToken,   // req.vAuthAccount
                                                 procPostUserConnections,
                                                 finishMetaverseAPI
                                               ] );
-router.delete('/api/v1/user/connections/:username', [ setupMetaverseAPI,
-                                                accountFromAuthToken,
-                                                usernameFromParams,
+router.delete('/api/v1/user/connections/:param1', [ setupMetaverseAPI,// req.vRestResp, vAuthToken
+                                                accountFromAuthToken,   // req.vAuthAccount
+                                                param1FromParams,     // req.vParam1
                                                 procDeleteUserConnections,
                                                 finishMetaverseAPI
                                               ] );
