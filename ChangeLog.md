@@ -1,4 +1,13 @@
 # Iamus Changelog
+## Version 2.2.24
+
+<ul>
+<li><a href="http://github.com/kasenvr/Iamus/commit/f59619261cfa874be2c3cd5f436def099040dde8">view &bull;</a> Update Changelog.md</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/7ec03825c70af2f85ff569c38a59a0c77dca242c">view &bull;</a> When deleting connections or friends, remove the reverse pointers:     Deleting a connection removes both connection and friend in both accounts.     Deleting a friend removes friend from other account also. Closes #59</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/c0ca649c6b97915662597363785cf3ceeae85d2e">view &bull;</a> For domain token generation default web page, move generated domain     token text up higher and make it white so it stands out. Clean up some CSS errors. Closes #5</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/53ac8b06c950adeab17901476c2054c68315e49b">view &bull;</a> Bump version to 2.2.24</li> 
+</ul>
+
 ## Version 2.2.23
 
 <ul>
@@ -111,13 +120,5 @@
 <li><a href="http://github.com/kasenvr/Iamus/commit/b97e65f20ea89c6f2d7ed750ee256a13cf4dbc58">view &bull;</a> Add debug logging for Db.getObject()</li> 
 <li><a href="http://github.com/kasenvr/Iamus/commit/a4a293fd52744cc74828ad681b742b02bd95034f">view &bull;</a> Correct GET /api/v1/requests response for include HANDSHAKE data</li> 
 <li><a href="http://github.com/kasenvr/Iamus/commit/9b7c0cfab9c764215a633089df4070b692f634b0">view &bull;</a> Bump version to 2.2.16</li> 
-</ul>
-
-## Version 2.2.15
-
-<ul>
-<li><a href="http://github.com/kasenvr/Iamus/commit/117cf5aa7c70d6a42a5c9a5bc50380b708554484">view &bull;</a> Implement DELETE /api/v1/user/connection_requests Closes #41</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/3fca72713689706104a4e37aeeaa88cfbaaa7381">view &bull;</a> For /api/v1/user/heartbeat, return the location node_id for 'session_id'.     This attempts to change the problem reported in kasenvr/project-athena:#776</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/48de45bc760ae575c26e0332f3a31daf91e59ce0">view &bull;</a> Bump version to 2.2.15</li> 
 </ul>
 
