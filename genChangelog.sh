@@ -13,7 +13,7 @@ EOFFFF
 
 lastver=""
 
-for ver in $(git tag | grep '[^a-z]' | sort -g -t "." -k 3 -k 2 -r | head -10) ; do
+for ver in $(git tag | grep '[^a-z]' | sort -t "." -k 1,1nr -k 2,2nr -k 3,3nr | head -10) ; do
     if [[ ! -z "$lastver" ]] ; then
         echo "## Version ${lastver}" >> "${CHANGELOG}"
         echo "" >> "${CHANGELOG}"

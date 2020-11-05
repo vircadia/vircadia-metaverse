@@ -1,4 +1,11 @@
 # Iamus Changelog
+## Version 2.3.1
+
+<ul>
+<li><a href="http://github.com/kasenvr/Iamus/commit/a0edba9f67e250ba5d1b8ad5c758bd17d4981af3">view &bull;</a> Update ChangeLog.md</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/ffe9c154e709e5138c3afaa7377b448abac81354">view &bull;</a> Bump version to 2.3.1</li> 
+</ul>
+
 ## Version 2.2.24
 
 <ul>
@@ -110,15 +117,5 @@
 <li><a href="http://github.com/kasenvr/Iamus/commit/5c476fc4d903808ed0b04496e822e5621b30b129">view &bull;</a> Add file based logging using Winston.     This creates multiple log files in debug.log-directory which     defaults to files "iamus*.log" in "./logs".</li> 
 <li><a href="http://github.com/kasenvr/Iamus/commit/daf95f4cf825480c66751f5e68a0262cf69d622f">view &bull;</a> Update NPM package versions to latest</li> 
 <li><a href="http://github.com/kasenvr/Iamus/commit/1a7777deef66392e45739c372e4131438855b6d5">view &bull;</a> Bump version to 2.2.17</li> 
-</ul>
-
-## Version 2.2.16
-
-<ul>
-<li><a href="http://github.com/kasenvr/Iamus/commit/e6ba00202aa95336fa70823c0204f1e5b52876dc">view &bull;</a> Make all calls into Db.ts to require CriteriaFilters.     This eliminates just passing 'any'. Update all calls into Db to create GenericFilter rather than just passing     an 'any' object.</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/94772882a10a14819f5983982a7baad0ed8f81bd">view &bull;</a> Remove DomainEntity 'hosts' and replace it with 'managers'. Update documentation.</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/b97e65f20ea89c6f2d7ed750ee256a13cf4dbc58">view &bull;</a> Add debug logging for Db.getObject()</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/a4a293fd52744cc74828ad681b742b02bd95034f">view &bull;</a> Correct GET /api/v1/requests response for include HANDSHAKE data</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/9b7c0cfab9c764215a633089df4070b692f634b0">view &bull;</a> Bump version to 2.2.16</li> 
 </ul>
 
