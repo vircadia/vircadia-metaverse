@@ -15,7 +15,7 @@
 'use strict';
 
 import { Entity } from '@Entities/Entity';
-import { AccountEntity, checkAvailability } from '@Entities/AccountEntity';
+import { AccountEntity } from '@Entities/AccountEntity';
 import { DomainEntity } from '@Entities/DomainEntity';
 import { AuthToken } from '@Entities/AuthToken';
 import { Tokens, TokenScope } from '@Entities/Tokens';

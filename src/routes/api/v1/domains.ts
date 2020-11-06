@@ -64,7 +64,7 @@ const procPostDomains: RequestHandler = async (req: Request, resp: Response, nex
     if (req.body && req.body.domain && req.body.domain.label) {
       const newDomainName = req.body.domain.label;
       if (IsNotNullOrEmpty(newDomainName)) {
-        if (await domainFields.name.validate(domainFields.name, 'name', newDomainName)) {
+        if (await domainFields.name.validate(domainFields.name, req.vAuthAccount, newDomainName)) {
           const generatedAPIkey: string = GenUUID();
 
           const newDomain = Domains.createDomain();
@@ -105,7 +105,7 @@ const procPostDomains: RequestHandler = async (req: Request, resp: Response, nex
           req.vRestResp.addAdditionalField('domain', domainInfo);
         }
         else {
-          req.vRestResp.respondFailure('name contains not allowed characters');
+          req.vRestResp.respondFailure('domain name can only contain the characters a-zA-Z0-9+-_.');
         };
       }
       else {

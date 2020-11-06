@@ -17,7 +17,7 @@
 import { Request } from 'express';
 
 import { Accounts } from '@Entities/Accounts';
-import { checkAvailability, AccountEntity, setAccountField } from '@Entities/AccountEntity';
+import { AccountEntity, setAccountField } from '@Entities/AccountEntity';
 
 import { Domains } from '@Entities/Domains';
 import { DomainEntity } from '@Entities/DomainEntity';

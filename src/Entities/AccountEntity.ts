@@ -69,12 +69,6 @@ export class AccountEntity implements Entity {
   public timeOfLastHeartbeat: Date; // when we last heard from this user
 };
 
-// Helper function that checks to make sure 'availability' is the right value.
-// Returns 'true' if availability is legal
-export function checkAvailability(pAvailability: string): boolean {
-  return ['none', 'all', 'friends', 'connections'].includes(pAvailability.toLowerCase());
-};
-
 // Get the value of a domain field with the fieldname.
 // Checks to make sure the getter has permission to get the values.
 // Returns the value. Could be 'undefined' whether the requestor doesn't have permissions or that's

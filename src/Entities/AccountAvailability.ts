@@ -22,13 +22,13 @@ export class AccountAvailability {
   public static CONNECTIONS: string = 'connections';     // available to connections
   public static ALL: string = 'all';          // available to all
 
-  // See if the passed role code is a known role token
-  static KnownAvailability(pAvailabilit: string): boolean {
+  // See if the passed availability code is a known availability token
+  static KnownAvailability(pAvailability: string): boolean {
     return [ AccountAvailability.NONE,
             AccountAvailability.FRIENDS,
             AccountAvailability.CONNECTIONS,
             AccountAvailability.ALL
-           ].includes(pAvailabilit);
+           ].includes(pAvailability);
   };
 
 };
