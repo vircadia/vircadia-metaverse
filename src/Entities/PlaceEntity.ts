@@ -20,7 +20,7 @@ import { Domains } from '@Entities/Domains';
 import { Places } from '@Entities/Places';
 
 import { checkAccessToEntity, Perm } from '@Route-Tools/Permissions';
-import { FieldDefn } from '@Route-Tools/GetterSetter';
+import { FieldDefn, ValidateResponse } from '@Route-Tools/GetterSetter';
 import { isStringValidator, isSArraySet, isPathValidator, isDateValidator } from '@Route-Tools/GetterSetter';
 import { simpleGetter, simpleSetter, noSetter, sArraySetter, dateStringGetter } from '@Route-Tools/GetterSetter';
 import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/GetterSetter';
@@ -60,7 +60,7 @@ export async function setPlaceField(pAuthToken: AuthToken,  // authorization for
             pField: string, pVal: any,          // field being changed and the new value
             pRequestingAccount?: AccountEntity, // Account associated with pAuthToken, if known
             pUpdates?: VKeyedCollection         // where to record updates made (optional)
-                    ): Promise<boolean> {
+                    ): Promise<ValidateResponse> {
   return setEntityField(placeFields, pAuthToken, pPlace, pField, pVal, pRequestingAccount, pUpdates);
 };
 // Generate an 'update' block for the specified field or fields.
@@ -90,17 +90,23 @@ export const placeFields: { [key: string]: FieldDefn } = {
     request_field_name: 'name',
     get_permissions: [ 'all' ],
     set_permissions: [ 'domain', 'owner', 'admin' ],
-    validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<boolean> => {
+    validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {
       // Verify that the placename is unique
-      let valid: boolean = false;
+      let validity: ValidateResponse;
       if (typeof(pVal) === 'string') {
         const maybePlace = await Places.getPlaceWithName(pVal);
         // If no other place with this name or we're setting our own name
         if (IsNullOrEmpty(maybePlace) || (pEntity as PlaceEntity).id === maybePlace.id) {
-          valid = true;
+          validity = { valid: true };
+        }
+        else {
+          validity = { valid: false, reason: 'place name already exists' };
         };
+      }
+      else {
+        validity = { valid: false, reason: 'place name must be a string' };
       };
-      return valid;
+      return validity;
     },
     setter: simpleSetter,
     getter: simpleGetter
@@ -119,27 +125,32 @@ export const placeFields: { [key: string]: FieldDefn } = {
     request_field_name: 'domainId',
     get_permissions: [ 'all' ],
     set_permissions: [ 'owner', 'admin' ],
-    validate: async (pField: FieldDefn, pEntity: Entity, pVal: any, pAuth: AuthToken): Promise<boolean> => {
+    validate: async (pField: FieldDefn, pEntity: Entity, pVal: any, pAuth: AuthToken): Promise<ValidateResponse> => {
       // This is setting a place to a new domainId. Make sure the domain exists
       //         and requestor has access to that domain.
-      let valid = false;
+      let validity: ValidateResponse = { valid: false, reason: 'system error' };
       if (typeof(pVal) === 'string') {
         const maybeDomain = await Domains.getDomainWithId(pVal);
         if (IsNotNullOrEmpty(maybeDomain)) {
           if (IsNotNullOrEmpty(pAuth)) {
             if (checkAccessToEntity(pAuth, maybeDomain, [ Perm.SPONSOR, Perm.ADMIN ])) {
-              valid = true;
+              validity = { valid: true };
             }
             else {
               Logger.error(`PlaceEntity:domainId.validate: attempt to set to non-owned domain. RequesterAId=${pAuth.accountId}, DomainId=${pVal}`);
+              validity = { valid: false, reason: 'not authorized to change domainId' };
             };
           };
         }
         else {
           Logger.error(`PlaceEntity:domainId.validate: attempt to set to non-existant domain. RequesterAId=${pAuth.accountId}, DomainId=${pVal}`);
+          validity = { valid: false, reason: 'domain not found' };
         };
+      }
+      else {
+        validity = { valid: false, reason: 'invalid domainId format' };
       };
-      return valid;
+      return validity;
     },
     setter: simpleSetter,
     getter: simpleGetter

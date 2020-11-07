@@ -40,12 +40,13 @@ const procPostField: RequestHandler = async (req: Request, resp: Response, next:
   if (req.vAuthAccount && req.vAccount) {
     if (req.body.hasOwnProperty('set')) {
       const updates: VKeyedCollection = {};
-      if (await setAccountField(req.vAuthToken, req.vAccount, req.vParam1, req.body.set, req.vAuthAccount, updates)) {
+      const success = await setAccountField(req.vAuthToken, req.vAccount, req.vParam1, req.body.set, req.vAuthAccount, updates);
+      if (success.valid) {
         // Setting worked so update the database
         Accounts.updateEntityFields(req.vAccount, updates);
       }
       else {
-        req.vRestResp.respondFailure('value could not be set');
+        req.vRestResp.respondFailure('value could not be set:' + success.reason);
       };
     }
     else {

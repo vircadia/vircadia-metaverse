@@ -24,6 +24,11 @@ import { SArray, VKeyedCollection } from '@Tools/vTypes';
 import { IsNotNullOrEmpty, IsNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
 
+export interface ValidateResponse {
+  valid: boolean,
+  reason?: string
+};
+
 // A start at having a table driven access permissions to the Entity attributes.
 // Each Entity field would have an entry that includes who can read or write
 //    the value of the field along with getter and setter routines that
@@ -33,7 +38,7 @@ import { Logger } from '@Tools/Logging';
 //    for the 'updated' field (since the 'set' could be a merge type operation).
 export type getterFunction = (pDfd: FieldDefn, pD: Entity) => any;
 export type setterFunction = (pDfd: FieldDefn, pD: Entity, pV: any) => void;
-export type validateFunction = (pDfd: FieldDefn, pD: Entity, pV: any, pAuth?: AuthToken) => Promise<boolean>;
+export type validateFunction = (pDfd: FieldDefn, pD: Entity, pV: any, pAuth?: AuthToken) => Promise<ValidateResponse>;
 export type updaterFunction = (pDfd: FieldDefn, pD: Entity, pUpdates: VKeyedCollection) => void;
 export interface FieldDefn {
     entity_field: string,
@@ -52,31 +57,48 @@ export type EntityFieldsDefn = { [ key: string]: FieldDefn };
 // The values passed are from the user and thus need much checking.
 // Return Promise<boolean> of 'true' if pValue is legal.
 //     (These are async because some validation might require looking up some database info)
-export async function noValidation(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<boolean> {
-  return true;
+export async function noValidation(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<ValidateResponse> {
+  return { valid: true };
 };
-export async function isStringValidator(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<boolean> {
-  return typeof(pValue) === 'string';
+export async function isStringValidator(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<ValidateResponse> {
+  if (typeof(pValue) === 'string') {
+    return { valid: true };
+  };
+  return { valid: false, reason: 'field value must be a string' };
 };
-export async function isNumberValidator(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<boolean> {
-  return typeof(pValue) === 'number';
+export async function isNumberValidator(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<ValidateResponse> {
+  if (typeof(pValue) === 'number') {
+    return { valid: true };
+  };
+  return { valid: false, reason: 'field value must be a number' };
 };
-export async function isBooleanValidator(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<boolean> {
-  return typeof(pValue) === 'boolean';
+export async function isBooleanValidator(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<ValidateResponse> {
+  if (typeof(pValue) === 'boolean') {
+    return { valid: true };
+  };
+  return { valid: false, reason: 'field value must be a boolean' };
 };
-export async function isPathValidator(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<boolean> {
+export async function isPathValidator(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<ValidateResponse> {
   // Regexp to check format of "domainname/float,float,float/float,float,float,float"
-  return /^[\w +_-]*\/-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?\/-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?$/.test(pValue);
-  // return typeof(pValue) === 'string';
+  if  (/^[\w +_-]*\/-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?\/-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?$/.test(pValue)) {
+    return { valid: true };
+  };
+  return { valid: false, reason: 'path must have the form "domain/f,f,f/f,f,f,f' };
 };
-export async function isDateValidator(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<boolean> {
-  return pValue instanceof Date;
+export async function isDateValidator(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<ValidateResponse> {
+  if (pValue instanceof Date) {
+    return { valid: true };
+  };
+  return { valid: false, reason: 'field value must be a valid date string' };
 };
 // verify the value is a string or a set/add/remove collection of string arrays.
 // This pairs with the SArray getter/setter which accepts a string (add), an
 //     array of strings (set), or a manipulator (set/add/remove object).
-export async function isSArraySet(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<boolean> {
-  return isValidSArraySet(pValue);
+export async function isSArraySet(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<ValidateResponse> {
+  if (isValidSArraySet(pValue)) {
+    return { valid: true };
+  };
+  return { valid: false, reason: 'field value must be an array of strings' };
 };
 export function isValidSArraySet(pValue: any): boolean {
   let ret = false;
@@ -132,7 +154,7 @@ export function isValidSArray(pValue: any): boolean {
       ret = allStrings;
     };
   };
-  Logger.cdebug('field-setting', `isSArray: "${JSON.stringify(pValue)} is ${ret}`);
+  Logger.cdebug('field-setting', `isSArray: "${JSON.stringify(pValue)}" is ${ret}`);
   return ret;
 };
 // Accepts an SArray setter (see validator) and returns each value string found
@@ -342,7 +364,7 @@ export async function getEntityField(
 
 // Set a entity field with the fieldname and a value.
 // Checks to make sure the setter has permission to set.
-// Returns 'true' if the value was set and 'false' if the value could not be set.
+// Returns a ValidateResponse that can include a field giving the reason for the error
 export async function setEntityField(
             pPerms: EntityFieldsDefn,
             pAuthToken: AuthToken,      // authorization for making this change
@@ -350,19 +372,19 @@ export async function setEntityField(
             pField: string, pVal: any,          // field being changed and the new value
             pRequestingAccount?: AccountEntity, // Account associated with pAuthToken, if known
             pUpdates?: VKeyedCollection         // where to record updates made (optional)
-                    ): Promise<boolean> {
-  let didSet = false;
+                    ): Promise<ValidateResponse> {
+  let validity: ValidateResponse;
   const perms = pPerms[pField];
   if (perms) {
     try {
       Logger.cdebug('field-setting', `setEntityField: ${pField}=>${JSON.stringify(pVal)}`);
       if (await checkAccessToEntity(pAuthToken, pEntity, perms.set_permissions, pRequestingAccount)) {
         Logger.cdebug('field-setting', `setEntityField: access passed`);
-        if (await perms.validate(perms, pEntity, pVal, pAuthToken)) {
+        validity = await perms.validate(perms, pEntity, pVal, pAuthToken);
+        if (validity.valid) {
           Logger.cdebug('field-setting', `setEntityField: value validated`);
           if (typeof(perms.setter) === 'function') {
             perms.setter(perms, pEntity, pVal);
-            didSet = true;
             if (pUpdates) {
               getEntityUpdateForField(pPerms, pEntity, pField, pUpdates);
             };
@@ -371,17 +393,21 @@ export async function setEntityField(
         else {
           Logger.cdebug('field-setting', `value did not validate`);
         };
+      }
+      else {
+        validity = { valid: false, reason: 'account cannot set field' };
       };
     }
     catch (err) {
       Logger.error(`setEntityField: exception: ${err}`);
-      didSet = false;
+      validity = { valid: false, reason: 'exception setting: ' + err };
     };
   }
   else {
     Logger.error(`setEntityField: no perms field. Field=${pField}`);
+    validity = { valid: false, reason: `setEntityField: no perms field. Field=${pField}`};
   };
-  return didSet;
+  return validity;
 };
 // Generate an 'update' block for the specified field or fields.
 // This is a field/value collection that can be passed to the database routines.

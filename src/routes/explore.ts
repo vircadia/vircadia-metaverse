@@ -53,6 +53,7 @@ const procGetExplore: RequestHandler = async (req: Request, resp: Response, next
       placeDesc['Network Address'] = aDomain.networkAddr;
       placeDesc['Network Port'] = aDomain.networkPort;
 
+      // If there is a sponsoring account, add the domain owner to the place description
       placeDesc.Owner = '';
       if (IsNotNullOrEmpty(aDomain.sponsorAccountId)) {
         const aAccount = await Accounts.getAccountWithId(aDomain.sponsorAccountId);

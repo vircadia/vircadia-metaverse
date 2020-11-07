@@ -17,7 +17,7 @@ import { Entity } from '@Entities/Entity';
 import { AccountEntity } from '@Entities/AccountEntity';
 import { AuthToken } from '@Entities/AuthToken';
 
-import { FieldDefn } from '@Route-Tools/GetterSetter';
+import { FieldDefn, ValidateResponse } from '@Route-Tools/GetterSetter';
 import { isStringValidator, isNumberValidator, isBooleanValidator, isSArraySet, isDateValidator } from '@Route-Tools/GetterSetter';
 import { simpleGetter, simpleSetter, noGetter, noSetter, noOverwriteSetter, sArraySetter, dateStringGetter } from '@Route-Tools/GetterSetter';
 import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/GetterSetter';
@@ -81,7 +81,7 @@ export async function setDomainField(pAuthToken: AuthToken,  // authorization fo
             pField: string, pVal: any,          // field being changed and the new value
             pRequestingAccount?: AccountEntity, // Account associated with pAuthToken, if known
             pUpdates?: VKeyedCollection         // where to record updates made (optional)
-                    ): Promise<boolean> {
+                    ): Promise<ValidateResponse> {
   return setEntityField(domainFields, pAuthToken, pDomain, pField, pVal, pRequestingAccount, pUpdates);
 };
 // Generate an 'update' block for the specified field or fields.
@@ -111,11 +111,20 @@ export const domainFields: { [key: string]: FieldDefn } = {
     request_field_name: 'name',
     get_permissions: [ 'all' ],
     set_permissions: [ 'domain', 'sponsor', 'admin' ],
-    validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<boolean> => {
-      if (typeof(pVal) === 'string') {
-        return /^[A-Za-z][A-Za-z0-9+\-_\.]*$/.test(pVal);
+    validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {
+      let validity: ValidateResponse;
+      if (typeof(pVal) === 'string' && (pVal as string).length > 0) {
+        if( /^[A-Za-z][A-Za-z0-9+\-_\.]*$/.test(pVal) ) {
+          validity = { valid: true };
+        }
+        else {
+          validity = { valid: false, reason: 'domain name characters must be A-Za-z0-9+-_.'};
+        };
+      }
+      else {
+        validity = { valid: false, reason: 'domain name must be a simple string'};
       };
-      return false;
+      return validity;
     },
     setter: noOverwriteSetter,
     getter: simpleGetter
@@ -126,11 +135,20 @@ export const domainFields: { [key: string]: FieldDefn } = {
     request_field_name: 'world_name',
     get_permissions: [ 'all' ],
     set_permissions: [ 'domain', 'sponsor', 'admin' ],
-    validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<boolean> => {
+    validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {
+      let validity: ValidateResponse;
       if (typeof(pVal) === 'string' && (pVal as string).length > 0) {
-        return /^[A-Za-z][A-Za-z0-9+\-_\.]*$/.test(pVal);
+        if (/^[A-Za-z][A-Za-z0-9+\-_\.]*$/.test(pVal)) {
+          validity = { valid: true };
+        }
+        else {
+          validity = { valid: false, reason: 'domain name characters must be A-Za-z0-9+-_.'};
+        };
+      }
+      else {
+        validity = { valid: false, reason: 'domain name must be a simple string'};
       };
-      return false;
+      return validity;
     },
     setter: noOverwriteSetter,
     getter: simpleGetter

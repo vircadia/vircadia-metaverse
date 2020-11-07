@@ -25,7 +25,6 @@ import { Tokens, TokenScope } from '@Entities/Tokens';
 import { AuthToken } from '@Entities/AuthToken';
 import { Sessions } from '@Entities/Sessions';
 import { Places } from '@Entities/Places';
-import { setPlaceField } from '@Entities/PlaceEntity';
 
 import { RESTResponse } from '@Route-Tools/RESTResponse';
 

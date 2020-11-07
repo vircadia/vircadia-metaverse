@@ -41,11 +41,11 @@ const procMakeAdmin: RequestHandler = async (req: Request, resp: Response, next:
         const updates: VKeyedCollection = {};
         const adminToken = Tokens.createSpecialAdminToken();
         const success = await setAccountField(adminToken, adminAccount, 'roles', { 'add': AccountRoles.ADMIN }, adminAccount, updates);
-        if (success) {
+        if (success.valid) {
           await Accounts.updateEntityFields(adminAccount, updates);
         }
         else {
-          req.vRestResp.respondFailure('could not set admin');
+          req.vRestResp.respondFailure('could not set admin: ' + success.reason);
         };
       };
     }

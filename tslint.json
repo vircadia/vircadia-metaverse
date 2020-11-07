@@ -7,5 +7,9 @@
     "rules": {
         "trailing-comma": [ false ]
     },
+    "strict-boolean-expressions": [
+        true,
+        "allow-boolean-or-undefined"
+    ],
     "rulesDirectory": []
 }

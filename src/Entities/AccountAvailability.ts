@@ -14,6 +14,8 @@
 
 'use strict'
 
+import { Logger } from '@Tools/Logging';
+
 // Class to manage the manipulations on roles that accounts can have
 export class AccountAvailability {
   // at the moment, the only role is 'admin'

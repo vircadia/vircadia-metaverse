@@ -45,12 +45,13 @@ const procPostField: RequestHandler = async (req: Request, resp: Response, next:
     if (req.vPlace && req.vParam1) {
       if (req.body.hasOwnProperty('set')) {
         const updates: VKeyedCollection = {};
-        if (await setPlaceField(req.vAuthToken, req.vPlace, req.vParam1, req.body.set, req.vAuthAccount, updates)) {
+        const success = await setPlaceField(req.vAuthToken, req.vPlace, req.vParam1, req.body.set, req.vAuthAccount, updates);
+        if (success.valid) {
           // Setting worked so update the database
           Places.updateEntityFields(req.vPlace, updates);
         }
         else {
-          req.vRestResp.respondFailure('value could not be set');
+          req.vRestResp.respondFailure('value could not be set: ' + success.reason);
         };
       }
       else {

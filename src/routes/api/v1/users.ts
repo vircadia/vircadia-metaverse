@@ -77,8 +77,10 @@ const procPostUsers: RequestHandler = async (req: Request, resp: Response, next:
       const userEmail: string = req.body.user.email;
       Logger.debug(`procPostUsers: request to create account for ${userName} with email ${userEmail}`);
       // Precheck format of username and email before trying to set them
-      if (await accountFields.username.validate(accountFields.username, 'username', userName)) {
-        if (await accountFields.email.validate(accountFields.email, 'email', userEmail)) {
+      let ifValid = await accountFields.username.validate(accountFields.username, 'username', userName);
+      if (ifValid.valid) {
+        ifValid = await accountFields.email.validate(accountFields.email, 'email', userEmail);
+        if (ifValid.valid) {
           // See if account already exists
           let prevAccount = await Accounts.getAccountWithUsername(userName);
           if (IsNullOrEmpty(prevAccount)) {
@@ -116,11 +118,11 @@ const procPostUsers: RequestHandler = async (req: Request, resp: Response, next:
           };
         }
         else {
-          req.vRestResp.respondFailure('Badly formatted email');
+          req.vRestResp.respondFailure(ifValid.reason ?? 'Badly formatted email');
         };
       }
       else {
-        req.vRestResp.respondFailure('Badly formatted username');
+        req.vRestResp.respondFailure(ifValid.reason ?? 'Badly formatted username');
       };
     }
     else {
