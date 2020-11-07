@@ -149,7 +149,10 @@ export const accountFields: { [key: string]: FieldDefn } = {
       let validity: ValidateResponse;
       if (typeof(pVal) === 'string') {
         // Check email for sanity
-        if (/^[A-Za-z0-9+\-_\.]+@[A-Za-z0-9-\.]+$/.test(pVal)) {
+        // Old style check which doesn't cover all the RFC complient email addresses possible
+        // if (/^[A-Za-z0-9+\-_\.]+@[A-Za-z0-9-\.]+$/.test(pVal)) {
+        // Much simpiler check that just makes sure there is one AT sign
+        if ((pVal.match(/@/g) || []).length === 1) {
           // Make sure no other account is using this email address
           const otherAccount = await Accounts.getAccountWithEmail(pVal);
           if (IsNullOrEmpty(otherAccount) || otherAccount.id === (pEntity as AccountEntity).id) {
@@ -160,7 +163,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
           };
         }
         else {
-          validity = { valid: false, reason: 'username can contain only A-Za-z0-9+-_.' };
+          validity = { valid: false, reason: 'email address needs one AT sign' };
         };
       }
       else {
