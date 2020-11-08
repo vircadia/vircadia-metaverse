@@ -144,12 +144,31 @@ initializeConfiguration()
 
   // When the server is ready, start listening
   server.on('listening', () => {
-          Logger.info(`Started metaverse-server version ${Config.server["server-version"]['version-tag']} at ${new Date().toISOString()}`);
+          Logger.info(`Started metaverse-server version ${Config.server["server-version"]['version-tag']}`);
         })
         .on('error', (err) => {
           Logger.error('server exception: ' + err.message);
         })
         .listen(Config.server["listen-port"], Config.server["listen-host"]);
+
+  // Receive termination signals, shutdown server, stop receiving requests cleanly
+  // SIGTERM is usually sent by Docker to stop the application. If this doesn't exit,
+  //     a SIGKILL will be sent in 10 seconds.
+  process.on('SIGTERM', () => {
+    Logger.info('SIGTERM');
+    server.close( () => {
+      Logger.info(`SIGTERM: Stopped metaverse-server version ${Config.server["server-version"]['version-tag']}`);
+      process.exit();
+    });
+  });
+  // SIGINT (usually cntl-C) means to stop and exit
+  process.on('SIGINT', () => {
+    Logger.info('SIGINT');
+    server.close( () => {
+      Logger.info(`SIGINT: Stopped metaverse-server version ${Config.server["server-version"]['version-tag']}`);
+      process.exit();
+    });
+  });
 })
 .catch( err => {
   Logger.error('main: bad failure: ' + err);
