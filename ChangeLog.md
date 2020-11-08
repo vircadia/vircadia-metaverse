@@ -1,4 +1,15 @@
 # Iamus Changelog
+## Version 2.3.2
+
+<ul>
+<li><a href="http://github.com/kasenvr/Iamus/commit/1a137f8f7b2722234ef5d3a5fd110d1007a502fd">view &bull;</a> Fix sorting of versions in genChangeLog.sh Update Changelog.md</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/4654f30bb6af0cb89ac0a4c7fcf9f640576876f3">view &bull;</a> Return more useful error message when finding a domain name contains     non-allowed characters. Some non-functional formatting and code cleanup.</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/729cdd156c95d514751a7663bafd6b584c725d49">view &bull;</a> Fix line endings to Linux style</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/0511c01854bebf75a46a7ad79dbf243f194aa06d">view &bull;</a> Modify Entity field value validation to return reason for any validation failure.     Rather than just returning 'false', the validator returns a structure with         an optional reason for the validation failure. Modify the callers of Entity field setting to return error. Closes #48 Fix AccountEntity.Availability and AccountEntity.Roles to validate values correctly.</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/8dca92378f89629819e544ff3d73351756902b2e">view &bull;</a> Tone down the AccountEntity.email format validation to require one AT sign     An RFC complient email address can be very complex so rely on later     email verification handshake to really checkout that email is a good format. Closes #63</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/3d6f7679ea605c288f537ddf8fffd011d9795922">view &bull;</a> Bump version to 2.3.2</li> 
+</ul>
+
 ## Version 2.3.1
 
 <ul>
@@ -101,21 +112,5 @@
 <li><a href="http://github.com/kasenvr/Iamus/commit/8c113716027c141a08e3f59da439b11496332581">view &bull;</a> Add monitoring/statistic infrastructure and initial categories 'os' and 'server'.     New requests under /api/v1/stats/...</li> 
 <li><a href="http://github.com/kasenvr/Iamus/commit/dbec702e1e21f09e9c7c30874bd2343735c5ae97">view &bull;</a> Add documentation for Monitoring feature.</li> 
 <li><a href="http://github.com/kasenvr/Iamus/commit/5f5ea9a427a3dfcce1a32df34178476cb5993f17">view &bull;</a> Bump version to 2.2.18</li> 
-</ul>
-
-## Version 2.2.17
-
-<ul>
-<li><a href="http://github.com/kasenvr/Iamus/commit/8ed88fe10cdb65607e25270df1ff9bf32da98cd7">view &bull;</a> Update API-Users.md (#49)</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/c7fdb942cb642995c2217d20409f226caf1be578">view &bull;</a> Default account token login time to one week. Remove configuration information for ActivityPub.     Not used yet and a real implmentation will define its own config needs.</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/3a5939ad5ffa858eda8c7c057e6701144955ba2f">view &bull;</a> Remove old ActivityPub files that are not used.</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/d393e95516df65b4f7fbc6151b9cefe7d9cc33da">view &bull;</a> Add replacement of DASHBOARD_URL in Config.metaverse-server.tokengen_url. Add comments with example for dashboard version of 'tokengen_url' configuration.</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/3dd4edcf3fee2f5ee17d0d1dc4e69de53c695dca">view &bull;</a> Add debug logging for failure response of API requests.</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/856a039d6e6e6539ee435995e5dba722399c71ed">view &bull;</a> Even more debugging for REST request error handling.</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/0f7b00b089a0deec6db91e31a0b3010555df00b0">view &bull;</a> When uniquifying a place name (usually in default creation), create     legal unique place name (use hyphen instead of space).</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/62e7a4db15a4a22843134cbf9ae829c5bc412db3">view &bull;</a> Rename RequestEntity fields for HANDSHAKE to make it clearer the NodeId vs AccountId Use correct fields for finding previous handshake requests in connection_request</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/5c476fc4d903808ed0b04496e822e5621b30b129">view &bull;</a> Add file based logging using Winston.     This creates multiple log files in debug.log-directory which     defaults to files "iamus*.log" in "./logs".</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/daf95f4cf825480c66751f5e68a0262cf69d622f">view &bull;</a> Update NPM package versions to latest</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/1a7777deef66392e45739c372e4131438855b6d5">view &bull;</a> Bump version to 2.2.17</li> 
 </ul>
 
