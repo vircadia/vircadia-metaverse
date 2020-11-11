@@ -43,6 +43,7 @@ This request return JSON formatted as:
                     "domain": {
                         "id": domainId,
                         "name": domainName,
+                        "sponsorAccountId": string,
                         "network_address": string,
                         "ice_server_address": string,
                         "time_of_last_heartbeat": ISOStringDate,
@@ -78,6 +79,7 @@ domains the requestor is the associated account of.
                     "domain": {
                         "id": domainId,
                         "name": domainName,
+                        "sponsorAccountId": string,
                         "network_address": string,
                         "ice_server_address": string,
                         "time_of_last_heartbeat": ISOStringDate,

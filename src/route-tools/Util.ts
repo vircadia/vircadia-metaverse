@@ -129,6 +129,7 @@ export async function buildDomainInfo(pDomain: DomainEntity): Promise<any> {
     'id': pDomain.id,
     'domainId': pDomain.id,
     'name': pDomain.name,
+    'sponsorAccountId': pDomain.sponsorAccountId,
     'label': pDomain.name,
     'network_address': pDomain.networkAddr,
     'network_port': pDomain.networkPort,
