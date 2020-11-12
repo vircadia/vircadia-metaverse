@@ -114,7 +114,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
     entity_field: 'username',
     request_field_name: 'username',
     get_permissions: [ 'all' ],
-    set_permissions: [ 'none' ],
+    set_permissions: [ 'owner', 'admin' ],
     validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {
       let validity: ValidateResponse;
       if (typeof(pVal) === 'string') {
@@ -411,7 +411,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
     entity_field: 'timeOfLastHeartbeat',
     request_field_name: 'time_of_last_heartbeat',
     get_permissions: [ 'all' ],
-    set_permissions: [ 'none' ],
+    set_permissions: [ 'admin' ],
     validate: isDateValidator,
     setter: noSetter,
     getter: dateStringGetter
