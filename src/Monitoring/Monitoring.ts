@@ -54,7 +54,7 @@ export const Monitoring = {
   // This allows stats to be optional because the caller doesn't need to
   //     know if the stat exists.
   event(pEventName: string, pCount: number = 1): void {
-    const theStat = _statistics.get(pEventName);
+    const theStat = _statistics?.get(pEventName);
     if (theStat) {
         theStat.Event(pCount);
     };
