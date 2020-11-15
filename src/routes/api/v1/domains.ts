@@ -75,6 +75,13 @@ const procPostDomains: RequestHandler = async (req: Request, resp: Response, nex
             newDomain.iPAddrOfFirstContact = req.vSenderKey;
           };
 
+          if (req.body.domain.network_address) {
+            newDomain.networkAddr = req.body.domain.network_address;
+          };
+          if (req.body.domain.network_port) {
+            newDomain.networkPort = req.body.domain.network_port;
+          };
+
           // Creating a domain also creates a Place for that domain
           // Note that place names are unique so we modify the place name if there is already one.
           const newPlacename = await Places.uniqifyPlaceName(newDomain.name);
