@@ -1,4 +1,16 @@
 # Iamus Changelog
+## Version 2.3.4
+
+<ul>
+<li><a href="http://github.com/kasenvr/Iamus/commit/387e26b76f6c98b5fe5e55f34d319c588f77b5a8">view &bull;</a> Update Changelog.md</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/d9759a3986c7c906b687047df268a9476193648d">view &bull;</a> Add documentation on the design of the Entity field get/set system.</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/356b27369300f543e57dd7e7a73bc8f1d686ea15">view &bull;</a> Fix DELETE Place so the owner of the Place's domain can delete the Place.</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/f9651d25d43a76d8e4aa5ee932f3e0a0f279514a">view &bull;</a> Make Monitoring.event so it doesn't fail if monitoring was not inited.</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/d45833f889f838bdefe5cf8bfb31d316aad486e5">view &bull;</a> Record network_address and network_port if specified when creating doamin.</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/acaa36a494ad439122f48376ba31f08068219566">view &bull;</a> Added "maturity" and "tags" to PlaceEntity Centralized "maturity" specifications into src/Entities/sets/Maturity.ts Moved AccountAvailability and AccountRoles to src/Entities/sets and made a set pattern. Documented "/api/v1/places?maturity=LEVEL" and "/api/v1/places?tags=TAGLIST" Added comments to src/Entities/EntityFilters/CriteriaFilter.ts explaining how filters are to be used Added "maturity-catagories" to Places responses Fixed /api/v1/users/places to return only the places that belong to the requesting user Deleted bin/www -- what was that from??</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/56c4649b60f58915c3b05907f3f1149cf3fe0e71">view &bull;</a> Bump version to 2.3.4</li> 
+</ul>
+
 ## Version 2.3.3
 
 <ul>
@@ -98,19 +110,5 @@
 <li><a href="http://github.com/kasenvr/Iamus/commit/cd3c1cf57c2fa644d99787d08384e3ad166bfe3e">view &bull;</a> Change "GET /explore" to "GET /explore.json" as that's what the calling     script wants.</li> 
 <li><a href="http://github.com/kasenvr/Iamus/commit/519f918ff0d5449fc042414659a415cd33c4f23f">view &bull;</a> Add /api/v1/users/connections which returns connections and their images/location info.</li> 
 <li><a href="http://github.com/kasenvr/Iamus/commit/f6b15d8e749f748c5e1265b573229da35bac9ab2">view &bull;</a> Bump version to 2.2.20</li> 
-</ul>
-
-## Version 2.2.19
-
-<ul>
-<li><a href="http://github.com/kasenvr/Iamus/commit/76fd7ffc1ef865f8913daa8bf4c088ab76225653">view &bull;</a> Update ChangeLog.md</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/6fc75b342899ab69fe330f9449bc86ee23145b21">view &bull;</a> Add week history for apiRequests</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/ead079973b6918de016abb05697b6056c427b80c">view &bull;</a> Fix line endings to be consistant Linux form</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/48e048fd3e3e97a027bf7202f3994c50e170371b">view &bull;</a> Remove some chatty debug messages for errors in RESTResponse.</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/36c6a25c16246cedb7e05ce51d6232567ea80808">view &bull;</a> Remove 'accountId' from PlaceEntity to simplify place linkage management     Update API-Place documentation Add middleware.placeFromParams to map :placeId to req.vPlace     Add req.vPlace to ExpressJS.Request     Centralize code to look up place with both id and name     Lookup domain when fetching place by parameter id Update /api/v1/places/* to use :placeId     Use permissions.checkEntityAccess rather than checking fields for permissions</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/8da9cc25998042e4cad5279bb0e9754d637c1066">view &bull;</a> Correct domain address variable naming from "network_addr" to "network_address"     Updates names on POST input and GET responses.     Update documentation.</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/357bf894d90b2bbfa34a0f143b35aa31a86eec54">view &bull;</a> Add /explore API point that returns Place information with location info</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/e5099e082c996dd0406b8782e20f5286fa6e9f07">view &bull;</a> Add function to assume a domain server's addr if not saved.     Add Config.metaverse-server.fix-domain-network-address defaulting to 'true'</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/7a28811715fc72ab7cfe3cbe274bfbf4d15578e8">view &bull;</a> Bump version to 2.2.19</li> 
 </ul>
 
