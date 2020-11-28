@@ -18,6 +18,10 @@ import { Request } from 'express';
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 
 // A generic filter wrapper where the caller can pass any criteria.
+// This is used to pass a raw MongoDB query parameter and fulfills
+//    the value typing and tags all the MongoDB queries spread around
+//    the code -- at least you can find them if the DB access needs
+//    to change.
 export class GenericFilter extends CriteriaFilter {
 
   private _criteria: any;

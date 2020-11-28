@@ -219,6 +219,9 @@ export async function *getObjects(pCollection: string,
   };
 };
 
+// These definitions are here because doing the 'import' reference seems
+//     to create some reference loop that causes the field tables in the
+//     Entities to not get initialized.
 const domainCollection = 'domains';
 const accountCollection = 'accounts';
 const placeCollection = 'places';
@@ -235,7 +238,6 @@ async function BuildIndexes() {
   //    'username': should be case-less compare. Also update Accounts.getAccountWithUsername()
   //    'locationNodeId'
   //    'email'
-  //    what is needed for friends?
   await Datab.createIndex(accountCollection, { 'id': 1 } );
   await Datab.createIndex(accountCollection, { 'username': 1 },
                     { collation: noCaseCollation } );

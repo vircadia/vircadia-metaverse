@@ -14,6 +14,8 @@
 
 'use strict';
 
+import Config from '@Base/config';
+
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 import { setupMetaverseAPI, finishMetaverseAPI, param1FromParams } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
@@ -24,25 +26,35 @@ import { procPostPlaces } from '../places';
 import { buildPlaceInfo } from '@Route-Tools/Util';
 
 import { Places } from '@Entities/Places';
+import { Maturity } from '@Entities/Sets/Maturity';
 
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
+import { PlaceFilterInfo } from '@Entities/EntityFilters/PlaceFilterInfo';
+import { Domains } from '@Entities/Domains';
 
 const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
-    const scoper = new AccountScopeFilter(req.vAuthAccount, 'accountId');
     const pager = new PaginationInfo();
+    const placer = new PlaceFilterInfo();
 
-    scoper.parametersFromRequest(req);
     pager.parametersFromRequest(req);
+    placer.parametersFromRequest(req);
 
     const allPlaces: any[] = [];
-    for await (const place of Places.enumerateAsync(scoper, pager)) {
-      allPlaces.push(await buildPlaceInfo(place));
+    for await (const place of Places.enumerateAsync(placer, pager)) {
+      // Make sure the place "belongs" to the requestor
+      if (place.domainId) {
+        const aDomain = await Domains.getDomainWithId(place.domainId);
+        if (aDomain && aDomain.sponsorAccountId === req.vAuthAccount.id) {
+          allPlaces.push(await buildPlaceInfo(place));
+        };
+      };
     };
 
     req.vRestResp.Data = {
-      'places': allPlaces
+      'places': allPlaces,
+      'maturity-categories': Maturity.MaturityCategories
     };
 
     pager.addResponseFields(req);

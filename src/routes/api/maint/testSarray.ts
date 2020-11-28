@@ -19,7 +19,7 @@ import { Config } from '@Base/config';
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 
-import { AccountAvailability } from '@Entities/AccountAvailability';
+import { Availability } from '@Entities/Sets/Availability';
 import { isValidSArraySet, isValidSArray, verifyAllSArraySetValues, isPathValidator } from '@Route-Tools/GetterSetter';
 
 import { SArray } from '@Tools/vTypes';
@@ -63,11 +63,11 @@ const proctestsarray: RequestHandler = async (req: Request, resp: Response, next
       'good values': await verifyAllSArraySetValues({
               'set': [ 'none', 'friends' ],
               'remove': 'connections'
-            }, AccountAvailability.KnownAvailability),
+            }, Availability.KnownAvailability),
       'one bad value': await verifyAllSArraySetValues({
               'set': [ 'none', 'friends' ],
               'remove': [ 'connections', 'frog' ]
-            }, AccountAvailability.KnownAvailability)
+            }, Availability.KnownAvailability)
     },
     'checkPathValidation': {
       'good path 1': await isPathValidator(undefined, undefined, '/0,0,0/0,0,0,1'),

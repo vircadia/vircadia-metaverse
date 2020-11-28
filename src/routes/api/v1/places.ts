@@ -14,6 +14,8 @@
 
 'use strict'
 
+import Config from '@Base/config';
+
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
@@ -25,6 +27,8 @@ import { Places } from '@Entities/Places';
 import { checkAccessToEntity, Perm } from '@Route-Tools/Permissions';
 
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
+import { PlaceFilterInfo } from '@Entities/EntityFilters/PlaceFilterInfo';
+import { Maturity } from '@Entities/Sets/Maturity';
 
 import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
@@ -34,17 +38,20 @@ import { Logger } from '@Tools/Logging';
 const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
     const pager = new PaginationInfo();
+    const placer = new PlaceFilterInfo();
 
     pager.parametersFromRequest(req);
+    placer.parametersFromRequest(req);
 
     // Loop through all the filtered accounts and create array of info
     const places: any[] = [];
-    for await (const place of Places.enumerateAsync(pager)) {
+    for await (const place of Places.enumerateAsync(pager, placer)) {
       places.push(await buildPlaceInfo(place));
     };
 
     req.vRestResp.Data = {
-      'places': places
+      'places': places,
+      'maturity-categories': Maturity.MaturityCategories
     };
 
     pager.addResponseFields(req);

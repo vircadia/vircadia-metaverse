@@ -57,6 +57,9 @@ export class AccountFilterInfo extends CriteriaFilter {
 
   // Passed the request, get the filter parameters from the query.
   // Here we pre-process the parameters to make the DB query construction quicker.
+  //    filter=connections|friends|all
+  //    status=online|domainId
+  //    search=wildcardSearchString
   public parametersFromRequest(pRequest: Request) : void {
     this._requestingAccount = pRequest.vAuthAccount;
 

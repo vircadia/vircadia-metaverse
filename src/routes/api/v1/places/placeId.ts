@@ -14,6 +14,8 @@
 
 'use strict';
 
+import Config from '@Base/config';
+
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 import { setupMetaverseAPI, finishMetaverseAPI, param1FromParams, placeFromParams } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
@@ -23,6 +25,7 @@ import { checkAccessToEntity, Perm } from '@Route-Tools/Permissions';
 import { buildPlaceInfo } from '@Route-Tools/Util';
 
 import { Places } from '@Entities/Places';
+import { Maturity } from '@Entities/Sets/Maturity';
 import { setPlaceField } from '@Entities/PlaceEntity';
 
 import { IsNullOrEmpty } from '@Tools/Misc';
@@ -32,7 +35,8 @@ import { Logger } from '@Tools/Logging';
 export const procGetPlacesPlaceId: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vPlace) {
     req.vRestResp.Data = {
-      'place': await buildPlaceInfo(req.vPlace)
+      'place': await buildPlaceInfo(req.vPlace),
+      'maturity-categories': Maturity.MaturityCategories
     };
   }
   else {

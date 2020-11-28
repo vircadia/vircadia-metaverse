@@ -23,7 +23,7 @@ import { setupMetaverseAPI, finishMetaverseAPI, finishReturnData } from '@Route-
 
 import { AccountEntity } from '@Entities/AccountEntity';
 import { Accounts } from '@Entities/Accounts';
-import { AccountRoles } from '@Entities/AccountRoles';
+import { Roles } from '@Entities/Sets/Roles';
 import { AuthToken } from '@Entities/AuthToken';
 import { Tokens, TokenScope } from '@Entities/Tokens';
 

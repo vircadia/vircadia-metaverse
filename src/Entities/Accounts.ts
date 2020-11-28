@@ -18,7 +18,7 @@ import { Config } from '@Base/config';
 import crypto from 'crypto';
 
 import { AccountEntity, accountFields, setAccountField } from '@Entities/AccountEntity';
-import { AccountRoles } from '@Entities/AccountRoles';
+import { Roles } from '@Entities/Sets/Roles';
 import { Domains } from '@Entities/Domains';
 import { Places } from '@Entities/Places';
 import { Tokens } from '@Entities/Tokens';
@@ -137,7 +137,7 @@ export const Accounts = {
     newAcct.id= GenUUID();
     newAcct.username = pUsername;
     newAcct.email = pEmail.toLowerCase();
-    newAcct.roles = [AccountRoles.USER];
+    newAcct.roles = [Roles.USER];
     newAcct.friends = []
     newAcct.connections = []
     newAcct.whenCreated = new Date();
@@ -235,6 +235,6 @@ export const Accounts = {
   },
   // getter property that is 'true' if the user is a grid administrator
   isAdmin(pAcct: AccountEntity): boolean {
-    return SArray.has(pAcct.roles, AccountRoles.ADMIN);
+    return SArray.has(pAcct.roles, Roles.ADMIN);
   }
 };

@@ -16,8 +16,8 @@
 import { Entity } from '@Entities/Entity';
 import { AuthToken } from '@Entities/AuthToken';
 import { Accounts } from '@Entities/Accounts';
-import { AccountRoles } from '@Entities/AccountRoles';
-import { AccountAvailability } from '@Entities/AccountAvailability';
+import { Roles } from '@Entities/Sets/Roles';
+import { Availability } from '@Entities/Sets/Availability';
 
 import { isStringValidator, isBooleanValidator, isPathValidator, isNumberValidator, isSArraySet, isDateValidator, ValidateResponse } from '@Route-Tools/GetterSetter';
 import { simpleGetter, simpleSetter, sArraySetter, dateStringGetter } from '@Route-Tools/GetterSetter';
@@ -282,7 +282,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
     get_permissions: [ 'all' ],
     set_permissions: [ 'owner', 'admin' ],
     validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {
-      if (await verifyAllSArraySetValues(pVal, AccountAvailability.KnownAvailability)) {
+      if (await verifyAllSArraySetValues(pVal, Availability.KnownAvailability)) {
         return { valid: true };
       }
       return { valid: false, reason: 'not legal availability value'};
@@ -381,7 +381,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
     get_permissions: [ 'all' ],
     set_permissions: [ 'admin' ],
     validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {
-      if (await verifyAllSArraySetValues(pVal, AccountRoles.KnownRole)) {
+      if (await verifyAllSArraySetValues(pVal, Roles.KnownRole)) {
         return { valid: true };
       }
       return { valid: false, reason: 'not valid role name'};

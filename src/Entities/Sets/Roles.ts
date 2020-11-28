@@ -17,14 +17,14 @@
 import { IsNotNullOrEmpty } from "@Tools/Misc";
 
 // Class to manage the manipulations on roles that accounts can have
-export class AccountRoles {
+export class Roles {
   // at the moment, the only role is 'admin'
   public static ADMIN: string = 'admin';   // someone who has metaverse-server admin
   public static USER: string = 'user';     // a 'user' or 'person'
 
   // See if the passed role code is a known role token
   static KnownRole(pScope: string): boolean {
-    return [ AccountRoles.ADMIN, AccountRoles.USER ].includes(pScope);
+    return [ Roles.ADMIN, Roles.USER ].includes(pScope);
   };
 
 };

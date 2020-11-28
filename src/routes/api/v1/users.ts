@@ -30,7 +30,7 @@ import { buildUserInfo } from '@Route-Tools/Util';
 
 import { Logger } from '@Tools/Logging';
 import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
-import { AccountRoles } from '@Entities/AccountRoles';
+import { Roles } from '@Entities/Sets/Roles';
 import { SArray } from '@Tools/vTypes';
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
@@ -93,7 +93,7 @@ const procPostUsers: RequestHandler = async (req: Request, resp: Response, next:
                   // If we're creating the admin account, assign it admin privilages
                   if (newAcct.username === adminAccountName) {
                     if (IsNullOrEmpty(newAcct.roles)) newAcct.roles = [];
-                    SArray.add(newAcct.roles, AccountRoles.ADMIN);
+                    SArray.add(newAcct.roles, Roles.ADMIN);
                     Logger.info(`procPostUsers: setting new account ${adminAccountName} as admin`);
                   }
                   newAcct.IPAddrOfCreator = req.vSenderKey;

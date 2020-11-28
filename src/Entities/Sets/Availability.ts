@@ -16,9 +16,7 @@
 
 import { Logger } from '@Tools/Logging';
 
-// Class to manage the manipulations on roles that accounts can have
-export class AccountAvailability {
-  // at the moment, the only role is 'admin'
+export class Availability {
   public static NONE: string = 'none';        // no one can see me
   public static FRIENDS: string = 'friends';  // available to friends
   public static CONNECTIONS: string = 'connections';     // available to connections
@@ -26,10 +24,10 @@ export class AccountAvailability {
 
   // See if the passed availability code is a known availability token
   static KnownAvailability(pAvailability: string): boolean {
-    return [ AccountAvailability.NONE,
-            AccountAvailability.FRIENDS,
-            AccountAvailability.CONNECTIONS,
-            AccountAvailability.ALL
+    return [ Availability.NONE,
+            Availability.FRIENDS,
+            Availability.CONNECTIONS,
+            Availability.ALL
            ].includes(pAvailability);
   };
 

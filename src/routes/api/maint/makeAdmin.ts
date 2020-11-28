@@ -24,7 +24,7 @@ import { Accounts } from '@Entities/Accounts';
 import { Tokens } from '@Entities/Tokens';
 import { IsNotNullOrEmpty } from '@Tools/Misc';
 import { setAccountField } from '@Entities/AccountEntity';
-import { AccountRoles } from '@Entities/AccountRoles';
+import { Roles } from '@Entities/Sets/Roles';
 
 import { SArray, VKeyedCollection } from '@Tools/vTypes';
 
@@ -34,13 +34,13 @@ const procMakeAdmin: RequestHandler = async (req: Request, resp: Response, next:
   if (req.vRestResp) {
     const adminAccount = await Accounts.getAccountWithUsername(adminAccountName);
     if (IsNotNullOrEmpty(adminAccount)) {
-      if (SArray.has(adminAccount.roles, AccountRoles.ADMIN)) {
+      if (SArray.has(adminAccount.roles, Roles.ADMIN)) {
         Logger.debug(`procMakeAdmin: ${adminAccountName} already has role "admin"`);
       }
       else {
         const updates: VKeyedCollection = {};
         const adminToken = Tokens.createSpecialAdminToken();
-        const success = await setAccountField(adminToken, adminAccount, 'roles', { 'add': AccountRoles.ADMIN }, adminAccount, updates);
+        const success = await setAccountField(adminToken, adminAccount, 'roles', { 'add': Roles.ADMIN }, adminAccount, updates);
         if (success.valid) {
           await Accounts.updateEntityFields(adminAccount, updates);
         }

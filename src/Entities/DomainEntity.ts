@@ -13,6 +13,8 @@
 //   limitations under the License.
 'use strict'
 
+import Config from '@Base/config';
+
 import { Entity } from '@Entities/Entity';
 import { AccountEntity } from '@Entities/AccountEntity';
 import { AuthToken } from '@Entities/AuthToken';
@@ -20,10 +22,11 @@ import { AuthToken } from '@Entities/AuthToken';
 import { FieldDefn, ValidateResponse } from '@Route-Tools/GetterSetter';
 import { isStringValidator, isNumberValidator, isBooleanValidator, isSArraySet, isDateValidator } from '@Route-Tools/GetterSetter';
 import { simpleGetter, simpleSetter, noGetter, noSetter, noOverwriteSetter, sArraySetter, dateStringGetter } from '@Route-Tools/GetterSetter';
-import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/GetterSetter';
+import { getEntityField, setEntityField, getEntityUpdateForField, verifyAllSArraySetValues } from '@Route-Tools/GetterSetter';
 
 import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
+import { Maturity } from './Sets/Maturity';
 
 // NOTE: this class cannot have functions in them as they are just JSON to and from the database
 export class DomainEntity implements Entity {
@@ -293,7 +296,12 @@ export const domainFields: { [key: string]: FieldDefn } = {
     request_field_name: 'maturity',
     get_permissions: [ 'all' ],
     set_permissions: [ 'domain', 'sponsor', 'admin' ],
-    validate: isStringValidator,
+    validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {
+      if(typeof(pVal) === 'string' && Maturity.KnownMaturity(pVal)) {
+        return { valid: true };
+      }
+      return { valid: false, reason: 'not accepted maturity value'};
+    },
     setter: simpleSetter,
     getter: simpleGetter
   },

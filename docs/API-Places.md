@@ -18,6 +18,8 @@ This request takes a number of parameters to control the list of places returned
 
 | QUERY     | Description |
 | -------   | --------- |
+| maturity  | get the places with the specified maturity level |
+| tags      | get places that have specified tags (comma separated list. Any tag matches) |
 | per_page | number of entries to return per request |
 | page_num | which group of entries to return |
 | order    | comma separated list of 'ascending', 'decending', 'num_users', 'name' |
@@ -26,6 +28,8 @@ So, a legal request could be:
 
 ```
     GET /api/v1/places?per_page=20&page_num=4&order=ascending,num_users
+    GET /api/v1/places?maturity=adult
+    GET /api/v1/places?tags=friendly,kids,sandbox
 ```
 
 This request return JSON formatted as:
@@ -40,6 +44,8 @@ This request return JSON formatted as:
                     "name": string,
                     "address": string,
                     "description": string,
+                    "maturity": string,     // one of 'unrated', 'everyone', 'teen', 'mature', 'adult'
+                    "tags": string[],       // tags describing place categories
                     "domain": {
                         "id": domainId,
                         "name": domainName,
@@ -53,7 +59,8 @@ This request return JSON formatted as:
                     "images": [ URL, URL, ... ]
                 },
                 ...
-            ]
+            ],
+            "maturity-categories": string[] // maturity categories for the grid
         }
     }
 ```
@@ -76,6 +83,8 @@ domains the requestor is the associated account of.
                     "name": string,
                     "address": string,
                     "description": string,
+                    "maturity": string,     // one of 'unrated', 'everyone', 'teen', 'mature', 'adult'
+                    "tags": string[],       // tags describing place categories
                     "domain": {
                         "id": domainId,
                         "name": domainName,
@@ -89,7 +98,8 @@ domains the requestor is the associated account of.
                     "images": [ URL, URL, ... ]
                 },
                 ...
-            ]
+            ],
+            "maturity-categories": string[] // maturity categories for the grid
         }
     }
 ```
@@ -181,6 +191,8 @@ The place fields that can be fetched:
 | name       |   all    | domain, owner, admin | string |
 | description |  all    | domain, owner, admin | string |
 | domainId   |   all    |    none     | string |
+| maturity   |   all    | domain, owner, admin | string |
+| tags       |   all    | domain, owner, admin | stringArray |
 | address    |   all    | domain, owner, admin | addressString |
 | thumbnail  |   all    | domain, owner, admin | string |
 | images     |   all    | domain, owner, admin | stringArray |

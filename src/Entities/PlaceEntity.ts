@@ -13,6 +13,8 @@
 //   limitations under the License.
 'use strict'
 
+import Config from '@Base/config';
+
 import { Entity } from '@Entities/Entity';
 import { AccountEntity } from '@Entities/AccountEntity';
 import { AuthToken } from '@Entities/AuthToken';
@@ -23,7 +25,9 @@ import { checkAccessToEntity, Perm } from '@Route-Tools/Permissions';
 import { FieldDefn, ValidateResponse } from '@Route-Tools/GetterSetter';
 import { isStringValidator, isSArraySet, isPathValidator, isDateValidator } from '@Route-Tools/GetterSetter';
 import { simpleGetter, simpleSetter, noSetter, sArraySetter, dateStringGetter } from '@Route-Tools/GetterSetter';
-import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/GetterSetter';
+import { getEntityField, setEntityField, getEntityUpdateForField, verifyAllSArraySetValues } from '@Route-Tools/GetterSetter';
+
+import { Maturity } from '@Entities/Sets/Maturity';
 
 import { VKeyedCollection } from '@Tools/vTypes';
 import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
@@ -34,6 +38,8 @@ export class PlaceEntity implements Entity {
   public id: string;            // globally unique place identifier
   public name: string;          // Human friendly name of the place
   public description: string;   // Human friendly description of the place
+  public maturity: string;        // tags defining the string content
+  public tags: string[];        // tags defining the string content
   public domainId: string;      // domain the place is in
   public address: string;       // Address within the domain
   public thumbnail: string;     // thumbnail for place
@@ -171,6 +177,29 @@ export const placeFields: { [key: string]: FieldDefn } = {
     set_permissions: [ 'domain', 'owner', 'admin' ],
     validate: isPathValidator,
     setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'maturity': {
+    entity_field: 'maturity',
+    request_field_name: 'maturity',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'domain', 'sponsor', 'admin' ],
+    validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {
+      if(typeof(pVal) === 'string' && Maturity.KnownMaturity(pVal)) {
+        return { valid: true };
+      }
+      return { valid: false, reason: 'not accepted maturity value'};
+    },
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'tags': {
+    entity_field: 'tags',
+    request_field_name: 'tags',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'domain', 'owner', 'admin' ],
+    validate: isSArraySet,
+    setter: sArraySetter,
     getter: simpleGetter
   },
   'thumbnail': {

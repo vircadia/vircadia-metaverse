@@ -253,6 +253,8 @@ export async function buildPlaceInfoSmall(pPlace: PlaceEntity): Promise<any> {
     'name': pPlace.name,
     'address': pPlace.address,
     'description': pPlace.description,
+    'maturity': pPlace.maturity,
+    'tags': pPlace.tags,
     'thumbnail': pPlace.thumbnail,
     'images': pPlace.images
   };

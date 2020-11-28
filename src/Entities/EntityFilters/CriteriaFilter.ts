@@ -15,6 +15,23 @@
 
 import { Request } from 'express';
 
+// Criteria filters are used to filter collections of entities.
+// They work by taking an enumeration stream and returning a stream
+//    with only entities  that fit the criteria.
+// They work with the MongoDB database and create query filters
+//    so the queries return only the selected entities.
+// After construction, the filter is gets parameters from the request
+//    URL. A call to 'parametersFromRequest' with a request query like
+//    '?pagenum=5' would be selecting only page 5 entries.
+// The criteria filter is called before making the MongoDB query and
+//    can return MongoDB query pieces if it can be done. The filter
+//    doesn't have to do DB query filtering as it is called for each
+//    found entity so it can test them. So, filters usually either
+//    return a DB query filter when called by 'criteriaParameters' or
+//    does the test with 'criteriaTest'.
+// The call 'addResponseFields' is called after the request is completed
+//    and is used mostly by Pagination to add page info to the query
+//    response.
 export abstract class CriteriaFilter {
 
   // Take a request and extract filter parameters
