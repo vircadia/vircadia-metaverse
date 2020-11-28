@@ -25,6 +25,7 @@ import { createObject, getObject, getObjects, countObjects, updateObjectFields, 
 import { GenUUID, IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
+import { Maturity } from './Sets/Maturity';
 
 export type DomainTestFunction = (domain: DomainEntity) => boolean;
 
@@ -90,6 +91,7 @@ export const Domains = {
     newDomain.managers = [];
     newDomain.images = [];
     newDomain.whenCreated = new Date();
+    newDomain.maturity = Maturity.UNRATED;
     return newDomain;
   },
   async removeDomain(pDomainEntity: DomainEntity) : Promise<boolean> {

@@ -56,6 +56,7 @@ const procPostDomainsTemporary: RequestHandler = async (req: Request, resp: Resp
   newPlace.domainId = newDomain.id;
   newPlace.name = newPlacename;
   newPlace.description = 'A place in ' + newDomain.name;
+  newPlace.maturity = newDomain.maturity;
   newPlace.iPAddrOfFirstContact = req.vSenderKey;
 
   // If the requestor is logged in, associate that account with the new domain/place

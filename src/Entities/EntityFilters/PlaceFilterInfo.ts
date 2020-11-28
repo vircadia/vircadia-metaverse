@@ -46,12 +46,24 @@ export class PlaceFilterInfo extends CriteriaFilter {
     try {
       // Comma separated list of attribute criteria.
       if (typeof(pRequest.query.maturity) === 'string') {
-        if (Maturity.KnownMaturity(pRequest.query.maturity)) {
-          this._maturity = pRequest.query.maturity.split(',');
+        this._maturity = pRequest.query.maturity.split(',');
+        // Check to make sure all the pieces are legal maturity names
+        let allLegal = true;
+        for (const mat of this._maturity) {
+          if ( ! Maturity.KnownMaturity(mat)) {
+            allLegal = false;
+            break;
+          };
+        };
+        if (allLegal) {
           if (this._maturity.includes(Maturity.UNRATED)) {
             // Adding a 'null' to the set causes places with no rating to be included
             this._maturity.push(null);
-          }
+          };
+        }
+        else {
+          Logger.cdebug('query-detail', `PlaceFilterInfo.parametersFromRequest: passed undefined maturity level ${JSON.stringify(this._maturity)}`);
+          this._maturity = undefined;
         };
       };
 
@@ -61,7 +73,7 @@ export class PlaceFilterInfo extends CriteriaFilter {
         this._tags = pRequest.query.tag.split(',');
       };
 
-      Logger.cdebug('query-detail', `PlaceFilterInfo.parametersFromRequest: _maturity=${this._maturity}, _tags=${JSON.stringify(this._tags)}`);
+      Logger.cdebug('query-detail', `PlaceFilterInfo.parametersFromRequest: _maturity=${JSON.stringify(this._maturity)}, _tags=${JSON.stringify(this._tags)}`);
     }
     catch (e) {
       Logger.error('PlaceFilterInfo: parameters from request: exception: ' + e);

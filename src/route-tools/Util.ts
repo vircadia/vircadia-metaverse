@@ -31,6 +31,7 @@ import { createPublicKey } from 'crypto';
 import { VKeyedCollection, VKeyValue } from '@Tools/vTypes';
 import { IsNotNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
+import { Maturity } from '@Entities/Sets/Maturity';
 
 // The public_key is sent as a binary (DER) form of a PKCS1 key.
 // To keep backward compatibility, we convert the PKCS1 key into a SPKI key in PEM format
@@ -161,7 +162,7 @@ export async function buildDomainInfoV1(pDomain: DomainEntity): Promise<any> {
     'total_users': pDomain.numUsers + pDomain.anonUsers,
     'capacity': pDomain.capacity,
     'description': pDomain.description,
-    'maturity': pDomain.maturity,
+    'maturity': pDomain.maturity ?? Maturity.UNRATED,
     'restriction': pDomain.restriction,
     'managers': pDomain.managers,
     'tags': pDomain.tags,
@@ -253,7 +254,7 @@ export async function buildPlaceInfoSmall(pPlace: PlaceEntity): Promise<any> {
     'name': pPlace.name,
     'address': pPlace.address,
     'description': pPlace.description,
-    'maturity': pPlace.maturity,
+    'maturity': pPlace.maturity ?? Maturity.UNRATED,
     'tags': pPlace.tags,
     'thumbnail': pPlace.thumbnail,
     'images': pPlace.images
