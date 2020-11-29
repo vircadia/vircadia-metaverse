@@ -13,10 +13,17 @@
 //   limitations under the License.
 'use strict'
 
+import { AccountEntity } from '@Entities/AccountEntity';
 import { PlaceEntity } from '@Entities/PlaceEntity';
+import { placeFields } from '@Entities/PlaceFields';
+
+import { AuthToken } from '@Entities/AuthToken';
 
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
+
+import { ValidateResponse } from '@Route-Tools/EntityFieldDefn';
+import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/GetterSetter';
 
 import { createObject, getObject, getObjects, updateObjectFields, deleteOne, deleteMany, noCaseCollation } from '@Tools/Db';
 
@@ -57,6 +64,34 @@ export const Places = {
       Logger.info(`uniqifyPlaceName: non-unique place name ${pPlaceName}. Creating ${newPlacename}`);
     };
     return newPlacename;
+  },
+  // Get the value of a place field with the fieldname.
+  // Checks to make sure the getter has permission to get the values.
+  // Returns the value. Could be 'undefined' whether the requestor doesn't have permissions or that's
+  //     the actual field value.
+  async getField(pAuthToken: AuthToken, pPlace: PlaceEntity,
+                                  pField: string, pRequestingAccount?: AccountEntity): Promise<any> {
+    return getEntityField(placeFields, pAuthToken, pPlace, pField, pRequestingAccount);
+  },
+  // Set a place field with the fieldname and a value.
+  // Checks to make sure the setter has permission to set.
+  // Returns 'true' if the value was set and 'false' if the value could not be set.
+  async setField(pAuthToken: AuthToken,  // authorization for making this change
+              pPlace: PlaceEntity,               // the place being changed
+              pField: string, pVal: any,          // field being changed and the new value
+              pRequestingAccount?: AccountEntity, // Account associated with pAuthToken, if known
+              pUpdates?: VKeyedCollection         // where to record updates made (optional)
+                      ): Promise<ValidateResponse> {
+    return setEntityField(placeFields, pAuthToken, pPlace, pField, pVal, pRequestingAccount, pUpdates);
+  },
+  // Generate an 'update' block for the specified field or fields.
+  // This is a field/value collection that can be passed to the database routines.
+  // Note that this directly fetches the field value rather than using 'getter' since
+  //     we want the actual value (whatever it is) to go into the database.
+  // If an existing VKeyedCollection is passed, it is added to an returned.
+  getUpdateForField(pPlace: PlaceEntity,
+                pField: string | string[], pExisting?: VKeyedCollection): VKeyedCollection {
+    return getEntityUpdateForField(placeFields, pPlace, pField, pExisting);
   },
   async removePlace(pPlaceEntity: PlaceEntity) : Promise<boolean> {
     Logger.info(`Places: removing place ${pPlaceEntity.name}, id=${pPlaceEntity.id}`);

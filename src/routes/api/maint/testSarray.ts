@@ -20,7 +20,7 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 
 import { Availability } from '@Entities/Sets/Availability';
-import { isValidSArraySet, isValidSArray, verifyAllSArraySetValues, isPathValidator } from '@Route-Tools/GetterSetter';
+import { isValidSArraySet, isValidSArray, verifyAllSArraySetValues, isPathValidator } from '@Route-Tools/Validators';
 
 import { SArray } from '@Tools/vTypes';
 import { IsNotNullOrEmpty } from '@Tools/Misc';

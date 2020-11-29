@@ -21,7 +21,6 @@ import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
 
 import { Accounts } from '@Entities/Accounts';
-import { accountFields } from '@Entities/AccountEntity';
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
 import { AccountFilterInfo } from '@Entities/EntityFilters/AccountFilterInfo';
@@ -77,9 +76,9 @@ const procPostUsers: RequestHandler = async (req: Request, resp: Response, next:
       const userEmail: string = req.body.user.email;
       Logger.debug(`procPostUsers: request to create account for ${userName} with email ${userEmail}`);
       // Precheck format of username and email before trying to set them
-      let ifValid = await accountFields.username.validate(accountFields.username, 'username', userName);
+      let ifValid = await Accounts.validateFieldValue('username', userName);
       if (ifValid.valid) {
-        ifValid = await accountFields.email.validate(accountFields.email, 'email', userEmail);
+        ifValid = await Accounts.validateFieldValue('email', userEmail);
         if (ifValid.valid) {
           // See if account already exists
           let prevAccount = await Accounts.getAccountWithUsername(userName);

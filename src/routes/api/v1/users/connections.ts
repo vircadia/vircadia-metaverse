@@ -17,10 +17,9 @@
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 
 import { Accounts } from '@Entities/Accounts';
-import { getAccountField } from '@Entities/AccountEntity';
 
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
-import { accountFromAuthToken, usernameFromParams } from '@Route-Tools/middleware';
+import { accountFromAuthToken } from '@Route-Tools/middleware';
 import { buildLocationInfo, buildImageInfo } from '@Route-Tools/Util';
 
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
@@ -35,7 +34,7 @@ const procGetUsersConnections: RequestHandler = async (req: Request, resp: Respo
     const pager = new PaginationInfo();
     pager.parametersFromRequest(req);
 
-    let connections: string[] = await getAccountField(req.vAuthToken, req.vAuthAccount, 'connections', req.vAuthAccount);
+    let connections: string[] = await Accounts.getField(req.vAuthToken, req.vAuthAccount, 'connections', req.vAuthAccount);
     connections = IsNullOrEmpty(connections)
               ? []        // if no connections info, return empty list
               : connections;

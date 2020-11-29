@@ -20,7 +20,7 @@ import { accountFromAuthToken } from '@Route-Tools/middleware';
 
 import { Domains } from '@Entities/Domains';
 import { Places } from '@Entities/Places';
-import { domainFields } from '@Entities/DomainEntity';
+import { DomainFields } from '@Entities/DomainFields';
 import { buildDomainInfoV1 } from '@Route-Tools/Util';
 import { buildDomainInfo, buildPlaceInfo } from '@Route-Tools/Util';
 
@@ -64,7 +64,7 @@ const procPostDomains: RequestHandler = async (req: Request, resp: Response, nex
     if (req.body && req.body.domain && req.body.domain.label) {
       const newDomainName = req.body.domain.label;
       if (IsNotNullOrEmpty(newDomainName)) {
-        const ifValid = await domainFields.name.validate(domainFields.name, req.vAuthAccount, newDomainName);
+        const ifValid = await DomainFields.name.validate(DomainFields.name, req.vAuthAccount, newDomainName);
         if (ifValid.valid) {
           const generatedAPIkey: string = GenUUID();
 

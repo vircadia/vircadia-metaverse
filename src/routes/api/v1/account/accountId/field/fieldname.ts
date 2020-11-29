@@ -19,14 +19,13 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 import { setupMetaverseAPI, finishMetaverseAPI, tokenFromParams, accountFromParams } from '@Route-Tools/middleware';
 import { accountFromAuthToken, param1FromParams } from '@Route-Tools/middleware';
 
-import { getAccountField, setAccountField, getAccountUpdateForField } from '@Entities/AccountEntity';
 import { Accounts } from '@Entities/Accounts';
 import { VKeyedCollection } from '@Tools/vTypes';
 
 // Get the scope of the logged in account
 const procGetField: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount && req.vAccount) {
-    req.vRestResp.Data = await getAccountField(req.vAuthToken, req.vAccount, req.vParam1, req.vAuthAccount);
+    req.vRestResp.Data = await Accounts.getField(req.vAuthToken, req.vAccount, req.vParam1, req.vAuthAccount);
   }
   else {
     req.vRestResp.respondFailure('unauthorized');
@@ -40,7 +39,7 @@ const procPostField: RequestHandler = async (req: Request, resp: Response, next:
   if (req.vAuthAccount && req.vAccount) {
     if (req.body.hasOwnProperty('set')) {
       const updates: VKeyedCollection = {};
-      const success = await setAccountField(req.vAuthToken, req.vAccount, req.vParam1, req.body.set, req.vAuthAccount, updates);
+      const success = await Accounts.setField(req.vAuthToken, req.vAccount, req.vParam1, req.body.set, req.vAuthAccount, updates);
       if (success.valid) {
         // Setting worked so update the database
         Accounts.updateEntityFields(req.vAccount, updates);

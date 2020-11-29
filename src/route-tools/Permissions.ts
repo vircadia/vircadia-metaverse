@@ -15,33 +15,18 @@
 'use strict';
 
 import { Entity } from '@Entities/Entity';
+import { Accounts } from '@Entities/Accounts';
 import { AccountEntity } from '@Entities/AccountEntity';
+import { Domains } from '@Entities/Domains';
 import { DomainEntity } from '@Entities/DomainEntity';
 import { AuthToken } from '@Entities/AuthToken';
 import { Tokens, TokenScope } from '@Entities/Tokens';
-import { Accounts } from '@Entities/Accounts';
+
+import { Perm } from '@Route-Tools/Perm';
 
 import { SArray, VKeyedCollection } from '@Tools/vTypes';
 import { IsNotNullOrEmpty, IsNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
-
-//  'all': any one
-//  'domain': the requesting authToken is for a domain and the sponsor account matches
-//  'owner': the requesting account is the owner of the target account
-//  'friend': the requesting account is a friend of the target account
-//  'connection': the requesting account is a connection of the target account
-//  'admin': the requesting account has 'admin' privilages
-//  'sponsor': the requesting account is the sponsor of the traget domain
-export class Perm {
-  public static NONE     = 'none';
-  public static ALL      = 'all';
-  public static DOMAIN   = 'domain';      // check against .sponsorId
-  public static OWNER    = 'owner';       // check against .id or .accountId
-  public static FRIEND   = 'friend';      // check member of .friends
-  public static CONNECTION = 'connection';// check member of .connections
-  public static ADMIN    = 'admin';       // check if isAdmin
-  public static SPONSOR  = 'sponsor';     // check against .sponsorAccountId
-};
 
 // Check if the passed AuthToken has access to the passed Entity.
 // Generalized for any Entity. The permissions expect 'accountId' and 'sponsorAccountId'
@@ -131,6 +116,15 @@ export async function checkAccessToEntity(pAuthToken: AuthToken,  // token being
             if (pTargetEntity.hasOwnProperty('sponsorAccountId')) {
               Logger.cdebug('field-setting', `checkAccessToEntity: authToken is domain. auth.AccountId=${pAuthToken.accountId}, sponsor=${(pTargetEntity as any).sponsorAccountId}`);
               canAccess = pAuthToken.accountId === (pTargetEntity as DomainEntity).sponsorAccountId;
+            };
+          };
+          break;
+        case Perm.DOMAINACCESS:
+          // Target entity has a domain reference and verify the requestor is able to reference that domain
+          if (pTargetEntity.hasOwnProperty('domainId')) {
+            const aDomain = await Domains.getDomainWithId((pTargetEntity as any).domainId);
+            if (aDomain) {
+              canAccess = aDomain.sponsorAccountId === pAuthToken.accountId;
             };
           };
           break;

@@ -20,11 +20,11 @@ import { HTTPStatusCode } from '@Route-Tools/RESTResponse';
 
 import { accountFromAuthToken } from '@Route-Tools/middleware';
 import { domainFromParams } from '@Route-Tools/middleware';
-import { checkAccessToEntity, Perm } from '@Route-Tools/Permissions';
+import { Perm } from '@Route-Tools/Perm';
+import { checkAccessToEntity } from '@Route-Tools/Permissions';
 import { buildDomainInfoV1 } from '@Route-Tools/Util';
 
 import { Domains } from '@Entities/Domains';
-import { setDomainField } from '@Entities/DomainEntity';
 import { Accounts } from '@Entities/Accounts';
 
 import { VKeyedCollection } from '@Tools/vTypes';
@@ -71,12 +71,12 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
         for (const field of ['version', 'protocol', 'network_address', 'network_port', 'automatic_networking',
                     'restricted', 'capacity', 'description', 'maturity', 'restriction', 'managers', 'tags' ]) {
           if (valuesToSet.hasOwnProperty(field)) {
-            await setDomainField(req.vAuthToken, req.vDomain, field, valuesToSet[field], req.vAuthAccount, updated);
+            await Domains.setField(req.vAuthToken, req.vDomain, field, valuesToSet[field], req.vAuthAccount, updated);
           };
         };
         if (valuesToSet.hasOwnProperty('heartbeat')) {
-          await setDomainField(req.vAuthToken, req.vDomain, 'num_users', valuesToSet.heartbeat.num_users, req.vAuthAccount, updated);
-          await setDomainField(req.vAuthToken, req.vDomain, 'num_anon_users', valuesToSet.heartbeat.num_anon_users, req.vAuthAccount, updated);
+          await Domains.setField(req.vAuthToken, req.vDomain, 'num_users', valuesToSet.heartbeat.num_users, req.vAuthAccount, updated);
+          await Domains.setField(req.vAuthToken, req.vDomain, 'num_anon_users', valuesToSet.heartbeat.num_anon_users, req.vAuthAccount, updated);
         };
 
         if (valuesToSet.meta) {
@@ -85,7 +85,7 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
           for (const field of [ 'capacity', 'contact_info', 'description', 'managers', 'tags', 'images',
                         'maturity', 'restriction', 'thumbnail', 'world_name' ]) {
             if (valuesToSet.hasOwnProperty(field)) {
-              await setDomainField(req.vAuthToken, req.vDomain, field, valuesToSet[field], req.vAuthAccount, updated);
+              await Domains.setField(req.vAuthToken, req.vDomain, field, valuesToSet[field], req.vAuthAccount, updated);
             };
           };
         };

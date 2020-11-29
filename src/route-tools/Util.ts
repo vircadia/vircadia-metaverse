@@ -17,7 +17,7 @@
 import { Request } from 'express';
 
 import { Accounts } from '@Entities/Accounts';
-import { AccountEntity, setAccountField } from '@Entities/AccountEntity';
+import { AccountEntity } from '@Entities/AccountEntity';
 
 import { Domains } from '@Entities/Domains';
 import { DomainEntity } from '@Entities/DomainEntity';
@@ -76,7 +76,7 @@ export async function updateLocationInfo(pReq: Request): Promise<VKeyedCollectio
       for (const field of ['connected', 'path', 'place_id', 'domain_id',
                             'network_address', 'node_id', 'availability']) {
         if (loc.hasOwnProperty(field)) {
-          await setAccountField(pReq.vAuthToken, pReq.vAuthAccount, field, loc[field], pReq.vAuthAccount, newLoc);
+          await Accounts.setField(pReq.vAuthToken, pReq.vAuthAccount, field, loc[field], pReq.vAuthAccount, newLoc);
         };
       };
     }

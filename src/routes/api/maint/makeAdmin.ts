@@ -23,7 +23,6 @@ import { Logger } from '@Tools/Logging';
 import { Accounts } from '@Entities/Accounts';
 import { Tokens } from '@Entities/Tokens';
 import { IsNotNullOrEmpty } from '@Tools/Misc';
-import { setAccountField } from '@Entities/AccountEntity';
 import { Roles } from '@Entities/Sets/Roles';
 
 import { SArray, VKeyedCollection } from '@Tools/vTypes';
@@ -40,7 +39,7 @@ const procMakeAdmin: RequestHandler = async (req: Request, resp: Response, next:
       else {
         const updates: VKeyedCollection = {};
         const adminToken = Tokens.createSpecialAdminToken();
-        const success = await setAccountField(adminToken, adminAccount, 'roles', { 'add': Roles.ADMIN }, adminAccount, updates);
+        const success = await Accounts.setField(adminToken, adminAccount, 'roles', { 'add': Roles.ADMIN }, adminAccount, updates);
         if (success.valid) {
           await Accounts.updateEntityFields(adminAccount, updates);
         }

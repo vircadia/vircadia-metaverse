@@ -19,7 +19,8 @@ import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken, accountFromParams } from '@Route-Tools/middleware';
 import { buildLocationInfo } from '@Route-Tools/Util';
 
-import { Perm, checkAccessToEntity } from '@Route-Tools/Permissions';
+import { Perm } from '@Route-Tools/Perm';
+import { checkAccessToEntity } from '@Route-Tools/Permissions';
 
 const procGetUserLocation: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {

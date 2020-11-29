@@ -19,7 +19,6 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken, param1FromParams } from '@Route-Tools/middleware';
 import { Accounts } from '@Entities/Accounts';
-import { getAccountField, setAccountField } from '@Entities/AccountEntity';
 
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 
@@ -32,7 +31,7 @@ const procGetUserFriends: RequestHandler = async (req: Request, resp: Response, 
     const pager = new PaginationInfo();
     pager.parametersFromRequest(req);
 
-    let friends = await getAccountField(req.vAuthToken, req.vAuthAccount, 'friends', req.vAuthAccount);
+    let friends = await Accounts.getField(req.vAuthToken, req.vAuthAccount, 'friends', req.vAuthAccount);
     friends = IsNullOrEmpty(friends)
               ? []        // if no friends info, return empty list
               : friends;
@@ -54,10 +53,10 @@ const procPostUserFriends: RequestHandler = async (req: Request, resp: Response,
     if (req.body.username && typeof(req.body.username) === 'string') {
       const newFriend = req.body.username;
       // Verify the username is a connection.
-      const connections: string[] = await getAccountField(req.vAuthToken, req.vAuthAccount, 'connections', req.vAuthAccount) ?? [];
+      const connections: string[] = await Accounts.getField(req.vAuthToken, req.vAuthAccount, 'connections', req.vAuthAccount) ?? [];
       if (SArray.hasNoCase(connections, newFriend)) {
         const updates: VKeyedCollection = {};
-        await setAccountField(req.vAuthToken, req.vAuthAccount, 'friends', { "add": newFriend }, req.vAuthAccount, updates);
+        await Accounts.setField(req.vAuthToken, req.vAuthAccount, 'friends', { "add": newFriend }, req.vAuthAccount, updates);
         await Accounts.updateEntityFields(req.vAuthAccount, updates);
       }
       else {

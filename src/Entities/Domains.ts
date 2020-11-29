@@ -15,39 +15,33 @@
 
 import Config from '@Base/config';
 
-import { DomainEntity, domainFields } from '@Entities/DomainEntity';
+import { AuthToken } from '@Entities/AuthToken';
+import { AccountEntity } from '@Entities/AccountEntity';
+import { DomainEntity } from '@Entities/DomainEntity';
+import { DomainFields, CheckDomainFields } from '@Entities/DomainFields';
 
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
+
+import { ValidateResponse } from '@Route-Tools/EntityFieldDefn';
+import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/GetterSetter';
+
+import { Maturity } from '@Entities/Sets/Maturity';
 
 import { createObject, getObject, getObjects, countObjects, updateObjectFields, deleteOne } from '@Tools/Db';
 
 import { GenUUID, IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
-import { Maturity } from './Sets/Maturity';
-
-export type DomainTestFunction = (domain: DomainEntity) => boolean;
 
 export let domainCollection = 'domains';
 
 // Initialize domain management.
 // Periodic checks on liveness of domains and resetting of values if not talking
 export function initDomains(): void {
-  // DEBUG DEBUG: for unknown reasons some field ops end up 'undefined'
-  Object.keys(domainFields).forEach( fieldName => {
-    const defn = domainFields[fieldName];
-    if (typeof(defn.validate) !== 'function') {
-      Logger.error(`initDomains: field ${defn.entity_field} validator is not a function`);
-    };
-    if (typeof(defn.getter) !== 'function') {
-      Logger.error(`initDomains: field ${defn.entity_field} getter is not a function`);
-    };
-    if (typeof(defn.setter) !== 'function') {
-      Logger.error(`initDomains: field ${defn.entity_field} setter is not a function`);
-    };
-  });
-  // END DEBUG DEBUG
+
+  // Validate the fields are all set (DEBUG DEGUG for problems with circular references)
+  CheckDomainFields();
 
   setInterval( async () => {
     // Find domains that are not heartbeating and reset activity if not talking
@@ -105,6 +99,34 @@ export const Domains = {
     //     This creates places that point at domains that don't exist
     // await Places.removeMany(new GenericFilter({ 'domainId': pDomainEntity.id }));
     return;
+  },
+  // Get the value of a domain field with the fieldname.
+  // Checks to make sure the getter has permission to get the values.
+  // Returns the value. Could be 'undefined' whether the requestor doesn't have permissions or that's
+  //     the actual field value.
+  async getField(pAuthToken: AuthToken, pDomain: DomainEntity,
+                                  pField: string, pRequestingAccount?: AccountEntity): Promise<any> {
+    return getEntityField(DomainFields, pAuthToken, pDomain, pField, pRequestingAccount);
+  },
+  // Set a domain field with the fieldname and a value.
+  // Checks to make sure the setter has permission to set.
+  // Returns 'true' if the value was set and 'false' if the value could not be set.
+  async setField(pAuthToken: AuthToken,  // authorization for making this change
+              pDomain: DomainEntity,              // the domain being changed
+              pField: string, pVal: any,          // field being changed and the new value
+              pRequestingAccount?: AccountEntity, // Account associated with pAuthToken, if known
+              pUpdates?: VKeyedCollection         // where to record updates made (optional)
+                      ): Promise<ValidateResponse> {
+    return setEntityField(DomainFields, pAuthToken, pDomain, pField, pVal, pRequestingAccount, pUpdates);
+  },
+  // Generate an 'update' block for the specified field or fields.
+  // This is a field/value collection that can be passed to the database routines.
+  // Note that this directly fetches the field value rather than using 'getter' since
+  //     we want the actual value (whatever it is) to go into the database.
+  // If an existing VKeyedCollection is passed, it is added to an returned.
+  getUpdateForField(pDomain: DomainEntity,
+                pField: string | string[], pExisting?: VKeyedCollection): VKeyedCollection {
+    return getEntityUpdateForField(DomainFields, pDomain, pField, pExisting);
   },
   // Return the number of domains that match the criteria
   async domainCount(pCriteria: CriteriaFilter): Promise<number> {

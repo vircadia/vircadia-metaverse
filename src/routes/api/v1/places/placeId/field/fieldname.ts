@@ -20,7 +20,6 @@ import { setupMetaverseAPI, finishMetaverseAPI, tokenFromParams, accountFromPara
 import { accountFromAuthToken, param1FromParams, param2FromParams } from '@Route-Tools/middleware';
 
 import { Places } from '@Entities/Places';
-import { getPlaceField, setPlaceField } from '@Entities/PlaceEntity';
 
 import { checkAccessToEntity } from '@Route-Tools/Permissions';
 
@@ -31,7 +30,7 @@ import { Logger } from '@Tools/Logging';
 // Get a field from a place entry
 const procGetField: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vPlace && req.vParam1) {
-    req.vRestResp.Data = await getPlaceField(req.vAuthToken, req.vPlace, req.vParam1, req.vAuthAccount);
+    req.vRestResp.Data = await Places.getField(req.vAuthToken, req.vPlace, req.vParam1, req.vAuthAccount);
   }
   else {
     req.vRestResp.respondFailure('no such place');
@@ -45,7 +44,7 @@ const procPostField: RequestHandler = async (req: Request, resp: Response, next:
     if (req.vPlace && req.vParam1) {
       if (req.body.hasOwnProperty('set')) {
         const updates: VKeyedCollection = {};
-        const success = await setPlaceField(req.vAuthToken, req.vPlace, req.vParam1, req.body.set, req.vAuthAccount, updates);
+        const success = await Places.setField(req.vAuthToken, req.vPlace, req.vParam1, req.body.set, req.vAuthAccount, updates);
         if (success.valid) {
           // Setting worked so update the database
           Places.updateEntityFields(req.vPlace, updates);

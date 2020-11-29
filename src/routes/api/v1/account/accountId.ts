@@ -18,11 +18,11 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { accountFromAuthToken, accountFromParams } from '@Route-Tools/middleware';
 
-import { Perm, checkAccessToEntity } from '@Route-Tools/Permissions';
+import { Perm } from '@Route-Tools/Perm';
+import { checkAccessToEntity } from '@Route-Tools/Permissions';
 import { buildAccountInfo } from '@Route-Tools/Util';
 
 import { Accounts } from '@Entities/Accounts';
-import { setAccountField, getAccountUpdateForField } from '@Entities/AccountEntity';
 
 import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
@@ -55,18 +55,18 @@ const procPostAccountId: RequestHandler = async (req: Request, resp: Response, n
       const updates: VKeyedCollection = {};
       for (const field of [ 'email', 'public_key' ]) {
         if (valuesToSet.hasOwnProperty(field)) {
-          await setAccountField(req.vAuthToken, req.vAccount, field, valuesToSet.field, req.vAuthAccount, updates);
+          await Accounts.setField(req.vAuthToken, req.vAccount, field, valuesToSet.field, req.vAuthAccount, updates);
         };
       };
       if (valuesToSet.hasOwnProperty('images')) {
         if (valuesToSet.images.hero) {
-          await setAccountField(req.vAuthToken, req.vAccount, 'images_hero', valuesToSet.images.hero, req.vAuthAccount, updates);
+          await Accounts.setField(req.vAuthToken, req.vAccount, 'images_hero', valuesToSet.images.hero, req.vAuthAccount, updates);
         };
         if (valuesToSet.images.tiny) {
-          await setAccountField(req.vAuthToken, req.vAccount, 'images_tiny', valuesToSet.images.tiny, req.vAuthAccount, updates);
+          await Accounts.setField(req.vAuthToken, req.vAccount, 'images_tiny', valuesToSet.images.tiny, req.vAuthAccount, updates);
         };
         if (valuesToSet.images.thumbnail) {
-          await setAccountField(req.vAuthToken, req.vAccount, 'images_thumbnail', valuesToSet.images.thumbnail, req.vAuthAccount, updates);
+          await Accounts.setField(req.vAuthToken, req.vAccount, 'images_thumbnail', valuesToSet.images.thumbnail, req.vAuthAccount, updates);
         };
       };
       await Accounts.updateEntityFields(req.vAuthAccount, updates);

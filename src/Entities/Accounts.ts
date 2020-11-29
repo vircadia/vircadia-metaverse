@@ -17,17 +17,23 @@ import { Config } from '@Base/config';
 
 import crypto from 'crypto';
 
-import { AccountEntity, accountFields, setAccountField } from '@Entities/AccountEntity';
-import { Roles } from '@Entities/Sets/Roles';
+import { AccountEntity } from '@Entities/AccountEntity';
+import { accountFields, CheckAccountFields } from '@Entities/AccountFields';
+
 import { Domains } from '@Entities/Domains';
+import { Roles } from '@Entities/Sets/Roles';
 import { Places } from '@Entities/Places';
 import { Tokens } from '@Entities/Tokens';
+import { AuthToken } from '@Entities/AuthToken';
+
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
 
+import { ValidateResponse } from '@Route-Tools/EntityFieldDefn';
+import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/GetterSetter';
+
 import { createObject, getObject, getObjects, updateObjectFields, deleteOne, noCaseCollation, countObjects } from '@Tools/Db';
 import { GenUUID, genRandomString, IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
-
 import { VKeyedCollection, SArray } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
 
@@ -35,20 +41,8 @@ export let accountCollection = 'accounts';
 
 // Initialize account management.
 export function initAccounts(): void {
-  // DEBUG DEBUG: for unknown reasons some field ops end up 'undefined'
-  Object.keys(accountFields).forEach( fieldName => {
-    const defn = accountFields[fieldName];
-    if (typeof(defn.validate) !== 'function') {
-      Logger.error(`initAccounts: field ${defn.entity_field} validator is not a function`);
-    };
-    if (typeof(defn.getter) !== 'function') {
-      Logger.error(`initAccounts: field ${defn.entity_field} getter is not a function`);
-    };
-    if (typeof(defn.setter) !== 'function') {
-      Logger.error(`initAccounts: field ${defn.entity_field} setter is not a function`);
-    };
-  });
-  // END DEBUG DEBUG
+  // Validate the fields have been initialized
+  CheckAccountFields();
 };
 
 export const Accounts = {
@@ -128,6 +122,42 @@ export const Accounts = {
   async updateEntityFields(pEntity: AccountEntity, pFields: VKeyedCollection): Promise<AccountEntity> {
     return updateObjectFields(accountCollection, new GenericFilter({ 'id': pEntity.id }), pFields);
   },
+  // Get the value of a domain field with the fieldname.
+  // Checks to make sure the getter has permission to get the values.
+  // Returns the value. Could be 'undefined' whether the requestor doesn't have permissions or that's
+  //     the actual field value.
+  async getField(pAuthToken: AuthToken, pAccount: AccountEntity,
+                    pField: string, pRequestingAccount?: AccountEntity): Promise<any> {
+    return getEntityField(accountFields, pAuthToken, pAccount, pField, pRequestingAccount);
+  },
+  // Set a domain field with the fieldname and a value.
+  // Checks to make sure the setter has permission to set.
+  // Returns 'true' if the value was set and 'false' if the value could not be set.
+  async setField(pAuthToken: AuthToken,  // authorization for making this change
+              pAccount: AccountEntity,            // the account being changed
+              pField: string, pVal: any,          // field being changed and the new value
+              pRequestingAccount?: AccountEntity, // Account associated with pAuthToken, if known
+              pUpdates?: VKeyedCollection         // where to record updates made (optional)
+                      ): Promise<ValidateResponse> {
+    return setEntityField(accountFields, pAuthToken, pAccount, pField, pVal, pRequestingAccount, pUpdates);
+  },
+  // Generate an 'update' block for the specified field or fields.
+  // This is a field/value collection that can be passed to the database routines.
+  // Note that this directly fetches the field value rather than using 'getter' since
+  //     we want the actual value (whatever it is) to go into the database.
+  // If an existing VKeyedCollection is passed, it is added to an returned.
+  getUpdateForField(pAccount: AccountEntity,
+                pField: string | string[], pExisting?: VKeyedCollection): VKeyedCollection {
+    return getEntityUpdateForField(accountFields, pAccount, pField, pExisting);
+  },
+  // Verify that the passed value is legal for the named field
+  async validateFieldValue(pFieldName: string, pValue: any): Promise<ValidateResponse> {
+    const defn = accountFields[pFieldName];
+    if (defn) {
+      return await defn.validate(defn, defn.request_field_name, pValue);
+    };
+    return { 'valid': false, 'reason': 'Unknown field name' };
+  },
   // Return the number of accounts that match the criteria
   async accountCount(pCriteria: CriteriaFilter): Promise<number> {
     return countObjects(accountCollection, pCriteria);
@@ -176,7 +206,7 @@ export const Accounts = {
     if (SArray.hasNoCase(pRequestingAccount.connections, pTargetAccount.username)) {
       const adminToken = Tokens.createSpecialAdminToken();
       const updates: VKeyedCollection = {};
-      await setAccountField(adminToken, pRequestingAccount, 'friends', { 'add': pTargetAccount.username }, pRequestingAccount, updates);
+      await Accounts.setField(adminToken, pRequestingAccount, 'friends', { 'add': pTargetAccount.username }, pRequestingAccount, updates);
       await Accounts.updateEntityFields(pRequestingAccount, updates);
     }
   },
@@ -184,36 +214,36 @@ export const Accounts = {
   async makeAccountsConnected(pRequestingAccount: AccountEntity, pTargetAccount: AccountEntity): Promise<void> {
     const adminToken = Tokens.createSpecialAdminToken();
     let updates: VKeyedCollection = {};
-    await setAccountField(adminToken, pRequestingAccount, 'connections', { 'add': pTargetAccount.username }, pRequestingAccount, updates);
+    await Accounts.setField(adminToken, pRequestingAccount, 'connections', { 'add': pTargetAccount.username }, pRequestingAccount, updates);
     await Accounts.updateEntityFields(pRequestingAccount, updates);
     updates = {};
-    await setAccountField(adminToken, pTargetAccount, 'connections', { 'add': pRequestingAccount.username }, pTargetAccount, updates);
+    await Accounts.setField(adminToken, pTargetAccount, 'connections', { 'add': pRequestingAccount.username }, pTargetAccount, updates);
     await Accounts.updateEntityFields(pTargetAccount, updates);
   },
   // Remove the named account from the list of connections. Also cleans out the other side
   async removeConnection(pAccount: AccountEntity, pConnectionName: string) {
     let updates: VKeyedCollection = {};
     const adminToken = Tokens.createSpecialAdminToken();
-      await setAccountField(adminToken, pAccount, 'connections', { 'remove': pConnectionName }, pAccount, updates);
-      await setAccountField(adminToken, pAccount, 'friends', { 'remove': pConnectionName }, pAccount, updates);
+      await Accounts.setField(adminToken, pAccount, 'connections', { 'remove': pConnectionName }, pAccount, updates);
+      await Accounts.setField(adminToken, pAccount, 'friends', { 'remove': pConnectionName }, pAccount, updates);
       await Accounts.updateEntityFields(pAccount, updates);
     const otherAccount = await Accounts.getAccountWithUsername(pConnectionName);
     if (otherAccount) {
       updates = {};
-      await setAccountField(adminToken, otherAccount, 'connections', { 'remove': pAccount.username }, otherAccount, updates);
-      await setAccountField(adminToken, otherAccount, 'friends', { 'remove': pAccount.username }, otherAccount, updates);
+      await Accounts.setField(adminToken, otherAccount, 'connections', { 'remove': pAccount.username }, otherAccount, updates);
+      await Accounts.setField(adminToken, otherAccount, 'friends', { 'remove': pAccount.username }, otherAccount, updates);
       await Accounts.updateEntityFields(otherAccount, updates);
     };
   },
   async removeFriend(pAccount: AccountEntity, pFriendName: string) {
     let updates: VKeyedCollection = {};
     const adminToken = Tokens.createSpecialAdminToken();
-      await setAccountField(adminToken, pAccount, 'friends', { 'remove': pFriendName }, pAccount, updates);
+      await Accounts.setField(adminToken, pAccount, 'friends', { 'remove': pFriendName }, pAccount, updates);
       await Accounts.updateEntityFields(pAccount, updates);
     const otherAccount = await Accounts.getAccountWithUsername(pFriendName);
     if (otherAccount) {
       updates = {};
-      await setAccountField(adminToken, otherAccount, 'friends', { 'remove': pAccount.username }, otherAccount, updates);
+      await Accounts.setField(adminToken, otherAccount, 'friends', { 'remove': pAccount.username }, otherAccount, updates);
       await Accounts.updateEntityFields(otherAccount, updates);
     };
   },

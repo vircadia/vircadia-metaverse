@@ -20,13 +20,13 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 import { setupMetaverseAPI, finishMetaverseAPI, param1FromParams, placeFromParams } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
 
-import { checkAccessToEntity, Perm } from '@Route-Tools/Permissions';
+import { Perm } from '@Route-Tools/Perm';
+import { checkAccessToEntity } from '@Route-Tools/Permissions';
 
 import { buildPlaceInfo } from '@Route-Tools/Util';
 
 import { Places } from '@Entities/Places';
 import { Maturity } from '@Entities/Sets/Maturity';
-import { setPlaceField } from '@Entities/PlaceEntity';
 
 import { IsNullOrEmpty } from '@Tools/Misc';
 import { VKeyedCollection } from '@Tools/vTypes';
@@ -62,7 +62,7 @@ export const procPutPlacesPlaceId: RequestHandler = async (req: Request, resp: R
         };
         for (const field of [ 'path', 'address', 'description', 'thumbnail' ]) {
           if (req.body.place.hasOwnProperty(field)) {
-            await setPlaceField(req.vAuthToken, req.vPlace, field, req.body.place[field], req.vAuthAccount, updates);
+            await Places.setField(req.vAuthToken, req.vPlace, field, req.body.place[field], req.vAuthAccount, updates);
           };
         };
         Places.updateEntityFields(req.vPlace, updates);
