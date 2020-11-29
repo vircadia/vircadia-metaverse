@@ -1,4 +1,14 @@
 # Iamus Changelog
+## Version 2.3.5
+
+<ul>
+<li><a href="http://github.com/kasenvr/Iamus/commit/e95291d4988f48d780795e134a364d9120f22fc3">view &bull;</a> Update ChangeLog.md</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/b360944a70a994ee701a0f2b23303a1d71dd76fb">view &bull;</a> Change Place filter 'maturity' to take a comma separated string     of maturity classes to match.</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/00355c7481b1958379d574a1ff7acc65a18d2eed">view &bull;</a> When creating a Place, default maturity to the parent domain's maturity. Default DomainEntity.maturity to Maturity.UNRATED.</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/a80864dfea02c284c195000184392f9c1f7bdcce">view &bull;</a> Massive refactoring to remove circular import dependencies that were     causing null value initializations due to how Javascript loads. Move Entity field definitions into separate files. Moved Entity field getting and setting into the Entity controlling class. Repackaged (into multiple files) Permission and Get/Set/Validate routines.</li> 
+<li><a href="http://github.com/kasenvr/Iamus/commit/bf4df1bad8290c7ef4b20e5ce940b1a925f3b04e">view &bull;</a> Bump version to 2.3.5</li> 
+</ul>
+
 ## Version 2.3.4
 
 <ul>
@@ -94,21 +104,5 @@
 <li><a href="http://github.com/kasenvr/Iamus/commit/f58fdefbc47f37f9bcdaf314d14c970b4c358b17">view &bull;</a> Remove code that assumed domain-server network address was connection IP addr.     The immediate connection can be from a proxy server so it's often wrong.     More design and debugging is needed for this feature. Add /api/maint/fixDomainIP to allow an admin to clean out bad domain IP addresses.</li> 
 <li><a href="http://github.com/kasenvr/Iamus/commit/9cd564701196f3b5fe118003b25bbe0c897c5135">view &bull;</a> Get login account info for fixDomainIP maint operation.</li> 
 <li><a href="http://github.com/kasenvr/Iamus/commit/b515cd2c546dce221747410484e9415a4eb4be29">view &bull;</a> Bump version to 2.2.21</li> 
-</ul>
-
-## Version 2.2.20
-
-<ul>
-<li><a href="http://github.com/kasenvr/Iamus/commit/bcba27784d37f4d7190a7b67f6b7ec4250715881">view &bull;</a> Add the missing address to the end of an Explore hifi URL</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/a2b8737f327f9cac359db53d481ec36221b66bfd">view &bull;</a> Fix line endings to Linux style.</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/6517cb89b740779ca5532bcd975b9f0f9f729b39">view &bull;</a> Remove authentication requirement for fetching /explore</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/facd94a32b11d9fd9df99c2b6ec8b70e1c28aacb">view &bull;</a> Change type of request being searched for in connection_request. Add some debug messages to connection_request.</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/b59c6ec0994ed9eef117e846b40e33d527e1b000">view &bull;</a> Always return "Owner" in Explore entries.</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/ff55e37fa4ebf8044de3247324786de00344eca6">view &bull;</a> Add more debugging to user/connection_request</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/e359e51dbe3e0cb78bf3145c1ec74dd853dfbaac">view &bull;</a> Fix problem where set entity field would not assign a value if the     field did not exist on the target entity.</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/708e24542aa6680e8de679719267a2bb8e1380e7">view &bull;</a> Add function route-tools.Util.buildImageInfo() for consistant user image return data.</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/cd3c1cf57c2fa644d99787d08384e3ad166bfe3e">view &bull;</a> Change "GET /explore" to "GET /explore.json" as that's what the calling     script wants.</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/519f918ff0d5449fc042414659a415cd33c4f23f">view &bull;</a> Add /api/v1/users/connections which returns connections and their images/location info.</li> 
-<li><a href="http://github.com/kasenvr/Iamus/commit/f6b15d8e749f748c5e1265b573229da35bac9ab2">view &bull;</a> Bump version to 2.2.20</li> 
 </ul>
 
