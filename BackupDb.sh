@@ -72,7 +72,7 @@ if [[ -z "${BACKUP_USER_PW}" || "${BACKUP_USER_PW}" == "null" ]] ; then
 fi
 
 # Archive directory can be specified in the backup directory
-CONFIG_ARCHIVE_DIR=$(jq '.backup["backup-dir"]' "$CONFIG_FILE" | sed -e 's/"//' )
+CONFIG_ARCHIVE_DIR=$(jq '.backup["backup-dir"]' "$CONFIG_FILE" | sed -e 's/"//g' )
 if [[ ! -z "$CONFIG_ARCHIVE_DIR" && "$CONFIG_ARCHIVE_DIR" != "null" ]] ; then
     ARCHIVE_DIR="$CONFIG_ARCHIVE_DIR"
 fi
@@ -87,7 +87,7 @@ fi
 DATETAG=$(date +%Y%m%d.%H%M)
 ARCHIVE_FILE="${ARCHIVE_DIR}/Backup-${DB_NAME}-${DATETAG}"
 
-echo "Backing up database ${DB_NAME} on host ${DB_HOST} with user ${DB_USER} to file ${ARCHIVE_FILE}"
+echo "Backing up database ${DB_NAME} on host ${DB_HOST} with user ${BACKUP_USER} to file ${ARCHIVE_FILE}"
 
 mongodump --username="$BACKUP_USER" --password="${BACKUP_USER_PW}" --authenticationDatabase="$AUTH_DB" \
         --host="${DB_HOST}" --db="${DB_NAME}" --gzip --archive="${ARCHIVE_FILE}"
