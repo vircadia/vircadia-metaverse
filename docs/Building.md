@@ -23,7 +23,7 @@ Say you want to build and run Iamus in the directory IBASE. The steps are:
 
 ```sh
 cd $IBASE
-git clone https://github.com/kasenvr/Iamus.git
+git clone https://github.com/vircadia/Iamus.git
 cd Iamus
 npm install     # install all the required NodeJS packages
 npm run build   # build Iamus into $IBASE/Iamus/dist/
@@ -39,7 +39,7 @@ Iamus can also be built and run in a Docker container.
 Refer to [Running Docker Image] for instructions.
 
 For connecting domain-servers to the Iamus metaverse-server,
-you must point any domain-servers (Project-Athena) at this
+you must point any domain-servers (Vircadia) at this
 metaverse server. This is accomplished by setting the `HIFI_METAVERSE_URL`:
 
 ```sh

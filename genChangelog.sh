@@ -20,7 +20,7 @@ for ver in $(git tag | grep '[^a-z]' | sort -t "." -k 1,1nr -k 2,2nr -k 3,3nr | 
         echo "<ul>" >> "${CHANGELOG}"
 
         git log ${ver}..${lastver} \
-            --pretty=format:'<li><a href="http://github.com/kasenvr/Iamus/commit/%H">view &bull;</a> %s</li> ' \
+            --pretty=format:'<li><a href="http://github.com/vircadia/Iamus/commit/%H">view &bull;</a> %s</li> ' \
             --reverse | grep -v Merge >> "${CHANGELOG}"
 
         echo "</ul>" >> "${CHANGELOG}"

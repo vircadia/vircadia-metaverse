@@ -14,7 +14,7 @@ refer to the [test setup] document.
 To create your own Docker image, the process is:
 
 ```sh
-git clone https://github.com/kasenvr/Iamus.git
+git clone https://github.com/vircadia/Iamus.git
 cd Iamus/docker
 docker build -t iamus .
 ```
