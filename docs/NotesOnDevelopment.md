@@ -30,7 +30,7 @@ my development setup.
 
 ## Building and Running Ice-Server and Domain-Server
 
-The ice-server and domain-server are part of the [Project Athena] project.
+The ice-server and domain-server are part of the [Vircadia] project.
 For the ice-server and domain-server, I've been using the
 [vircadia-builder] project to build a properly configured
 version of these services.
@@ -41,7 +41,7 @@ The process is:
 
 ```sh
 cd
-git clone https://github.com/kasenvr/vircadia-builder.git
+git clone https://github.com/vircadia/vircadia-builder.git
 cd vircadia-builder
 ./vircadia-builder --tag=master --build=domain-server,ice-server,assignment-client
 cd ~/Vircadia/sources
@@ -116,11 +116,11 @@ and
 There is a PR that incorporates these changes for the **BlueStuff** test
 metaverse. This pull request has a build of the domain-server and
 Interface with pointers to the test domain.
-See [PR472](https://github.com/kasenvr/project-athena/pull/472)
+See [PR472](https://github.com/vircadia/vircadia/pull/472)
 for built images.
 
-[Project Athena]: https://github.com/kasenvr/project-athena
-[vircadia-builder]: https://github.com/kasenvr/vircadia-builder
+[Vircadia]: https://github.com/vircadia/vircadia
+[vircadia-builder]: https://github.com/vircadia/vircadia-builder
 [Docker]: https://docker.io/
 [DigitalOcean]: https://DigitalOcean.com/
 [Running Docker Image]: ./RunningDockerImage.md

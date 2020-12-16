@@ -1,10 +1,10 @@
 # Iamus Test Setup
 
 **TL:DR version**: a test metaverse using the latest
-Iamus and Project Athena
+Iamus and Vircadia
 sources (metaverse-server and ice-server) has been created.
 Do testing by running domain-servers
-and Interfaces created in [Project Athena] pull request #472 ([PR #472]).
+and Interfaces created in [Vircadia] pull request #472 ([PR #472]).
 
 Long version:
 
@@ -31,7 +31,7 @@ Command line parameters exist to change most of metaverse-server
 links, there are some (especially in the scripts) that must
 be changed in the source.
 
-There is a pull request ([PR #472]) on [Project Athena]'s Github
+There is a pull request ([PR #472]) on [Vircadia]'s Github
 repository that applies the source patches and thus builds
 images of the domain-server and Interface that should work
 with this test metaverse server.
@@ -55,9 +55,9 @@ The ice-server is addressed at `http://ice.bluestuff.org:7337`.
 As of 20200616, https has not yet been set up for these servers so
 the links must be `http:`.
 
-[Project Athena]: https://github.com/kasenvr/project-athena
-[vircadia-builder]: https://github.com/kasenvr/vircadia-builder
+[Vircadia]: https://github.com/vircadia/vircadia
+[vircadia-builder]: https://github.com/vircadia/vircadia-builder
 [Docker]: https://docker.io/
 [DigitalOcean]: https://DigitalOcean.com/
 [Running Docker Image]: ./RunningDockerImage.md
-[PR #472]: https://github.com/kasenvr/project-athena/pull/472
+[PR #472]: https://github.com/vircadia/vircadia/pull/472
