@@ -29,7 +29,6 @@ import { Places } from '@Entities/Places';
 import { Maturity } from '@Entities/Sets/Maturity';
 
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
-import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
 import { PlaceFilterInfo } from '@Entities/EntityFilters/PlaceFilterInfo';
 import { Domains } from '@Entities/Domains';
 

@@ -31,7 +31,7 @@ import { AuthToken } from '@Entities/AuthToken';
 const procGetAccountTokens: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vRestResp && req.vAuthAccount && req.vAccount) {
     const pager = new PaginationInfo();
-    const scoper = new AccountScopeFilter(req.vAuthAccount);
+    const scoper = new AccountScopeFilter(req.vAuthAccount, 'accountId');
     pager.parametersFromRequest(req);
     scoper.parametersFromRequest(req);
     const acctFilter = new GenericFilter( { 'accountId': req.vAccount.id } );

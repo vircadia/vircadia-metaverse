@@ -28,7 +28,7 @@ const procGetTokens: RequestHandler = async (req: Request, resp: Response, next:
   Logger.debug('procGetTokens');
   if (req.vAuthAccount) {
     const pager = new PaginationInfo();
-    const scoper = new AccountScopeFilter(req.vAuthAccount);
+    const scoper = new AccountScopeFilter(req.vAuthAccount, 'accountId');
     pager.parametersFromRequest(req);
     scoper.parametersFromRequest(req);
 
