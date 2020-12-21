@@ -27,7 +27,7 @@ const procGetUserProfile: RequestHandler = async (req: Request, resp: Response, 
     const dashboardURL = Config.metaverse["dashboard-url"];
     const metaverseURL = encodeURIComponent(Config.metaverse["metaverse-server-url"]);
     const username = encodeURIComponent(req.vUsername);
-    const redirectionURL = `${dashboardURL}?metaverse=${metaverseURL}&page=user/profile&user=${username}`;
+    const redirectionURL = `${dashboardURL}?metaverse=${metaverseURL}&page=profile/${username}`;
     resp.statusCode = HTTPStatusCode.Found;
     resp.setHeader('Location', redirectionURL),
     resp.setHeader('content-type', 'text/html');
