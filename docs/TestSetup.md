@@ -1,4 +1,4 @@
-# Iamus Test Setup
+# Iamus Test Setup (outdated)
 
 **TL:DR version**: a test metaverse using the latest
 Iamus and Vircadia
