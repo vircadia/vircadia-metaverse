@@ -6,12 +6,12 @@
     "author": "Robert Adams <misterblue@misterblue.com>",
     "repository": {
         "type": "git",
-        "url": "https://github.com/Misterblue/Iamus"
+        "url": "https://github.com/vircadia/Iamus"
     },
     "bugs": {
-        "url": "https://github.com/Misterblue/Iamus/issues"
+        "url": "https://github.com/vircadia/Iamus/issues"
     },
-    "homepage": "https://github.com/Misterblue/Iamus",
+    "homepage": "https://github.com/vircadia/Iamus",
     "keywords": [
         "Vircadia",
         "ActivityPub",
@@ -33,9 +33,9 @@
         "build:iamus": "tsc",
         "prestart": "npm run build",
         "start": "node dist/index.js",
-        "clean-dist": "rm -rf dist/*",
-        "create-version": "./createVersion.sh",
-        "copy-static": "cp -r src/static dist",
+        "clean-dist": "node build_scripts/cleanDist.js",
+        "create-version": "node build_scripts/createVersion.js",
+        "copy-static": "node build_scripts/copyStatic.js",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "dependencies": {
@@ -43,6 +43,7 @@
         "debug": "~2.6.9",
         "deepmerge": "^4.2.2",
         "express": "~4.16.1",
+        "fs-extra": "^9.0.1",
         "glob": "^7.1.6",
         "http-errors": "~1.6.3",
         "loglevel": "^1.7.1",
