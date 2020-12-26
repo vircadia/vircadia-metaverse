@@ -59,6 +59,9 @@ are returned (limited by pagination).
 Get the information for one account. The requestor must either be the
 account owner or an admin account.
 
+The passed "accountId" can be either the accountId (exact string as returned by
+`/api/v1/accounts` or other requests) or the account's username (URI encoded string).
+
 The information returned is the same as in the "/api/v1/accounts" but just
 for one account so the information is for "account" and is not enclosed
 in an array.
@@ -80,6 +83,9 @@ in an array.
 Update account information.
 
 The requestor must be either the account being modified or an administrator account.
+
+The passed "accountId" can be either the accountId (exact string as returned by
+`/api/v1/accounts` or other requests) or the account's username (URI encoded string).
 
 The POST body has the same format as the GET request. If a field is present, then that
 value is modified. Most of the fields cannot be modified, though, and these are ignored.
@@ -104,6 +110,9 @@ The fields that can be changed are:
 
 Get the value of an account field. The result returned is just the value of
 that field.
+
+The passed "accountId" can be either the accountId (exact string as returned by
+`/api/v1/accounts` or other requests) or the account's username (URI encoded string).
 
 This request is the opposite of the POST request that sets the values.
 
@@ -169,6 +178,9 @@ returns:
 This request sets the value of an account field.
 See the table under GET for the possible fields and the permissions
 required to change account values.
+
+The passed "accountId" can be either the accountId (exact string as returned by
+`/api/v1/accounts` or other requests) or the account's username (URI encoded string).
 
 The request to set a value POST's a JSON structure that gives
 the value to set. So,
@@ -240,6 +252,9 @@ A successful creation, will return:
 Get the tokens held by the account. The requesting account must be
 logged in and be either the account identified in "{accountId}" or
 be an administrative account.
+
+The passed "accountId" can be either the accountId (exact string as returned by
+`/api/v1/accounts` or other requests) or the account's username (URI encoded string).
 
 ```
     {

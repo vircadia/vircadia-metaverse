@@ -20,6 +20,9 @@ import { AccountEntity } from '@Entities/AccountEntity';
 import { Logger } from '@Tools/Logging';
 import { ParseQueryString } from '@Tools/Misc';
 
+// AccountScopeFilter filters a query stream to the accounts the requestor
+//    can look at. That is, a person can normally see only the domains
+//    that they sponsor.
 export class AccountScopeFilter extends CriteriaFilter {
   private _asAdmin = false;
   private _accessingAcct: AccountEntity;
