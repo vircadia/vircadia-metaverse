@@ -93,24 +93,20 @@ export async function updateLocationInfo(pReq: Request): Promise<VKeyedCollectio
 //    the account has set location and/or has an associated domain.
 // Return a structure that represents the target account's domain
 export async function buildLocationInfo(pAcct: AccountEntity): Promise<any> {
-  const ret: any = {};
+  let ret: any = {};
   if (pAcct.locationDomainId) {
     const aDomain = await Domains.getDomainWithId(pAcct.locationDomainId);
     if (IsNotNullOrEmpty(aDomain)) {
-      return {
-        'node_id': pAcct.locationNodeId,
+      ret = {
         'root': {
           'domain': await buildDomainInfo(aDomain),
         },
         'path': pAcct.locationPath,
-        'online': Accounts.isOnline(pAcct)
       };
     }
     else {
       // The domain doesn't have an ID
-      return {
-        'node_id': pAcct.locationNodeId,
-        'online': Accounts.isOnline(pAcct),
+      ret = {
         'root': {
           'domain': {
             'network_address': pAcct.locationNetworkAddress,
