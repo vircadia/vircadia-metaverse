@@ -27,6 +27,7 @@ import { Perm } from '@Route-Tools/Perm';
 import { SArray, VKeyedCollection } from '@Tools/vTypes';
 import { IsNotNullOrEmpty, IsNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
+import { Availability } from '@Entities/Sets/Availability';
 
 // Check if the passed AuthToken has access to the passed Entity.
 // Generalized for any Entity. The permissions expect 'accountId' and 'sponsorAccountId'
@@ -37,6 +38,7 @@ import { Logger } from '@Tools/Logging';
 //    which means the requestor must be the account owner, a friend or connection of the
 //    requested account or the requestor must be an admin.
 // Note that the list of RequiredAccess is a OR list -- any one access type is sufficient.
+// Note that pAuthToken can be passed as 'undefined'.
 export async function checkAccessToEntity(pAuthToken: AuthToken,  // token being used to access
                             pTargetEntity: Entity,              // entity being accessed
                             pRequiredAccess: string[],          // permissions required to access domain
@@ -44,16 +46,25 @@ export async function checkAccessToEntity(pAuthToken: AuthToken,  // token being
                     ): Promise<boolean> {
   let requestingAccount = pRequestingAccount;
   let canAccess: boolean = false;
-  if (IsNotNullOrEmpty(pAuthToken) && IsNotNullOrEmpty(pTargetEntity)) {
+  if (IsNotNullOrEmpty(pTargetEntity)) {
     for (const perm of pRequiredAccess) {
       Logger.cdebug('field-setting', `checkAccessToEntity: checking ${perm}`);
       switch (perm) {
         case Perm.ALL:
           canAccess = true;
           break;
+        case Perm.PUBLIC:
+          // The target entity is publicly visible
+          // Mostly AccountEntities that must have an 'availability' field
+          if (pTargetEntity.hasOwnProperty('availability')) {
+            if ((pTargetEntity as AccountEntity).availability.includes(Availability.ALL)) {
+              canAccess = true;
+            };
+          };
+          break;
         case Perm.DOMAIN:
           // requestor is a domain and it's account is the domain's sponsoring account
-          if (SArray.has(pAuthToken.scope, TokenScope.DOMAIN)) {
+          if (pAuthToken && SArray.has(pAuthToken.scope, TokenScope.DOMAIN)) {
             if (pTargetEntity.hasOwnProperty('sponsorAccountId')) {
               Logger.cdebug('field-setting', `checkAccessToEntity: authToken is domain. auth.AccountId=${pAuthToken.accountId}, sponsor=${(pTargetEntity as any).sponsorAccountId}`);
               canAccess = pAuthToken.accountId === (pTargetEntity as any).sponsorAccountId;
@@ -69,7 +80,7 @@ export async function checkAccessToEntity(pAuthToken: AuthToken,  // token being
           break;
         case Perm.OWNER:
           // The requestor wants to be the same account as the target entity
-          if (pTargetEntity.hasOwnProperty('id')) {
+          if (pAuthToken && pTargetEntity.hasOwnProperty('id')) {
             canAccess = pAuthToken.accountId === (pTargetEntity as AccountEntity).id;
           };
           if (!canAccess && pTargetEntity.hasOwnProperty('accountId')) {
@@ -78,7 +89,7 @@ export async function checkAccessToEntity(pAuthToken: AuthToken,  // token being
           break;
         case Perm.FRIEND:
           // The requestor is a 'friend' of the target entity
-          if (pTargetEntity.hasOwnProperty('friends')) {
+          if (pAuthToken && pTargetEntity.hasOwnProperty('friends')) {
             const targetFriends: string[] = (pTargetEntity as AccountEntity).friends;
             if (targetFriends) {
               requestingAccount = requestingAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
@@ -88,7 +99,7 @@ export async function checkAccessToEntity(pAuthToken: AuthToken,  // token being
           break;
         case Perm.CONNECTION:
           // The requestor is a 'connection' of the target entity
-          if (pTargetEntity.hasOwnProperty('connections')) {
+          if (pAuthToken && pTargetEntity.hasOwnProperty('connections')) {
             const targetConnections: string[] = (pTargetEntity as AccountEntity).connections;
             if (targetConnections) {
               requestingAccount = requestingAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
@@ -97,7 +108,7 @@ export async function checkAccessToEntity(pAuthToken: AuthToken,  // token being
           };
           break;
         case Perm.ADMIN:
-          if (Tokens.isSpecialAdminToken(pAuthToken)) {
+          if (pAuthToken && Tokens.isSpecialAdminToken(pAuthToken)) {
             Logger.cdebug('field-setting', `checkAccessToEntity: isSpecialAdminToken`);
             canAccess = true;
           }
@@ -112,7 +123,7 @@ export async function checkAccessToEntity(pAuthToken: AuthToken,  // token being
           break;
         case Perm.SPONSOR:
           // Requestor is a regular account and is the sponsor of the domain
-          if (SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
+          if (pAuthToken && SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
             if (pTargetEntity.hasOwnProperty('sponsorAccountId')) {
               Logger.cdebug('field-setting', `checkAccessToEntity: authToken is domain. auth.AccountId=${pAuthToken.accountId}, sponsor=${(pTargetEntity as any).sponsorAccountId}`);
               canAccess = pAuthToken.accountId === (pTargetEntity as DomainEntity).sponsorAccountId;
@@ -121,7 +132,7 @@ export async function checkAccessToEntity(pAuthToken: AuthToken,  // token being
           break;
         case Perm.DOMAINACCESS:
           // Target entity has a domain reference and verify the requestor is able to reference that domain
-          if (pTargetEntity.hasOwnProperty('domainId')) {
+          if (pAuthToken && pTargetEntity.hasOwnProperty('domainId')) {
             const aDomain = await Domains.getDomainWithId((pTargetEntity as any).domainId);
             if (aDomain) {
               canAccess = aDomain.sponsorAccountId === pAuthToken.accountId;

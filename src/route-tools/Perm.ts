@@ -26,6 +26,7 @@
 export class Perm {
   public static NONE     = 'none';
   public static ALL      = 'all';
+  public static PUBLIC   = 'public';      // target account is publicly visible
   public static DOMAIN   = 'domain';      // check against .sponsorId
   public static OWNER    = 'owner';       // check against .id or .accountId
   public static FRIEND   = 'friend';      // check member of .friends
