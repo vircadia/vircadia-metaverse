@@ -28,6 +28,7 @@ are returned (limited by pagination).
                     "accountId": "uniqueAccountId",
                     "username: "username",
                     "email": "email",
+                    "availability": "all",              // one of "friends", "connections", "all"
                     "public_key": "usersPublicKey",     // stripped PEM public key
                     "images": {
                         "hero": stringUrlToImage,
@@ -41,6 +42,7 @@ are returned (limited by pagination).
                         "domainid": stringIdOfDomain,
                         "availability": stringWhoCanSee // one of "all", "none", "connections", "friends"
                     },
+                    "profile_detail": {},               // account detail information
                     "friends": [ "friendName", "friendName", ... ],
                     "connections": [ "connectionName", "connectionName", ...],
                     "administator": false,              // 'true' if has "admin" role

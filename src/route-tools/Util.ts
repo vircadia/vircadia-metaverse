@@ -214,12 +214,34 @@ export async function buildAccountInfo(pReq: Request, pAccount: AccountEntity): 
     'email': pAccount.email,
     'administrator': Accounts.isAdmin(pAccount),
     'roles': pAccount.roles,
+    'availability': pAccount.availability,
     'public_key': createSimplifiedPublicKey(pAccount.sessionPublicKey),
     'images': {
       'hero': pAccount.imagesHero,
       'tiny': pAccount.imagesTiny,
       'thumbnail': pAccount.imagesThumbnail
     },
+    'profile_detail': pAccount.profileDetail,
+    'location': await buildLocationInfo(pAccount),
+    'friends': pAccount.friends,
+    'connections': pAccount.connections,
+    'when_account_created': pAccount.whenCreated ? pAccount.whenCreated.toISOString() : undefined,
+    'time_of_last_heartbeat': pAccount.timeOfLastHeartbeat ? pAccount.timeOfLastHeartbeat.toISOString() : undefined
+  };
+};
+// Return the block of account information used as the account 'profile'.
+// Anyone can fetch a profile (if 'availability' is 'any') so not all info is returned
+export async function buildAccountProfile(pReq: Request, pAccount: AccountEntity): Promise<any> {
+  return {
+    'accountId': pAccount.id,
+    'id': pAccount.id,
+    'username': pAccount.username,
+    'images': {
+      'hero': pAccount.imagesHero,
+      'tiny': pAccount.imagesTiny,
+      'thumbnail': pAccount.imagesThumbnail
+    },
+    'profile_detail': pAccount.profileDetail,
     'location': await buildLocationInfo(pAccount),
     'friends': pAccount.friends,
     'connections': pAccount.connections,
