@@ -61,6 +61,12 @@ export async function isDateValidator(pField: FieldDefn, pEntity: Entity, pValue
   };
   return { valid: false, reason: 'field value must be a valid date string' };
 };
+export async function isObjectValidator(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<ValidateResponse> {
+  if (pValue instanceof Object) {
+    return { valid: true };
+  };
+  return { valid: false, reason: 'field value must be a valid date string' };
+};
 // verify the value is a string or a set/add/remove collection of string arrays.
 // This pairs with the SArray getter/setter which accepts a string (add), an
 //     array of strings (set), or a manipulator (set/add/remove object).

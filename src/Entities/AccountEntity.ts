@@ -26,17 +26,18 @@ export class AccountEntity implements Entity {
   public imagesTiny: string;
 
   public locationConnected: boolean;
-  public locationPath: string;        // "/floatX,floatY,floatZ/floatX,floatY,floatZ,floatW"
-  public locationPlaceId: string;     // uuid of place
-  public locationDomainId: string;    // uuid of domain located in
+  public locationPath: string;      // "/floatX,floatY,floatZ/floatX,floatY,floatZ,floatW"
+  public locationPlaceId: string;   // uuid of place
+  public locationDomainId: string;  // uuid of domain located in
   public locationNetworkAddress: string;
   public locationNetworkPort: number;
-  public locationNodeId: string;      // sessionId
-  public availability: string[];      // contains 'none', 'friends', 'connections', 'all'
+  public locationNodeId: string;    // sessionId
+  public availability: string[];    // contains 'none', 'friends', 'connections', 'all'
 
   public connections: string[];
   public friends: string[];
-  public locker: string;      // JSON blob stored for user from server
+  public locker: any;               // JSON blob stored for user from server
+  public profileDetail: any;        // JSON blob stored for user from server
 
   // User authentication
   public passwordHash: string;

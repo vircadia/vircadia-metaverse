@@ -20,7 +20,8 @@ import { Accounts } from '@Entities/Accounts';
 import { Roles } from '@Entities/Sets/Roles';
 import { Availability } from '@Entities/Sets/Availability';
 
-import { isStringValidator, isBooleanValidator, isPathValidator, isNumberValidator, isSArraySet, isDateValidator } from '@Route-Tools/Validators';
+import { isStringValidator, isBooleanValidator, isPathValidator, isNumberValidator } from '@Route-Tools/Validators';
+import { isObjectValidator, isSArraySet, isDateValidator } from '@Route-Tools/Validators';
 import { simpleGetter, simpleSetter, sArraySetter, dateStringGetter } from '@Route-Tools/Validators';
 import { noGetter, noSetter, verifyAllSArraySetValues } from '@Route-Tools/Validators';
 import { FieldDefn, ValidateResponse } from '@Route-Tools/EntityFieldDefn';
@@ -292,7 +293,16 @@ export const accountFields: { [key: string]: FieldDefn } = {
     request_field_name: 'locker',
     get_permissions: [ 'owner', 'admin' ],
     set_permissions: [ 'owner', 'admin' ],
-    validate: isStringValidator,
+    validate: isObjectValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'profile_detail': {
+    entity_field: 'profileDetail',
+    request_field_name: 'profile_detail',
+    get_permissions: [ 'all' ],
+    set_permissions: [ 'owner', 'admin' ],
+    validate: isObjectValidator,
     setter: simpleSetter,
     getter: simpleGetter
   },
