@@ -70,10 +70,12 @@ export class PaginationInfo extends CriteriaFilter {
   public criteriaTest(pThingy: any): boolean {
     if (! this._doingQuery) {
       this.TotalEntries++;
-      if (++this._currentItem > this.PerPage) {
+      if (this._currentItem > this.PerPage) {
         this._currentItem = 1;
         ++this._currentPage;
-      }
+      };
+      // Logger.debug(`Pagination: curItem=${this._currentItem}, curP=${this._currentPage}, perPg=${this.PerPage}, total=${this.TotalEntries}`);
+      this._currentItem++;
       return this.PageNum === this._currentPage;
     };
     return true;
