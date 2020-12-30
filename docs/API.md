@@ -26,6 +26,7 @@ Documentation referenced below is available for the
 [Places](./API-Places.md),
 [Tokens](./API-Tokens.md),
 [User](./API-Users.md),
+[Profiles](./API-Profiles.md),
 and
 [Monitoring](./API-Monitoring.md),
 categories.
@@ -78,6 +79,8 @@ The API requests to the metaverse-server are:
 | POST   | /api/v1/users                   | [doc](./API-Users.md#post-apiv1users) create account |
 | GET    | /api/v1/users/:username/location  | [doc](./API-Users.md#) fetch a particular user's location |
 | GET    | /api/v1/users/:username/public_key | [doc](./API-Users.md#) fetch a particular user's public_key |
+| GET    | /api/v1/profiles                | [doc](./API-Profiles.md#) fetch account profiles |
+| GET    | /api/v1/profile/:accountId      | [doc](./API-Profiles.md#get-apiv1profileaccountId) fetch specific account profile |
 | POST   | /api/v1/user_activities         | update the user activitiy state |
 | GET    | /api/v1/user_stories            | fetch stories |
 | POST   | /oauth/token                    | [doc](./API-Tokens.md#post-oauthtoken) OAUTH2 login |
