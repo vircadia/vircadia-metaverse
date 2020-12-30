@@ -72,7 +72,10 @@ initializeConfiguration()
   } ));
 
   // Most of the requests are JSON in an out
-  expr.use(express.json({ 'strict': false }));
+  expr.use(express.json({
+    'strict': false,
+    'limit': Config.server['max-body-size']
+  }));
 
   // There is a problem with some of the domain-server requests that don't
   //    include  the final closing curly-bracket on the JSON. Until that

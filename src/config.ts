@@ -32,6 +32,7 @@ export let Config = {
       'listen-port': 9400,
       'key-file': '',           // if supplied, do https
       'cert-file': '',
+      'max-body-size': 300000,  // maximum body size for input JSON bodies
       'static-base': '/static', // base of static data URL
       'user-config-file': './iamus.json', // startup config over-ride
       'server-version': {       // overlaid with VERSION.json
