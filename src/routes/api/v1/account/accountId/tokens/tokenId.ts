@@ -61,7 +61,7 @@ export const name = '/api/v1/account/:accoundId/tokens/:tokenId';
 
 export const router = Router();
 
-router.delete('/api/v1/account/:accountId/tokens/:tokenId', [ setupMetaverseAPI,
+router.delete('/api/v1/account/:accountId/tokens/:tokenId', [ setupMetaverseAPI,  // req.vRestResp, req.vAuthToken
                                                     accountFromAuthToken,   // req.vAuthAccount
                                                     accountFromParams,      // req.vAccount
                                                     tokenFromParams,        // req.vToken

@@ -39,7 +39,7 @@ export const name = '/api/v1/user_activities';
 
 export const router = Router();
 
-router.post( '/api/v1/user_activities', [ setupMetaverseAPI,
-                                          accountFromAuthToken,
+router.post( '/api/v1/user_activities', [ setupMetaverseAPI,      // req.vRestResp, req.vAuthToken
+                                          accountFromAuthToken,   // req.vAuthAccount
                                           procPostUserActivities,
                                           finishMetaverseAPI ] );

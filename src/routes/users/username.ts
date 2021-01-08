@@ -43,7 +43,7 @@ export const name = '/users/:username';
 
 export const router = Router();
 
-router.get( '/users/:username', [ setupMetaverseAPI,    // req.vAuthToken
-                                 usernameFromParams,   // req.vUsername
+router.get( '/users/:username', [ setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
+                                 usernameFromParams,    // req.vUsername
                                  procGetUserProfile,
                                  finishMetaverseAPI ] );

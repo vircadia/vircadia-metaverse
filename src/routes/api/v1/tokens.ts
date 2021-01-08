@@ -51,6 +51,7 @@ const procGetTokens: RequestHandler = async (req: Request, resp: Response, next:
       tokens: toks
     };
 
+    scoper.addResponseFields(req);
     pager.addResponseFields(req);
   }
   else {
@@ -63,7 +64,7 @@ export const name = '/api/v1/tokens';
 
 export const router = Router();
 
-router.get(   '/api/v1/tokens',                 [ setupMetaverseAPI,
-                                                  accountFromAuthToken,   // vRestResp.vAuthAccount
-                                                  procGetTokens,
-                                                  finishMetaverseAPI ] );
+router.get('/api/v1/tokens',                 [ setupMetaverseAPI,      // req.vRestResp, req.vAuthToken
+                                               accountFromAuthToken,   // req.vAuthAccount
+                                               procGetTokens,
+                                               finishMetaverseAPI ] );

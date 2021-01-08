@@ -49,6 +49,7 @@ const procGetDomains: RequestHandler = async (req: Request, resp: Response, next
       'domains': domainArray
     };
 
+    scoper.addResponseFields(req);
     pager.addResponseFields(req);
   }
   else {
@@ -135,11 +136,11 @@ export const name = '/api/v1/domains';
 
 export const router = Router();
 
-router.get(   '/api/v1/domains',  [ setupMetaverseAPI,
-                                    accountFromAuthToken,
+router.get(   '/api/v1/domains',  [ setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
+                                    accountFromAuthToken, // req.vAuthAccount
                                     procGetDomains,
                                     finishMetaverseAPI ] );
-router.post(   '/api/v1/domains', [ setupMetaverseAPI,
-                                    accountFromAuthToken,
+router.post(   '/api/v1/domains', [ setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
+                                    accountFromAuthToken, // req.vAuthAccount
                                     procPostDomains,
                                     finishMetaverseAPI ] );

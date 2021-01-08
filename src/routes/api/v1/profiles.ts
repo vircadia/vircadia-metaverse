@@ -46,6 +46,8 @@ const procGetProfiles: RequestHandler = async (req: Request, resp: Response, nex
   req.vRestResp.Data = {
     profiles: accts
   };
+
+  scoper.addResponseFields(req);
   pager.addResponseFields(req);
 
   next();
@@ -55,6 +57,6 @@ export const name = '/api/v1/profiles';
 
 export const router = Router();
 
-router.get(   '/api/v1/profiles',                 [ setupMetaverseAPI,      // req.vRestResp
+router.get(   '/api/v1/profiles',                 [ setupMetaverseAPI,      // req.vRestResp, req.vAuthToken
                                                     procGetProfiles,
                                                     finishMetaverseAPI ] );

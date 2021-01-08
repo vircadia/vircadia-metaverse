@@ -159,7 +159,7 @@ export const name = "/oauth/token";
 
 export const router = Router();
 
-router.post( '/oauth/token',  [ setupMetaverseAPI,        // req.vRestResp
+router.post( '/oauth/token',  [ setupMetaverseAPI,        // req.vRestResp, req.vAuthToken
                                 bodyParser.urlencoded({extended: true}), // req.body
                                 procPostOauthToken,
                                 finishReturnData ]);

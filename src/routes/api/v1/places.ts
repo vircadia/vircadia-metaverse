@@ -55,6 +55,7 @@ const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next:
       'maturity-categories': Maturity.MaturityCategories
     };
 
+    placer.addResponseFields(req);
     pager.addResponseFields(req);
   }
   else {
@@ -128,12 +129,12 @@ export const name = '/api/v1/places';
 
 export const router = Router();
 
-router.get(   '/api/v1/places',   [ setupMetaverseAPI,      // req.vRestResp
+router.get(   '/api/v1/places',   [ setupMetaverseAPI,      // req.vRestResp, req.vAuthToken
                                     accountFromAuthToken,   // req.vAuthAccount
                                     procGetPlaces,
                                     finishMetaverseAPI ] );
 router.post(   '/api/v1/places',
-                                  [ setupMetaverseAPI,   // req.vRESTResp
+                                  [ setupMetaverseAPI,   // req.vRESTResp, req.vAuthToken
                                     accountFromAuthToken, // req.vAuthAccount
                                     procPostPlaces,
                                     finishMetaverseAPI ] );

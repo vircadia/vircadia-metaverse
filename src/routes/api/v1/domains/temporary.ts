@@ -83,7 +83,7 @@ export const name = '/api/v1/domains/temporary';
 
 export const router = Router();
 
-router.post(  '/api/v1/domains/temporary',      [ setupMetaverseAPI,        // req.vRestResp
-                                                  accountFromAuthToken,     // req.vAuthToken, req.vAuthAccount
+router.post(  '/api/v1/domains/temporary',      [ setupMetaverseAPI,        // req.vRestResp, req.vAuthToken
+                                                  accountFromAuthToken,     // req.vAuthAccount
                                                   procPostDomainsTemporary,
                                                   finishMetaverseAPI ] );

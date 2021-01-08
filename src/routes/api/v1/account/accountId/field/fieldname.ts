@@ -63,7 +63,7 @@ export const name = '/api/v1/account/:accountId/field/:fieldname';
 export const router = Router();
 
 router.get( '/api/v1/account/:accountId/field/:param1',
-                                          [ setupMetaverseAPI,    // req.vRestResp
+                                          [ setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
                                             accountFromAuthToken, // req.vAuthAccount
                                             accountFromParams,    // req.vAccount
                                             param1FromParams,     // req.vParam1
@@ -71,7 +71,7 @@ router.get( '/api/v1/account/:accountId/field/:param1',
                                             finishMetaverseAPI
                                           ] );
 router.post('/api/v1/account/:accountId/field/:param1',
-                                          [ setupMetaverseAPI,    // req.vRestResp
+                                          [ setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
                                             accountFromAuthToken, // req.vAuthAccount
                                             accountFromParams,    // req.vAccount
                                             param1FromParams,     // req.vParam1

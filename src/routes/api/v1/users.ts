@@ -60,6 +60,8 @@ const procGetUsers: RequestHandler = async (req: Request, resp: Response, next: 
     };
 
     pager.addResponseFields(req);
+    infoer.addResponseFields(req);
+    scoper.addResponseFields(req);
   }
   else {
     req.vRestResp.respondFailure('No account specified');
@@ -135,10 +137,10 @@ export const name = '/api/v1/users';
 
 export const router = Router();
 
-router.get(   '/api/v1/users',                    [ setupMetaverseAPI,      // req.vRestResp
-                                                    accountFromAuthToken,   // req.vAuthAccount
-                                                    procGetUsers,
-                                                    finishMetaverseAPI ] );
-router.post(  '/api/v1/users',                    [ setupMetaverseAPI,
-                                                    procPostUsers,
-                                                    finishMetaverseAPI ] );
+router.get(   '/api/v1/users',        [ setupMetaverseAPI,      // req.vRestResp, req.vAuthToken
+                                        accountFromAuthToken,   // req.vAuthAccount
+                                        procGetUsers,
+                                        finishMetaverseAPI ] );
+router.post(  '/api/v1/users',        [ setupMetaverseAPI,      // req.vRestResp, req.vAuthToken
+                                        procPostUsers,
+                                        finishMetaverseAPI ] );

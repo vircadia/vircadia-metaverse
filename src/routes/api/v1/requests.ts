@@ -58,6 +58,7 @@ const procGetRequests: RequestHandler = async (req: Request, resp: Response, nex
       requests: reqs
     };
 
+    scoper.addResponseFields(req);
     pager.addResponseFields(req);
   }
   else {
@@ -70,7 +71,7 @@ export const name = '/api/v1/requests';
 
 export const router = Router();
 
-router.get(   '/api/v1/requests', [ setupMetaverseAPI,    // req.vRestResp
+router.get(   '/api/v1/requests', [ setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
                                     accountFromAuthToken, // req.vAuthAccount
                                     procGetRequests,
                                     finishMetaverseAPI ] );

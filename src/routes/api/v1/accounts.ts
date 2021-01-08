@@ -48,9 +48,11 @@ const procGetAccounts: RequestHandler = async (req: Request, resp: Response, nex
       accounts: accts
     };
     pager.addResponseFields(req);
+    scoper.addResponseFields(req);
+    infoer.addResponseFields(req);
   }
   else {
-    req.vRestResp.respondFailure('No account specified');
+    req.vRestResp.respondFailure('Not logged in');
   };
   next();
 };
@@ -59,7 +61,7 @@ export const name = '/api/v1/accounts';
 
 export const router = Router();
 
-router.get(   '/api/v1/accounts',                 [ setupMetaverseAPI,      // req.vRestResp
+router.get(   '/api/v1/accounts',                 [ setupMetaverseAPI,      // req.vRestResp, req.vAuthToken
                                                     accountFromAuthToken,   // req.vAuthAccount
                                                     procGetAccounts,
                                                     finishMetaverseAPI ] );

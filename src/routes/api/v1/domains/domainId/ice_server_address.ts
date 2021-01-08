@@ -42,9 +42,9 @@ export const name = '/api/v1/domains/:domainId/ice_server_address';
 
 export const router = Router();
 
-router.put(   '/api/v1/domains/:domainId/ice_server_address', [ setupMetaverseAPI,
-                                                  domainFromParams,
-                                                  domainAPIkeyFromBody,
+router.put(   '/api/v1/domains/:domainId/ice_server_address', [ setupMetaverseAPI, // req.vRestResp, req.vAuthToken
+                                                  domainFromParams,     // req.vDomain
+                                                  domainAPIkeyFromBody, // req.vDomainAPIKey
                                                   verifyDomainAccess,
                                                   procPutDomainsIceServerAddress,
                                                   finishMetaverseAPI ] );

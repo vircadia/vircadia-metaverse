@@ -36,6 +36,6 @@ export const name = '/user/places';
 
 export const router = Router();
 
-router.get( '/user/places', [ setupMetaverseAPI,    // req.vRESTResp
+router.get( '/user/places', [ setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
                               procGetPlaces,
                               finishMetaverseAPI ] );

@@ -31,6 +31,6 @@ export const name = '/api/v1/user_stories';
 
 export const router = Router();
 
-router.get('/api/v1/user_stories',  [ setupMetaverseAPI,
+router.get('/api/v1/user_stories',  [ setupMetaverseAPI,      // req.vRestResp, req.vAuthToken
                                       procGetUserStories,
                                       finishMetaverseAPI ] );

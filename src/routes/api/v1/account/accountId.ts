@@ -96,18 +96,18 @@ export const name = '/api/v1/account/:accountId';
 
 export const router = Router();
 
-router.get(  '/api/v1/account/:accountId',        [ setupMetaverseAPI,
-                                                    accountFromAuthToken,   // vRestResp.vAuthAccount
-                                                    accountFromParams,
+router.get(  '/api/v1/account/:accountId',        [ setupMetaverseAPI,      // req.vRestResp, req.vAuthToken
+                                                    accountFromAuthToken,   // req.vAuthAccount
+                                                    accountFromParams,      // req.vAccount
                                                     procGetAccountId,
                                                     finishMetaverseAPI ] );
-router.post(  '/api/v1/account/:accountId',       [ setupMetaverseAPI,
-                                                    accountFromAuthToken,   // vRestResp.vAuthAccount
-                                                    accountFromParams,
+router.post(  '/api/v1/account/:accountId',       [ setupMetaverseAPI,      // req.vRestResp, req.vAuthToken
+                                                    accountFromAuthToken,   // req.vAuthAccount
+                                                    accountFromParams,      // req.vAccount
                                                     procPostAccountId,
                                                     finishMetaverseAPI ] );
-router.delete('/api/v1/account/:accountId',       [ setupMetaverseAPI,
-                                                    accountFromAuthToken,   // vRestResp.vAuthAccount
-                                                    accountFromParams,      // vRestResp.vAccount
+router.delete('/api/v1/account/:accountId',       [ setupMetaverseAPI,      // req.vRestResp, req.vAuthToken
+                                                    accountFromAuthToken,   // req.vAuthAccount
+                                                    accountFromParams,      // req.vAccount
                                                     procDeleteAccountId,
                                                     finishMetaverseAPI ] );
