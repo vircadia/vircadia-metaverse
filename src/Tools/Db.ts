@@ -19,15 +19,13 @@ import { MongoClient, Db, FilterQuery } from 'mongodb';
 
 import deepmerge from 'deepmerge';
 
-import { SimpleObject, IsNullOrEmpty } from '@Tools/Misc';
-
 // This seems to create a circular reference  that causes variables to not be initialized
 // import { domainCollection } from '@Entities/Domains';
 
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 
 import { VKeyedCollection } from '@Tools/vTypes';
-import { IsNotNullOrEmpty } from './Misc';
+import { SimpleObject, IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
 
 // The initial MongoClient
