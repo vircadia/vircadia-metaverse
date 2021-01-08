@@ -243,8 +243,6 @@ export async function buildAccountProfile(pReq: Request, pAccount: AccountEntity
     },
     'profile_detail': pAccount.profileDetail,
     'location': await buildLocationInfo(pAccount),
-    'friends': pAccount.friends,
-    'connections': pAccount.connections,
     'when_account_created': pAccount.whenCreated ? pAccount.whenCreated.toISOString() : undefined,
     'time_of_last_heartbeat': pAccount.timeOfLastHeartbeat ? pAccount.timeOfLastHeartbeat.toISOString() : undefined
   };
