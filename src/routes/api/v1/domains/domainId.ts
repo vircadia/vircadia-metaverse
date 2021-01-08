@@ -130,18 +130,23 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
 
 // DELETE /api/v1/domains/:domainId
 const procDeleteDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount && req.vDomain) {
-    if (req.vAuthAccount.id === req.vDomain.sponsorAccountId || Accounts.isAdmin(req.vAuthAccount)) {
-      await Domains.removeDomain(req.vDomain);
-      await Domains.removeDomainContext(req.vDomain);
+  if (req.vAuthAccount) {
+    if (req.vDomain) {
+      if (await checkAccessToEntity(req.vAuthToken, req.vDomain, [ Perm.SPONSOR, Perm.ADMIN ])) {
+        await Domains.removeDomain(req.vDomain);
+        await Domains.removeDomainContext(req.vDomain);
+      }
+      else {
+        req.vRestResp.respondFailure('Not authorized');
+      };
     }
     else {
-      req.vRestResp.respondFailure('Not authorized');
+      req.vRestResp.respondFailure('Domain not found');
     };
   }
   else {
-      req.vRestResp.respondFailure('No account or target domain');
-  }
+    req.vRestResp.respondFailure('Not logged in');
+  };
   next();
 };
 
@@ -149,18 +154,18 @@ export const name = '/api/v1/domains/:domainId';
 
 export const router = Router();
 
-router.get(   '/api/v1/domains/:domainId',      [ setupMetaverseAPI,
-                                                  domainFromParams,
+router.get(   '/api/v1/domains/:domainId',      [ setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
+                                                  domainFromParams,     // req.vDomain
                                                   procGetDomainsDomainid,
                                                   finishMetaverseAPI ] );
-router.put(   '/api/v1/domains/:domainId',      [ setupMetaverseAPI,
-                                                  domainFromParams,     // set vDomain
-                                                  domainAPIkeyFromBody, // set vDomainAPIKey
+router.put(   '/api/v1/domains/:domainId',      [ setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
+                                                  domainFromParams,     // req.vDomain
+                                                  domainAPIkeyFromBody, // req.vDomainAPIKey
                                                   verifyDomainAccess,
                                                   procPutDomains,
                                                   finishMetaverseAPI ] );
-router.delete('/api/v1/domains/:domainId',      [ setupMetaverseAPI,
-                                                  domainFromParams,
-                                                  accountFromAuthToken,
+router.delete('/api/v1/domains/:domainId',      [ setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
+                                                  domainFromParams,     // req.vDomain
+                                                  accountFromAuthToken, // req.vAuthAccount
                                                   procDeleteDomains,
                                                   finishMetaverseAPI ] );
