@@ -76,6 +76,12 @@ export let Config = {
       'db-authdb': 'admin',
       'db-connection': ''   // connection string replaces above if supplied
     },
+    'backup': {
+        "backup-user": "backuper",  // database backup user account (for BackupDb.sh)
+        "backup-pw": "nooneknowsit", // database backup user password (for BackupDb.sh)
+        "backup-dir": "directoryName", // Backup file directory. Optional. Defaults to "./DatabaseBackup"
+        "authenticationDatabase": "databaseName" // auth db for backup user. Optional. Defaults to "admin"
+    },
     'debug': {
       'loglevel': 'info',
 
