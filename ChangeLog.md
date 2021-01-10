@@ -1,4 +1,19 @@
 # Iamus Changelog
+## Version 2.3.8
+
+<ul>
+<li><a href="http://github.com/vircadia/Iamus/commit/c1671fa5576c2c7f2aced46647654592882f16ae">view &bull;</a> Update ChangeLog.md</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/8300f8aa96626a7aa5337c7a2af8e92b3047ce32">view &bull;</a> Update DockerFile to pull from the official location: 'vircadia/Iamus'.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/4d46a409ee853b7bd541603db690e278026b6f54">view &bull;</a> Fix line endings to be UNIX format.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/73b2b91cc867e54332964652c29a8d4d14d50bf5">view &bull;</a> Remove 'friends' and 'connections' from buildAccountProfile() response.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/f1bb24c6d42dad66f154d8733d8a20c9b37e4a85">view &bull;</a> Separate error messages for /api/v1/domain/:domainId     separate 'not logged in' from 'domain not found' Add comments on request processors for set variables. Change no auth info error to "Not logged in"</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/198550c165fdd9af55c407fa785b39a0cf71b4e3">view &bull;</a> Clean up 'imports' in Db.ts so all @Tools are together</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/2be04a3f53c56bee58e47db90a68a38ca8c5881c">view &bull;</a> Add comments to request processors making clear set request variables.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/715e9fbfa0f5d66e26a007d553069ffc27f891a4">view &bull;</a> Add "backup" section to config.ts for the BackupDb.sh script.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/8a5b14e99d11cc834377104f0223bc6d96dc51a8">view &bull;</a> Fix wrong calculation of monitoring histogram 'timeBase'     'timeBase' should now be the start time of the first bucket.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/3db9af9be1ce2dd77d56cc20fe671455b9bca9ec">view &bull;</a> Bump version to 2.3.8</li> 
+</ul>
+
 ## Version 2.3.7
 
 <ul>
@@ -83,14 +98,5 @@
 <li><a href="http://github.com/vircadia/Iamus/commit/7ec03825c70af2f85ff569c38a59a0c77dca242c">view &bull;</a> When deleting connections or friends, remove the reverse pointers:     Deleting a connection removes both connection and friend in both accounts.     Deleting a friend removes friend from other account also. Closes #59</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/c0ca649c6b97915662597363785cf3ceeae85d2e">view &bull;</a> For domain token generation default web page, move generated domain     token text up higher and make it white so it stands out. Clean up some CSS errors. Closes #5</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/53ac8b06c950adeab17901476c2054c68315e49b">view &bull;</a> Bump version to 2.2.24</li> 
-</ul>
-
-## Version 2.2.23
-
-<ul>
-<li><a href="http://github.com/vircadia/Iamus/commit/1c51ba8f46832f70551d2802422cbb91c20a681d">view &bull;</a> Update ChangeLog.md Modify genChangelog.sh to get the tags from git and generating a list     of the last 10 version tags (tag form: major.minor.patch)</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/db36bccf9dd965cc66940ff839596249d94abe14">view &bull;</a> Add pagination response fields to API requests that handle pagination.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/2b01b6bad64d0a7ceeb141befd5f6b0fb41db198">view &bull;</a> Implement redirection of /users/:username to Dashboard. Closes #58</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/4dcab7bbcbf4bf5bb2f02143c541fe88b9abe3ac">view &bull;</a> Bump version to 2.2.23</li> 
 </ul>
 
