@@ -19,6 +19,7 @@ import { Config, initializeConfiguration } from '@Base/config';
 
 import http from 'http';
 import https from 'https';
+import { Socket }  from 'net';
 import path from 'path';
 import express from 'express';
 import cors from 'cors';
@@ -145,37 +146,64 @@ initializeConfiguration()
     server = http.createServer(expr);
   };
 
+  // Keep track of connected sockets to enable clean shutdowns
+  ManageServer(server);
+
   // When the server is ready, start listening
   server.on('listening', () => {
-          Logger.info(`Started metaverse-server version ${Config.server["server-version"]['version-tag']}`);
-        })
-        .on('error', (err) => {
-          Logger.error('server exception: ' + err.message);
-        })
-        .listen(Config.server["listen-port"], Config.server["listen-host"]);
+    Logger.info(`Started metaverse-server version ${Config.server["server-version"]['version-tag']}`);
+  })
+  .on('error', (err) => {
+    Logger.error('server exception: ' + err.message);
+  })
+  .listen(Config.server["listen-port"], Config.server["listen-host"]);
 
   // Receive termination signals, shutdown server, stop receiving requests cleanly
   // SIGTERM is usually sent by Docker to stop the application. If this doesn't exit,
   //     a SIGKILL will be sent in 10 seconds.
   process.on('SIGTERM', () => {
     Logger.info('SIGTERM');
-    server.close( () => {
-      Logger.info(`SIGTERM: Stopped metaverse-server version ${Config.server["server-version"]['version-tag']}`);
-      process.exit();
-    });
+    ShutdownServer(server, 'SIGTERM');
   });
   // SIGINT (usually cntl-C) means to stop and exit
   process.on('SIGINT', () => {
     Logger.info('SIGINT');
-    server.close( () => {
-      Logger.info(`SIGINT: Stopped metaverse-server version ${Config.server["server-version"]['version-tag']}`);
-      process.exit();
-    });
+    ShutdownServer(server, 'SIGINT');
   });
 })
 .catch( err => {
   Logger.error('main: bad failure: ' + err);
 });
+
+// The ExpressJS server won't shutdown if there are open connections
+//    so this sets up something to remember connections and to destroy
+//    them when this needs the server to shutdown.
+// The ExpressJS operation 'server.close()' will hang until all connections
+//    close so the connections have to be destroyed to stop the server.
+// Technically we could wait if there is a long operation but ShutdownServer()
+//    is called when the app needs to exit so the caller will
+//    have to deal with the error.
+let nextSockerId: number = 444;
+const currentConnections: Map<number, Socket> = new Map<number, Socket>();
+function ManageServer(pServer: http.Server|https.Server): void {
+  pServer.on('connection', sock => {
+    const sockId = nextSockerId++;
+    currentConnections.set(sockId, sock);
+    sock.on('close', () => {
+      currentConnections.delete(sockId);
+    });
+  })
+};
+function ShutdownServer(pServer: http.Server|https.Server, pMsg: string): void {
+  currentConnections.forEach( (val, id) => {
+    val.destroy();
+  });
+  currentConnections.clear();
+  pServer.close( () => {
+    Logger.info(`${pMsg}: Stopped metaverse-server version ${Config.server["server-version"]['version-tag']}`);
+    process.exit();
+  });
+};
 
 // Search a directory for .js files that export a 'router' property and return a
 //    new Router that routes to those exports.
