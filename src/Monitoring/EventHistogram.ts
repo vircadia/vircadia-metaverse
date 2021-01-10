@@ -77,7 +77,7 @@ export class EventHistogram extends Histogram {
       "buckets": this._numBuckets,
       "bucketMilliseconds": this._bucketMilliseconds,
       "totalMilliseconds": this._totalHistogramMilliseconds,
-      "timeBase": this._timeBase - this._bucketMilliseconds * (this._numBuckets - this._lastBucket),
+      "timeBase": this._timeBase - (this._bucketMilliseconds * (this._numBuckets - this._lastBucket)),
       "baseNumber": Math.floor((this._timeBase / this._bucketMilliseconds)) + this._lastBucket + 1,
       "type": "accumulation",
       "values": values
