@@ -94,7 +94,7 @@ export const procPutPlacesPlaceId: RequestHandler = async (req: Request, resp: R
 export const procDeletePlacesPlaceId: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
     if (req.vPlace) {
-      if (checkAccessToEntity(req.vAuthToken, req.vDomain, [ Perm.SPONSOR, Perm.ADMIN ], req.vAuthAccount)) {
+      if (await checkAccessToEntity(req.vAuthToken, req.vDomain, [ Perm.SPONSOR, Perm.ADMIN ], req.vAuthAccount)) {
         Logger.info(`procDeletePlacesPlaceId: deleting place "${req.vPlace.name}", id=${req.vPlace.id}`);
         await Places.removePlace(req.vPlace);
       }

@@ -31,7 +31,7 @@ import { Logger } from '@Tools/Logging';
 
 const procGetProfileAccountId: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAccount) {
-    if (checkAccessToEntity(req.vAuthToken, req.vAccount, [ Perm.PUBLIC, Perm.OWNER, Perm.ADMIN ])) {
+    if (await checkAccessToEntity(req.vAuthToken, req.vAccount, [ Perm.PUBLIC, Perm.OWNER, Perm.ADMIN ])) {
       req.vRestResp.Data = {
         account: await buildAccountProfile(req, req.vAccount)
       };

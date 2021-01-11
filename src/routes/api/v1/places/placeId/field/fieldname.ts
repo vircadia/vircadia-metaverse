@@ -21,8 +21,6 @@ import { accountFromAuthToken, param1FromParams, param2FromParams } from '@Route
 
 import { Places } from '@Entities/Places';
 
-import { checkAccessToEntity } from '@Route-Tools/Permissions';
-
 import { VKeyedCollection } from '@Tools/vTypes';
 import { IsNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';

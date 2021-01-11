@@ -25,7 +25,7 @@ import { checkAccessToEntity } from '@Route-Tools/Permissions';
 const procGetUserLocation: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
     if (req.vAccount) {
-      if (checkAccessToEntity(req.vAuthToken, req.vAccount,
+      if (await checkAccessToEntity(req.vAuthToken, req.vAccount,
                           [ Perm.OWNER, Perm.FRIEND, Perm.CONNECTION, Perm.ADMIN ], req.vAuthAccount)) {
         req.vRestResp.Data = {
           'location': await buildLocationInfo(req.vAccount)

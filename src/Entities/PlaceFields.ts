@@ -94,7 +94,7 @@ export const placeFields: { [key: string]: FieldDefn } = {
         const maybeDomain = await Domains.getDomainWithId(pVal);
         if (IsNotNullOrEmpty(maybeDomain)) {
           if (IsNotNullOrEmpty(pAuth)) {
-            if (checkAccessToEntity(pAuth, maybeDomain, [ Perm.SPONSOR, Perm.ADMIN ])) {
+            if (await checkAccessToEntity(pAuth, maybeDomain, [ Perm.SPONSOR, Perm.ADMIN ])) {
               validity = { valid: true };
             }
             else {
