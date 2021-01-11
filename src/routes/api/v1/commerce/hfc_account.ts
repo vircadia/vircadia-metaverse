@@ -26,7 +26,7 @@ const procPutCommerceHfcAccount: RequestHandler = async (req: Request, resp: Res
     Logger.debug('procPutCommerceHfcAccount');
   }
   else {
-    req.vRestResp.respondFailure('unauthorized');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };

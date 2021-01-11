@@ -50,7 +50,7 @@ const procMakeAdmin: RequestHandler = async (req: Request, resp: Response, next:
     }
     else {
       Logger.error(`procMakeAdmin: could not fetch account "${adminAccountName}"`);
-      req.vRestResp.respondFailure('no such account');
+      req.vRestResp.respondFailure('No account named admin account name exists');
     };
   };
   next();

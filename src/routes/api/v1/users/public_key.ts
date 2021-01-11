@@ -26,12 +26,15 @@ import { createSimplifiedPublicKey, convertBinKeyToPEM } from '@Route-Tools/Util
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
 const procGetUsersPublicKey: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vRestResp && req.vAccount) {
+  if (req.vAccount) {
     req.vRestResp.Data = {
       'public_key': createSimplifiedPublicKey(req.vAccount.sessionPublicKey),
       'username': req.vAccount.username,
       'accountid': req.vAccount.id
     };
+  }
+  else {
+    req.vRestResp.respondFailure('Target account not found');
   };
   next();
 };

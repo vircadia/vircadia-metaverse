@@ -59,7 +59,7 @@ const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next:
     pager.addResponseFields(req);
   }
   else {
-    req.vRestResp.respondFailure('unauthorized');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };

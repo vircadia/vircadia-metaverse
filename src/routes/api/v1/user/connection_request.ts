@@ -129,7 +129,7 @@ const procPostUserConnectionRequest: RequestHandler = async (req: Request, resp:
     };
   }
   else {
-    req.vRestResp.respondFailure('unauthorized');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };
@@ -168,7 +168,7 @@ const procDeleteUserConnectionRequest: RequestHandler = async (req: Request, res
     await Requests.removeAllMyRequests(req.vAuthAccount.id, RequestType.HANDSHAKE);
   }
   else {
-    req.vRestResp.respondFailure('unauthorized');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };

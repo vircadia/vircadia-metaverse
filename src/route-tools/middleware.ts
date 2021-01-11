@@ -120,7 +120,7 @@ export const accountFromAuthToken: RequestHandler = async (req: Request, resp: R
     if (IsNotNullOrEmpty(req.vAuthToken)) {
       req.vAuthAccount = await Accounts.getAccountWithId(req.vAuthToken.accountId);
       if (IsNullOrEmpty(req.vAuthAccount)) {
-        req.vAccountError = 'No account found for authorization';
+        req.vAccountError = 'Not logged in';
         Logger.debug('accountFromAuthToken: account lookup fail: authToken=' + req.vRestResp.getAuthToken());
       };
     };

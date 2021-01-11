@@ -68,7 +68,7 @@ const procGetUsersConnections: RequestHandler = async (req: Request, resp: Respo
     pager.addResponseFields(req);
   }
   else {
-    req.vRestResp.respondFailure('unauthorized');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };

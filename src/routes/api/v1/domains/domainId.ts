@@ -141,11 +141,11 @@ const procDeleteDomains: RequestHandler = async (req: Request, resp: Response, n
       };
     }
     else {
-      req.vRestResp.respondFailure('Domain not found');
+      req.vRestResp.respondFailure(req.vDomainError ?? 'Domain not found');
     };
   }
   else {
-    req.vRestResp.respondFailure('Not logged in');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };

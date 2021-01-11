@@ -41,7 +41,7 @@ const procGetProfileAccountId: RequestHandler = async (req: Request, resp: Respo
     };
   }
   else {
-    req.vRestResp.respondFailure('No such account');
+    req.vRestResp.respondFailure('Target account not found');
   };
 
   next();

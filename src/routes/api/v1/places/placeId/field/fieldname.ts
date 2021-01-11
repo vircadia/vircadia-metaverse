@@ -62,7 +62,7 @@ const procPostField: RequestHandler = async (req: Request, resp: Response, next:
     };
   }
   else {
-    req.vRestResp.respondFailure('unauthorized');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };

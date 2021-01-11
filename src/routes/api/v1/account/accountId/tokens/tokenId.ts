@@ -31,28 +31,40 @@ import { Accounts } from '@Entities/Accounts';
 // The requestor account has to have authorization to access the toke so
 //    either 'vAuthAccount' is an admin or is the same as 'vAccount'.
 const procDeleteToken: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vRestResp && req.vAuthAccount && req.vAccount && req.vTokenId) {
-    const scoper = new AccountScopeFilter(req.vAuthAccount, 'accountId');
-    scoper.parametersFromRequest(req);
-
-    const tok = await Tokens.getTokenWithTokenId(req.vTokenId);
-    if (tok) {
-      if ( scoper.AsAdmin() && Accounts.isAdmin(req.vAuthAccount)
-                || req.vAuthAccount.id === tok.accountId) {
-        if (req.vAccount.id === tok.accountId) {
-          await Tokens.removeToken(tok);
+  if (req.vAuthAccount) {
+    if (req.vAccount) {
+      if (req.vTokenId) {
+        const scoper = new AccountScopeFilter(req.vAuthAccount, 'accountId');
+        scoper.parametersFromRequest(req);
+        const tok = await Tokens.getTokenWithTokenId(req.vTokenId);
+        if (tok) {
+          if ( scoper.AsAdmin() && Accounts.isAdmin(req.vAuthAccount)
+                    || req.vAuthAccount.id === tok.accountId) {
+            if (req.vAccount.id === tok.accountId) {
+              await Tokens.removeToken(tok);
+            }
+            else {
+              req.vRestResp.respondFailure('Token account does not match requested account');
+            };
+          }
+          else {
+            req.vRestResp.respondFailure('Unauthorized');
+          };
         }
         else {
-          req.vRestResp.respondFailure('Token account does not match requested account');
+          req.vRestResp.respondFailure('Token not found');
         };
       }
       else {
-        req.vRestResp.respondFailure('Unauthorized');
+        req.vRestResp.respondFailure('Token no speciied');
       };
     }
     else {
-      req.vRestResp.respondFailure('Token not found');
-    }
+      req.vRestResp.respondFailure('Target acccount not found');
+    };
+  }
+  else {
+    req.vRestResp.respondFailure('Not logged in');
   };
   next();
 };

@@ -62,7 +62,7 @@ const procGetRequests: RequestHandler = async (req: Request, resp: Response, nex
     pager.addResponseFields(req);
   }
   else {
-    req.vRestResp.respondFailure('No account specified');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };

@@ -42,7 +42,7 @@ const procGetUserConnections: RequestHandler = async (req: Request, resp: Respon
     pager.addResponseFields(req);
   }
   else {
-    req.vRestResp.respondFailure('unauthorized');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };
@@ -60,7 +60,7 @@ const procDeleteUserConnections: RequestHandler = async (req: Request, resp: Res
     await Accounts.removeConnection(req.vAuthAccount, req.vParam1);
   }
   else {
-    req.vRestResp.respondFailure('unauthorized');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };

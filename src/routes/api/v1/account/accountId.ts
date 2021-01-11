@@ -30,18 +30,23 @@ import { Logger } from '@Tools/Logging';
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
 const procGetAccountId: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount && req.vAccount) {
-    if (checkAccessToEntity(req.vAuthToken, req.vAccount, [ Perm.OWNER, Perm.ADMIN ])) {
-      req.vRestResp.Data = {
-        account: await buildAccountInfo(req, req.vAccount)
+  if (req.vAuthAccount) {
+    if (req.vAccount) {
+      if (checkAccessToEntity(req.vAuthToken, req.vAccount, [ Perm.OWNER, Perm.ADMIN ])) {
+        req.vRestResp.Data = {
+          account: await buildAccountInfo(req, req.vAccount)
+        };
+      }
+      else {
+        req.vRestResp.respondFailure('Unauthorized');
       };
     }
     else {
-      req.vRestResp.respondFailure('Unauthorized');
+      req.vRestResp.respondFailure('Target account not found');
     };
   }
   else {
-    req.vRestResp.respondFailure('No account specified');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };
@@ -50,29 +55,34 @@ const procGetAccountId: RequestHandler = async (req: Request, resp: Response, ne
 // The setter must be either an admin account or the account itself
 const procPostAccountId: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vRestResp) {
-    if (req.vAuthAccount && req.vAccount) {
-      const valuesToSet = req.body.accounts;
-      const updates: VKeyedCollection = {};
-      for (const field of [ 'email', 'public_key' ]) {
-        if (valuesToSet.hasOwnProperty(field)) {
-          await Accounts.setField(req.vAuthToken, req.vAccount, field, valuesToSet.field, req.vAuthAccount, updates);
+    if (req.vAuthAccount) {
+      if (req.vAccount) {
+        const valuesToSet = req.body.accounts;
+        const updates: VKeyedCollection = {};
+        for (const field of [ 'email', 'public_key' ]) {
+          if (valuesToSet.hasOwnProperty(field)) {
+            await Accounts.setField(req.vAuthToken, req.vAccount, field, valuesToSet.field, req.vAuthAccount, updates);
+          };
         };
+        if (valuesToSet.hasOwnProperty('images')) {
+          if (valuesToSet.images.hero) {
+            await Accounts.setField(req.vAuthToken, req.vAccount, 'images_hero', valuesToSet.images.hero, req.vAuthAccount, updates);
+          };
+          if (valuesToSet.images.tiny) {
+            await Accounts.setField(req.vAuthToken, req.vAccount, 'images_tiny', valuesToSet.images.tiny, req.vAuthAccount, updates);
+          };
+          if (valuesToSet.images.thumbnail) {
+            await Accounts.setField(req.vAuthToken, req.vAccount, 'images_thumbnail', valuesToSet.images.thumbnail, req.vAuthAccount, updates);
+          };
+        };
+        await Accounts.updateEntityFields(req.vAuthAccount, updates);
+      }
+      else {
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Account not specified');
       };
-      if (valuesToSet.hasOwnProperty('images')) {
-        if (valuesToSet.images.hero) {
-          await Accounts.setField(req.vAuthToken, req.vAccount, 'images_hero', valuesToSet.images.hero, req.vAuthAccount, updates);
-        };
-        if (valuesToSet.images.tiny) {
-          await Accounts.setField(req.vAuthToken, req.vAccount, 'images_tiny', valuesToSet.images.tiny, req.vAuthAccount, updates);
-        };
-        if (valuesToSet.images.thumbnail) {
-          await Accounts.setField(req.vAuthToken, req.vAccount, 'images_thumbnail', valuesToSet.images.thumbnail, req.vAuthAccount, updates);
-        };
-      };
-      await Accounts.updateEntityFields(req.vAuthAccount, updates);
     }
     else {
-      req.vRestResp.respondFailure(req.vAccountError ?? 'Accounts not specified');
+      req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
     };
   };
   next();
@@ -81,13 +91,22 @@ const procPostAccountId: RequestHandler = async (req: Request, resp: Response, n
 // Delete an account.
 // The setter must be an admin account.
 const procDeleteAccountId: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vRestResp) {
-    if (req.vAuthAccount && req.vAccount) {
+  if (req.vAuthAccount) {
+    if (req.vAccount) {
       if (Accounts.isAdmin(req.vAuthAccount)) {
         await Accounts.removeAccount(req.vAccount);
         await Accounts.removeAccountContext(req.vAccount);
+      }
+      else {
+        req.vRestResp.respondFailure('Not an administrator');
       };
+    }
+    else {
+      req.vRestResp.respondFailure('Target account does not exist');
     };
+  }
+  else {
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };

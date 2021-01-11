@@ -26,7 +26,6 @@ import { Logger } from '@Tools/Logging';
 // Query parameter of 'scope' can say wether token is for 'owner' or 'domain'.
 const procPostTokenNew: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vAuthAccount) {
-
     // The user passes the scope but make sure we know it's one we know
     let scope = TokenScope.OWNER;
     if (req.query && req.query.scope && typeof(req.query.scope) === 'string') {
@@ -50,7 +49,7 @@ const procPostTokenNew: RequestHandler = async (req: Request, resp: Response, ne
     };
   }
   else {
-    req.vRestResp.respondFailure('account not found');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };

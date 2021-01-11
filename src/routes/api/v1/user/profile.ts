@@ -36,7 +36,7 @@ const procGetUserProfile: RequestHandler = async (req: Request, resp: Response, 
     };
   }
   else {
-    req.vRestResp.respondFailure('auth token did not work');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };

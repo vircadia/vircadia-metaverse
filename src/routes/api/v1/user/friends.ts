@@ -42,7 +42,7 @@ const procGetUserFriends: RequestHandler = async (req: Request, resp: Response, 
     pager.addResponseFields(req);
   }
   else {
-    req.vRestResp.respondFailure('unauthorized');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };
@@ -68,7 +68,7 @@ const procPostUserFriends: RequestHandler = async (req: Request, resp: Response,
     };
   }
   else {
-    req.vRestResp.respondFailure('unauthorized');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };
@@ -79,7 +79,7 @@ const procDeleteUserFriends: RequestHandler = async (req: Request, resp: Respons
     await Accounts.removeFriend(req.vAuthAccount, req.vParam1);
   }
   else {
-    req.vRestResp.respondFailure('unauthorized');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };

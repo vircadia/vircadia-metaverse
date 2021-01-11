@@ -48,7 +48,7 @@ const procGetStat: RequestHandler = async (req: Request, resp: Response, next: N
     };
   }
   else {
-    req.vRestResp.respondFailure('unauthorized');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };

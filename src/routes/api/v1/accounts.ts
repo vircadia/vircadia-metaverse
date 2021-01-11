@@ -52,7 +52,7 @@ const procGetAccounts: RequestHandler = async (req: Request, resp: Response, nex
     infoer.addResponseFields(req);
   }
   else {
-    req.vRestResp.respondFailure('Not logged in');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };

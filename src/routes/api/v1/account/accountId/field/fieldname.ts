@@ -24,11 +24,16 @@ import { VKeyedCollection } from '@Tools/vTypes';
 
 // Get the scope of the logged in account
 const procGetField: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount && req.vAccount) {
-    req.vRestResp.Data = await Accounts.getField(req.vAuthToken, req.vAccount, req.vParam1, req.vAuthAccount);
+  if (req.vAuthAccount) {
+    if (req.vAccount) {
+      req.vRestResp.Data = await Accounts.getField(req.vAuthToken, req.vAccount, req.vParam1, req.vAuthAccount);
+    }
+    else {
+      req.vRestResp.respondFailure('Target account not found');
+    };
   }
   else {
-    req.vRestResp.respondFailure('unauthorized');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };
@@ -36,24 +41,29 @@ const procGetField: RequestHandler = async (req: Request, resp: Response, next: 
 // Add a role to my roles collection.
 // Not implemented as something needs to be done with request_connection, etc
 const procPostField: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount && req.vAccount) {
-    if (req.body.hasOwnProperty('set')) {
-      const updates: VKeyedCollection = {};
-      const success = await Accounts.setField(req.vAuthToken, req.vAccount, req.vParam1, req.body.set, req.vAuthAccount, updates);
-      if (success.valid) {
-        // Setting worked so update the database
-        Accounts.updateEntityFields(req.vAccount, updates);
+  if (req.vAuthAccount) {
+    if (req.vAccount) {
+      if (req.body.hasOwnProperty('set')) {
+        const updates: VKeyedCollection = {};
+        const success = await Accounts.setField(req.vAuthToken, req.vAccount, req.vParam1, req.body.set, req.vAuthAccount, updates);
+        if (success.valid) {
+          // Setting worked so update the database
+          Accounts.updateEntityFields(req.vAccount, updates);
+        }
+        else {
+          req.vRestResp.respondFailure('value could not be set:' + success.reason);
+        };
       }
       else {
-        req.vRestResp.respondFailure('value could not be set:' + success.reason);
+        req.vRestResp.respondFailure('no set value given');
       };
     }
     else {
-      req.vRestResp.respondFailure('no set value given');
+      req.vRestResp.respondFailure('Target account not found');
     };
   }
   else {
-    req.vRestResp.respondFailure('unauthorized');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };

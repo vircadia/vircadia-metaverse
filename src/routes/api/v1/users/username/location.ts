@@ -40,7 +40,7 @@ const procGetUserLocation: RequestHandler = async (req: Request, resp: Response,
     };
   }
   else {
-    req.vRestResp.respondFailure('unauthorized');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };

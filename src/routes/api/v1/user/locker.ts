@@ -31,7 +31,7 @@ const procGetUserLocker: RequestHandler = async (req: Request, resp: Response, n
     };
   }
   else {
-    req.vRestResp.respondFailure('unauthorized');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
 
   next();
@@ -41,7 +41,7 @@ const procPostUserLocker: RequestHandler = async (req: Request, resp: Response, 
     await Accounts.updateEntityFields(req.vAuthAccount, { 'locker': req.body } );
   }
   else {
-    req.vRestResp.respondFailure('unauthorized');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };

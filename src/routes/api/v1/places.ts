@@ -59,7 +59,7 @@ const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next:
     pager.addResponseFields(req);
   }
   else {
-    req.vRestResp.respondFailure('No account specified');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };
@@ -120,7 +120,7 @@ export const procPostPlaces: RequestHandler = async (req: Request, resp: Respons
     };
   }
   else {
-    req.vRestResp.respondFailure('no domain specified');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };

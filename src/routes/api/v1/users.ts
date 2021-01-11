@@ -64,7 +64,7 @@ const procGetUsers: RequestHandler = async (req: Request, resp: Response, next: 
     scoper.addResponseFields(req);
   }
   else {
-    req.vRestResp.respondFailure('No account specified');
+    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
   };
   next();
 };
@@ -129,7 +129,7 @@ const procPostUsers: RequestHandler = async (req: Request, resp: Response, next:
     else {
       req.vRestResp.respondFailure('Badly formatted request');
     };
-  }
+  };
   next();
 };
 
