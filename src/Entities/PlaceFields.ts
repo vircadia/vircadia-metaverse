@@ -40,8 +40,8 @@ export const placeFields: { [key: string]: FieldDefn } = {
   'id': {
     entity_field: 'id',
     request_field_name: 'id',
-    get_permissions: [ 'all' ],
-    set_permissions: [ 'none' ],
+    get_permissions: [ Perm.ALL ],
+    set_permissions: [ Perm.NONE ],
     validate: isStringValidator,
     setter: simpleSetter,
     getter: simpleGetter
@@ -49,8 +49,8 @@ export const placeFields: { [key: string]: FieldDefn } = {
   'name': {
     entity_field: 'name',
     request_field_name: 'name',
-    get_permissions: [ 'all' ],
-    set_permissions: [ 'domain', 'owner', 'admin' ],
+    get_permissions: [ Perm.ALL ],
+    set_permissions: [ Perm.DOMAIN, Perm.OWNER, Perm.ADMIN ],
     validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {
       // Verify that the placename is unique
       let validity: ValidateResponse;
@@ -75,8 +75,8 @@ export const placeFields: { [key: string]: FieldDefn } = {
   'description': {
     entity_field: 'description',
     request_field_name: 'description',
-    get_permissions: [ 'all' ],
-    set_permissions: [ 'domain', 'owner', 'admin' ],
+    get_permissions: [ Perm.ALL ],
+    set_permissions: [ Perm.DOMAIN, Perm.OWNER, Perm.ADMIN ],
     validate: isStringValidator,
     setter: simpleSetter,
     getter: simpleGetter
@@ -84,8 +84,8 @@ export const placeFields: { [key: string]: FieldDefn } = {
   'domainId': {
     entity_field: 'domainId',
     request_field_name: 'domainId',
-    get_permissions: [ 'all' ],
-    set_permissions: [ 'owner', 'admin' ],
+    get_permissions: [ Perm.ALL ],
+    set_permissions: [ Perm.OWNER, Perm.ADMIN ],
     validate: async (pField: FieldDefn, pEntity: Entity, pVal: any, pAuth: AuthToken): Promise<ValidateResponse> => {
       // This is setting a place to a new domainId. Make sure the domain exists
       //         and requestor has access to that domain.
@@ -120,7 +120,7 @@ export const placeFields: { [key: string]: FieldDefn } = {
     entity_field: 'address',
     request_field_name: 'address',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domainaccess', 'admin' ],
+    set_permissions: [ Perm.DOMAINACCESS, Perm.ADMIN ],
     validate: isPathValidator,
     setter: simpleSetter,
     getter: simpleGetter
@@ -129,7 +129,7 @@ export const placeFields: { [key: string]: FieldDefn } = {
     entity_field: 'address',
     request_field_name: 'path',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domainaccess', 'admin' ],
+    set_permissions: [ Perm.DOMAINACCESS, Perm.ADMIN ],
     validate: isPathValidator,
     setter: simpleSetter,
     getter: simpleGetter
@@ -138,7 +138,7 @@ export const placeFields: { [key: string]: FieldDefn } = {
     entity_field: 'maturity',
     request_field_name: 'maturity',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domainaccess', 'admin' ],
+    set_permissions: [ Perm.DOMAINACCESS, Perm.ADMIN ],
     validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {
       if(typeof(pVal) === 'string' && Maturity.KnownMaturity(pVal)) {
         return { valid: true };
@@ -152,7 +152,7 @@ export const placeFields: { [key: string]: FieldDefn } = {
     entity_field: 'tags',
     request_field_name: 'tags',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domainaccess', 'admin' ],
+    set_permissions: [ Perm.DOMAINACCESS, Perm.ADMIN ],
     validate: isSArraySet,
     setter: sArraySetter,
     getter: simpleGetter
@@ -161,7 +161,7 @@ export const placeFields: { [key: string]: FieldDefn } = {
     entity_field: 'thumbnail',
     request_field_name: 'thumbnail',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domainaccess', 'admin' ],
+    set_permissions: [ Perm.DOMAINACCESS, Perm.ADMIN ],
     validate: isStringValidator,
     setter: simpleSetter,
     getter: simpleGetter
@@ -170,7 +170,7 @@ export const placeFields: { [key: string]: FieldDefn } = {
     entity_field: 'images',
     request_field_name: 'images',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domainaccess', 'admin' ],
+    set_permissions: [ Perm.DOMAINACCESS, Perm.ADMIN ],
     validate: isSArraySet,
     setter: sArraySetter,
     getter: simpleGetter
@@ -180,7 +180,7 @@ export const placeFields: { [key: string]: FieldDefn } = {
     entity_field: 'iPAddrOfFirstContact',
     request_field_name: 'addr_of_first_contact',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'none' ],
+    set_permissions: [ Perm.NONE ],
     validate: isStringValidator,
     setter: simpleSetter,
     getter: simpleGetter
@@ -189,7 +189,7 @@ export const placeFields: { [key: string]: FieldDefn } = {
     entity_field: 'whenCreated',
     request_field_name: 'when_place_entry_created',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'none' ],
+    set_permissions: [ Perm.NONE ],
     validate: isDateValidator,
     setter: noSetter,
     getter: dateStringGetter

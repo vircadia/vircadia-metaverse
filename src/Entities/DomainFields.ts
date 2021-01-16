@@ -44,38 +44,6 @@ export function CheckDomainFields(): void {
   // END DEBUG DEBUG
 };
 
-/*
-// Get the value of a domain field with the fieldname.
-// Checks to make sure the getter has permission to get the values.
-// Returns the value. Could be 'undefined' whether the requestor doesn't have permissions or that's
-//     the actual field value.
-export async function getDomainField(pAuthToken: AuthToken, pDomain: DomainEntity,
-                                pField: string, pRequestingAccount?: AccountEntity): Promise<any> {
-  return getEntityField(DomainFields, pAuthToken, pDomain, pField, pRequestingAccount);
-};
-// Set a domain field with the fieldname and a value.
-// Checks to make sure the setter has permission to set.
-// Returns 'true' if the value was set and 'false' if the value could not be set.
-export async function setDomainField(pAuthToken: AuthToken,  // authorization for making this change
-            pDomain: DomainEntity,              // the domain being changed
-            pField: string, pVal: any,          // field being changed and the new value
-            pRequestingAccount?: AccountEntity, // Account associated with pAuthToken, if known
-            pUpdates?: VKeyedCollection         // where to record updates made (optional)
-                    ): Promise<ValidateResponse> {
-  return setEntityField(DomainFields, pAuthToken, pDomain, pField, pVal, pRequestingAccount, pUpdates);
-};
-
-// Generate an 'update' block for the specified field or fields.
-// This is a field/value collection that can be passed to the database routines.
-// Note that this directly fetches the field value rather than using 'getter' since
-//     we want the actual value (whatever it is) to go into the database.
-// If an existing VKeyedCollection is passed, it is added to an returned.
-export function getDomainUpdateForField(pDomain: DomainEntity,
-              pField: string | string[], pExisting?: VKeyedCollection): VKeyedCollection {
-  return getEntityUpdateForField(DomainFields, pDomain, pField, pExisting);
-};
-*/
-
 // Naming and access for the fields in a DomainEntity.
 // Indexed by request_field_name.
 export const DomainFields: { [key: string]: FieldDefn } = {
@@ -83,7 +51,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'id',
     request_field_name: 'id',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'none' ],
+    set_permissions: [ Perm.NONE ],
     validate: isStringValidator,
     setter: simpleSetter,
     getter: simpleGetter
@@ -92,7 +60,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'name',
     request_field_name: 'name',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domain', 'sponsor', 'admin' ],
+    set_permissions: [ Perm.DOMAIN, Perm.SPONSOR, Perm.ADMIN ],
     validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {
       let validity: ValidateResponse;
       if (typeof(pVal) === 'string' && (pVal as string).length > 0) {
@@ -116,7 +84,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'name',
     request_field_name: 'world_name',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domain', 'sponsor', 'admin' ],
+    set_permissions: [ Perm.DOMAIN, Perm.SPONSOR, Perm.ADMIN ],
     validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {
       let validity: ValidateResponse;
       if (typeof(pVal) === 'string' && (pVal as string).length > 0) {
@@ -139,7 +107,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'publicKey',
     request_field_name: 'public_key',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domain' ],
+    set_permissions: [ Perm.DOMAIN ],
     validate: isStringValidator,
     setter: simpleSetter,
     getter: simpleGetter
@@ -148,7 +116,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'sponsorAccountId',
     request_field_name: 'sponsor_account_id',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domain', 'sponsor', 'admin' ],
+    set_permissions: [ Perm.DOMAIN, Perm.SPONSOR, Perm.ADMIN ],
     validate: isStringValidator,
     setter: simpleSetter,
     getter: simpleGetter
@@ -157,7 +125,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'version',
     request_field_name: 'version',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domain' ],
+    set_permissions: [ Perm.DOMAIN ],
     validate: isStringValidator,
     setter: simpleSetter,
     getter: simpleGetter
@@ -166,7 +134,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'protocol',
     request_field_name: 'protocol',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domain' ],
+    set_permissions: [ Perm.DOMAIN ],
     validate: isStringValidator,
     setter: simpleSetter,
     getter: simpleGetter
@@ -175,7 +143,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'networkAddr',
     request_field_name: 'network_address',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domain' ],
+    set_permissions: [ Perm.DOMAIN ],
     validate: isStringValidator,
     setter: simpleSetter,
     getter: simpleGetter
@@ -184,7 +152,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'networkPort',
     request_field_name: 'network_port',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domain' ],
+    set_permissions: [ Perm.DOMAIN ],
     validate: isNumberValidator,
     setter: simpleSetter,
     getter: simpleGetter
@@ -193,7 +161,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'networkingMode',
     request_field_name: 'automatic_networking',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domain' ],
+    set_permissions: [ Perm.DOMAIN ],
     validate: isStringValidator,
     setter: simpleSetter,
     getter: simpleGetter
@@ -202,7 +170,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'numUsers',
     request_field_name: 'num_users',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domain', 'admin' ],
+    set_permissions: [ Perm.DOMAIN, Perm.ADMIN ],
     validate: isNumberValidator,
     setter: simpleSetter,
     getter: simpleGetter
@@ -211,7 +179,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'anonUsers',
     request_field_name: 'num_anon_users',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domain', 'admin' ],
+    set_permissions: [ Perm.DOMAIN, Perm.ADMIN ],
     validate: isNumberValidator,
     setter: simpleSetter,
     getter: simpleGetter
@@ -220,7 +188,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'restricted',
     request_field_name: 'restricted',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domain', 'sponsor', 'admin' ],
+    set_permissions: [ Perm.DOMAIN, Perm.SPONSOR, Perm.ADMIN ],
     validate: isBooleanValidator,
     setter: simpleSetter,
     getter: simpleGetter
@@ -229,7 +197,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'capacity',
     request_field_name: 'capacity',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domain', 'sponsor', 'admin' ],
+    set_permissions: [ Perm.DOMAIN, Perm.SPONSOR, Perm.ADMIN ],
     validate: isNumberValidator,
     setter: simpleSetter,
     getter: simpleGetter
@@ -238,7 +206,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'description',
     request_field_name: 'description',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domain', 'sponsor', 'admin' ],
+    set_permissions: [ Perm.DOMAIN, Perm.SPONSOR, Perm.ADMIN ],
     validate: isStringValidator,
     setter: noOverwriteSetter,
     getter: simpleGetter
@@ -247,7 +215,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'contactInfo',
     request_field_name: 'contact_info',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domain', 'sponsor', 'admin' ],
+    set_permissions: [ Perm.DOMAIN, Perm.SPONSOR, Perm.ADMIN ],
     validate: isStringValidator,
     setter: noOverwriteSetter,
     getter: simpleGetter
@@ -256,7 +224,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'thumbnail',
     request_field_name: 'thumbnail',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domain', 'sponsor', 'admin' ],
+    set_permissions: [ Perm.DOMAIN, Perm.SPONSOR, Perm.ADMIN ],
     validate: isStringValidator,
     setter: noOverwriteSetter,
     getter: simpleGetter
@@ -265,7 +233,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'images',
     request_field_name: 'images',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domain', 'sponsor', 'admin' ],
+    set_permissions: [ Perm.DOMAIN, Perm.SPONSOR, Perm.ADMIN ],
     validate: isSArraySet,
     setter: sArraySetter,
     getter: simpleGetter
@@ -274,7 +242,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'maturity',
     request_field_name: 'maturity',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domain', 'sponsor', 'admin' ],
+    set_permissions: [ Perm.DOMAIN, Perm.SPONSOR, Perm.ADMIN ],
     validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {
       if(typeof(pVal) === 'string' && Maturity.KnownMaturity(pVal)) {
         return { valid: true };
@@ -288,7 +256,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'restriction',
     request_field_name: 'restriction',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domain', 'sponsor', 'admin' ],
+    set_permissions: [ Perm.DOMAIN, Perm.SPONSOR, Perm.ADMIN ],
     validate: isStringValidator,
     setter: simpleSetter,
     getter: simpleGetter
@@ -297,7 +265,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'managers',
     request_field_name: 'managers',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domain', 'sponsor', 'admin' ],
+    set_permissions: [ Perm.DOMAIN, Perm.SPONSOR, Perm.ADMIN ],
     validate: isSArraySet,
     setter: sArraySetter,
     getter: simpleGetter
@@ -306,7 +274,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'tags',
     request_field_name: 'tags',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'domain', 'sponsor', 'admin' ],
+    set_permissions: [ Perm.DOMAIN, Perm.SPONSOR, Perm.ADMIN ],
     validate: isSArraySet,
     setter: sArraySetter,
     getter: simpleGetter
@@ -316,7 +284,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'iPAddrOfFirstContact',
     request_field_name: 'addr_of_first_contact',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'none' ],
+    set_permissions: [ Perm.NONE ],
     validate: isStringValidator,
     setter: simpleSetter,
     getter: simpleGetter
@@ -325,7 +293,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'whenCreated',
     request_field_name: 'when_domain_entry_created',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'none' ],
+    set_permissions: [ Perm.NONE ],
     validate: isDateValidator,
     setter: noSetter,
     getter: dateStringGetter
@@ -334,7 +302,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'timeOfLastHeartbeat',
     request_field_name: 'time_of_last_heartbeat',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'none' ],
+    set_permissions: [ Perm.NONE ],
     validate: isDateValidator,
     setter: noSetter,
     getter: dateStringGetter
@@ -343,7 +311,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     entity_field: 'lastSenderKey',
     request_field_name: 'last_sender_key',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ 'none' ],
+    set_permissions: [ Perm.NONE ],
     validate: isStringValidator,
     setter: simpleSetter,
     getter: simpleGetter
