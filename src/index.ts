@@ -43,7 +43,8 @@ import { Logger, initLogging, morganOptions } from '@Tools/Logging';
 
 initializeConfiguration()
 .catch ( err => {
-  Logger.error('main: failured configuration: ' + err);
+  Logger.error('main: failed configuration: ' + err);
+  return;
 })
 .then( () => {
   initLogging();
@@ -72,7 +73,8 @@ initializeConfiguration()
     'credentials': true
   } ));
 
-  // Most of the requests are JSON in an out
+  // Most of the requests are JSON in an out.
+  // This parses the JSON and adds 'Request.body'
   expr.use(express.json({
     'strict': false,
     'limit': Config.server['max-body-size']
@@ -113,9 +115,6 @@ initializeConfiguration()
 
   // The metaverseAPI operations
   expr.use(createAPIRouter('routes'));
-
-  // Acting as an ActivityPub server
-  // expr.use(createAPIRouter('ActivityPub'));
 
   // Serving static files
   expr.use(Config.server["static-base"] ?? '/static', express.static(path.join(__dirname, 'static')));
