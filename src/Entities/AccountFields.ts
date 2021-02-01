@@ -121,7 +121,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
       };
       return validity;
     },
-    setter: (pField: FieldDefn, pEntity: Entity, pVal: any): any => {
+    setter: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<any> => {
       // emails are stored in lower-case
       (pEntity as AccountEntity).email = (pVal as string).toLowerCase();
     },
@@ -284,7 +284,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
     get_permissions: [ Perm.NONE ],
     set_permissions: [ Perm.OWNER, Perm.ADMIN ],
     validate: isStringValidator,
-    setter: (pField: FieldDefn, pEntity: Entity, pVal: any): void => {
+    setter: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<void> => {
       Accounts.storePassword((pEntity as AccountEntity), pVal);
     },
     getter: noGetter,
