@@ -183,18 +183,18 @@ export async function verifyAllSArraySetValues(pValue: any, pCheckFunction: Vali
 };
 
 // ======== GETTER ============================================================
-export function noGetter(pField: FieldDefn, pEntity: Entity): any {
+export async function noGetter(pField: FieldDefn, pEntity: Entity): Promise<any> {
   Logger.error(`noGetter: attempt to get field ${pField.entity_field}`);
 };
 // Return  the field value.
-export function simpleGetter(pField: FieldDefn, pEntity: Entity): any {
+export async function simpleGetter(pField: FieldDefn, pEntity: Entity): Promise<any> {
   if (pEntity.hasOwnProperty(pField.entity_field)) {
     return (pEntity as any)[pField.entity_field];
   };
   return undefined;
 };
 // Return a date field as an ISO formatted string
-export function dateStringGetter(pField: FieldDefn, pEntity: Entity): string {
+export async function dateStringGetter(pField: FieldDefn, pEntity: Entity): Promise<string> {
   if (pEntity.hasOwnProperty(pField.entity_field)) {
     const dateVal: Date = (pEntity as any)[pField.entity_field];
     return dateVal ? dateVal.toISOString() : undefined;
