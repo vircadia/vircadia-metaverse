@@ -93,7 +93,7 @@ export const procPostPlaces: RequestHandler = async (req: Request, resp: Respons
         if (await checkAccessToEntity(req.vAuthToken, aDomain, [ Perm.SPONSOR, Perm.ADMIN ], req.vAuthAccount)) {
           const maybePlace = await Places.getPlaceWithName(requestedName);
           if (IsNullOrEmpty(maybePlace)) {
-            const newPlace = Places.createPlace();
+            const newPlace = await Places.createPlace(aDomain.sponsorAccountId);
             newPlace.name = requestedName;
             newPlace.description = requestedDesc;
             newPlace.address = requestedAddr;

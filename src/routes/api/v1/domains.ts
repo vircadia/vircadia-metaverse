@@ -86,7 +86,7 @@ const procPostDomains: RequestHandler = async (req: Request, resp: Response, nex
           // Creating a domain also creates a Place for that domain
           // Note that place names are unique so we modify the place name if there is already one.
           const newPlacename = await Places.uniqifyPlaceName(newDomain.name);
-          const newPlace = Places.createPlace();
+          const newPlace = await Places.createPlace(req.vAuthToken.accountId);
           newPlace.domainId = newDomain.id;
           newPlace.name = newPlacename;
           newPlace.description = 'A place in ' + newDomain.name;

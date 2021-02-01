@@ -18,6 +18,7 @@ import { PlaceEntity } from '@Entities/PlaceEntity';
 import { placeFields } from '@Entities/PlaceFields';
 
 import { AuthToken } from '@Entities/AuthToken';
+import { Tokens, TokenScope } from '@Entities/Tokens';
 
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
@@ -47,12 +48,14 @@ export const Places = {
     Logger.info(`Places: creating place ${pPlaceEntity.name}, id=${pPlaceEntity.id}`);
     return IsNullOrEmpty(pPlaceEntity) ? null : createObject(placeCollection, pPlaceEntity);
   },
-  createPlace(): PlaceEntity {
+  async createPlace(pAccountId: string): Promise<PlaceEntity> {
     const newPlace = new PlaceEntity();
     newPlace.id = GenUUID();
     newPlace.name = 'UNKNOWN-' + genRandomString(5);
     newPlace.address = '/0,0,0/0,0,0,0';
     newPlace.whenCreated = new Date();
+    const APItoken = await Tokens.createToken(pAccountId, [ TokenScope.PLACE ], -1);
+    newPlace.currentAPIKeyTokenId = APItoken.id;
     return newPlace;
   },
   // Verify the passed placename is unique and return the unique name
