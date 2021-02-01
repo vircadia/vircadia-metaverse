@@ -82,8 +82,8 @@ export const Tokens = {
         break;
       default:
         // There is a specification of some hours to expire
-        let hours = Clamp(pExpireHours, 1, 1000000);  // max is 114 years
-        aToken.expirationTime = new Date(new Date().valueOf() + pExpireHours * 1000*60*60);
+        const hours = Clamp(pExpireHours, 1, 1000000);  // max is 114 years
+        aToken.expirationTime = new Date(new Date().valueOf() + hours * 1000*60*60);
         break;
     };
     return aToken;

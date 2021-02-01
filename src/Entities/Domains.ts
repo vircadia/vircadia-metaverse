@@ -146,7 +146,7 @@ export const Domains = {
   },
   // Return the Date when an domain is considered inactive
   dateWhenNotActive(): Date {
-    const notActiveTime = new Date(Date.now() - 1000 * Config["metaverse-server"]["domain-seconds-until-offline"]);
+    const notActiveTime = new Date(Date.now() - (1000 * Config["metaverse-server"]["domain-seconds-until-offline"] ) );
     return notActiveTime;
   },
   // Return 'true' if the passed string could be a domainId. Used as a precheck before querying the Db.
