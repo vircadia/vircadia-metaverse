@@ -74,7 +74,7 @@ export async function setEntityField(
         if (validity.valid) {
           Logger.cdebug('field-setting', `setEntityField: value validated`);
           if (typeof(perms.setter) === 'function') {
-            perms.setter(perms, pEntity, pVal);
+            await perms.setter(perms, pEntity, pVal);
             if (pUpdates) {
               getEntityUpdateForField(pPerms, pEntity, pField, pUpdates);
             };

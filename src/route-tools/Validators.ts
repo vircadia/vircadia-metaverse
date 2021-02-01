@@ -203,17 +203,17 @@ export async function dateStringGetter(pField: FieldDefn, pEntity: Entity): Prom
 };
 
 // ======== SETTER ===============================================================
-export function noSetter(pField: FieldDefn, pEntity: Entity, pVal: any): void {
+export async function noSetter(pField: FieldDefn, pEntity: Entity, pVal: any): Promise<void> {
   Logger.error(`noSetter: attempt to set field ${pField.entity_field}`);
 };
 // Set the value of the field.
 // The different type of values require different manipulations.
-export function simpleSetter(pField: FieldDefn, pEntity: Entity, pVal: any): void {
+export async function simpleSetter(pField: FieldDefn, pEntity: Entity, pVal: any): Promise<void> {
   Logger.cdebug('field-setting', `simpleSetter: setting ${pField.entity_field}=>${JSON.stringify(pVal)}`);
   (pEntity as any)[pField.entity_field] = pVal;
 };
 // A setter that will not set if the passed value is undefined, null, or a zero-length string
-export function noOverwriteSetter(pField: FieldDefn, pEntity: Entity, pVal: any): void {
+export async function noOverwriteSetter(pField: FieldDefn, pEntity: Entity, pVal: any): Promise<void> {
   // Don't overwrite a value with a null or empty value.
   if (IsNotNullOrEmpty(pVal)) {
     if (Array.isArray(pVal)) {
@@ -233,7 +233,7 @@ export function noOverwriteSetter(pField: FieldDefn, pEntity: Entity, pVal: any)
 //  The value should be a 'manipulator' "{ "set": SArray, "add": [ add vals ], "remove": [ remove vals ] }"
 //  but this also accepts a string (presumes an "add")
 //                        a string array (presumes a "set")
-export function sArraySetter(pField: FieldDefn, pEntity: Entity, pVal: any): void {
+export async function sArraySetter(pField: FieldDefn, pEntity: Entity, pVal: any): Promise<void> {
   const fieldName = pField.entity_field;
 
   Logger.cdebug('field-setting', `sArraySetter: setting ${fieldName} with ${JSON.stringify(pVal)}`);
