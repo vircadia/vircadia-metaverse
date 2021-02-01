@@ -27,12 +27,13 @@ import { Perm } from '@Route-Tools/Perm';
 import { checkAccessToEntity } from '@Route-Tools/Permissions';
 
 import { FieldDefn, ValidateResponse } from '@Route-Tools/EntityFieldDefn';
-import { isStringValidator, isSArraySet, isPathValidator, isDateValidator } from '@Route-Tools/Validators';
+import { isStringValidator, isSArraySet, isPathValidator, isDateValidator, isNumberValidator } from '@Route-Tools/Validators';
 import { simpleGetter, simpleSetter, noSetter, sArraySetter, dateStringGetter } from '@Route-Tools/Validators';
 
 import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 
 import { Logger } from '@Tools/Logging';
+import { Tokens } from './Tokens';
 
 // Naming and access for the fields in a PlaceEntity.
 // Indexed by request_field_name.
@@ -174,6 +175,62 @@ export const placeFields: { [key: string]: FieldDefn } = {
     validate: isSArraySet,
     setter: sArraySetter,
     getter: simpleGetter
+  },
+  'current_attendance': {
+    entity_field: 'currentAttendence',
+    request_field_name: 'current_attendance',
+    get_permissions: [ Perm.ALL ],
+    set_permissions: [ Perm.DOMAINACCESS, Perm.ADMIN ],
+    validate: isNumberValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'current_images': {
+    entity_field: 'currentImages',
+    request_field_name: 'current_images',
+    get_permissions: [ Perm.ALL ],
+    set_permissions: [ Perm.DOMAINACCESS, Perm.ADMIN ],
+    validate: isSArraySet,
+    setter: sArraySetter,
+    getter: simpleGetter
+  },
+  'current_info': {
+    entity_field: 'currentInfo',
+    request_field_name: 'current_info',
+    get_permissions: [ Perm.ALL ],
+    set_permissions: [ Perm.DOMAINACCESS, Perm.ADMIN ],
+    validate: isStringValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'current_last_update_time': {
+    entity_field: 'currentLastUpdateTime',
+    request_field_name: 'current_last_update_time',
+    get_permissions: [ Perm.DOMAINACCESS, Perm.ADMIN ],
+    set_permissions: [ Perm.NONE ],
+    validate: isDateValidator,
+    setter: simpleSetter,
+    getter: dateStringGetter
+  },
+  'current_api_key': {
+    entity_field: 'currentAPIKeyTokenId',
+    request_field_name: 'current_api_key',
+    get_permissions: [ Perm.DOMAINACCESS, Perm.ADMIN],
+    set_permissions: [ Perm.NONE ],
+    validate: isStringValidator,
+    setter: noSetter,
+    getter: async (pField: FieldDefn, pEntity: Entity): Promise<any> => {
+      if (pEntity.hasOwnProperty('currentAPIKeyTokenId')) {
+        const tokenId = (pEntity as PlaceEntity).currentAPIKeyTokenId;
+        if (IsNotNullOrEmpty(tokenId)) {
+          const aToken = await Tokens.getTokenWithTokenId(tokenId);
+          if (aToken) {
+            return aToken.token;
+          };
+        };
+      };
+      return 'unknown';
+    }
   },
   // admin stuff
   'addr_of_first_contact': {
