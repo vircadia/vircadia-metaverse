@@ -11,12 +11,13 @@
 const fse = require('fs-extra');
 
 const srcDir = `./src/static`;
-const destDir = `./dist`;
+const destDir = `./dist/static`;
 
-fse.copySync(srcDir, destDir, { overwrite: true }, function (err) {
-    if (err) {
-        console.error(err);
-    } else {
-        console.log("Successfully copied src/static to dist!");
-    }
-});
+try {
+    fse.mkdirSync(destDir);
+    fse.copySync(srcDir, destDir, { overwrite: true });
+    console.log(`Successfully copied ${srcDir} to ${destDir}!`);
+}
+catch (err) {
+    console.log(`Failed to copy copied ${srcDir} to ${destDir}!: ${err}`);
+};
