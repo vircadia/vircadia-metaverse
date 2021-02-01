@@ -40,7 +40,7 @@ export async function getEntityField(
       Logger.cdebug('field-setting', `getEntityField: access passed`);
       if (typeof(perms.getter) === 'function') {
         Logger.cdebug('field-setting', `getEntityField: doing getter`);
-        val = perms.getter(perms, pEntity);
+        val = await perms.getter(perms, pEntity);
         Logger.cdebug('field-setting', `getEntityField: ${pField}=>${JSON.stringify(val)}`);
       }
       else {
