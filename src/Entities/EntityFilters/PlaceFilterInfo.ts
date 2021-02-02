@@ -25,6 +25,11 @@ import { Logger } from '@Tools/Logging';
 
 
 // Process a request that wants to filter Account collection with parameters:
+//  &maturity=unrated,mature
+//  &tag=tag1,tag2,tag3
+//  &status=online,active
+//        online = Place/Domain are heartbeating
+//        active = one or more avatars are present
 export class PlaceFilterInfo extends CriteriaFilter {
 
   private _maturity: string[];
@@ -40,8 +45,6 @@ export class PlaceFilterInfo extends CriteriaFilter {
 
   // Passed the request, get the filter parameters from the query.
   // Here we pre-process the parameters to make the DB query construction quicker.
-  //  maturity=string
-  //  tag=string,string,...   (contains one)
   public parametersFromRequest(pRequest: Request) : void {
     try {
       // Comma separated list of attribute criteria.
@@ -67,10 +70,23 @@ export class PlaceFilterInfo extends CriteriaFilter {
         };
       };
 
-      // Commas separated list of target's status.
-      // Currently, the only selection is 'online'.
+      // Commas separated list of place tags
       if (typeof(pRequest.query.tag) === 'string') {
         this._tags = pRequest.query.tag.split(',');
+      };
+
+      if (typeof(pRequest.query.status) === 'string') {
+        const statuses = pRequest.query.status.split(',');
+        for (const stat of statuses) {
+          switch (stat) {
+            case 'online':
+              break;
+            case 'active':
+              break;
+            default:
+              break;
+          };
+        };
       };
 
       Logger.cdebug('query-detail', `PlaceFilterInfo.parametersFromRequest: _maturity=${JSON.stringify(this._maturity)}, _tags=${JSON.stringify(this._tags)}`);

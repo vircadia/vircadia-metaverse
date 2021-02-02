@@ -23,6 +23,7 @@ import { Places } from '@Entities/Places';
 import { Domains } from '@Entities/Domains';
 
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
+import { PlaceFilterInfo } from '@Entities/EntityFilters/PlaceFilterInfo';
 
 import { IsNotNullOrEmpty, IsNullOrEmpty } from '@Tools/Misc';
 import { VKeyedCollection } from '@Tools/vTypes';
@@ -30,11 +31,13 @@ import { Logger } from '@Tools/Logging';
 
 const procGetExplore: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   const pager = new PaginationInfo();
+  const placer = new PlaceFilterInfo();
 
   pager.parametersFromRequest(req);
+  placer.parametersFromRequest(req);
 
   const allPlaces: any[] = [];
-  for await (const place of Places.enumerateAsync(pager)) {
+  for await (const place of Places.enumerateAsync(placer, pager)) {
     const aDomain = await Domains.getDomainWithId(place.domainId);
     if (aDomain && IsNotNullOrEmpty(aDomain.networkAddr)) {
       const placeDesc: VKeyedCollection = {
@@ -69,6 +72,7 @@ const procGetExplore: RequestHandler = async (req: Request, resp: Response, next
   };
   req.vRestResp.Data = allPlaces;
 
+  placer.addResponseFields(req);
   pager.addResponseFields(req);
 
   next();
