@@ -30,8 +30,8 @@ export class PlaceEntity implements Entity {
   public images: string[];      // images for the place
 
   // A Place can have a beacon that updates current state and information
-  // If current information is not supplied, attendence defaults to domain's
-  public currentAttendence: number    // current attendence at the Place
+  // If current information is not supplied, attendance defaults to domain's
+  public currentAttendance: number    // current attendance at the Place
   public currentImages: string[]      // images at the session
   public currentInfo: string          // JSON information about the session
   public currentLastUpdateTime: Date  // time that the last session information was updated

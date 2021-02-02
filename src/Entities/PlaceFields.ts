@@ -177,7 +177,7 @@ export const placeFields: { [key: string]: FieldDefn } = {
     getter: simpleGetter
   },
   'current_attendance': {
-    entity_field: 'currentAttendence',
+    entity_field: 'currentAttendance',
     request_field_name: 'current_attendance',
     get_permissions: [ Perm.ALL ],
     set_permissions: [ Perm.DOMAINACCESS, Perm.ADMIN ],
