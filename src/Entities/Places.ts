@@ -56,7 +56,7 @@ export const Places = {
     const newPlace = new PlaceEntity();
     newPlace.id = GenUUID();
     newPlace.name = 'UNKNOWN-' + genRandomString(5);
-    newPlace.address = '/0,0,0/0,0,0,0';
+    newPlace.path = '/0,0,0/0,0,0,1';
     newPlace.whenCreated = new Date();
     const APItoken = await Tokens.createToken(pAccountId, [ TokenScope.PLACE ], -1);
     newPlace.currentAPIKeyTokenId = APItoken.id;
@@ -124,7 +124,7 @@ export const Places = {
     // If the last current update is stale (older than a few minutes), the domain's number is used
     let attendance: number = 0;
     let useDomain: boolean = true;
-    let lastGoodUpdateTime = new Date(Date.now()
+    const lastGoodUpdateTime = new Date(Date.now()
                   - (Config['metaverse-server']['place-current-timeout-minutes'] * 60 * 1000));
     if (IsNotNullOrEmpty(pPlace.currentLastUpdateTime) && pPlace.currentLastUpdateTime > lastGoodUpdateTime) {
       attendance = pPlace.currentAttendance;
@@ -133,7 +133,7 @@ export const Places = {
     if (useDomain) {
       // There isn't current attendance info. Default to domain's numbers
       if (IsNullOrEmpty(pPlace.domainId)) {
-        let aDomain = await Domains.getDomainWithId(pPlace.domainId);
+        const aDomain = await Domains.getDomainWithId(pPlace.domainId);
         if (IsNotNullOrEmpty(aDomain)) {
           attendance = (aDomain.numUsers ?? 0) + (aDomain.anonUsers ?? 0);
         };
@@ -141,5 +141,32 @@ export const Places = {
     };
     return attendance;
 
+  },
+  async getCurrentInfoAPIKey(pPlace: PlaceEntity): Promise<string> {
+    // Return that APIKey value from the access token
+    let key: string;
+    const keyToken = await Tokens.getTokenWithTokenId(pPlace.currentAPIKeyTokenId);
+    if (IsNotNullOrEmpty(keyToken)) {
+      key = keyToken.token;
+    };
+    return key;
+  },
+  async getAddressString(pPlace: PlaceEntity): Promise<string> {
+    // Compute and return the string for the Places's address.
+    // The address is of the form "optional-domain/x,y,z/x,y,z,w".
+    // If the domain is missing, the domain-server's network address is added
+    let addr = pPlace.path ?? '/0,0,0/0,0,0,1';
+    const pieces = addr.split('/');
+    if (pieces[0].length === 0) {
+      const aDomain = await Domains.getDomainWithId(pPlace.domainId);
+      if (IsNotNullOrEmpty(aDomain)) {
+        let domainAddr = aDomain.networkAddr;
+        if (IsNotNullOrEmpty(aDomain.networkPort)) {
+          domainAddr = aDomain.networkAddr + ":" + aDomain.networkPort;
+        };
+        addr = domainAddr + addr;
+      };
+    };
+    return addr;
   }
 };

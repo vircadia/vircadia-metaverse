@@ -20,6 +20,8 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 import { setupMetaverseAPI, finishMetaverseAPI, param1FromParams, placeFromParams } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
 
+import { Tokens } from '@Entities/Tokens';
+
 import { Perm } from '@Route-Tools/Perm';
 import { checkAccessToEntity } from '@Route-Tools/Permissions';
 
@@ -28,14 +30,19 @@ import { buildPlaceInfo } from '@Route-Tools/Util';
 import { Places } from '@Entities/Places';
 import { Maturity } from '@Entities/Sets/Maturity';
 
-import { IsNullOrEmpty } from '@Tools/Misc';
+import { IsNotNullOrEmpty, IsNullOrEmpty } from '@Tools/Misc';
 import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
 
 export const procGetPlacesPlaceId: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.vPlace) {
+    const placeInfo = await buildPlaceInfo(req.vPlace);
+    // If the requestor is the 'owner' of the place, add APIKey to the response
+    if (checkAccessToEntity(req.vAuthToken, req.vPlace, [ Perm.DOMAINACCESS, Perm.ADMIN ], req.vAuthAccount)) {
+      placeInfo.current_api_key = Places.getCurrentInfoAPIKey(req.vPlace);
+    };
     req.vRestResp.Data = {
-      'place': await buildPlaceInfo(req.vPlace),
+      'place': placeInfo,
       'maturity-categories': Maturity.MaturityCategories
     };
   }
@@ -62,7 +69,7 @@ export const procPutPlacesPlaceId: RequestHandler = async (req: Request, resp: R
                 updates.domainId = req.vPlace.domainId;
               };
             };
-            for (const field of [ 'path', 'address', 'description', 'thumbnail' ]) {
+            for (const field of [ 'path', 'description', 'thumbnail' ]) {
               if (req.body.place.hasOwnProperty(field)) {
                 await Places.setField(req.vAuthToken, req.vPlace, field, req.body.place[field], req.vAuthAccount, updates);
               };

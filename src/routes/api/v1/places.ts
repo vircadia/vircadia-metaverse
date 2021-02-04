@@ -96,7 +96,7 @@ export const procPostPlaces: RequestHandler = async (req: Request, resp: Respons
             const newPlace = await Places.createPlace(aDomain.sponsorAccountId);
             newPlace.name = requestedName;
             newPlace.description = requestedDesc;
-            newPlace.address = requestedAddr;
+            newPlace.path = requestedAddr;
             newPlace.domainId = aDomain.id;
             newPlace.maturity = aDomain.maturity ?? Maturity.UNRATED;
             Places.addPlace(newPlace);

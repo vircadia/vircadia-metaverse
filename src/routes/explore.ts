@@ -43,14 +43,8 @@ const procGetExplore: RequestHandler = async (req: Request, resp: Response, next
       const placeDesc: VKeyedCollection = {
         'Domain Name': place.name,
       };
-      // Build redirection URL for getting to the place
-      let visit = 'hifi://' + aDomain.networkAddr;
-      if (IsNotNullOrEmpty(aDomain.networkPort)) {
-        visit += ':' + aDomain.networkPort;
-      };
-      // visit += '/' + place.address;
-      visit += place.address;
-      placeDesc.Visit = visit;
+      placeDesc.Address = Places.getAddressString(place);
+      placeDesc.Visit = 'hifi://' + placeDesc.Address;
 
       placeDesc.DomainId = aDomain.id;
       placeDesc['Network Address'] = aDomain.networkAddr;
@@ -65,7 +59,12 @@ const procGetExplore: RequestHandler = async (req: Request, resp: Response, next
         };
       };
 
+      // 'People' is number of people at place for old Explore script
       placeDesc.People = aDomain.numUsers + aDomain.anonUsers;
+
+      placeDesc.Attendance = Places.getCurrentAttendance(place);
+      placeDesc.CurrentImages = place.currentImages;
+      placeDesc.CurrentInfo = place.currentInfo;
 
       allPlaces.push(placeDesc);
     };

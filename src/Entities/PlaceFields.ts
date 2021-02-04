@@ -117,17 +117,19 @@ export const placeFields: { [key: string]: FieldDefn } = {
     setter: simpleSetter,
     getter: simpleGetter
   },
-  'address': {
-    entity_field: 'address',
+  'address': { // The network address of a location in the domain
+    entity_field: 'path',
     request_field_name: 'address',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ Perm.DOMAINACCESS, Perm.ADMIN ],
+    set_permissions: [ Perm.NONE ],
     validate: isPathValidator,
-    setter: simpleSetter,
-    getter: simpleGetter
+    setter: noSetter,
+    getter: async (pField: FieldDefn, pEntity: Entity): Promise<any> => {
+      return Places.getAddressString(pEntity as PlaceEntity);
+    }
   },
-  'path': { // alternate external name for 'address'
-    entity_field: 'address',
+  'path': { // the address within the domain
+    entity_field: 'path',
     request_field_name: 'path',
     get_permissions: [ Perm.ALL ],
     set_permissions: [ Perm.DOMAINACCESS, Perm.ADMIN ],
@@ -223,13 +225,7 @@ export const placeFields: { [key: string]: FieldDefn } = {
     setter: noSetter,
     getter: async (pField: FieldDefn, pEntity: Entity): Promise<any> => {
       if (pEntity.hasOwnProperty('currentAPIKeyTokenId')) {
-        const tokenId = (pEntity as PlaceEntity).currentAPIKeyTokenId;
-        if (IsNotNullOrEmpty(tokenId)) {
-          const aToken = await Tokens.getTokenWithTokenId(tokenId);
-          if (aToken) {
-            return aToken.token;
-          };
-        };
+        return Places.getCurrentInfoAPIKey(pEntity as PlaceEntity);
       };
       return 'unknown';
     }

@@ -70,10 +70,10 @@ The API requests to the metaverse-server are:
 | GET    | /api/v1/user/location           | [doc](./API-Users.md#get-apiv1userprofile) get this user's profile |
 | GET    | /api/v1/user/places/            | [doc](./API-places.md#get-apiv1userplaces) fetch requesting user's places |
 | POST   | /api/v1/user/places/            | [doc](./API-places.md#post-apiv1userplaces) create a place |
-| GET    | /api/v1/user/places/:placeId    | [doc](./API-places.md#get-apiv1userplacesplaceId) get information on specific place |
-| DELETE | /api/v1/user/places/:placeId    | [doc](./API-places.md#delete-apiv1userplacesplaceId) delete a place |
-| GET    | /api/v1/user/places/:placeId/field/:fieldname  | [doc](./API-places.md#get-apiv1userplacesplaceidfieldfieldname) fetch specific place parameter |
-| POST   | /api/v1/user/places/:placeId/field/:fieldname  | [doc](./API-places.md#post-apiv1userplacesplaceidfieldfieldname) set specific place parameter |
+| GET    | /api/v1/places/:placeId         | [doc](./API-places.md#get-apiv1placesplaceId) get information on specific place |
+| DELETE | /api/v1/places/:placeId         | [doc](./API-places.md#delete-apiv1placesplaceId) delete a place |
+| GET    | /api/v1/places/:placeId/field/:fieldname  | [doc](./API-places.md#get-apiv1placesplaceidfieldfieldname) fetch specific place parameter |
+| POST   | /api/v1/places/:placeId/field/:fieldname  | [doc](./API-places.md#post-apiv1placesplaceidfieldfieldname) set specific place parameter |
 | PUT    | /api/v1/user/public_key         | [doc](./API-Users.md#put-apiv1userpublic_key) update this user's public key |
 | GET    | /api/v1/users                   | [doc](./API-Users.md#get-apiv1users) fetch list of user information |
 | POST   | /api/v1/users                   | [doc](./API-Users.md#post-apiv1users) create account |
