@@ -53,6 +53,7 @@ export let Config = {
       'handshake-request-expiration-minutes': 1,            // one minute handshake
       'connection-request-expiration-minutes': 60 * 24 * 4, // 4 days
       'friend-request-expiration-minutes': 60 * 24 * 4,     // 4 days
+      'place-current-timeout-minutes': 60,  // minutes until current place info is stale
       // redirection URL used for initial domain token generation,
       // "METAVERSE_SERVER_URL" is replaced (from Config.metaverse.metaverse-server-url)
       // "DASHBOARD_URL" is replaced (from Config.metaverse.dashboard-url)

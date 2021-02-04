@@ -13,6 +13,10 @@
 //   limitations under the License.
 'use strict'
 
+import Config from '@Base/config';
+
+import { Domains } from '@Entities/Domains';
+
 import { AccountEntity } from '@Entities/AccountEntity';
 import { PlaceEntity } from '@Entities/PlaceEntity';
 import { placeFields } from '@Entities/PlaceFields';
@@ -114,5 +118,28 @@ export const Places = {
   async updateEntityFields(pEntity: PlaceEntity, pFields: VKeyedCollection): Promise<PlaceEntity> {
     return updateObjectFields(placeCollection,
                               new GenericFilter({ 'id': pEntity.id }), pFields);
+  },
+  async getCurrentAttendance(pPlace: PlaceEntity): Promise<number> {
+    // Attendance is either reported by a beacon script or defaults to the domain's numbers
+    // If the last current update is stale (older than a few minutes), the domain's number is used
+    let attendance: number = 0;
+    let useDomain: boolean = true;
+    let lastGoodUpdateTime = new Date(Date.now()
+                  - (Config['metaverse-server']['place-current-timeout-minutes'] * 60 * 1000));
+    if (IsNotNullOrEmpty(pPlace.currentLastUpdateTime) && pPlace.currentLastUpdateTime > lastGoodUpdateTime) {
+      attendance = pPlace.currentAttendance;
+      useDomain = IsNullOrEmpty(attendance);
+    };
+    if (useDomain) {
+      // There isn't current attendance info. Default to domain's numbers
+      if (IsNullOrEmpty(pPlace.domainId)) {
+        let aDomain = await Domains.getDomainWithId(pPlace.domainId);
+        if (IsNotNullOrEmpty(aDomain)) {
+          attendance = (aDomain.numUsers ?? 0) + (aDomain.anonUsers ?? 0);
+        };
+      };
+    };
+    return attendance;
+
   }
 };

@@ -183,7 +183,9 @@ export const placeFields: { [key: string]: FieldDefn } = {
     set_permissions: [ Perm.DOMAINACCESS, Perm.ADMIN ],
     validate: isNumberValidator,
     setter: simpleSetter,
-    getter: simpleGetter
+    getter: async (pField: FieldDefn, pEntity: Entity): Promise<any> => {
+      return Places.getCurrentAttendance(pEntity as PlaceEntity);
+    }
   },
   'current_images': {
     entity_field: 'currentImages',

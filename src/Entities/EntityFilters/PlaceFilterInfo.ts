@@ -30,6 +30,7 @@ import { Logger } from '@Tools/Logging';
 //  &status=online,active
 //        online = Place/Domain are heartbeating
 //        active = one or more avatars are present
+//  &order=ascending,decending,num_users,name
 export class PlaceFilterInfo extends CriteriaFilter {
 
   private _maturity: string[];

@@ -273,7 +273,11 @@ export async function buildPlaceInfoSmall(pPlace: PlaceEntity): Promise<any> {
     'maturity': pPlace.maturity ?? Maturity.UNRATED,
     'tags': pPlace.tags,
     'thumbnail': pPlace.thumbnail,
-    'images': pPlace.images
+    'images': pPlace.images,
+    'current_attendance': await Places.getCurrentAttendance(pPlace),
+    'current_images': pPlace.currentImages,
+    'current_info': pPlace.currentInfo,
+    'current_last_update_time': pPlace.currentLastUpdateTime
   };
   return ret;
 };
