@@ -2,13 +2,56 @@
 
 Requests that create and manage Place entries.
 
-Places are basicly location "bookmarks" that are created by a domain owner
+Places are location "bookmarks" that are created by a domain owner
 to denote locations of interest in a domain.
+The list of places is used for an "Explore" dialog so users can
+find interesting locations to visit.
 
-Places are created by a domain "owner" using
+Places are created by a domain owner/manager using
 [POST /api/v1/user/places](./API-Places.md#post-apiv1userplaces).
-The domain "owner" is the account that is associated with the 
-domain (the account that registered the domain with the metaverse-server).
+The domain owner/manager is the account(s) associated with the 
+domain (the account that registered the domain with the metaverse-server
+or an account that is flagged as a manager of the domain).
+
+A Place is described with a name, description, images, and other
+identifying information. The Place name is unique within the metaverse-server.
+A Place also has an identifying ID.
+A Place owner/manager can update several of the Place information items with
+[PUT /api/v1/places/{placeID}](./API-Places.md#post-apiv1placesplaceid)
+or can update values individually with
+[POST /api/v1/places/{placeID}/field/{fieldname}](./API-Places.md#post-apiv1placesplaceidfieldfieldname)
+.
+
+Places have "current" information which is updated with
+[POST /api/v1/places/current](./API-Places.md#post-apiv1placescurrent).
+The current information includes an attendance number along
+with images and other info.
+The idea is that a particular Place can have a script which updates
+the current attendance for the Place as well as updating current
+images of what's happening at the place.
+This provides a real-time update of the Place's activity.
+
+By default, the current attendance is the domain's avatar count.
+If the attendance has ever been set by
+[POST /api/v1/places/current](./API-Places.md#post-apiv1placescurrent)
+,
+the attendance will be zeroed if it has not been updated in the
+last hour.
+So, if a Place never sets current attendance, it will report the
+domain's avatar count. If the Place has a current attendance
+script, the Place will report that attendance or zero depending
+if the script has been updating the attendance count.
+
+Access to update the current information is controlled by an
+`APIkey`. The `APIkey` is visible to the domain owner and managers
+in the
+[GET /api/v1/places/{placeId}](./API-Places.md#get-apiv1placeplaceid)
+request or by the fetch of the place field `current_api_key`.
+The `APIkey` is created when the place is created and can be
+recreated by doing a
+[POST /api/v1/places/current/refreshkey](./API-Places.md#get-apiv1placecurrentrefreshkey)
+request.
+Of course, the `APIkey` should be kept as secret as possible.
 
 ## GET /api/v1/places
 
@@ -19,18 +62,21 @@ This request takes a number of parameters to control the list of places returned
 | QUERY     | Description |
 | -------   | --------- |
 | maturity  | get the places with the specified maturity level |
-| tags      | get places that have specified tags (comma separated list. Any tag matches) |
+| tag       | get places that have specified tags (comma separated list. Any tag matches) |
 | per_page | number of entries to return per request |
-| page_num | which group of entries to return |
+| page_num | which "page" of entries to return |
 | order    | comma separated list of 'ascending', 'decending', 'num_users', 'name' |
+| status   | comma separated list of 'online' (domain is heartbeating), 'active' (has attendees) |
 
 So, a legal request could be:
 
 ```
     GET /api/v1/places?per_page=20&page_num=4&order=ascending,num_users
     GET /api/v1/places?maturity=adult
-    GET /api/v1/places?tags=friendly,kids,sandbox
+    GET /api/v1/places?tag=friendly,kids,sandbox
 ```
+
+(Note: as of February 2021, "order" and "status" queries are not yet implimented.)
 
 This request return JSON formatted as:
 
@@ -57,6 +103,10 @@ This request return JSON formatted as:
                     },
                     "thumbnail": URL,
                     "images": [ URL, URL, ... ]
+                    "current_attendance": number,
+                    "current_images": string[],
+                    "current_info": string,
+                    "current_last_update_time": ISOStringDate
                 },
                 ...
             ],
@@ -79,23 +129,7 @@ domains the requestor is the associated account of.
         "data": {
             "places": [
                 {
-                    "placeId": string,
-                    "name": string,
-                    "address": string,
-                    "description": string,
-                    "maturity": string,     // one of 'unrated', 'everyone', 'teen', 'mature', 'adult'
-                    "tags": string[],       // tags describing place categories
-                    "domain": {
-                        "id": domainId,
-                        "name": domainName,
-                        "sponsorAccountId": string,
-                        "network_address": string,
-                        "ice_server_address": string,
-                        "time_of_last_heartbeat": ISOStringDate,
-                        "num_users": integer
-                    },
-                    "thumbnail": URL,
-                    "images": [ URL, URL, ... ]
+                    <Same format as shown in /api/v1/places>
                 },
                 ...
             ],
@@ -113,7 +147,7 @@ Get the place information for one place.
         "status": "success",
         "data": {
             "place": {
-                SAME INFORMATION AS RETURNED ABOVE
+                <Same format as shown in /api/v1/places>
             }
         }
     }
@@ -150,7 +184,7 @@ Delete the place entry.
 The requestor must be either an admin account or the
 account associated with the domain.
 
-## PUT /api/v1/places/:placeId
+## PUT /api/v1/places/{placeId}
 
 Legacy request that changes values in a place.
 
@@ -188,16 +222,21 @@ The place fields that can be fetched:
 | FIELDNAME  | GET PERM | SET PERM    | TYPE |
 | ---------  | -------- | --------    | ---- |
 | placeId    |   all    |    none     | string |
-| name       |   all    | domain, owner, admin | string |
-| description |  all    | domain, owner, admin | string |
+| name       |   all    | domainOwner, admin | string |
+| description |  all    | domainOwner, admin | string |
 | domainId   |   all    |    none     | string |
-| maturity   |   all    | domain, owner, admin | string |
-| tags       |   all    | domain, owner, admin | stringArray |
-| address    |   all    | domain, owner, admin | addressString |
-| thumbnail  |   all    | domain, owner, admin | string |
-| images     |   all    | domain, owner, admin | stringArray |
+| maturity   |   all    | domainOwner, admin | string |
+| tags       |   all    | domainOwner, admin | stringArray |
+| address    |   all    | domainOwner, admin | addressString |
+| thumbnail  |   all    | domainOwner, admin | string |
+| images     |   all    | domainOwner, admin | stringArray |
+| current_attendance | all | none | number |
+| current_images | all | domainOwner, admin | stringArray |
+| current_info | all | domainOwner, admin | string |
+| current_last_update_time | all | none | ISODateString |
+| current_api_key | domainOwner, admin | none | string |
 | addr_of_first_contact | all | none | string |
-| when_place_entry_created | all | none | ISODate |
+| when_place_entry_created | all | none | ISODateString |
 
 The JSON structure returned looks like the regular REST response
 with the "data" object being the value requests.
@@ -261,5 +300,50 @@ POST /api/v1/places/f7e2bac9-ba02-4db7-bfd0-473286a502c6/field/images
 
 This will set the "images" field to the "set" value, then add the "add" value
 then remove the "remove" value. Of course, each of these manipulation fields
-are optional so, if you wanted to add a new image, just having "add" will add
+is optional so, if you wanted to add a new image, just having "add" will add
 that image to the list.
+
+## POST /api/v1/places/current
+
+Update the Place's current activity information.
+
+This request does not need any authentication.
+
+The body of the request must include a `placeId`
+and a `current_api_key` and the other fields are optional.
+
+```
+    {
+        "placeId": string,
+        "current_api_key": string,
+        "current_attendance": number,
+        "current_images": string[],
+        "current_info": string,
+    }
+```
+
+The response is either "success" or "failure".
+For "failure", the `error` field will state the reason for the failure.
+
+## POST /api/v1/places/current/refreshkey
+
+A request to change the current information setting APIkey.
+This causes any existing key to be revoked and deleted and
+a new key to be generated.
+
+The requestor must be logged in as the domain owner, a 
+manager of the domain, or an administration account.
+
+The body of the request must include a `placeId`
+and a `current_api_key` with the latter being the APIkey
+that is being replaced.
+
+If the logged in account is an administrator and the query
+includes "asAdmin=true", `current_api_key` is optional.
+
+```
+    {
+        "placeId": string,
+        "current_api_key": string,
+    }
+```
