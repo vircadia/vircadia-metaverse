@@ -251,7 +251,7 @@ export async function buildAccountProfile(pReq: Request, pAccount: AccountEntity
 // Return an object with the formatted place information
 // Pass the PlaceEntity and the place's domain if known.
 export async function buildPlaceInfo(pPlace: PlaceEntity, pDomain?: DomainEntity): Promise<any> {
-  const ret = await buildPlaceInfoSmall(pPlace);
+  const ret = await buildPlaceInfoSmall(pPlace, pDomain);
 
   // if the place points to a domain, add that information also
   if (IsNotNullOrEmpty(pPlace.domainId)) {
@@ -263,7 +263,7 @@ export async function buildPlaceInfo(pPlace: PlaceEntity, pDomain?: DomainEntity
   return ret;
 };
 // Return the basic information block for a Place
-export async function buildPlaceInfoSmall(pPlace: PlaceEntity): Promise<any> {
+export async function buildPlaceInfoSmall(pPlace: PlaceEntity, pDomain?: DomainEntity): Promise<any> {
   const ret: VKeyedCollection =  {
     'placeId': pPlace.id,
     'id': pPlace.id,
@@ -275,7 +275,7 @@ export async function buildPlaceInfoSmall(pPlace: PlaceEntity): Promise<any> {
     'tags': pPlace.tags,
     'thumbnail': pPlace.thumbnail,
     'images': pPlace.images,
-    'current_attendance': await Places.getCurrentAttendance(pPlace),
+    'current_attendance': await Places.getCurrentAttendance(pPlace, pDomain),
     'current_images': pPlace.currentImages,
     'current_info': pPlace.currentInfo,
     'current_last_update_time': pPlace.currentLastUpdateTime

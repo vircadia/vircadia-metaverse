@@ -35,6 +35,7 @@ import { createObject, getObject, getObjects, updateObjectFields, deleteOne, del
 import { GenUUID, IsNullOrEmpty, IsNotNullOrEmpty, genRandomString } from '@Tools/Misc';
 import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
+import { DomainEntity } from './DomainEntity';
 
 export let placeCollection = 'places';
 
@@ -119,7 +120,7 @@ export const Places = {
     return updateObjectFields(placeCollection,
                               new GenericFilter({ 'id': pEntity.id }), pFields);
   },
-  async getCurrentAttendance(pPlace: PlaceEntity): Promise<number> {
+  async getCurrentAttendance(pPlace: PlaceEntity, pDomain?: DomainEntity): Promise<number> {
     // Attendance is either reported by a beacon script or defaults to the domain's numbers
     // If the last current update is stale (older than a few minutes), the domain's number is used
     let attendance: number = 0;
@@ -132,11 +133,14 @@ export const Places = {
     };
     if (useDomain) {
       // There isn't current attendance info. Default to domain's numbers
-      if (IsNullOrEmpty(pPlace.domainId)) {
-        const aDomain = await Domains.getDomainWithId(pPlace.domainId);
-        if (IsNotNullOrEmpty(aDomain)) {
-          attendance = (aDomain.numUsers ?? 0) + (aDomain.anonUsers ?? 0);
+      let aDomain = pDomain;
+      if (IsNullOrEmpty(aDomain)) {
+        if (IsNotNullOrEmpty(pPlace.domainId)) {
+          aDomain = await Domains.getDomainWithId(pPlace.domainId);
         };
+      };
+      if (IsNotNullOrEmpty(aDomain)) {
+        attendance = (aDomain.numUsers ?? 0) + (aDomain.anonUsers ?? 0);
       };
     };
     return attendance;
