@@ -28,6 +28,7 @@ import { PlaceFilterInfo } from '@Entities/EntityFilters/PlaceFilterInfo';
 import { IsNotNullOrEmpty, IsNullOrEmpty } from '@Tools/Misc';
 import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
+import { buildPlaceInfoSmall } from '@Route-Tools/Util';
 
 const procGetExplore: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   const pager = new PaginationInfo();
@@ -60,11 +61,10 @@ const procGetExplore: RequestHandler = async (req: Request, resp: Response, next
       };
 
       // 'People' is number of people at place for old Explore script
-      placeDesc.People = aDomain.numUsers + aDomain.anonUsers;
+      // placeDesc.People = aDomain.numUsers + aDomain.anonUsers;
+      placeDesc.People = Places.getCurrentAttendance(place, aDomain);
 
-      placeDesc.Attendance = Places.getCurrentAttendance(place);
-      placeDesc.CurrentImages = place.currentImages;
-      placeDesc.CurrentInfo = place.currentInfo;
+      placeDesc.Place = await buildPlaceInfoSmall(place, aDomain);
 
       allPlaces.push(placeDesc);
     };
