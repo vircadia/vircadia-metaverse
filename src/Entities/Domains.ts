@@ -46,7 +46,7 @@ export function initDomains(): void {
   setInterval( async () => {
     // Find domains that are not heartbeating and reset activity if not talking
     for await (const aDomain of Domains.enumerateAsync(new GenericFilter(
-                    { 'timeOfLastHeartbeat': { '$lt': Domains.dateWhenNotActive },
+                    { 'timeOfLastHeartbeat': { '$lt': Domains.dateWhenNotActive() },
                       '$or': [ { 'numUsers': { '$gt': 0 } }, { 'anonUsers': { '$gt': 0 } } ]
                     }) ) ) {
       Logger.info(`Domains: domain ${aDomain.name} not heartbeating. Zeroing users.`);
