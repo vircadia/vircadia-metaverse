@@ -28,7 +28,7 @@ const procGetUserTokensNew: RequestHandler = async (req: Request, resp: Response
     const forDomainServer = req.query.for_domain_server;
     const scope = forDomainServer ? TokenScope.DOMAIN : TokenScope.OWNER;
     const tokenInfo = await Tokens.createToken(req.vAuthAccount.id, [ scope ]);
-    Tokens.addToken(tokenInfo);
+    await Tokens.addToken(tokenInfo);
 
     const body = `<center><h2>Your domain's access token is ${tokenInfo.token}</h2></center>`;
     resp.setHeader('content-type', 'text/html');

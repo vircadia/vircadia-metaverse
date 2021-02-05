@@ -275,6 +275,7 @@ async function DoDatabaseFormatChanges() {
   await RenameDbField(accountCollection, 'whenAccountCreated', 'whenCreated');
 
   await RenameDbField(placeCollection, 'placeId', 'id');
+  await RenameDbField(placeCollection, 'address', 'path');
   await RenameDbField(placeCollection, 'whenPlaceEntryCreated', 'whenCreated');
 
   await RenameDbField(tokenCollection, 'tokenId', 'id');

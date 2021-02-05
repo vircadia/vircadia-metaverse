@@ -50,10 +50,13 @@ export async function isBooleanValidator(pField: FieldDefn, pEntity: Entity, pVa
 };
 export async function isPathValidator(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<ValidateResponse> {
   // Regexp to check format of "domainname/float,float,float/float,float,float,float"
-  if  (/^[\w +_-]*\/-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?\/-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?$/.test(pValue)) {
+  // if  (/^[\w\.:+_-]*\/-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?\/-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?$/.test(pValue)) {
+  // Regexp to check format of "/float,float,float/float,float,float,float"
+  //    This make a "path" just the position and rotation within a domain
+  if  (/^\/-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?\/-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?$/.test(pValue)) {
     return { valid: true };
   };
-  return { valid: false, reason: 'path must have the form "domain/f,f,f/f,f,f,f' };
+  return { valid: false, reason: 'path must have the form "optional-network-addr/f,f,f/f,f,f,f' };
 };
 export async function isDateValidator(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<ValidateResponse> {
   if (pValue instanceof Date) {
@@ -65,7 +68,7 @@ export async function isObjectValidator(pField: FieldDefn, pEntity: Entity, pVal
   if (pValue instanceof Object) {
     return { valid: true };
   };
-  return { valid: false, reason: 'field value must be a valid date string' };
+  return { valid: false, reason: 'field value must resolve to an object' };
 };
 // verify the value is a string or a set/add/remove collection of string arrays.
 // This pairs with the SArray getter/setter which accepts a string (add), an
@@ -183,18 +186,18 @@ export async function verifyAllSArraySetValues(pValue: any, pCheckFunction: Vali
 };
 
 // ======== GETTER ============================================================
-export function noGetter(pField: FieldDefn, pEntity: Entity): any {
+export async function noGetter(pField: FieldDefn, pEntity: Entity): Promise<any> {
   Logger.error(`noGetter: attempt to get field ${pField.entity_field}`);
 };
 // Return  the field value.
-export function simpleGetter(pField: FieldDefn, pEntity: Entity): any {
+export async function simpleGetter(pField: FieldDefn, pEntity: Entity): Promise<any> {
   if (pEntity.hasOwnProperty(pField.entity_field)) {
     return (pEntity as any)[pField.entity_field];
   };
   return undefined;
 };
 // Return a date field as an ISO formatted string
-export function dateStringGetter(pField: FieldDefn, pEntity: Entity): string {
+export async function dateStringGetter(pField: FieldDefn, pEntity: Entity): Promise<string> {
   if (pEntity.hasOwnProperty(pField.entity_field)) {
     const dateVal: Date = (pEntity as any)[pField.entity_field];
     return dateVal ? dateVal.toISOString() : undefined;
@@ -203,17 +206,17 @@ export function dateStringGetter(pField: FieldDefn, pEntity: Entity): string {
 };
 
 // ======== SETTER ===============================================================
-export function noSetter(pField: FieldDefn, pEntity: Entity, pVal: any): void {
+export async function noSetter(pField: FieldDefn, pEntity: Entity, pVal: any): Promise<void> {
   Logger.error(`noSetter: attempt to set field ${pField.entity_field}`);
 };
 // Set the value of the field.
 // The different type of values require different manipulations.
-export function simpleSetter(pField: FieldDefn, pEntity: Entity, pVal: any): void {
+export async function simpleSetter(pField: FieldDefn, pEntity: Entity, pVal: any): Promise<void> {
   Logger.cdebug('field-setting', `simpleSetter: setting ${pField.entity_field}=>${JSON.stringify(pVal)}`);
   (pEntity as any)[pField.entity_field] = pVal;
 };
 // A setter that will not set if the passed value is undefined, null, or a zero-length string
-export function noOverwriteSetter(pField: FieldDefn, pEntity: Entity, pVal: any): void {
+export async function noOverwriteSetter(pField: FieldDefn, pEntity: Entity, pVal: any): Promise<void> {
   // Don't overwrite a value with a null or empty value.
   if (IsNotNullOrEmpty(pVal)) {
     if (Array.isArray(pVal)) {
@@ -233,7 +236,7 @@ export function noOverwriteSetter(pField: FieldDefn, pEntity: Entity, pVal: any)
 //  The value should be a 'manipulator' "{ "set": SArray, "add": [ add vals ], "remove": [ remove vals ] }"
 //  but this also accepts a string (presumes an "add")
 //                        a string array (presumes a "set")
-export function sArraySetter(pField: FieldDefn, pEntity: Entity, pVal: any): void {
+export async function sArraySetter(pField: FieldDefn, pEntity: Entity, pVal: any): Promise<void> {
   const fieldName = pField.entity_field;
 
   Logger.cdebug('field-setting', `sArraySetter: setting ${fieldName} with ${JSON.stringify(pVal)}`);

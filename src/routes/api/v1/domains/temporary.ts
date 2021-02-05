@@ -50,20 +50,20 @@ const procPostDomainsTemporary: RequestHandler = async (req: Request, resp: Resp
     newDomain.iPAddrOfFirstContact = req.vSenderKey;
   };
 
-  // Creating a domain also creates a Place for that domain
-  const newPlacename = await Places.uniqifyPlaceName(newDomain.name);
-  const newPlace = Places.createPlace();
-  newPlace.domainId = newDomain.id;
-  newPlace.name = newPlacename;
-  newPlace.description = 'A place in ' + newDomain.name;
-  newPlace.maturity = newDomain.maturity;
-  newPlace.iPAddrOfFirstContact = req.vSenderKey;
-
   // If the requestor is logged in, associate that account with the new domain/place
   if (req.vAuthToken) {
     Logger.debug(`procPostDomainsTemporary: associating account ${req.vAuthToken.accountId} with new domain ${newDomain.id}`)
     newDomain.sponsorAccountId = req.vAuthToken.accountId;
   };
+
+  // Creating a domain also creates a Place for that domain
+  const newPlacename = await Places.uniqifyPlaceName(newDomain.name);
+  const newPlace = await Places.createPlace(newDomain.sponsorAccountId);
+  newPlace.domainId = newDomain.id;
+  newPlace.name = newPlacename;
+  newPlace.description = 'A place in ' + newDomain.name;
+  newPlace.maturity = newDomain.maturity;
+  newPlace.iPAddrOfFirstContact = req.vSenderKey;
 
   // Now that the local structures are updated, store the new entries
   await Domains.addDomain(newDomain);

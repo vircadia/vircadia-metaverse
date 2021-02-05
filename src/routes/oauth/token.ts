@@ -98,7 +98,7 @@ const procPostOauthToken: RequestHandler = async (req: Request, resp: Response, 
           if (requestingAccount && refreshToken.accountId === requestingAccount.id) {
             // refresh token has not expired and requestor is owner of the token so make new
             const newToken = await Tokens.createToken(req.vAuthAccount.id, refreshToken.scope);
-            Tokens.addToken(newToken);
+            await Tokens.addToken(newToken);
             respBody = buildOAuthResponseBody(requestingAccount, newToken);
           }
           else {

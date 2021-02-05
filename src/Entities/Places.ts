@@ -13,11 +13,17 @@
 //   limitations under the License.
 'use strict'
 
+import Config from '@Base/config';
+
+import { Domains } from '@Entities/Domains';
+
 import { AccountEntity } from '@Entities/AccountEntity';
 import { PlaceEntity } from '@Entities/PlaceEntity';
 import { placeFields } from '@Entities/PlaceFields';
+import { DomainEntity } from './DomainEntity';
 
 import { AuthToken } from '@Entities/AuthToken';
+import { Tokens, TokenScope } from '@Entities/Tokens';
 
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
@@ -47,12 +53,15 @@ export const Places = {
     Logger.info(`Places: creating place ${pPlaceEntity.name}, id=${pPlaceEntity.id}`);
     return IsNullOrEmpty(pPlaceEntity) ? null : createObject(placeCollection, pPlaceEntity);
   },
-  createPlace(): PlaceEntity {
+  async createPlace(pAccountId: string): Promise<PlaceEntity> {
     const newPlace = new PlaceEntity();
     newPlace.id = GenUUID();
     newPlace.name = 'UNKNOWN-' + genRandomString(5);
-    newPlace.address = '/0,0,0/0,0,0,0';
+    newPlace.path = '/0,0,0/0,0,0,1';
     newPlace.whenCreated = new Date();
+    const APItoken = await Tokens.createToken(pAccountId, [ TokenScope.PLACE ], -1);
+    await Tokens.addToken(APItoken);  // put token into DB
+    newPlace.currentAPIKeyTokenId = APItoken.id;
     return newPlace;
   },
   // Verify the passed placename is unique and return the unique name
@@ -84,6 +93,14 @@ export const Places = {
                       ): Promise<ValidateResponse> {
     return setEntityField(placeFields, pAuthToken, pPlace, pField, pVal, pRequestingAccount, pUpdates);
   },
+  // Verify that the passed value is legal for the named field
+  async validateFieldValue(pFieldName: string, pValue: any): Promise<ValidateResponse> {
+    const defn = placeFields[pFieldName];
+    if (defn) {
+      return await defn.validate(defn, defn.request_field_name, pValue);
+    };
+    return { 'valid': false, 'reason': 'Unknown field name' };
+  },
   // Generate an 'update' block for the specified field or fields.
   // This is a field/value collection that can be passed to the database routines.
   // Note that this directly fetches the field value rather than using 'getter' since
@@ -111,5 +128,58 @@ export const Places = {
   async updateEntityFields(pEntity: PlaceEntity, pFields: VKeyedCollection): Promise<PlaceEntity> {
     return updateObjectFields(placeCollection,
                               new GenericFilter({ 'id': pEntity.id }), pFields);
+  },
+  async getCurrentAttendance(pPlace: PlaceEntity, pDomain?: DomainEntity): Promise<number> {
+    // Attendance is either reported by a beacon script or defaults to the domain's numbers
+    // If the last current update is stale (older than a few minutes), the domain's number is used
+    let attendance: number = 0;
+    let useDomain: boolean = true;
+    const lastGoodUpdateTime = new Date(Date.now()
+                  - (Config['metaverse-server']['place-current-timeout-minutes'] * 60 * 1000));
+    if (IsNotNullOrEmpty(pPlace.currentLastUpdateTime) && pPlace.currentLastUpdateTime > lastGoodUpdateTime) {
+      attendance = pPlace.currentAttendance;
+      useDomain = IsNullOrEmpty(attendance);
+    };
+    if (useDomain) {
+      // There isn't current attendance info. Default to domain's numbers
+      let aDomain = pDomain;
+      if (IsNullOrEmpty(aDomain)) {
+        if (IsNotNullOrEmpty(pPlace.domainId)) {
+          aDomain = await Domains.getDomainWithId(pPlace.domainId);
+        };
+      };
+      if (IsNotNullOrEmpty(aDomain)) {
+        attendance = (aDomain.numUsers ?? 0) + (aDomain.anonUsers ?? 0);
+      };
+    };
+    return attendance;
+
+  },
+  async getCurrentInfoAPIKey(pPlace: PlaceEntity): Promise<string> {
+    // Return that APIKey value from the access token
+    let key: string;
+    const keyToken = await Tokens.getTokenWithTokenId(pPlace.currentAPIKeyTokenId);
+    if (IsNotNullOrEmpty(keyToken)) {
+      key = keyToken.token;
+    };
+    return key;
+  },
+  async getAddressString(pPlace: PlaceEntity): Promise<string> {
+    // Compute and return the string for the Places's address.
+    // The address is of the form "optional-domain/x,y,z/x,y,z,w".
+    // If the domain is missing, the domain-server's network address is added
+    let addr = pPlace.path ?? '/0,0,0/0,0,0,1';
+    const pieces = addr.split('/');
+    if (pieces[0].length === 0) {
+      const aDomain = await Domains.getDomainWithId(pPlace.domainId);
+      if (IsNotNullOrEmpty(aDomain)) {
+        let domainAddr = aDomain.networkAddr;
+        if (IsNotNullOrEmpty(aDomain.networkPort)) {
+          domainAddr = aDomain.networkAddr + ":" + aDomain.networkPort;
+        };
+        addr = domainAddr + addr;
+      };
+    };
+    return addr;
   }
 };

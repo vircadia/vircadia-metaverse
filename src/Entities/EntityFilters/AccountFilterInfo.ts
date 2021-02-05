@@ -26,9 +26,9 @@ import { Logger } from '@Tools/Logging';
 
 
 // Process a request that wants to filter Account collection with parameters:
-//    filter=connections|friends|all
-//    status=online|domainId
-//    search=wildcardSearchString
+//    &filter=connections|friends|all
+//    &status=online|domainId
+//    &search=wildcardSearchString
 export class AccountFilterInfo extends CriteriaFilter {
 
   private _requestingAccount: AccountEntity;

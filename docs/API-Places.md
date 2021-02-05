@@ -88,6 +88,7 @@ This request return JSON formatted as:
                 {
                     "placeId": string,
                     "name": string,
+                    "path": string,
                     "address": string,
                     "description": string,
                     "maturity": string,     // one of 'unrated', 'everyone', 'teen', 'mature', 'adult'

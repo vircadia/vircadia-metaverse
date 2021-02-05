@@ -22,7 +22,7 @@ import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 
 import { SArray, VKeyedCollection } from '@Tools/vTypes';
-import { GenUUID, IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
+import { Clamp, GenUUID, IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
 
 export let tokenCollection = 'tokens';
@@ -43,15 +43,16 @@ export function initTokens(): void {
 
 // Class to manage the manipulations on entities scope of application
 export class TokenScope {
-  public static OWNER: string = 'owner';   // a 'user' or 'person'
-  public static DOMAIN: string = 'domain'; // a domain-server
+  public static OWNER: string = 'owner';    // a 'user' or 'person'
+  public static DOMAIN: string = 'domain';  // a domain-server
+  public static PLACE: string = 'place';    // a Place (APIkey)
   // Added for ActivityPub access control
   public static READ: string = 'read';
   public static WRITE: string = 'write';
 
   // See if the passed scope token is a known scope code.
   static KnownScope(pScope: string): boolean {
-    return [ TokenScope.OWNER, TokenScope.DOMAIN ].includes(pScope);
+    return [ TokenScope.OWNER, TokenScope.DOMAIN, TokenScope.PLACE ].includes(pScope);
   };
 };
 
@@ -69,7 +70,22 @@ export const Tokens = {
       if (TokenScope.KnownScope(aScope)) aToken.scope.push(aScope);
     });
     aToken.whenCreated = new Date();
-    aToken.expirationTime = Tokens.computeDefaultExpiration(aToken.scope, aToken.whenCreated);
+
+    switch (pExpireHours) {
+      case 0:
+        // If expiration hours is not specified, compute default for this scope
+        aToken.expirationTime = Tokens.computeDefaultExpiration(aToken.scope, aToken.whenCreated);
+        break;
+      case -1:
+        // Expiration is infinite
+        aToken.expirationTime = new Date(2399, 12);
+        break;
+      default:
+        // There is a specification of some hours to expire
+        const hours = Clamp(pExpireHours, 1, 1000000);  // max is 114 years
+        aToken.expirationTime = new Date(new Date().valueOf() + hours * 1000*60*60);
+        break;
+    };
     return aToken;
   },
   async getTokenWithTokenId(pTokenId: string): Promise<AuthToken> {
@@ -88,8 +104,7 @@ export const Tokens = {
     return createObject(tokenCollection, pAuthToken);
   },
   async removeToken(pAuthToken: AuthToken) : Promise<boolean> {
-    return deleteOne(tokenCollection, new GenericFilter({ 'id': pAuthToken.id }));
-  },
+    return deleteOne(tokenCollection, new GenericFilter({ 'id': pAuthToken.id })); },
   async updateTokenFields(pEntity: AuthToken, pFields: VKeyedCollection): Promise<AuthToken> {
     return updateObjectFields(tokenCollection,
                               new GenericFilter({ 'id': pEntity.id }), pFields);

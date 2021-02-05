@@ -23,6 +23,9 @@ import { AccountEntity } from '@Entities/AccountEntity';
 import { SimpleObject } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
 
+// Controls access to Requests
+//  &asAdmin=true
+//  &acct=targetAccountId
 export class RequestScopeFilter extends CriteriaFilter {
   // If an admin and the optional target account
   private _asAdmin = false;

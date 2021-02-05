@@ -20,6 +20,9 @@ import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 import { Clamp } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
 
+// Limits the number of entries returned
+//  &page=N
+//  &per_page=N
 export class PaginationInfo extends CriteriaFilter {
   public PageNum: number = 1;
   public PerPage: number = 20;

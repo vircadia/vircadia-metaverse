@@ -46,7 +46,7 @@ export function initDomains(): void {
   setInterval( async () => {
     // Find domains that are not heartbeating and reset activity if not talking
     for await (const aDomain of Domains.enumerateAsync(new GenericFilter(
-                    { 'timeOfLastHeartbeat': { '$lt': Domains.dateWhenNotActive },
+                    { 'timeOfLastHeartbeat': { '$lt': Domains.dateWhenNotActive() },
                       '$or': [ { 'numUsers': { '$gt': 0 } }, { 'anonUsers': { '$gt': 0 } } ]
                     }) ) ) {
       Logger.info(`Domains: domain ${aDomain.name} not heartbeating. Zeroing users.`);
@@ -146,7 +146,7 @@ export const Domains = {
   },
   // Return the Date when an domain is considered inactive
   dateWhenNotActive(): Date {
-    const notActiveTime = new Date(Date.now() - 1000 * Config["metaverse-server"]["domain-seconds-until-offline"]);
+    const notActiveTime = new Date(Date.now() - (1000 * Config["metaverse-server"]["domain-seconds-until-offline"] ) );
     return notActiveTime;
   },
   // Return 'true' if the passed string could be a domainId. Used as a precheck before querying the Db.

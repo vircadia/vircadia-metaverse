@@ -23,31 +23,29 @@ import { Places } from '@Entities/Places';
 import { Domains } from '@Entities/Domains';
 
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
+import { PlaceFilterInfo } from '@Entities/EntityFilters/PlaceFilterInfo';
 
 import { IsNotNullOrEmpty, IsNullOrEmpty } from '@Tools/Misc';
 import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
+import { buildPlaceInfoSmall } from '@Route-Tools/Util';
 
 const procGetExplore: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   const pager = new PaginationInfo();
+  const placer = new PlaceFilterInfo();
 
   pager.parametersFromRequest(req);
+  placer.parametersFromRequest(req);
 
   const allPlaces: any[] = [];
-  for await (const place of Places.enumerateAsync(pager)) {
+  for await (const place of Places.enumerateAsync(placer, pager)) {
     const aDomain = await Domains.getDomainWithId(place.domainId);
     if (aDomain && IsNotNullOrEmpty(aDomain.networkAddr)) {
       const placeDesc: VKeyedCollection = {
         'Domain Name': place.name,
       };
-      // Build redirection URL for getting to the place
-      let visit = 'hifi://' + aDomain.networkAddr;
-      if (IsNotNullOrEmpty(aDomain.networkPort)) {
-        visit += ':' + aDomain.networkPort;
-      };
-      // visit += '/' + place.address;
-      visit += place.address;
-      placeDesc.Visit = visit;
+      placeDesc.Address = Places.getAddressString(place);
+      placeDesc.Visit = 'hifi://' + placeDesc.Address;
 
       placeDesc.DomainId = aDomain.id;
       placeDesc['Network Address'] = aDomain.networkAddr;
@@ -62,13 +60,18 @@ const procGetExplore: RequestHandler = async (req: Request, resp: Response, next
         };
       };
 
-      placeDesc.People = aDomain.numUsers + aDomain.anonUsers;
+      // 'People' is number of people at place for old Explore script
+      // placeDesc.People = aDomain.numUsers + aDomain.anonUsers;
+      placeDesc.People = Places.getCurrentAttendance(place, aDomain);
+
+      placeDesc.Place = await buildPlaceInfoSmall(place, aDomain);
 
       allPlaces.push(placeDesc);
     };
   };
   req.vRestResp.Data = allPlaces;
 
+  placer.addResponseFields(req);
   pager.addResponseFields(req);
 
   next();
