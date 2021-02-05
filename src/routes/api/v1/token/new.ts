@@ -33,7 +33,7 @@ const procPostTokenNew: RequestHandler = async (req: Request, resp: Response, ne
     };
     if (TokenScope.KnownScope(scope)) {
       const tokenInfo = await Tokens.createToken(req.vAuthAccount.id, [ scope ]);
-      Tokens.addToken(tokenInfo);
+      await Tokens.addToken(tokenInfo);
       req.vRestResp.Data = {
         'token': tokenInfo.token,
         'token_id': tokenInfo.id,

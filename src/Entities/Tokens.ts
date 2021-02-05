@@ -78,7 +78,7 @@ export const Tokens = {
         break;
       case -1:
         // Expiration is infinite
-        aToken.expirationTime = new Date(2399, 1);
+        aToken.expirationTime = new Date(2399, 12);
         break;
       default:
         // There is a specification of some hours to expire

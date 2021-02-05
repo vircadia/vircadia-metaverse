@@ -164,6 +164,7 @@ export const verifyDomainAccess: RequestHandler = async (req: Request, resp: Res
         // Auth token not available. See if APIKey does the trick
         if (req.vDomain.apiKey === req.vDomainAPIKey) {
           // APIKEY matches so create a fake AuthToken that works with checkAccessToEntity
+          // Note that this token does not get written to the DB
           req.vAuthToken = await Tokens.createToken(req.vDomainAPIKey, [ TokenScope.DOMAIN ], 1);
           verified = true;
         };

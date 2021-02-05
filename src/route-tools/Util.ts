@@ -268,7 +268,7 @@ export async function buildPlaceInfoSmall(pPlace: PlaceEntity, pDomain?: DomainE
     'placeId': pPlace.id,
     'id': pPlace.id,
     'name': pPlace.name,
-    'address': Places.getAddressString(pPlace),
+    'address': await Places.getAddressString(pPlace),
     'path': pPlace.path,
     'description': pPlace.description,
     'maturity': pPlace.maturity ?? Maturity.UNRATED,

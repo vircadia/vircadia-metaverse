@@ -60,6 +60,7 @@ export const Places = {
     newPlace.path = '/0,0,0/0,0,0,1';
     newPlace.whenCreated = new Date();
     const APItoken = await Tokens.createToken(pAccountId, [ TokenScope.PLACE ], -1);
+    await Tokens.addToken(APItoken);  // put token into DB
     newPlace.currentAPIKeyTokenId = APItoken.id;
     return newPlace;
   },
