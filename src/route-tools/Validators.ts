@@ -68,7 +68,7 @@ export async function isObjectValidator(pField: FieldDefn, pEntity: Entity, pVal
   if (pValue instanceof Object) {
     return { valid: true };
   };
-  return { valid: false, reason: 'field value must be a valid date string' };
+  return { valid: false, reason: 'field value must resolve to an object' };
 };
 // verify the value is a string or a set/add/remove collection of string arrays.
 // This pairs with the SArray getter/setter which accepts a string (add), an

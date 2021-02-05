@@ -27,7 +27,7 @@ import { Perm } from '@Route-Tools/Perm';
 import { checkAccessToEntity } from '@Route-Tools/Permissions';
 
 import { FieldDefn, ValidateResponse } from '@Route-Tools/EntityFieldDefn';
-import { isStringValidator, isSArraySet, isPathValidator, isDateValidator, isNumberValidator } from '@Route-Tools/Validators';
+import { isStringValidator, isSArraySet, isPathValidator, isDateValidator, isObjectValidator, isNumberValidator } from '@Route-Tools/Validators';
 import { simpleGetter, simpleSetter, noSetter, sArraySetter, dateStringGetter } from '@Route-Tools/Validators';
 
 import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
@@ -203,7 +203,7 @@ export const placeFields: { [key: string]: FieldDefn } = {
     request_field_name: 'current_info',
     get_permissions: [ Perm.ALL ],
     set_permissions: [ Perm.DOMAINACCESS, Perm.ADMIN ],
-    validate: isStringValidator,
+    validate: isObjectValidator,
     setter: simpleSetter,
     getter: simpleGetter
   },

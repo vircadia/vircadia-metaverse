@@ -92,6 +92,14 @@ export const Places = {
                       ): Promise<ValidateResponse> {
     return setEntityField(placeFields, pAuthToken, pPlace, pField, pVal, pRequestingAccount, pUpdates);
   },
+  // Verify that the passed value is legal for the named field
+  async validateFieldValue(pFieldName: string, pValue: any): Promise<ValidateResponse> {
+    const defn = placeFields[pFieldName];
+    if (defn) {
+      return await defn.validate(defn, defn.request_field_name, pValue);
+    };
+    return { 'valid': false, 'reason': 'Unknown field name' };
+  },
   // Generate an 'update' block for the specified field or fields.
   // This is a field/value collection that can be passed to the database routines.
   // Note that this directly fetches the field value rather than using 'getter' since
