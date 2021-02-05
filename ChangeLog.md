@@ -1,4 +1,17 @@
 # Iamus Changelog
+## Version 2.3.10
+
+<ul>
+<li><a href="http://github.com/vircadia/Iamus/commit/5cf0673a7e34260743fb834f7cf031fafa8f1657">view &bull;</a> Update ChangeLog.md</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/dc1db4ca1dd6eab7e147048f7c2790483bce939c">view &bull;</a> Have every request return "Not logged in" if an access token is not     included in the request. This makes the user interface more understandable. Modify several requests to report different errors if not logged in     or if parameters are not specified. Makes error more specific. Closes #70</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/c5228616f001f7073b4ab21179cc510dc9de682b">view &bull;</a> Make sure all calls to checkAccessToEntity() are await'ed.     Should fix some wrong access checking.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/d3568dfe8f95b441009cd492ea19035290d27c8e">view &bull;</a> Change field permissions to use Perm definitions rather than explicit strings.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/c1676c81d8b972fdd6c7af16729c601867762926">view &bull;</a> Update npm modules.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/0020502f1cf894860332643fa977c39e575fa18e">view &bull;</a> Properly copy /static directory into /dist output directory. Closes #74</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/b232e2f571f5fe27dc9fa0d103b86e3f5c18b916">view &bull;</a> Add preliminary documentation for new Place design.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/327e5263de6e8b102e27798d206e4c1d49ce7c5b">view &bull;</a> Bump version to 2.3.10</li> 
+</ul>
+
 ## Version 2.3.9
 
 <ul>
@@ -91,12 +104,5 @@
 <li><a href="http://github.com/vircadia/Iamus/commit/0511c01854bebf75a46a7ad79dbf243f194aa06d">view &bull;</a> Modify Entity field value validation to return reason for any validation failure.     Rather than just returning 'false', the validator returns a structure with         an optional reason for the validation failure. Modify the callers of Entity field setting to return error. Closes #48 Fix AccountEntity.Availability and AccountEntity.Roles to validate values correctly.</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/8dca92378f89629819e544ff3d73351756902b2e">view &bull;</a> Tone down the AccountEntity.email format validation to require one AT sign     An RFC complient email address can be very complex so rely on later     email verification handshake to really checkout that email is a good format. Closes #63</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/3d6f7679ea605c288f537ddf8fffd011d9795922">view &bull;</a> Bump version to 2.3.2</li> 
-</ul>
-
-## Version 2.3.1
-
-<ul>
-<li><a href="http://github.com/vircadia/Iamus/commit/a0edba9f67e250ba5d1b8ad5c758bd17d4981af3">view &bull;</a> Update ChangeLog.md</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/ffe9c154e709e5138c3afaa7377b448abac81354">view &bull;</a> Bump version to 2.3.1</li> 
 </ul>
 
