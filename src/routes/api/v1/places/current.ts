@@ -18,17 +18,10 @@ import Config from '@Base/config';
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
 import { setupMetaverseAPI, finishMetaverseAPI, param1FromParams, placeFromParams } from '@Route-Tools/middleware';
-import { accountFromAuthToken } from '@Route-Tools/middleware';
 
 import { Tokens } from '@Entities/Tokens';
 
-import { Perm } from '@Route-Tools/Perm';
-import { checkAccessToEntity } from '@Route-Tools/Permissions';
-
-import { buildPlaceInfo } from '@Route-Tools/Util';
-
 import { Places } from '@Entities/Places';
-import { Maturity } from '@Entities/Sets/Maturity';
 
 import { IsNotNullOrEmpty, IsNullOrEmpty } from '@Tools/Misc';
 import { VKeyedCollection } from '@Tools/vTypes';
@@ -45,7 +38,7 @@ interface CurrentBody {
 export const procPostPlaceCurrent: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   const reqBody = req.body as CurrentBody;
   if (IsNotNullOrEmpty(reqBody.placeId)) {
-    if (IsNullOrEmpty(reqBody.current_api_key)) {
+    if (IsNotNullOrEmpty(reqBody.current_api_key)) {
       const aPlace = await Places.getPlaceWithId(reqBody.placeId);
       if (IsNotNullOrEmpty(aPlace)) {
         const apiKey = await Places.getCurrentInfoAPIKey(aPlace);
@@ -72,6 +65,7 @@ export const procPostPlaceCurrent: RequestHandler = async (req: Request, resp: R
               };
             };
             // Update the database with the new values
+            updates.currentLastUpdateTime = new Date();
             await Places.updateEntityFields(aPlace, updates);
           }
           else {
@@ -92,20 +86,6 @@ export const procPostPlaceCurrent: RequestHandler = async (req: Request, resp: R
   }
   else {
     req.vRestResp.respondFailure('No placeId');
-  };
-  if (req.vPlace) {
-    const placeInfo = await buildPlaceInfo(req.vPlace);
-    // If the requestor is the 'owner' of the place, add APIKey to the response
-    if (checkAccessToEntity(req.vAuthToken, req.vPlace, [ Perm.DOMAINACCESS, Perm.ADMIN ], req.vAuthAccount)) {
-      placeInfo.current_api_key = Places.getCurrentInfoAPIKey(req.vPlace);
-    };
-    req.vRestResp.Data = {
-      'place': placeInfo,
-      'maturity-categories': Maturity.MaturityCategories
-    };
-  }
-  else {
-    req.vRestResp.respondFailure('No such place');
   };
   next();
 };

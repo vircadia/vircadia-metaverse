@@ -38,8 +38,8 @@ export const procGetPlacesPlaceId: RequestHandler = async (req: Request, resp: R
   if (req.vPlace) {
     const placeInfo = await buildPlaceInfo(req.vPlace);
     // If the requestor is the 'owner' of the place, add APIKey to the response
-    if (checkAccessToEntity(req.vAuthToken, req.vPlace, [ Perm.DOMAINACCESS, Perm.ADMIN ], req.vAuthAccount)) {
-      placeInfo.current_api_key = Places.getCurrentInfoAPIKey(req.vPlace);
+    if (await checkAccessToEntity(req.vAuthToken, req.vPlace, [ Perm.DOMAINACCESS, Perm.ADMIN ], req.vAuthAccount)) {
+      placeInfo.current_api_key = await Places.getCurrentInfoAPIKey(req.vPlace);
     };
     req.vRestResp.Data = {
       'place': placeInfo,
@@ -125,6 +125,7 @@ export const router = Router();
 
 router.get(   '/api/v1/places/:placeId',
                                      [ setupMetaverseAPI,   // req.vRESTResp
+                                      accountFromAuthToken, // req.vAuthAccount
                                       placeFromParams,      // req.vPlace, req.vDomain
                                       procGetPlacesPlaceId,
                                       finishMetaverseAPI ] );

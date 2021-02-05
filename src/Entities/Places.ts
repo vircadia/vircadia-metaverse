@@ -20,6 +20,7 @@ import { Domains } from '@Entities/Domains';
 import { AccountEntity } from '@Entities/AccountEntity';
 import { PlaceEntity } from '@Entities/PlaceEntity';
 import { placeFields } from '@Entities/PlaceFields';
+import { DomainEntity } from './DomainEntity';
 
 import { AuthToken } from '@Entities/AuthToken';
 import { Tokens, TokenScope } from '@Entities/Tokens';
@@ -35,7 +36,6 @@ import { createObject, getObject, getObjects, updateObjectFields, deleteOne, del
 import { GenUUID, IsNullOrEmpty, IsNotNullOrEmpty, genRandomString } from '@Tools/Misc';
 import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
-import { DomainEntity } from './DomainEntity';
 
 export let placeCollection = 'places';
 
