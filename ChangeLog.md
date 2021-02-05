@@ -1,4 +1,29 @@
 # Iamus Changelog
+## Version 2.3.11
+
+<ul>
+<li><a href="http://github.com/vircadia/Iamus/commit/d1ef1857d4c12856122028dbd591b7ef8f53b66f">view &bull;</a> Add logic to Tokens.createToken() for better expiration time computation:     0 says default, N says number of hours, and -1 says 'infinite'.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/2ac1150307e8daa1ab2d7f450ab805d6bf791136">view &bull;</a> Make entity field 'getter' to be async.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/de32d0a392fe467942d993dfc70e68bdd06469a2">view &bull;</a> Update callers of entity field 'getters' to be async</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/15c9ebba7776a87bcd139590cfa35d099f245eb7">view &bull;</a> Make entity field 'setters' async.     Update utility functions so 'setters' are all async</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/3a3a0c3528b7ff1b5c90f43a8795bb4811da10c6">view &bull;</a> Update callers of entity field 'setters' to be async</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/cbcd8b4f66e5f5a93737e47cd6e7507bf66409d4">view &bull;</a> Make Places.createPlace() async. Update callers to Places.createPlace() to await.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/fa1f04fa2db7d5e547c8b42be260fd489e748444">view &bull;</a> Fix bug is calculating expiration hours when creating a new token.     If hours were specified, the clamped value was not used.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/e0148fb0639f508fe0f2a00f4e7b24a558edb41d">view &bull;</a> Add PlaceEntity fields for current place state information.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/585f0edbc78dc89ccdc51403020375732fddacca">view &bull;</a> Correct spelling from 'attendence' to 'attendance'.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/faea8a2f20e956b401c40b6ba6e7e6234e70a0ef">view &bull;</a> Add comments at the top if the class to show what parameters the     criteria filter parses. Add beginnings of 'status' parameter to PlaceFilerInfo criteria filter Update /api/explore.json to use PlaceFilterInfo</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/c7d61509ed4035530bde08547b8407772dd388ea">view &bull;</a> Move Place attendance calculation to Places.ts Add current information to returned Place info structure Default Place attendance zero timeout to be 60 minutes.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/d6eaf01e19eb4a6e27df510226b346876931a6f9">view &bull;</a> Distinguish between a "path" ("/pos/rot") and an "address" (netaddr/pos/rot)     Rename PlaceEntity.address to be PlaceEntity.path     Define get/set for PlaceEntity fields for "path" and "address" with the         latter returning a "domain-network-address/pos/rot"     Restrict PlaceEntity.path validation to "/f,f,f/f,f,f,f"     Update DB to rename existing database fields address->path     Include both "path" and "address" in returned Place JSON information Add new Places functions:     Places.getCurrentInfoAPIKey()     Places.getAddressString() Optionally include APIKey in returned Place JSON for domain owner Add 'Attendance" and current place info to /explore.json response Update API.md description of the place operations</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/40a3a4f6eff0ea5d0a65a9163095ddbe25173a18">view &bull;</a> Add optional domain parameter to get attendance functions to eliminate     refetch of domain.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/98fa610a35b249a2d5bdf33a6d765008d0daaf9d">view &bull;</a> Update Explore response to include the Place information. Add documentation for /explore.json request.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/ca75711999d4a30fec561163713166742283375f">view &bull;</a> Add POST /api/v1/places/current Add Places.validateFieldValue() for checking incoming values. Update docs on place APIs</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/9fa357a4a5c8bc5423573af5f4ff53908225fa5a">view &bull;</a> Fix problem where Domain user count was not being zeroed on inactivity.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/5b86982a8c134c79d5f2b0c2b2f364526a609a0a">view &bull;</a> Add some missing 'await's. Most are just waiting for DB to store.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/94d95e5d2c47d0db6b3d58448bb2e8be2216a62d">view &bull;</a> Correct test logic for /api/v1/places/current so APIKey works. Remove cut-and-paste error code from same.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/eb4e3283517de57f5fed15afb8c89824416f1875">view &bull;</a> Update ChangeLog.md</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/42d2162e2f9f4044f74e9855eb35700383bd9912">view &bull;</a> Bump version to 2.3.11</li> 
+</ul>
+
 ## Version 2.3.10
 
 <ul>
@@ -93,16 +118,5 @@
 <li><a href="http://github.com/vircadia/Iamus/commit/6a8c2b0fab15558ef684555ff35843d030dcf718">view &bull;</a> Add domain.sponsorAccountId to Places information returned by /api/v1/places/... Update documentation.</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/fc4f64670e5836f732b8cef1f5a5a477d3aea76f">view &bull;</a> Fix problem with changing username: update AccountEntity setPermissions. Should fix vircadia/project-iamus-dashboard#21</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/8cf02628b3c8055d0e84655fa2e65951bd2a6a4b">view &bull;</a> Bump version to 2.3.3</li> 
-</ul>
-
-## Version 2.3.2
-
-<ul>
-<li><a href="http://github.com/vircadia/Iamus/commit/1a137f8f7b2722234ef5d3a5fd110d1007a502fd">view &bull;</a> Fix sorting of versions in genChangeLog.sh Update Changelog.md</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/4654f30bb6af0cb89ac0a4c7fcf9f640576876f3">view &bull;</a> Return more useful error message when finding a domain name contains     non-allowed characters. Some non-functional formatting and code cleanup.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/729cdd156c95d514751a7663bafd6b584c725d49">view &bull;</a> Fix line endings to Linux style</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/0511c01854bebf75a46a7ad79dbf243f194aa06d">view &bull;</a> Modify Entity field value validation to return reason for any validation failure.     Rather than just returning 'false', the validator returns a structure with         an optional reason for the validation failure. Modify the callers of Entity field setting to return error. Closes #48 Fix AccountEntity.Availability and AccountEntity.Roles to validate values correctly.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/8dca92378f89629819e544ff3d73351756902b2e">view &bull;</a> Tone down the AccountEntity.email format validation to require one AT sign     An RFC complient email address can be very complex so rely on later     email verification handshake to really checkout that email is a good format. Closes #63</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/3d6f7679ea605c288f537ddf8fffd011d9795922">view &bull;</a> Bump version to 2.3.2</li> 
 </ul>
 
