@@ -142,6 +142,7 @@ export async function buildDomainInfoV1(pDomain: DomainEntity): Promise<any> {
     'domainId': pDomain.id,
     'id': pDomain.id,       // legacy
     'name': pDomain.name,
+    'world_name': pDomain.name,   // legacy
     'label': pDomain.name,        // legacy
     'public_key': pDomain.publicKey ? createSimplifiedPublicKey(pDomain.publicKey) : undefined,
     'owner_places': await buildPlacesForDomain(pDomain),
