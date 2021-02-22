@@ -6,6 +6,13 @@ and running the server.
 For development or other running configurations, refer to
 [Notes On Development] and [Running Docker Image].
 
+## Prerequisites
+
+You will need the following installed on your system/server:
+
+* Git
+* NodeJS
+
 ## Build Instructions
 
 The application is a [NodeJS]/[ExpressJS]/[TypeScript] application so the
@@ -18,7 +25,7 @@ npm run build
 
 ## Running
 
-For testing and simple opertion, you can run Iamus in the build directory.
+For testing and simple operation, you can run Iamus in the build directory.
 Say you want to build and run Iamus in the directory IBASE. The steps are:
 
 ```sh
@@ -40,7 +47,7 @@ Refer to [Running Docker Image] for instructions.
 
 For connecting domain-servers to the Iamus metaverse-server,
 you must point any domain-servers (Vircadia) at this
-metaverse server. This is accomplished by setting the `HIFI_METAVERSE_URL`:
+metaverse server. This is accomplished by setting the `HIFI_METAVERSE_URL` environment variable:
 
 ```sh
 export HIFI_METAVERSE_URL=http://HOSTADDRESS:9400
@@ -71,7 +78,7 @@ current package and build version. The format of the file is:
 }
 ```
 
-`version-tag` combines the NPM package version, the date of build, and
+`version-tag` combines the NPM package version, the date of the build, and
 the GIT commit version and is used to tag the Docker image.
 
 The version information is also read and added to the configuration
@@ -81,7 +88,7 @@ data structure (for use by the application) and added to the
 ## Configuration
 
 The server parameters are all specified in `config.ts`. These default
-values are overlayed with environment variables and then overlayed with
+values are overlaid with environment variables and then overlaid with
 the contents of a configuration file.
 
 The environment variables are:
@@ -89,7 +96,7 @@ The environment variables are:
 - IAMUS_LOGLEVEL: logging level. One of 'error', 'info', 'warn', 'debug'. Default 'info'.
 - IAMUS_LISTEN_HOST: host to listen for requests on. Default '0.0.0.0'.
 - IAMUS_LISTEN_PORT: port to listen for requests on. Default 9400.
-- IAMUS_EXTERNAL_HOSTNAME: hostname to report as referencing back to this server. This is mostly used by ActivityPub for links to users. Default 'localhost'. This value MUST be set for proper metavserse-server operation.
+- IAMUS_EXTERNAL_HOSTNAME: hostname to report as referencing back to this server. This is mostly used by ActivityPub for links to users. Default 'localhost'. This value MUST be set for proper metaverse-server operation.
 - IAMUS_CONFIG_FILE: filename or URL of a JSON formatted configuration file that over-rides the values. Default "./iamus.json".
 
 The configuration file, if it exists, is read and its values overlay
@@ -139,6 +146,8 @@ All the configuration parameter default values are defined in `src/config.ts`.
 
 ## Setup MongoDB
 
+### Install on Linux
+
 Install MongoDb following the instructions at https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/ :
 
 ```sh
@@ -165,8 +174,8 @@ use admin
 db.createUser({user:"cadiauser", pwd: "LONGPASSWORD3", roles: [{ role: "readWrite", db: "domainstore" }]})
 ```
 
-Where, if course, "LONGPASSWORD*" is a collection of random letter and numbers.
-This creates account "adminer" for DB administration, "backuper" for doing backups
+Where, of course, "LONGPASSWORD*" is a collection of random letter and numbers to use as a password.
+This creates an account "adminer" for DB administration, "backuper" for doing backups
 and "cadiauser" to be the database user for the domain-server.
 The database is "domainstore".
 
@@ -178,6 +187,42 @@ security:
 ```
 
 then do `sudo systemctl restart mongod`.
+
+### Install on Windows
+
+Install MongoDb following the instructions at https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/ :
+
+```sh
+"C:\Program Files\MongoDB\Server\4.4\bin\mongo.exe"
+db.disableFreeMonitoring()
+```
+
+Turn on authentication and create some users for our instance:
+
+```sh
+"C:\Program Files\MongoDB\Server\4.4\bin\mongo.exe"
+use admin
+db.createUser({user:"adminer", pwd: "LONGPASSWORD1", roles: [ "root" ]})
+use admin
+db.createUser({user:"backuper", pwd: "LONGPASSWORD2", roles: [ "backup" ]})
+use admin
+db.createUser({user:"cadiauser", pwd: "LONGPASSWORD3", roles: [{ role: "readWrite", db: "domainstore" }]})
+```
+
+Where, of course, "LONGPASSWORD*" is a collection of random letter and numbers to use as a password.
+This creates an account "adminer" for DB administration, "backuper" for doing backups
+and "cadiauser" to be the database user for the domain-server.
+The database is "domainstore".
+
+After doing the above creation steps, edit `<install directory>\bin\mongod.cfg` and add:
+
+```
+security:
+    authorization: enabled
+```
+
+In Windows PowerShell, restart the service by running
+`Restart-Service MongoDB -force`.
 
 ## Logging
 
@@ -194,7 +239,7 @@ These parameters can be changed with the config file.
 | debug.log-max-size-megabytes | 100 | the maximum size of the individual log files |
 | debug.log-max-files | 10 | number of old log files to keep |
 | debug.log-compress | false | if to compress old versions of the log files |
-| debug.log-to-console | false | whether to additionlly log to the console |
+| debug.log-to-console | false | whether to additionally log to the console |
 
 When running with Docker, one often changes the logging directory to point
 into a mounted volume for easy reference.

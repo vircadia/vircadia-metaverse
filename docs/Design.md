@@ -72,11 +72,11 @@ the database. This two step process is done with:
 This sample takes the authorization of the requestor, the account being changed, the external
 name of the field being set, and the value being set.
 The extra parameters passing the AccountEntity that goes with the authorization token (this is
-optional but saves a database lookup if supplied) and a VKeyedCollection that has  the
+optional but saves a database lookup if supplied) and a VKeyedCollection that has the
 database information that needs to be updated for this set operation.
-Ths update information is then passed 
+This update information is then passed .
 
-This system of field getting and setting is implmented with field definitions
+This system of field getting and setting is implemented with field definitions
 that are attached to the entity definition.
 Each field in an Entity has a `FieldDefn` definition that gives its internal
 and external name and the routines to use to validate and update the field.
@@ -108,7 +108,7 @@ The functions `getter` and `setter` are the operations that get and set the fiel
 Of course, the setter presumes the set value has passed the validation. These function definitions
 accept and return type "any" so the callers need to know what they want/expect.
 
-## Other Implimentation Nodes
+## Other Implementation Nodes
 
 BEWARE! All "entity" classes are really just Objects that are read out
 of the database. Even though they are defined as classes, when read from the
