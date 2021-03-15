@@ -34,8 +34,8 @@ export interface ValidateResponse {
 // The setter is not part of the 'updated' field logic so that must be separate.
 //    The best logic is to use the setter and then use the resulting Entity value
 //    for the 'updated' field (since the 'set' could be a merge type operation).
-export type getterFunction = (pDfd: FieldDefn, pD: Entity) => any;
-export type setterFunction = (pDfd: FieldDefn, pD: Entity, pV: any) => void;
+export type getterFunction = (pDfd: FieldDefn, pD: Entity) => Promise<any>;
+export type setterFunction = (pDfd: FieldDefn, pD: Entity, pV: any) => Promise<void>;
 export type validateFunction = (pDfd: FieldDefn, pD: Entity, pV: any, pAuth?: AuthToken) => Promise<ValidateResponse>;
 export type updaterFunction = (pDfd: FieldDefn, pD: Entity, pUpdates: VKeyedCollection) => void;
 export interface FieldDefn {
