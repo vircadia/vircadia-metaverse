@@ -44,7 +44,7 @@ const procGetExplore: RequestHandler = async (req: Request, resp: Response, next
       const placeDesc: VKeyedCollection = {
         'Domain Name': place.name,
       };
-      placeDesc.Address = Places.getAddressString(place);
+      placeDesc.Address = await Places.getAddressString(place);
       placeDesc.Visit = 'hifi://' + placeDesc.Address;
 
       placeDesc.DomainId = aDomain.id;
@@ -62,7 +62,7 @@ const procGetExplore: RequestHandler = async (req: Request, resp: Response, next
 
       // 'People' is number of people at place for old Explore script
       // placeDesc.People = aDomain.numUsers + aDomain.anonUsers;
-      placeDesc.People = Places.getCurrentAttendance(place, aDomain);
+      placeDesc.People = await Places.getCurrentAttendance(place, aDomain);
 
       placeDesc.Place = await buildPlaceInfoSmall(place, aDomain);
 
