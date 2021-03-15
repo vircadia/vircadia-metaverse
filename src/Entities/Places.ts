@@ -170,6 +170,10 @@ export const Places = {
     // If the domain is missing, the domain-server's network address is added
     let addr = pPlace.path ?? '/0,0,0/0,0,0,1';
     const pieces = addr.split('/');
+    // kludge as there were a bunch of "undefined" domain/address names
+    if (pieces.length > 0 && pieces[0].length === 9 && pieces[0] === 'undefined') {
+        pieces[0] = '';
+    };
     if (pieces[0].length === 0) {
       const aDomain = await Domains.getDomainWithId(pPlace.domainId);
       if (IsNotNullOrEmpty(aDomain)) {
