@@ -1,4 +1,14 @@
 # Iamus Changelog
+## Version 2.3.12
+
+<ul>
+<li><a href="http://github.com/vircadia/Iamus/commit/190bf213309b02dd23ef40ea81e5431fc6a46944">view &bull;</a> Update ChangeLog.md</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/55f42d7bf336d112a54dd097ea7a4b4dba38256b">view &bull;</a> Add "world_name" as an alias for "name" in the domain information     return JSON to enable some legacy scripts/code.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/f69fc3d6d087c33c03782be2cc558b0e6a0791e4">view &bull;</a> Update defintions of property getters and setters so they are clearly async.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/9ba59b51b7a47e46eb2620bf38d8766d24f23aad">view &bull;</a> Update redirect URL. (#79)</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/3dfd4c4bc76c8a0080960bb70c7edbf068a4e0db">view &bull;</a> Bump version to 2.3.12</li> 
+</ul>
+
 ## Version 2.3.11
 
 <ul>
@@ -108,15 +118,5 @@
 <li><a href="http://github.com/vircadia/Iamus/commit/d45833f889f838bdefe5cf8bfb31d316aad486e5">view &bull;</a> Record network_address and network_port if specified when creating doamin.</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/acaa36a494ad439122f48376ba31f08068219566">view &bull;</a> Added "maturity" and "tags" to PlaceEntity Centralized "maturity" specifications into src/Entities/sets/Maturity.ts Moved AccountAvailability and AccountRoles to src/Entities/sets and made a set pattern. Documented "/api/v1/places?maturity=LEVEL" and "/api/v1/places?tags=TAGLIST" Added comments to src/Entities/EntityFilters/CriteriaFilter.ts explaining how filters are to be used Added "maturity-catagories" to Places responses Fixed /api/v1/users/places to return only the places that belong to the requesting user Deleted bin/www -- what was that from??</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/56c4649b60f58915c3b05907f3f1149cf3fe0e71">view &bull;</a> Bump version to 2.3.4</li> 
-</ul>
-
-## Version 2.3.3
-
-<ul>
-<li><a href="http://github.com/vircadia/Iamus/commit/fe0518f44cbbab7e87a68c8e2bf44a8149cf9262">view &bull;</a> Update Changelog.md</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/f1299154d43fe10687de6bc8ee79460fa4e24e53">view &bull;</a> Add proper handling of SIGTERM and SIGINT     Shutdown server, finish requests, and then cleanly exit.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/6a8c2b0fab15558ef684555ff35843d030dcf718">view &bull;</a> Add domain.sponsorAccountId to Places information returned by /api/v1/places/... Update documentation.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/fc4f64670e5836f732b8cef1f5a5a477d3aea76f">view &bull;</a> Fix problem with changing username: update AccountEntity setPermissions. Should fix vircadia/project-iamus-dashboard#21</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/8cf02628b3c8055d0e84655fa2e65951bd2a6a4b">view &bull;</a> Bump version to 2.3.3</li> 
 </ul>
 
