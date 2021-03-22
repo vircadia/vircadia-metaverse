@@ -186,7 +186,13 @@ export const placeFields: { [key: string]: FieldDefn } = {
     validate: isNumberValidator,
     setter: simpleSetter,
     getter: async (pField: FieldDefn, pEntity: Entity): Promise<any> => {
-      return Places.getCurrentAttendance(pEntity as PlaceEntity);
+        const aPlace = pEntity as PlaceEntity;
+        const attendance = await Places.getCurrentAttendance(aPlace);
+        // If the database record does not match the current attendance, update DB
+        if (aPlace.currentAttendance !== attendance) {
+            void Places.updateEntityFields(aPlace, { 'currentAttendance': attendance });
+        };
+        return attendance;
     }
   },
   'current_images': {

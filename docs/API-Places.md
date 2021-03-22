@@ -61,11 +61,12 @@ This request takes a number of parameters to control the list of places returned
 
 | QUERY     | Description |
 | -------   | --------- |
-| maturity  | get the places with the specified maturity level |
+| maturity  | get the places with the specified maturity level ("unrated", "adult", "mature", "teen", "everyone") |
 | tag       | get places that have specified tags (comma separated list. Any tag matches) |
 | per_page | number of entries to return per request |
 | page_num | which "page" of entries to return |
 | order    | comma separated list of 'ascending', 'decending', 'num_users', 'name' |
+| search   | search on the place name. ( "search=fred" will return all Places whos name includes "fred") |
 | status   | comma separated list of 'online' (domain is heartbeating), 'active' (has attendees) |
 
 So, a legal request could be:

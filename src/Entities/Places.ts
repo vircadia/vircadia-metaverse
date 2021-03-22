@@ -114,9 +114,11 @@ export const Places = {
     Logger.info(`Places: removing place ${pPlaceEntity.name}, id=${pPlaceEntity.id}`);
     return deleteOne(placeCollection, new GenericFilter({ 'id': pPlaceEntity.id }) );
   },
+
   async removeMany(pCriteria: CriteriaFilter) : Promise<number> {
     return deleteMany(placeCollection, pCriteria);
   },
+
   async *enumerateAsync(pPager: CriteriaFilter,
               pInfoer?: CriteriaFilter, pScoper?: CriteriaFilter): AsyncGenerator<PlaceEntity> {
     for await (const place of getObjects(placeCollection, pPager, pInfoer, pScoper)) {
@@ -124,11 +126,13 @@ export const Places = {
     };
     // return getObjects(placeCollection, pCriteria, pPager); // not sure why this doesn't work
   },
+
   // The contents of this entity have been updated
   async updateEntityFields(pEntity: PlaceEntity, pFields: VKeyedCollection): Promise<PlaceEntity> {
     return updateObjectFields(placeCollection,
                               new GenericFilter({ 'id': pEntity.id }), pFields);
   },
+
   async getCurrentAttendance(pPlace: PlaceEntity, pDomain?: DomainEntity): Promise<number> {
     // Attendance is either reported by a beacon script or defaults to the domain's numbers
     // If the last current update is stale (older than a few minutes), the domain's number is used
@@ -153,8 +157,8 @@ export const Places = {
       };
     };
     return attendance;
-
   },
+
   async getCurrentInfoAPIKey(pPlace: PlaceEntity): Promise<string> {
     // Return that APIKey value from the access token
     let key: string;
@@ -164,6 +168,7 @@ export const Places = {
     };
     return key;
   },
+
   async getAddressString(pPlace: PlaceEntity): Promise<string> {
     // Compute and return the string for the Places's address.
     // The address is of the form "optional-domain/x,y,z/x,y,z,w".
