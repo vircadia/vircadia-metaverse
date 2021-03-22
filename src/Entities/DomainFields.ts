@@ -18,6 +18,7 @@ import Config from '@Base/config';
 import { Entity } from '@Entities/Entity';
 
 import { Maturity } from '@Entities/Sets/Maturity';
+import { Restriction } from '@Entities/Sets/Restriction';
 
 import { Perm } from '@Route-Tools/Perm';
 
@@ -257,7 +258,12 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     request_field_name: 'restriction',
     get_permissions: [ Perm.ALL ],
     set_permissions: [ Perm.DOMAIN, Perm.SPONSOR, Perm.ADMIN ],
-    validate: isStringValidator,
+    validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {
+      if(typeof(pVal) === 'string' && Restriction.KnownRestriction(pVal)) {
+        return { valid: true };
+      }
+      return { valid: false, reason: 'not accepted restriction value'};
+    },
     setter: simpleSetter,
     getter: simpleGetter
   },
