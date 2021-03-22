@@ -180,15 +180,15 @@ export class PlaceFilterInfo extends CriteriaFilter {
         this._doingQuery = true;
         const criteria:VKeyedCollection = {};
         if (this._maturity) {
-            criteria['maturity'] = { '$in': this._maturity }
+            criteria.maturity = { '$in': this._maturity }
         };
         if (this._tags) {
-            criteria['tags'] = { '$in': this._tags }
+            criteria.tags = { '$in': this._tags }
         };
         if (this._search) {
-            criteria['name'] = { '$regex': this._search, '$options': 'i' }
+            criteria.name = { '$regex': this._search, '$options': 'i' }
         };
-        criteria['visibility'] = { "$or": [ { "visibility": { "$exists": false }},
+        criteria.visibility = { "$or": [ { "visibility": { "$exists": false }},
                                             { "visibility": Visibility.OPEN },
                                           ] };
         return criteria;

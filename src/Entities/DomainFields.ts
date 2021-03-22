@@ -18,6 +18,7 @@ import Config from '@Base/config';
 import { Entity } from '@Entities/Entity';
 
 import { Maturity } from '@Entities/Sets/Maturity';
+import { Visibility } from '@Entities/Sets/Visibility';
 import { Restriction } from '@Entities/Sets/Restriction';
 
 import { Perm } from '@Route-Tools/Perm';
