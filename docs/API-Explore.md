@@ -33,6 +33,7 @@ So, a legal request could be:
     GET /explore.json?maturity=adult
     GET /explore.json?order=ascending,num_users&maturity=unrated
     GET /explore.json?tag=friendly,kids,sandbox
+```
 
 The response is a JSON array of Place descriptions.
 
