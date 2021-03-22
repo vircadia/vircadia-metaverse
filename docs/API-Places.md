@@ -89,6 +89,7 @@ This request return JSON formatted as:
                 {
                     "placeId": string,
                     "name": string,
+                    "visibility": string,   // one of 'open', 'friends', 'connections', 'private'
                     "path": string,
                     "address": string,
                     "description": string,
@@ -226,6 +227,7 @@ The place fields that can be fetched:
 | placeId    |   all    |    none     | string |
 | name       |   all    | domainOwner, admin | string |
 | description |  all    | domainOwner, admin | string |
+| visibility |    all   | domainOwner, admin | string |
 | domainId   |   all    |    none     | string |
 | maturity   |   all    | domainOwner, admin | string |
 | tags       |   all    | domainOwner, admin | stringArray |

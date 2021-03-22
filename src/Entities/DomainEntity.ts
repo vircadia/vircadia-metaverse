@@ -21,6 +21,7 @@ import { Entity } from '@Entities/Entity';
 export class DomainEntity implements Entity {
   public id: string;           // globally unique domain identifier
   public name: string;         // domain name/label
+  public visibility: string;   // visibility of this entry in general domain lists
   public publicKey: string;    // DomainServers's public key in multi-line PEM format
   public apiKey: string;       // Access key if a temp domain
   public sponsorAccountId: string; // The account that gave this domain an access key

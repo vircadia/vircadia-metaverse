@@ -18,7 +18,6 @@ import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 import { Accounts } from '@Entities/Accounts';
 import { AccountEntity } from '@Entities/AccountEntity';
 import { Logger } from '@Tools/Logging';
-import { ParseQueryString } from '@Tools/Misc';
 
 // AccountScopeFilter filters a query stream to the accounts the requestor
 //    can look at. That is, a person can normally see only the domains

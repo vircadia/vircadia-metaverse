@@ -14,23 +14,21 @@
 
 'use strict'
 
-import Config from '@Base/config';
+export class Visibility {
+    public static OPEN: string = 'open';
+    public static FRIENDS: string = 'friends';
+    public static CONNECTIONS: string = 'connections';
+    public static PRIVATE: string = 'private';
 
-import { Logger } from '@Tools/Logging';
+    static VisibilityCategories = [
+            Visibility.OPEN,
+            Visibility.FRIENDS,
+            Visibility.CONNECTIONS,
+            Visibility.PRIVATE
+    ];
 
-export class Restriction {
-  public static OPEN: string = 'open';
-  public static HIFI: string = 'hifi';
-  public static ACL: string = 'acl';
-
-  static RestrictionCategories = [
-            Restriction.OPEN,
-             Restriction.HIFI,
-             Restriction.ACL
-            ];
-
-  static KnownRestriction(pRestriction: string): boolean {
-    return this.RestrictionCategories.includes(pRestriction);
-  };
-
+    static KnownVisibility(pVisibility: string): boolean {
+        return this.VisibilityCategories.includes(pVisibility);
+    };
 };
+

@@ -23,6 +23,7 @@ A request returns an array of domain descriptions:
                   "domainId": stringDomainId,
                   "id": stringDomainId,
                   "name": stringName,
+                  "visibility": string,   // one of 'open', 'friends', 'connections', 'private'
                   "label": stringName,
                   "public_key": stringPublicKey,
                   "sponsor_account_id": stringAccountIdAssociated,
@@ -136,6 +137,7 @@ The domain fields that can be fetched:
 | ---------     | -------- | --------   | ---- |
 | domainId      |    all   | noone      |string |
 | name          |    all   | domain sponsor admin | string |
+| visibility    |    all   | domain sponsor admin | string |
 | public_key    |    all   | domain     | string |
 | sponsor_account_id | all | domain sponsor admin | string |
 | version       |    all   | domain     | string |

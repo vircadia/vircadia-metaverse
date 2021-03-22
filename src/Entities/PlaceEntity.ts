@@ -22,6 +22,7 @@ export class PlaceEntity implements Entity {
   public id: string;            // globally unique place identifier
   public name: string;          // Human friendly name of the place
   public description: string;   // Human friendly description of the place
+  public visibility: string;    // visibility of this Place in general Place lists
   public maturity: string;      // maturity level of the place (see Sets/Maturity.ts)
   public tags: string[];        // tags defining the string content
   public domainId: string;      // domain the place is in

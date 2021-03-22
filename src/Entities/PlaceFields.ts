@@ -22,6 +22,7 @@ import { Domains } from '@Entities/Domains';
 import { Places } from '@Entities/Places';
 import { AuthToken } from '@Entities/AuthToken';
 import { Maturity } from '@Entities/Sets/Maturity';
+import { Visibility } from '@Entities/Sets/Visibility';
 
 import { Perm } from '@Route-Tools/Perm';
 import { checkAccessToEntity } from '@Route-Tools/Permissions';
@@ -33,7 +34,6 @@ import { simpleGetter, simpleSetter, noSetter, sArraySetter, dateStringGetter } 
 import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 
 import { Logger } from '@Tools/Logging';
-import { Tokens } from './Tokens';
 
 // Naming and access for the fields in a PlaceEntity.
 // Indexed by request_field_name.
@@ -77,8 +77,22 @@ export const placeFields: { [key: string]: FieldDefn } = {
     entity_field: 'description',
     request_field_name: 'description',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ Perm.DOMAIN, Perm.OWNER, Perm.ADMIN ],
+    set_permissions: [ Perm.DOMAINACCESS, Perm.ADMIN ],
     validate: isStringValidator,
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
+  'visiblity': {
+    entity_field: 'visiblity',
+    request_field_name: 'visiblity',
+    get_permissions: [ Perm.ALL ],
+    set_permissions: [ Perm.DOMAINACCESS, Perm.ADMIN ],
+    validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {
+      if(typeof(pVal) === 'string' && Visibility.KnownVisibility(pVal)) {
+        return { valid: true };
+      }
+      return { valid: false, reason: 'not accepted visibility value'};
+    },
     setter: simpleSetter,
     getter: simpleGetter
   },
@@ -86,7 +100,7 @@ export const placeFields: { [key: string]: FieldDefn } = {
     entity_field: 'domainId',
     request_field_name: 'domainId',
     get_permissions: [ Perm.ALL ],
-    set_permissions: [ Perm.OWNER, Perm.ADMIN ],
+    set_permissions: [ Perm.DOMAINACCESS, Perm.ADMIN ],
     validate: async (pField: FieldDefn, pEntity: Entity, pVal: any, pAuth: AuthToken): Promise<ValidateResponse> => {
       // This is setting a place to a new domainId. Make sure the domain exists
       //         and requestor has access to that domain.

@@ -31,7 +31,9 @@ import { createPublicKey } from 'crypto';
 import { VKeyedCollection, VKeyValue } from '@Tools/vTypes';
 import { IsNotNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
+
 import { Maturity } from '@Entities/Sets/Maturity';
+import { Visibility } from '@Entities/Sets/Visibility';
 
 // The public_key is sent as a binary (DER) form of a PKCS1 key.
 // To keep backward compatibility, we convert the PKCS1 key into a SPKI key in PEM format
@@ -126,6 +128,7 @@ export async function buildDomainInfo(pDomain: DomainEntity): Promise<any> {
     'id': pDomain.id,
     'domainId': pDomain.id,
     'name': pDomain.name,
+    'visibility': pDomain.visibility ?? Visibility.OPEN,
     'sponsorAccountId': pDomain.sponsorAccountId,
     'label': pDomain.name,
     'network_address': pDomain.networkAddr,
@@ -142,6 +145,7 @@ export async function buildDomainInfoV1(pDomain: DomainEntity): Promise<any> {
     'domainId': pDomain.id,
     'id': pDomain.id,       // legacy
     'name': pDomain.name,
+    'visibility': pDomain.visibility ?? Visibility.OPEN,
     'world_name': pDomain.name,   // legacy
     'label': pDomain.name,        // legacy
     'public_key': pDomain.publicKey ? createSimplifiedPublicKey(pDomain.publicKey) : undefined,
@@ -269,6 +273,7 @@ export async function buildPlaceInfoSmall(pPlace: PlaceEntity, pDomain?: DomainE
     'placeId': pPlace.id,
     'id': pPlace.id,
     'name': pPlace.name,
+    'visibility': pPlace.visibility ?? Visibility.OPEN,
     'address': await Places.getAddressString(pPlace),
     'path': pPlace.path,
     'description': pPlace.description,

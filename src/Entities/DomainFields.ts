@@ -80,6 +80,20 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     setter: noOverwriteSetter,
     getter: simpleGetter
   },
+  'visiblity': {
+    entity_field: 'visiblity',
+    request_field_name: 'visiblity',
+    get_permissions: [ Perm.ALL ],
+    set_permissions: [ Perm.DOMAIN, Perm.SPONSOR, Perm.ADMIN ],
+    validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {
+      if(typeof(pVal) === 'string' && Visibility.KnownVisibility(pVal)) {
+        return { valid: true };
+      }
+      return { valid: false, reason: 'not accepted visibility value'};
+    },
+    setter: simpleSetter,
+    getter: simpleGetter
+  },
   // An alternate way of setting domain name
   'world_name': {
     entity_field: 'name',
