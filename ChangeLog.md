@@ -1,4 +1,14 @@
 # Iamus Changelog
+## Version 2.3.13
+
+<ul>
+<li><a href="http://github.com/vircadia/Iamus/commit/7bdfdb0bc899dcc7a81941d47777d8321fbbd10b">view &bull;</a> Update ChangeLog.md</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/0b84cfb886e38c0bad07a79a0da8517bf6e62ebe">view &bull;</a> Fix return data for /explore.json so results are returned rather than the Promise</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/b43084967d9c940cc06272fa2744808caca183c9">view &bull;</a> When generating Place address, check for domain address of "undefined" as     there are a bunch of bad entries in the database.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/b72262c3210dcce6eac32a96cf8a5cc4792a53f1">view &bull;</a> Constrain Domain.Restriction to "open", "hifi", or "acl".</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/b7c32fc799f6709ef7f395f1925b4a837979bdef">view &bull;</a> Bump version to 2.3.13</li> 
+</ul>
+
 ## Version 2.3.12
 
 <ul>
@@ -106,17 +116,5 @@
 <li><a href="http://github.com/vircadia/Iamus/commit/00355c7481b1958379d574a1ff7acc65a18d2eed">view &bull;</a> When creating a Place, default maturity to the parent domain's maturity. Default DomainEntity.maturity to Maturity.UNRATED.</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/a80864dfea02c284c195000184392f9c1f7bdcce">view &bull;</a> Massive refactoring to remove circular import dependencies that were     causing null value initializations due to how Javascript loads. Move Entity field definitions into separate files. Moved Entity field getting and setting into the Entity controlling class. Repackaged (into multiple files) Permission and Get/Set/Validate routines.</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/bf4df1bad8290c7ef4b20e5ce940b1a925f3b04e">view &bull;</a> Bump version to 2.3.5</li> 
-</ul>
-
-## Version 2.3.4
-
-<ul>
-<li><a href="http://github.com/vircadia/Iamus/commit/387e26b76f6c98b5fe5e55f34d319c588f77b5a8">view &bull;</a> Update Changelog.md</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/d9759a3986c7c906b687047df268a9476193648d">view &bull;</a> Add documentation on the design of the Entity field get/set system.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/356b27369300f543e57dd7e7a73bc8f1d686ea15">view &bull;</a> Fix DELETE Place so the owner of the Place's domain can delete the Place.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/f9651d25d43a76d8e4aa5ee932f3e0a0f279514a">view &bull;</a> Make Monitoring.event so it doesn't fail if monitoring was not inited.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/d45833f889f838bdefe5cf8bfb31d316aad486e5">view &bull;</a> Record network_address and network_port if specified when creating doamin.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/acaa36a494ad439122f48376ba31f08068219566">view &bull;</a> Added "maturity" and "tags" to PlaceEntity Centralized "maturity" specifications into src/Entities/sets/Maturity.ts Moved AccountAvailability and AccountRoles to src/Entities/sets and made a set pattern. Documented "/api/v1/places?maturity=LEVEL" and "/api/v1/places?tags=TAGLIST" Added comments to src/Entities/EntityFilters/CriteriaFilter.ts explaining how filters are to be used Added "maturity-catagories" to Places responses Fixed /api/v1/users/places to return only the places that belong to the requesting user Deleted bin/www -- what was that from??</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/56c4649b60f58915c3b05907f3f1149cf3fe0e71">view &bull;</a> Bump version to 2.3.4</li> 
 </ul>
 
