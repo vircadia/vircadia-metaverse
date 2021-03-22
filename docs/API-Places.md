@@ -77,7 +77,11 @@ So, a legal request could be:
     GET /api/v1/places?tag=friendly,kids,sandbox
 ```
 
-(Note: as of February 2021, "order" and "status" queries are not yet implimented.)
+(Note: as of March 2021, "status" queries are not yet implimented.)
+
+(Note: as of March 2021, only visibility "OPEN" or unspecified visibility Places will be returned.)
+
+This request does not require the requestor to be logged in to get the list of Places.
 
 This request return JSON formatted as:
 

@@ -14,7 +14,6 @@
 'use strict'
 
 import { Request } from 'express';
-import { AccountEntity } from '@Entities/AccountEntity';
 import { PlaceEntity } from '@Entities/PlaceEntity';
 
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
@@ -180,17 +179,21 @@ export class PlaceFilterInfo extends CriteriaFilter {
         this._doingQuery = true;
         const criteria:VKeyedCollection = {};
         if (this._maturity) {
-            criteria.maturity = { '$in': this._maturity }
+            /* tslint:disable-next-line */
+            criteria['maturity'] = { '$in': this._maturity }
         };
         if (this._tags) {
-            criteria.tags = { '$in': this._tags }
+            /* tslint:disable-next-line */
+            criteria['tags'] = { '$in': this._tags }
         };
         if (this._search) {
-            criteria.name = { '$regex': this._search, '$options': 'i' }
+            /* tslint:disable-next-line */
+            criteria['name'] = { '$regex': this._search, '$options': 'i' }
         };
-        criteria.visibility = { "$or": [ { "visibility": { "$exists": false }},
-                                            { "visibility": Visibility.OPEN },
-                                          ] };
+        /* tslint:disable-next-line */
+        criteria['$or'] = [ { 'visibility': { '$exists': false }},
+                            { 'visibility': Visibility.OPEN },
+                          ];
         return criteria;
     };
 

@@ -37,7 +37,7 @@ import { Logger } from '@Tools/Logging';
 // Return places information
 // The accounts returned depend on the scope (whether admin) and the search criteria (infoer)
 const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
+  // if (req.vAuthAccount) {
     const pager = new PaginationInfo();
     const placer = new PlaceFilterInfo();
 
@@ -47,7 +47,10 @@ const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next:
     // Loop through all the filtered accounts and create array of info
     const places: any[] = [];
     for await (const place of Places.enumerateAsync(pager, placer)) {
-      places.push(await buildPlaceInfo(place));
+        const aDomain = await Domains.getDomainWithId(place.domainId);
+        if (aDomain && IsNotNullOrEmpty(aDomain.networkAddr)) {
+            places.push(await buildPlaceInfo(place));
+        };
     };
 
     req.vRestResp.Data = {
@@ -57,10 +60,10 @@ const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next:
 
     placer.addResponseFields(req);
     pager.addResponseFields(req);
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
+  // }
+  // else {
+  //   req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
+  // };
   next();
 };
 
