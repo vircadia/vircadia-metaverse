@@ -134,8 +134,11 @@ export async function buildDomainInfo(pDomain: DomainEntity): Promise<any> {
     'network_address': pDomain.networkAddr,
     'network_port': pDomain.networkPort,
     'ice_server_address': pDomain.iceServerAddr,
+    'version': pDomain.version,
+    'protocol_version': pDomain.protocol,
+    'active': pDomain.active ?? false,
     'time_of_last_heartbeat': pDomain.timeOfLastHeartbeat ? pDomain.timeOfLastHeartbeat.toISOString() : undefined,
-    'num_users': pDomain.numUsers
+    'num_users': pDomain.numUsers + pDomain.anonUsers
   };
 }
 

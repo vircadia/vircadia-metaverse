@@ -52,6 +52,7 @@ export function initDomains(): void {
       Logger.info(`Domains: domain ${aDomain.name} not heartbeating. Zeroing users.`);
       aDomain.numUsers = 0;
       aDomain.anonUsers = 0;
+      aDomain.active = false;
       const updates: VKeyedCollection = {
         'numUsers': 0,
         'anonUsers': 0

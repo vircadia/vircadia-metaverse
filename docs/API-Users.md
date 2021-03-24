@@ -51,7 +51,7 @@ The response body is an "applicaton/json" structure that contains an array of us
                         "node_id": stringSessionId,
                         "root": {
                             "domain": {
-                                "id":
+                                "id": string
                                 "network_address": stringHostname,
                                 "network_port": intPortNum,
                                 "ice_server_address": stringHostname,

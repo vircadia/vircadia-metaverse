@@ -105,6 +105,9 @@ This request return JSON formatted as:
                         "sponsorAccountId": string,
                         "network_address": string,
                         "ice_server_address": string,
+                        'version': string,          // version of domain-server
+                        'protocol_version': string, // protocol version for domain-server
+                        'active': boolean,          // true if domain is heartbeating
                         "time_of_last_heartbeat": ISOStringDate,
                         "num_users": integer
                     },

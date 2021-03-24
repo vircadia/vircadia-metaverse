@@ -51,7 +51,8 @@ export class DomainEntity implements Entity {
 
   // admin stuff
   public iPAddrOfFirstContact: string; // IP address that registered this domain
-  public whenCreated: Date; // What the variable name says
+  public whenCreated: Date;     // What the variable name says
+  public active: boolean;       // domain is heartbeating
   public timeOfLastHeartbeat: Date;    // time of last heartbeat
   public lastSenderKey: string;        // a key identifying the sender
 

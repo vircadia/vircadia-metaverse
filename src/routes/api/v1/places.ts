@@ -52,8 +52,8 @@ const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next:
     const places: any[] = [];
     for await (const place of Places.enumerateAsync(placer, pager)) {
         const aDomain = await Domains.getDomainWithId(place.domainId);
-        if (await visibilitier.criteriaTestAsync(place, aDomain)) {
-            if (aDomain && IsNotNullOrEmpty(aDomain.networkAddr)) {
+        if (aDomain && IsNotNullOrEmpty(aDomain.networkAddr)) {
+            if (await visibilitier.criteriaTestAsync(place, aDomain)) {
                 places.push(await buildPlaceInfo(place, aDomain));
             };
         };

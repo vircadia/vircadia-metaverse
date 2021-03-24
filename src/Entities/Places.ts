@@ -174,19 +174,19 @@ export const Places = {
     // The address is of the form "optional-domain/x,y,z/x,y,z,w".
     // If the domain is missing, the domain-server's network address is added
     let addr = pPlace.path ?? '/0,0,0/0,0,0,1';
+
+    // If no domain/address specified in path, build addr using reported domain IP/port
     const pieces = addr.split('/');
-    // kludge as there were a bunch of "undefined" domain/address names
-    if (pieces.length > 0 && pieces[0].length === 9 && pieces[0] === 'undefined') {
-        pieces[0] = '';
-    };
     if (pieces[0].length === 0) {
       const aDomain = await Domains.getDomainWithId(pPlace.domainId);
       if (IsNotNullOrEmpty(aDomain)) {
-        let domainAddr = aDomain.networkAddr;
-        if (IsNotNullOrEmpty(aDomain.networkPort)) {
-          domainAddr = aDomain.networkAddr + ":" + aDomain.networkPort;
+        if (IsNotNullOrEmpty(aDomain.networkAddr)) {
+            let domainAddr = aDomain.networkAddr;
+            if (IsNotNullOrEmpty(aDomain.networkPort)) {
+                domainAddr = aDomain.networkAddr + ":" + aDomain.networkPort;
+            };
+            addr = domainAddr + addr;
         };
-        addr = domainAddr + addr;
       };
     };
     return addr;

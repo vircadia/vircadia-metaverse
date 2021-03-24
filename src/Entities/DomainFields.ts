@@ -319,6 +319,15 @@ export const DomainFields: { [key: string]: FieldDefn } = {
     setter: noSetter,
     getter: dateStringGetter
   },
+  'active': {
+    entity_field: 'active',
+    request_field_name: 'active',
+    get_permissions: [ Perm.ALL ],
+    set_permissions: [ Perm.NONE ],
+    validate: isBooleanValidator,
+    setter: noSetter,
+    getter: simpleGetter
+  },
   'time_of_last_heartbeat': {
     entity_field: 'timeOfLastHeartbeat',
     request_field_name: 'time_of_last_heartbeat',

@@ -31,6 +31,7 @@ import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
 import Config from '@Base/config';
 import { IsNullOrEmpty } from '@Tools/Misc';
+import { updateObjectFields } from '@Tools/Db';
 
 // GET /api/v1/domains/:domainId
 // Return a small snippet if domain data for the domainId specified in the request
@@ -90,7 +91,7 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
           };
         };
 
-        /* FOLLOWING CODE DOES NOT WORK: the socker.remoteAddress is the IP addr
+        /* FOLLOWING CODE DOES NOT WORK: the socket.remoteAddress is the IP addr
                     of the front end proxy server. Need to use 'x-forwarded-for:' header
                     or whatever is  the right source.
                     Could also have the domain-server send the information more often.
@@ -109,6 +110,7 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
 
         // This 'POST" is used as the domain heartbeat. Remember it's alive.
         updated.timeOfLastHeartbeat = new Date();
+        updated.active = true;
         Logger.debug('procPutDomains. updating=' + JSON.stringify(updated));
         Domains.updateEntityFields(req.vDomain, updated);
       }
