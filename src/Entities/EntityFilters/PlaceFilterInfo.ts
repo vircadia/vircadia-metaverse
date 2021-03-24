@@ -18,7 +18,6 @@ import { PlaceEntity } from '@Entities/PlaceEntity';
 
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 import { Maturity } from '@Entities/Sets/Maturity';
-import { Visibility } from '@Entities/Sets/Visibility';
 
 import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
@@ -174,6 +173,10 @@ export class PlaceFilterInfo extends CriteriaFilter {
         return ret;
     };
 
+    public async criteriaTestAsync(pThingy: any): Promise<boolean> {
+        return this.criteriaTest(pThingy);
+    };
+
     // Return the MongoDB query parameters for the search criteria
     public criteriaParameters(): any {
         this._doingQuery = true;
@@ -190,10 +193,6 @@ export class PlaceFilterInfo extends CriteriaFilter {
             /* tslint:disable-next-line */
             criteria['name'] = { '$regex': this._search, '$options': 'i' }
         };
-        /* tslint:disable-next-line */
-        criteria['$or'] = [ { 'visibility': { '$exists': false }},
-                            { 'visibility': Visibility.OPEN },
-                          ];
         return criteria;
     };
 

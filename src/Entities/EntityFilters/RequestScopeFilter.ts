@@ -103,6 +103,10 @@ export class RequestScopeFilter extends CriteriaFilter {
     return true;
   };
 
+    public async criteriaTestAsync(pThingy: any): Promise<boolean> {
+        return this.criteriaTest(pThingy);
+    };
+
   public criteriaParameters(): any {
     this._doingQuery = true;
     let getAccountId = this._accessingAcct.id;

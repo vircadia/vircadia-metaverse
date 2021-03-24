@@ -179,6 +179,10 @@ export class AccountFilterInfo extends CriteriaFilter {
     return ret;
   };
 
+    public async criteriaTestAsync(pThingy: any): Promise<boolean> {
+        return this.criteriaTest(pThingy);
+    };
+
   // Return the MongoDB query parameters for the search criteria
   public criteriaParameters(): any {
     this._doingQuery = true;

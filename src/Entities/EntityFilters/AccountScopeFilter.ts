@@ -18,6 +18,7 @@ import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
 import { Accounts } from '@Entities/Accounts';
 import { AccountEntity } from '@Entities/AccountEntity';
 import { Logger } from '@Tools/Logging';
+import { prototype } from 'events';
 
 // AccountScopeFilter filters a query stream to the accounts the requestor
 //    can look at. That is, a person can normally see only the domains
@@ -87,6 +88,10 @@ export class AccountScopeFilter extends CriteriaFilter {
               && pToTest[this._field] === this._accessingAcct.id;
     }
     return true;
+  };
+
+  public async criteriaTestAsync(pThingy: any): Promise<boolean> {
+      return this.criteriaTest(pThingy);
   };
 
   public criteriaParameters(): any {

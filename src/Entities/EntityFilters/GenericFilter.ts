@@ -48,6 +48,10 @@ export class GenericFilter extends CriteriaFilter {
     return true;
   };
 
+    public async criteriaTestAsync(pThingy: any): Promise<boolean> {
+        return this.criteriaTest(pThingy);
+    };
+
   // Return Mongodb criteria for the search query
   // This changes what 'criteriaTest' returns since the testing is now
   //     expected to be in the query.

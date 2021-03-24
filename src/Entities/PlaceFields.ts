@@ -82,9 +82,9 @@ export const placeFields: { [key: string]: FieldDefn } = {
     setter: simpleSetter,
     getter: simpleGetter
   },
-  'visiblity': {
-    entity_field: 'visiblity',
-    request_field_name: 'visiblity',
+  'visibility': {
+    entity_field: 'visibility',
+    request_field_name: 'visibility',
     get_permissions: [ Perm.ALL ],
     set_permissions: [ Perm.DOMAINACCESS, Perm.ADMIN ],
     validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {

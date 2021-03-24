@@ -18,12 +18,14 @@ export class Visibility {
     public static OPEN: string = 'open';
     public static FRIENDS: string = 'friends';
     public static CONNECTIONS: string = 'connections';
+    public static GROUP: string = 'group';
     public static PRIVATE: string = 'private';
 
     static VisibilityCategories = [
             Visibility.OPEN,
             Visibility.FRIENDS,
             Visibility.CONNECTIONS,
+            Visibility.GROUP,
             Visibility.PRIVATE
     ];
 

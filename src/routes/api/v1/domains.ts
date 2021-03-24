@@ -26,6 +26,7 @@ import { buildDomainInfo, buildPlaceInfo } from '@Route-Tools/Util';
 
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
+import { VisibilityFilter } from '@Entities/EntityFilters/VisibilityFilter';
 import { HTTPStatusCode } from '@Route-Tools/RESTResponse';
 
 import { GenUUID, IsNotNullOrEmpty } from '@Tools/Misc';
@@ -37,18 +38,24 @@ const procGetDomains: RequestHandler = async (req: Request, resp: Response, next
 
     const pager = new PaginationInfo();
     const scoper = new AccountScopeFilter(req.vAuthAccount, "sponsorAccountId");
+    const visibilitier = new VisibilityFilter(req.vAuthAccount);
 
     pager.parametersFromRequest(req);
     scoper.parametersFromRequest(req);
+    // NOTE: until the DB uses aggregation queries, visibilitier cannot be used as a criteriaFilter
+    visibilitier.parametersFromRequest(req);
 
     const domainArray: any[] = [];
     for await (const aDomain of Domains.enumerateAsync(scoper, pager)) {
-      domainArray.push( await buildDomainInfoV1(aDomain) );
+        if (await visibilitier.criteriaTestAsync(req.vAuthAccount, aDomain)) {
+            domainArray.push( await buildDomainInfoV1(aDomain) );
+        }
     };
     req.vRestResp.Data = {
       'domains': domainArray
     };
 
+    visibilitier.addResponseFields(req);
     scoper.addResponseFields(req);
     pager.addResponseFields(req);
   }

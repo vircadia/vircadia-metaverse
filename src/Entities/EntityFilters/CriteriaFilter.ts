@@ -43,6 +43,11 @@ export abstract class CriteriaFilter {
   // Test a thing and return 'true' if it should be included in the set
   abstract criteriaTest(pThingy: any): boolean;
 
+  // A async version of criteriaTest. This is used externally to the
+  //    database filtering and should go away when the aggregate pipeline
+  //    is implemented.
+  abstract criteriaTestAsync(pThingy: any): Promise<boolean>;
+
   // Return Mongodb criteria for the search query
   // This changes what 'criteriaTest' returns since the testing is now
   //     expected to be in the query.

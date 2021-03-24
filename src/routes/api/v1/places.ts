@@ -29,6 +29,7 @@ import { checkAccessToEntity } from '@Route-Tools/Permissions';
 
 import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 import { PlaceFilterInfo } from '@Entities/EntityFilters/PlaceFilterInfo';
+import { VisibilityFilter } from '@Entities/EntityFilters/VisibilityFilter';
 import { Maturity } from '@Entities/Sets/Maturity';
 
 import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
@@ -40,16 +41,21 @@ const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next:
   // if (req.vAuthAccount) {
     const pager = new PaginationInfo();
     const placer = new PlaceFilterInfo();
+    const visibilitier = new VisibilityFilter(req.vAuthAccount);
 
     pager.parametersFromRequest(req);
     placer.parametersFromRequest(req);
+    // NOTE: until the DB uses aggregation queries, visibilitier cannot be used as a criteriaFilter
+    visibilitier.parametersFromRequest(req);
 
     // Loop through all the filtered accounts and create array of info
     const places: any[] = [];
-    for await (const place of Places.enumerateAsync(pager, placer)) {
+    for await (const place of Places.enumerateAsync(placer, pager)) {
         const aDomain = await Domains.getDomainWithId(place.domainId);
-        if (aDomain && IsNotNullOrEmpty(aDomain.networkAddr)) {
-            places.push(await buildPlaceInfo(place));
+        if (await visibilitier.criteriaTestAsync(place, aDomain)) {
+            if (aDomain && IsNotNullOrEmpty(aDomain.networkAddr)) {
+                places.push(await buildPlaceInfo(place, aDomain));
+            };
         };
     };
 
@@ -58,6 +64,7 @@ const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next:
       'maturity-categories': Maturity.MaturityCategories
     };
 
+    visibilitier.addResponseFields(req);
     placer.addResponseFields(req);
     pager.addResponseFields(req);
   // }
