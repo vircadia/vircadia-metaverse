@@ -1,6 +1,6 @@
 # Resource Use Limiting in Iamus
 
-**As of April 2, 2021 this is a PROPOSAL for Iamus functionality**
+**As of April 2, 2021 this is a PROPOSAL for Iamus functionality. Add comments/improvements to issue #81 **
 
 With any shared resource, there must be some controls to limit and/or manage
 the overuse of the resources.
@@ -104,7 +104,7 @@ by default but can be enabled by changing the metaverse-server's configuration
 file and setting `metaverse-server.allow-temp-domain-creation` to `true`.
 
 
-#Other Rate Limit Packages for NodeJS/Express
+# Notes On Other Resources and Solutions
 
 If you are working on this, here are pointers to other rate limiting packages.
 
