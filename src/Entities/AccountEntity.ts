@@ -43,6 +43,7 @@ export class AccountEntity implements Entity {
   public passwordHash: string;
   public passwordSalt: string;
   public sessionPublicKey: string;  // PEM public key generated for this session
+  public accountEmailVerified: boolean; // default true if not present
 
   // Old stuff
   public xmppPassword: string;

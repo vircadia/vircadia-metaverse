@@ -63,15 +63,20 @@ const procPostOauthToken: RequestHandler = async (req: Request, resp: Response, 
                         aAccount = await Accounts.getAccountWithEmail(userName);
                     };
                     if (aAccount) {
-
-                        if (await Accounts.validatePassword(aAccount, userPassword)) {
-                            Logger.debug(`procPostOAuthToken: login of user ${userName}`);
-                            const tokenInfo = await Tokens.createToken(aAccount.id, [ userScope ]);
-                            await Tokens.addToken(tokenInfo);
-                            respBody = buildOAuthResponseBody(aAccount, tokenInfo);
+                        if (aAccount.accountEmailVerified ?? true) {
+                            if (await Accounts.validatePassword(aAccount, userPassword)) {
+                                Logger.debug(`procPostOAuthToken: login of user ${userName}`);
+                                const tokenInfo = await Tokens.createToken(aAccount.id, [ userScope ]);
+                                await Tokens.addToken(tokenInfo);
+                                respBody = buildOAuthResponseBody(aAccount, tokenInfo);
+                            }
+                            else {
+                                respBody = buildOAuthErrorBody('Invalid password');
+                                req.vRestResp.IsFailure = true;
+                            };
                         }
                         else {
-                            respBody = buildOAuthErrorBody('Invalid password');
+                            respBody = buildOAuthErrorBody('Account not verified');
                             req.vRestResp.IsFailure = true;
                         };
                     }

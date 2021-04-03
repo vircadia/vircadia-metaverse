@@ -171,6 +171,9 @@ export const Accounts = {
     newAcct.friends = []
     newAcct.connections = []
     newAcct.whenCreated = new Date();
+    if (Config['metaverse-server']['enable-account-email-verification']) {
+        newAcct.accountEmailVerified = false;
+    };
 
     // Remember the password
     Accounts.storePassword(newAcct, pPassword);

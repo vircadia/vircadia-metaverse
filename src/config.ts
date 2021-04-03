@@ -64,7 +64,9 @@ export let Config = {
       // If to assume domain network_address if on is not set
       'fix-domain-network-address': true,
       // Whether allowing temp domain name creation
-      'allow-temp-domain-creation': false
+      'allow-temp-domain-creation': false,
+      // Email verification on account creation
+      'enable-account-email-verification': false,
     },
     'monitoring': {
       'enable': true,           // enable value monitoring
