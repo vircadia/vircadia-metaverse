@@ -63,7 +63,7 @@ export let Config = {
       'base-admin-account': 'adminer',
       // If to assume domain network_address if on is not set
       'fix-domain-network-address': true,
-      // Whether to allow temp domain name creation
+      // Whether allowing temp domain name creation
       'allow-temp-domain-creation': false
     },
     'monitoring': {
