@@ -71,66 +71,66 @@ const procGetUsers: RequestHandler = async (req: Request, resp: Response, next: 
 
 // Create a user account using the username and password passed
 const procPostUsers: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vRestResp) {
-    if (req.body && req.body.user) {
-      const userName: string = req.body.user.username;
-      const userPassword: string = req.body.user.password;
-      const userEmail: string = req.body.user.email;
-      Logger.debug(`procPostUsers: request to create account for ${userName} with email ${userEmail}`);
-      // Precheck format of username and email before trying to set them
-      let ifValid = await Accounts.validateFieldValue('username', userName);
-      if (ifValid.valid) {
-        ifValid = await Accounts.validateFieldValue('email', userEmail);
-        if (ifValid.valid) {
-          // See if account already exists
-          let prevAccount = await Accounts.getAccountWithUsername(userName);
-          if (IsNullOrEmpty(prevAccount)) {
-            prevAccount = await Accounts.getAccountWithEmail(userEmail);
-            if (IsNullOrEmpty(prevAccount)) {
-              const newAcct = await Accounts.createAccount(userName, userPassword, userEmail);
-              if (newAcct) {
-                try {
-                  const adminAccountName =  Config["metaverse-server"]["base-admin-account"] ?? 'wilma';
-                  // If we're creating the admin account, assign it admin privilages
-                  if (newAcct.username === adminAccountName) {
-                    if (IsNullOrEmpty(newAcct.roles)) newAcct.roles = [];
-                    SArray.add(newAcct.roles, Roles.ADMIN);
-                    Logger.info(`procPostUsers: setting new account ${adminAccountName} as admin`);
-                  }
-                  newAcct.IPAddrOfCreator = req.vSenderKey;
-                  await Accounts.addAccount(newAcct);
+    if (req.vRestResp) {
+        if (req.body && req.body.user) {
+            const userName: string = req.body.user.username;
+            const userPassword: string = req.body.user.password;
+            const userEmail: string = req.body.user.email;
+            Logger.debug(`procPostUsers: request to create account for ${userName} with email ${userEmail}`);
+            // Precheck format of username and email before trying to set them
+            let ifValid = await Accounts.validateFieldValue('username', userName);
+            if (ifValid.valid) {
+                ifValid = await Accounts.validateFieldValue('email', userEmail);
+                if (ifValid.valid) {
+                    // See if account already exists
+                    let prevAccount = await Accounts.getAccountWithUsername(userName);
+                    if (IsNullOrEmpty(prevAccount)) {
+                        prevAccount = await Accounts.getAccountWithEmail(userEmail);
+                        if (IsNullOrEmpty(prevAccount)) {
+                            const newAcct = await Accounts.createAccount(userName, userPassword, userEmail);
+                            if (newAcct) {
+                                try {
+                                    const adminAccountName =  Config["metaverse-server"]["base-admin-account"] ?? 'wilma';
+                                    // If we're creating the admin account, assign it admin privilages
+                                    if (newAcct.username === adminAccountName) {
+                                        if (IsNullOrEmpty(newAcct.roles)) newAcct.roles = [];
+                                            SArray.add(newAcct.roles, Roles.ADMIN);
+                                            Logger.info(`procPostUsers: setting new account ${adminAccountName} as admin`);
+                                    }
+                                    newAcct.IPAddrOfCreator = req.vSenderKey;
+                                    await Accounts.addAccount(newAcct);
+                                }
+                                catch (err) {
+                                    Logger.error('procPostUsers: exception adding user: ' + err);
+                                    req.vRestResp.respondFailure('Exception adding user: ' + err);
+                                }
+                            }
+                            else {
+                                Logger.debug('procPostUsers: error creating account for ' + userName);
+                                req.vRestResp.respondFailure('could not create account');
+                            };
+                        }
+                        else {
+                            req.vRestResp.respondFailure('Email already exists');
+                        };
+                    }
+                    else {
+                        req.vRestResp.respondFailure('Account already exists');
+                    };
                 }
-                catch (err) {
-                  Logger.error('procPostUsers: exception adding user: ' + err);
-                  req.vRestResp.respondFailure('Exception adding user: ' + err);
-                }
-              }
-              else {
-                Logger.debug('procPostUsers: error creating account for ' + userName);
-                req.vRestResp.respondFailure('could not create account');
-              };
+                else {
+                    req.vRestResp.respondFailure(ifValid.reason ?? 'Badly formatted email');
+                };
             }
             else {
-              req.vRestResp.respondFailure('Email already exists');
+                req.vRestResp.respondFailure(ifValid.reason ?? 'Badly formatted username');
             };
-          }
-          else {
-            req.vRestResp.respondFailure('Account already exists');
-          };
         }
         else {
-          req.vRestResp.respondFailure(ifValid.reason ?? 'Badly formatted email');
+            req.vRestResp.respondFailure('Badly formatted request');
         };
-      }
-      else {
-        req.vRestResp.respondFailure(ifValid.reason ?? 'Badly formatted username');
-      };
-    }
-    else {
-      req.vRestResp.respondFailure('Badly formatted request');
     };
-  };
-  next();
+    next();
 };
 
 export const name = '/api/v1/users';

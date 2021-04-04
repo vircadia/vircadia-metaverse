@@ -25,33 +25,33 @@ import { Monitoring } from '@Monitoring/Monitoring';
 import { Logger } from '@Tools/Logging';
 
 const procGetCategoryStats: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    if (req.vParam1) {
-      let includeHistory = true;
-      if (req.query.history) {
-        if (typeof(req.query.history) === 'string') {
-          includeHistory = [ 'false', 'no' ].includes(req.query.history) ? false : true;
+    if (req.vAuthAccount) {
+        if (req.vParam1) {
+            let includeHistory = true;
+            if (req.query.history) {
+                if (typeof(req.query.history) === 'string') {
+                    includeHistory = [ 'false', 'no' ].includes(req.query.history) ? false : true;
+                };
+            };
+
+            if (['os', 'server', 'metaverse'].includes(req.vParam1)) {
+                const data:any = {};
+                data[req.vParam1] = Monitoring.getStat(req.vParam1)?.Report(includeHistory);
+
+                req.vRestResp.Data = data;
+            }
+            else {
+                req.vRestResp.respondFailure('unknown stat');
+            };
+        }
+        else {
+            req.vRestResp.respondFailure('category not specified');
         };
-      };
-
-      if (['os', 'server', 'metaverse'].includes(req.vParam1)) {
-        const data:any = {};
-        data[req.vParam1] = Monitoring.getStat(req.vParam1)?.Report(includeHistory);
-
-        req.vRestResp.Data = data;
-      }
-      else {
-        req.vRestResp.respondFailure('unknown stat');
-      };
     }
     else {
-      req.vRestResp.respondFailure('category not specified');
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
     };
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
-  next();
+    next();
 };
 
 export const name = '/api/v1/stats/category/:category';

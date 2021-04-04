@@ -23,19 +23,19 @@ import { Domains } from '@Entities/Domains';
 
 // PUT /domains/:domainId/ice_server_address
 const procPutDomainsIceServerAddress: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('procPutDomainsIceServerAddress');
-  if (req.vDomain) {
-    if (req.body && req.body.domain && req.body.domain.ice_server_address) {
-      const updates: any = {
-        'iceServerAddr': req.body.domain.ice_server_address
-      };
-      Domains.updateEntityFields(req.vDomain, updates);
+    Logger.debug('procPutDomainsIceServerAddress');
+    if (req.vDomain) {
+        if (req.body && req.body.domain && req.body.domain.ice_server_address) {
+            const updates: any = {
+                'iceServerAddr': req.body.domain.ice_server_address
+            };
+            Domains.updateEntityFields(req.vDomain, updates);
+        };
+    }
+    else {
+        req.vRestResp.respondFailure(req.vDomainError ?? 'unauthorized');
     };
-  }
-  else {
-    req.vRestResp.respondFailure(req.vDomainError ?? 'unauthorized');
-  };
-next();
+    next();
 };
 
 export const name = '/api/v1/domains/:domainId/ice_server_address';

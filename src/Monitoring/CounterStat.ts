@@ -19,24 +19,24 @@ import { Stat, updateValueFunction } from '@Monitoring/Stat';
 
 export class CounterStat extends Stat {
 
-  constructor(pName: string, pCatagory: string, pUnit: string, pPullAction?: updateValueFunction) {
-    super(pName, pCatagory, pUnit, pPullAction);
-  };
+    constructor(pName: string, pCatagory: string, pUnit: string, pPullAction?: updateValueFunction) {
+        super(pName, pCatagory, pUnit, pPullAction);
+    };
 
-  // Record an event has happened
-  Event(pCount: number = 1): void {
-    this.value += pCount;
-    this._histograms.forEach( (histo) => {
-      histo.Event(pCount);
-    });
-  };
-  async Gather(): Promise<void> {
-    await this.DoPullAction();
-    return;
-  };
+    // Record an event has happened
+    Event(pCount: number = 1): void {
+        this.value += pCount;
+        this._histograms.forEach( (histo) => {
+            histo.Event(pCount);
+        });
+    };
+    async Gather(): Promise<void> {
+        await this.DoPullAction();
+        return;
+    };
 
-  Report(pReturnHistogram: boolean = true): any {
-    const report = super.Report(pReturnHistogram);
-    return report;
-  };
+    Report(pReturnHistogram: boolean = true): any {
+        const report = super.Report(pReturnHistogram);
+        return report;
+    };
 }

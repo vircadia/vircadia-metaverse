@@ -32,36 +32,36 @@ import { IsNotNullOrEmpty } from '@Tools/Misc';
 // To keep backward compatibility, we convert the PKCS1 key into a SPKI key in PEM format
 //      ("PEM" format is "Privacy Enhanced Mail" format and has the "BEGIN" and "END" text included).
 const procPutUserPublicKey: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    if (req.files) {
-      try {
-        // The public key is a binary 'file' that should be in multer memory storage
-        const publicKeyBin: Buffer = (req.files as any).public_key[0].buffer;
+    if (req.vAuthAccount) {
+        if (req.files) {
+            try {
+                // The public key is a binary 'file' that should be in multer memory storage
+                const publicKeyBin: Buffer = (req.files as any).public_key[0].buffer;
 
-        if (IsNotNullOrEmpty(publicKeyBin)) {
-          const fieldsToUpdate = {
-            'sessionPublicKey': convertBinKeyToPEM(publicKeyBin)
-          };
-          await Accounts.updateEntityFields(req.vAuthAccount, fieldsToUpdate);
+                if (IsNotNullOrEmpty(publicKeyBin)) {
+                    const fieldsToUpdate = {
+                        'sessionPublicKey': convertBinKeyToPEM(publicKeyBin)
+                    };
+                    await Accounts.updateEntityFields(req.vAuthAccount, fieldsToUpdate);
+                }
+                else {
+                    req.vRestResp.respondFailure('badly formed public key');
+                };
+            }
+            catch (e) {
+                Logger.error('procPutUserPublicKey: exception converting: ' + e);
+                req.vRestResp.respondFailure('exception converting public key');
+            }
         }
         else {
-          req.vRestResp.respondFailure('badly formed public key');
+            Logger.error('procPutUserPublicKey: no files part of body');
+            req.vRestResp.respondFailure('no public key supplied');
         };
-      }
-      catch (e) {
-        Logger.error('procPutUserPublicKey: exception converting: ' + e);
-        req.vRestResp.respondFailure('exception converting public key');
-      }
     }
     else {
-      Logger.error('procPutUserPublicKey: no files part of body');
-      req.vRestResp.respondFailure('no public key supplied');
-    }
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
-  next();
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
+    };
+    next();
 };
 
 export const name = '/api/v1/user/public_key';

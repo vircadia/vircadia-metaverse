@@ -31,50 +31,50 @@ import { Logger } from '@Tools/Logging';
 import { buildPlaceInfoSmall } from '@Route-Tools/Util';
 
 const procGetExplore: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  const pager = new PaginationInfo();
-  const placer = new PlaceFilterInfo();
+    const pager = new PaginationInfo();
+    const placer = new PlaceFilterInfo();
 
-  pager.parametersFromRequest(req);
-  placer.parametersFromRequest(req);
+    pager.parametersFromRequest(req);
+    placer.parametersFromRequest(req);
 
-  const allPlaces: any[] = [];
-  for await (const place of Places.enumerateAsync(placer, pager)) {
-    const aDomain = await Domains.getDomainWithId(place.domainId);
-    if (aDomain && IsNotNullOrEmpty(aDomain.networkAddr)) {
-      const placeDesc: VKeyedCollection = {
-        'Domain Name': place.name,
-      };
-      placeDesc.Address = await Places.getAddressString(place);
-      placeDesc.Visit = 'hifi://' + placeDesc.Address;
+    const allPlaces: any[] = [];
+    for await (const place of Places.enumerateAsync(placer, pager)) {
+        const aDomain = await Domains.getDomainWithId(place.domainId);
+        if (aDomain && IsNotNullOrEmpty(aDomain.networkAddr)) {
+            const placeDesc: VKeyedCollection = {
+                'Domain Name': place.name,
+            };
+            placeDesc.Address = await Places.getAddressString(place);
+            placeDesc.Visit = 'hifi://' + placeDesc.Address;
 
-      placeDesc.DomainId = aDomain.id;
-      placeDesc['Network Address'] = aDomain.networkAddr;
-      placeDesc['Network Port'] = aDomain.networkPort;
+            placeDesc.DomainId = aDomain.id;
+            placeDesc['Network Address'] = aDomain.networkAddr;
+            placeDesc['Network Port'] = aDomain.networkPort;
 
-      // If there is a sponsoring account, add the domain owner to the place description
-      placeDesc.Owner = '';
-      if (IsNotNullOrEmpty(aDomain.sponsorAccountId)) {
-        const aAccount = await Accounts.getAccountWithId(aDomain.sponsorAccountId);
-        if (IsNotNullOrEmpty(aAccount)) {
-          placeDesc.Owner = aAccount.username;
+            // If there is a sponsoring account, add the domain owner to the place description
+            placeDesc.Owner = '';
+            if (IsNotNullOrEmpty(aDomain.sponsorAccountId)) {
+                const aAccount = await Accounts.getAccountWithId(aDomain.sponsorAccountId);
+                if (IsNotNullOrEmpty(aAccount)) {
+                    placeDesc.Owner = aAccount.username;
+                };
+            };
+
+            // 'People' is number of people at place for old Explore script
+            // placeDesc.People = aDomain.numUsers + aDomain.anonUsers;
+            placeDesc.People = await Places.getCurrentAttendance(place, aDomain);
+
+            placeDesc.Place = await buildPlaceInfoSmall(place, aDomain);
+
+            allPlaces.push(placeDesc);
         };
-      };
-
-      // 'People' is number of people at place for old Explore script
-      // placeDesc.People = aDomain.numUsers + aDomain.anonUsers;
-      placeDesc.People = await Places.getCurrentAttendance(place, aDomain);
-
-      placeDesc.Place = await buildPlaceInfoSmall(place, aDomain);
-
-      allPlaces.push(placeDesc);
     };
-  };
-  req.vRestResp.Data = allPlaces;
+    req.vRestResp.Data = allPlaces;
 
-  placer.addResponseFields(req);
-  pager.addResponseFields(req);
+    placer.addResponseFields(req);
+    pager.addResponseFields(req);
 
-  next();
+    next();
 };
 
 export const name = '/explore';

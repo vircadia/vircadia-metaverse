@@ -21,16 +21,16 @@ import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 import { Logger } from '@Tools/Logging';
 
 const procPostUserActivities: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.body.action_name) {
-    const activity = req.body.action_name;
-    if (req.vAuthAccount) {
-      Logger.debug(`procPostUserActivities: Received user activity "${activity}" from ${req.vAuthAccount.username}`);
-    }
-    else {
-      Logger.debug(`procPostUserActivities: Received user activity "${activity}" from unknown user`);
+    if (req.body.action_name) {
+        const activity = req.body.action_name;
+        if (req.vAuthAccount) {
+            Logger.debug(`procPostUserActivities: Received user activity "${activity}" from ${req.vAuthAccount.username}`);
+        }
+        else {
+            Logger.debug(`procPostUserActivities: Received user activity "${activity}" from unknown user`);
+        };
     };
-  };
-  next();
+    next();
 };
 
 export const name = '/api/v1/user_activities';

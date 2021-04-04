@@ -27,61 +27,61 @@ import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 
 // Get the friends of the logged in account
 const procGetUserFriends: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    const pager = new PaginationInfo();
-    pager.parametersFromRequest(req);
+    if (req.vAuthAccount) {
+        const pager = new PaginationInfo();
+        pager.parametersFromRequest(req);
 
-    let friends = await Accounts.getField(req.vAuthToken, req.vAuthAccount, 'friends', req.vAuthAccount);
-    friends = IsNullOrEmpty(friends)
-              ? []        // if no friends info, return empty list
-              : friends;
-    req.vRestResp.Data = {
-      'friends': friends
+        let friends = await Accounts.getField(req.vAuthToken, req.vAuthAccount, 'friends', req.vAuthAccount);
+        friends = IsNullOrEmpty(friends)
+                ? []        // if no friends info, return empty list
+                : friends;
+        req.vRestResp.Data = {
+            'friends': friends
+        };
+
+        pager.addResponseFields(req);
+    }
+    else {
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
     };
-
-    pager.addResponseFields(req);
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
-  next();
+    next();
 };
 
 // Upgrade a connection to a friend.
 const procPostUserFriends: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    if (req.body.username && typeof(req.body.username) === 'string') {
-      const newFriend = req.body.username;
-      // Verify the username is a connection.
-      const connections: string[] = await Accounts.getField(req.vAuthToken, req.vAuthAccount, 'connections', req.vAuthAccount) ?? [];
-      if (SArray.hasNoCase(connections, newFriend)) {
-        const updates: VKeyedCollection = {};
-        await Accounts.setField(req.vAuthToken, req.vAuthAccount, 'friends', { "add": newFriend }, req.vAuthAccount, updates);
-        await Accounts.updateEntityFields(req.vAuthAccount, updates);
-      }
-      else {
-        req.vRestResp.respondFailure('cannot add friend who is not a connection');
-      };
+    if (req.vAuthAccount) {
+        if (req.body.username && typeof(req.body.username) === 'string') {
+            const newFriend = req.body.username;
+            // Verify the username is a connection.
+            const connections: string[] = await Accounts.getField(req.vAuthToken, req.vAuthAccount, 'connections', req.vAuthAccount) ?? [];
+            if (SArray.hasNoCase(connections, newFriend)) {
+                const updates: VKeyedCollection = {};
+                await Accounts.setField(req.vAuthToken, req.vAuthAccount, 'friends', { "add": newFriend }, req.vAuthAccount, updates);
+                await Accounts.updateEntityFields(req.vAuthAccount, updates);
+            }
+            else {
+                req.vRestResp.respondFailure('cannot add friend who is not a connection');
+            };
+        }
+        else {
+            req.vRestResp.respondFailure('badly formed request');
+        };
     }
     else {
-      req.vRestResp.respondFailure('badly formed request');
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
     };
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
-  next();
+    next();
 };
 
 // Remove a friend from my friend list.
 const procDeleteUserFriends: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    await Accounts.removeFriend(req.vAuthAccount, req.vParam1);
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
-  next();
+    if (req.vAuthAccount) {
+        await Accounts.removeFriend(req.vAuthAccount, req.vParam1);
+    }
+    else {
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
+    };
+    next();
 };
 
 export const name = '/api/v1/user/friends';

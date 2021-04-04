@@ -19,11 +19,11 @@ import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 
 // GET /api/v1/commerce/available_updates?per_page=10
 const procGetCommerceAvailableUpdates: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vRestResp) {
-    req.vRestResp.Data = {
-    };
-  }
-  next();
+    if (req.vRestResp) {
+        req.vRestResp.Data = {
+        };
+    }
+    next();
 };
 
 export const name = '/api/v1/commerce/available_updates';

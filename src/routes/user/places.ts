@@ -23,13 +23,13 @@ import { HTTPStatusCode } from '@Route-Tools/RESTResponse';
 // When a user gots to "METAVERSE_URL/user/places", redirect to
 //        "https://dashboard.vircadia.com?metaverse=METAVERSE_URL&page=places"
 const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  const dashboardURL = Config.metaverse["dashboard-url"];
-  const metaverseURL = encodeURIComponent(Config.metaverse["metaverse-server-url"]);
-  const redirectionURL = `${dashboardURL}?metaverse=${metaverseURL}&page=places`;
-  resp.statusCode = HTTPStatusCode.Found;
-  resp.setHeader('Location', redirectionURL),
-  resp.setHeader('content-type', 'text/html');
-  resp.send();
+    const dashboardURL = Config.metaverse["dashboard-url"];
+    const metaverseURL = encodeURIComponent(Config.metaverse["metaverse-server-url"]);
+    const redirectionURL = `${dashboardURL}?metaverse=${metaverseURL}&page=places`;
+    resp.statusCode = HTTPStatusCode.Found;
+    resp.setHeader('Location', redirectionURL),
+    resp.setHeader('content-type', 'text/html');
+    resp.send();
 };
 
 export const name = '/user/places';

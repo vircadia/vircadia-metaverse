@@ -36,58 +36,58 @@ interface CurrentBody {
 };
 
 export const procPostPlaceCurrent: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  const reqBody = req.body as CurrentBody;
-  if (IsNotNullOrEmpty(reqBody.placeId)) {
-    if (IsNotNullOrEmpty(reqBody.current_api_key)) {
-      const aPlace = await Places.getPlaceWithId(reqBody.placeId);
-      if (IsNotNullOrEmpty(aPlace)) {
-        const apiKey = await Places.getCurrentInfoAPIKey(aPlace);
-        if (apiKey) {
-          if (apiKey === reqBody.current_api_key) {
+    const reqBody = req.body as CurrentBody;
+    if (IsNotNullOrEmpty(reqBody.placeId)) {
+        if (IsNotNullOrEmpty(reqBody.current_api_key)) {
+            const aPlace = await Places.getPlaceWithId(reqBody.placeId);
+            if (IsNotNullOrEmpty(aPlace)) {
+                const apiKey = await Places.getCurrentInfoAPIKey(aPlace);
+                if (apiKey) {
+                    if (apiKey === reqBody.current_api_key) {
 
-            // The apiKey checks out so we're authenticated to update the Place
-            const updates: VKeyedCollection = {};
-            // Since we are doing just a few fields that are OK because of the APIKey, fake out
-            //      the authentication for setting the fields with the special Admin token
-            const specialAuth = Tokens.createSpecialAdminToken();
+                        // The apiKey checks out so we're authenticated to update the Place
+                        const updates: VKeyedCollection = {};
+                        // Since we are doing just a few fields that are OK because of the APIKey, fake out
+                        //      the authentication for setting the fields with the special Admin token
+                        const specialAuth = Tokens.createSpecialAdminToken();
 
-            for (const field of [ 'current_attendance', 'current_images', 'current_info']) {
+                        for (const field of [ 'current_attendance', 'current_images', 'current_info']) {
 
-              // If the requestor is setting a value, make sure it's legal before updating
-              if (reqBody.hasOwnProperty(field)) {
-                const validity = await Places.validateFieldValue(field, req.body[field]);
-                if (validity.valid) {
-                  await Places.setField(specialAuth, aPlace, field, req.body[field], undefined, updates);
+                            // If the requestor is setting a value, make sure it's legal before updating
+                            if (reqBody.hasOwnProperty(field)) {
+                                const validity = await Places.validateFieldValue(field, req.body[field]);
+                                if (validity.valid) {
+                                    await Places.setField(specialAuth, aPlace, field, req.body[field], undefined, updates);
+                                }
+                                else {
+                                    req.vRestResp.respondFailure(`Value for ${field} is not valid: ${validity.reason}`);
+                                };
+                            };
+                        };
+                        // Update the database with the new values
+                        updates.currentLastUpdateTime = new Date();
+                        await Places.updateEntityFields(aPlace, updates);
+                    }
+                    else {
+                        req.vRestResp.respondFailure('current_api_key does not match Places key');
+                    };
                 }
                 else {
-                  req.vRestResp.respondFailure(`Value for ${field} is not valid: ${validity.reason}`);
+                    req.vRestResp.respondFailure('Place apikey lookup failed');
                 };
-              };
+            }
+            else {
+                req.vRestResp.respondFailure('Place specified by placeId does not exist');
             };
-            // Update the database with the new values
-            updates.currentLastUpdateTime = new Date();
-            await Places.updateEntityFields(aPlace, updates);
-          }
-          else {
-            req.vRestResp.respondFailure('current_api_key does not match Places key');
-          };
         }
         else {
-          req.vRestResp.respondFailure('Place apikey lookup failed');
+            req.vRestResp.respondFailure('No current_api_key');
         };
-      }
-      else {
-        req.vRestResp.respondFailure('Place specified by placeId does not exist');
-      };
     }
     else {
-      req.vRestResp.respondFailure('No current_api_key');
+        req.vRestResp.respondFailure('No placeId');
     };
-  }
-  else {
-    req.vRestResp.respondFailure('No placeId');
-  };
-  next();
+    next();
 };
 
 export const name = '/api/v1/places/current';

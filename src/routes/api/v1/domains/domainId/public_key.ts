@@ -30,18 +30,18 @@ import { HTTPStatusCode } from '@Route-Tools/RESTResponse';
 // For backward-compatibility, the PEM formatted public key is returned by this
 //     request as a single line string without the BEGIN and END texts.
 const procGetDomainsPublicKey: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('procGetDomainsPublicKey');
-  if (req.vDomain) {
-    // Response is a simple public_key field
-    req.vRestResp.Data = {
-      'public_key': createSimplifiedPublicKey(req.vDomain.publicKey)
+    Logger.debug('procGetDomainsPublicKey');
+    if (req.vDomain) {
+        // Response is a simple public_key field
+        req.vRestResp.Data = {
+            'public_key': createSimplifiedPublicKey(req.vDomain.publicKey)
+        };
+    }
+    else {
+        req.vRestResp.HTTPStatus = HTTPStatusCode.Unauthorized;
+        req.vRestResp.respondFailure('No domain');
     };
-  }
-  else {
-    req.vRestResp.HTTPStatus = HTTPStatusCode.Unauthorized;
-    req.vRestResp.respondFailure('No domain');
-  };
-  next();
+    next();
 };
 
 // PUT /domains/:domainId/public_key
@@ -50,33 +50,33 @@ const procGetDomainsPublicKey: RequestHandler = async (req: Request, resp: Respo
 // To keep backward compatibility, we convert the PKCS1 key into a SPKI key in PEM format
 //      ("PEM" format is "Privacy Enhanced Mail" format and has the "BEGIN" and "END" text included).
 const procPutDomainsPublicKey: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('procPutDomainsPublicKey');
-  if (req.vDomain) {
-    if (req.files) {
-      try {
-        // The public key is a binary 'file' that should be in multer memory storage
-        const publicKeyBin: Buffer = (req.files as any).public_key[0].buffer;
+    Logger.debug('procPutDomainsPublicKey');
+    if (req.vDomain) {
+        if (req.files) {
+            try {
+                // The public key is a binary 'file' that should be in multer memory storage
+                const publicKeyBin: Buffer = (req.files as any).public_key[0].buffer;
 
-        const fieldsToUpdate = {
-          'publicKey': convertBinKeyToPEM(publicKeyBin)
+                const fieldsToUpdate = {
+                    'publicKey': convertBinKeyToPEM(publicKeyBin)
+                };
+                await Domains.updateEntityFields(req.vDomain, fieldsToUpdate);
+            }
+            catch (e) {
+                Logger.error('procPutDomainsPublicKey: exception converting: ' + e);
+                req.vRestResp.respondFailure('exception converting public key');
+            }
+        }
+        else {
+            Logger.error('procPutDomainsPublicKey: no files part of body');
+            req.vRestResp.respondFailure('no public key supplied');
         };
-        await Domains.updateEntityFields(req.vDomain, fieldsToUpdate);
-      }
-      catch (e) {
-        Logger.error('procPutDomainsPublicKey: exception converting: ' + e);
-        req.vRestResp.respondFailure('exception converting public key');
-      }
     }
     else {
-      Logger.error('procPutDomainsPublicKey: no files part of body');
-      req.vRestResp.respondFailure('no public key supplied');
+        req.vRestResp.HTTPStatus = HTTPStatusCode.Unauthorized;
+        req.vRestResp.respondFailure(req.vDomainError ?? 'no such domain');
     };
-  }
-  else {
-    req.vRestResp.HTTPStatus = HTTPStatusCode.Unauthorized;
-    req.vRestResp.respondFailure(req.vDomainError ?? 'no such domain');
-  };
-  next();
+    next();
 };
 
 export const name = '/api/v1/domains/public_key';

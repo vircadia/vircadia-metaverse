@@ -20,8 +20,6 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 import { setupMetaverseAPI, finishMetaverseAPI, param1FromParams, placeFromParams } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
 
-import { Tokens } from '@Entities/Tokens';
-
 import { Perm } from '@Route-Tools/Perm';
 import { checkAccessToEntity } from '@Route-Tools/Permissions';
 
@@ -35,88 +33,88 @@ import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
 
 export const procGetPlacesPlaceId: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vPlace) {
-    const placeInfo = await buildPlaceInfo(req.vPlace);
-    // If the requestor is the 'owner' of the place, add APIKey to the response
-    if (await checkAccessToEntity(req.vAuthToken, req.vPlace, [ Perm.DOMAINACCESS, Perm.ADMIN ], req.vAuthAccount)) {
-      placeInfo.current_api_key = await Places.getCurrentInfoAPIKey(req.vPlace);
+    if (req.vPlace) {
+        const placeInfo = await buildPlaceInfo(req.vPlace);
+        // If the requestor is the 'owner' of the place, add APIKey to the response
+        if (await checkAccessToEntity(req.vAuthToken, req.vPlace, [ Perm.DOMAINACCESS, Perm.ADMIN ], req.vAuthAccount)) {
+            placeInfo.current_api_key = await Places.getCurrentInfoAPIKey(req.vPlace);
+        };
+        req.vRestResp.Data = {
+            'place': placeInfo,
+            'maturity-categories': Maturity.MaturityCategories
+        };
+    }
+    else {
+        req.vRestResp.respondFailure('No such place');
     };
-    req.vRestResp.Data = {
-      'place': placeInfo,
-      'maturity-categories': Maturity.MaturityCategories
-    };
-  }
-  else {
-    req.vRestResp.respondFailure('No such place');
-  };
-  next();
+    next();
 };
 
 // Update place information
 // This request happens when a domain is being assigned to another domain
 export const procPutPlacesPlaceId: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    if (req.vPlace) {
-      if (req.vDomain) {
-        if (await checkAccessToEntity(req.vAuthToken, req.vDomain, [ Perm.SPONSOR, Perm.ADMIN ], req.vAuthAccount)) {
-          if (req.body.place) {
-            const updates: VKeyedCollection = {};
-            if (req.body.place.pointee_query) {
-              // The caller specified a domain. Either the same domain or changing
-              if (req.body.place.pointee_query !== req.vPlace.domainId) {
-                Logger.info(`procPutPlacesPlaceId: domain changing from ${req.vPlace.domainId} to ${req.body.place.pointee_query}`)
-                req.vPlace.domainId = req.body.place.pointee_query;
-                updates.domainId = req.vPlace.domainId;
-              };
+    if (req.vAuthAccount) {
+        if (req.vPlace) {
+            if (req.vDomain) {
+                if (await checkAccessToEntity(req.vAuthToken, req.vDomain, [ Perm.SPONSOR, Perm.ADMIN ], req.vAuthAccount)) {
+                    if (req.body.place) {
+                        const updates: VKeyedCollection = {};
+                        if (req.body.place.pointee_query) {
+                            // The caller specified a domain. Either the same domain or changing
+                            if (req.body.place.pointee_query !== req.vPlace.domainId) {
+                                Logger.info(`procPutPlacesPlaceId: domain changing from ${req.vPlace.domainId} to ${req.body.place.pointee_query}`)
+                                req.vPlace.domainId = req.body.place.pointee_query;
+                                updates.domainId = req.vPlace.domainId;
+                            };
+                        };
+                        for (const field of [ 'path', 'description', 'thumbnail' ]) {
+                            if (req.body.place.hasOwnProperty(field)) {
+                                await Places.setField(req.vAuthToken, req.vPlace, field, req.body.place[field], req.vAuthAccount, updates);
+                            };
+                        };
+                        Places.updateEntityFields(req.vPlace, updates);
+                    }
+                    else {
+                        req.vRestResp.respondFailure('badly formed data');
+                    };
+                }
+                else {
+                    req.vRestResp.respondFailure('unauthorized');
+                };
+            }
+            else {
+                req.vRestResp.respondFailure('Target domain not found');
             };
-            for (const field of [ 'path', 'description', 'thumbnail' ]) {
-              if (req.body.place.hasOwnProperty(field)) {
-                await Places.setField(req.vAuthToken, req.vPlace, field, req.body.place[field], req.vAuthAccount, updates);
-              };
-            };
-            Places.updateEntityFields(req.vPlace, updates);
-          }
-          else {
-            req.vRestResp.respondFailure('badly formed data');
-          };
         }
         else {
-          req.vRestResp.respondFailure('unauthorized');
+            req.vRestResp.respondFailure('Target place not found');
         };
-      }
-      else {
-        req.vRestResp.respondFailure('Target domain not found');
-      };
     }
     else {
-      req.vRestResp.respondFailure('Target place not found');
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
     };
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
-  next();
+    next();
 };
 // Delete a Place
 export const procDeletePlacesPlaceId: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    if (req.vPlace) {
-      if (await checkAccessToEntity(req.vAuthToken, req.vDomain, [ Perm.SPONSOR, Perm.ADMIN ], req.vAuthAccount)) {
-        Logger.info(`procDeletePlacesPlaceId: deleting place "${req.vPlace.name}", id=${req.vPlace.id}`);
-        await Places.removePlace(req.vPlace);
-      }
-      else {
-        req.vRestResp.respondFailure('unauthorized');
-      };
+    if (req.vAuthAccount) {
+        if (req.vPlace) {
+            if (await checkAccessToEntity(req.vAuthToken, req.vDomain, [ Perm.SPONSOR, Perm.ADMIN ], req.vAuthAccount)) {
+                Logger.info(`procDeletePlacesPlaceId: deleting place "${req.vPlace.name}", id=${req.vPlace.id}`);
+                await Places.removePlace(req.vPlace);
+            }
+            else {
+                req.vRestResp.respondFailure('unauthorized');
+            };
+        }
+        else {
+            req.vRestResp.respondFailure('Target place not found');
+        };
     }
     else {
-      req.vRestResp.respondFailure('Target place not found');
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
     };
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
-  next();
+    next();
 };
 
 export const name = '/api/v1/places/:placeId';

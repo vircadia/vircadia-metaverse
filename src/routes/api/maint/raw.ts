@@ -28,24 +28,24 @@ import { Logger } from '@Tools/Logging';
 
 // A maint function for admin account that lets one get any object in any collection
 const procMaintRaw: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vRestResp && req.vAuthAccount) {
-    if (Accounts.isAdmin(req.vAuthAccount)) {
-      if (req.vParam1 && req.vParam2 && req.vParam3) {
-        const collection = req.vParam1;
-        const field = req.vParam2;
-        const value = req.vParam3;
-        const criteria = new GenericFilter(SimpleObject(field, value));
-        req.vRestResp.Data = await getObject(collection, criteria);
-      }
-      else {
-        req.vRestResp.respondFailure('parameters missing');
-      };
-    }
-    else {
-      req.vRestResp.respondFailure('not admin');
+    if (req.vRestResp && req.vAuthAccount) {
+        if (Accounts.isAdmin(req.vAuthAccount)) {
+            if (req.vParam1 && req.vParam2 && req.vParam3) {
+                const collection = req.vParam1;
+                const field = req.vParam2;
+                const value = req.vParam3;
+                const criteria = new GenericFilter(SimpleObject(field, value));
+                req.vRestResp.Data = await getObject(collection, criteria);
+            }
+            else {
+                req.vRestResp.respondFailure('parameters missing');
+            };
+        }
+        else {
+            req.vRestResp.respondFailure('not admin');
+        };
     };
-  };
-  next();
+    next();
 };
 
 export const name = '/api/maint/raw/';

@@ -25,33 +25,33 @@ import { Logger } from '@Tools/Logging';
 // Request that creates a token for the passed account.
 // Query parameter of 'scope' can say wether token is for 'owner' or 'domain'.
 const procPostTokenNew: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    // The user passes the scope but make sure we know it's one we know
-    let scope = TokenScope.OWNER;
-    if (req.query && req.query.scope && typeof(req.query.scope) === 'string') {
-      scope = req.query.scope as string;
-    };
-    if (TokenScope.KnownScope(scope)) {
-      const tokenInfo = await Tokens.createToken(req.vAuthAccount.id, [ scope ]);
-      await Tokens.addToken(tokenInfo);
-      req.vRestResp.Data = {
-        'token': tokenInfo.token,
-        'token_id': tokenInfo.id,
-        'refresh_token': tokenInfo.refreshToken,
-        'token_expiration_seconds': (tokenInfo.expirationTime.valueOf() - tokenInfo.whenCreated.valueOf()) / 1000,
-        'account_name': req.vAuthAccount.username,
-        'account_roles': req.vAuthAccount.roles,
-        'account_id': req.vAuthAccount.id
-      };
+    if (req.vAuthAccount) {
+        // The user passes the scope but make sure we know it's one we know
+        let scope = TokenScope.OWNER;
+        if (req.query && req.query.scope && typeof(req.query.scope) === 'string') {
+            scope = req.query.scope as string;
+        };
+        if (TokenScope.KnownScope(scope)) {
+            const tokenInfo = await Tokens.createToken(req.vAuthAccount.id, [ scope ]);
+            await Tokens.addToken(tokenInfo);
+            req.vRestResp.Data = {
+                'token': tokenInfo.token,
+                'token_id': tokenInfo.id,
+                'refresh_token': tokenInfo.refreshToken,
+                'token_expiration_seconds': (tokenInfo.expirationTime.valueOf() - tokenInfo.whenCreated.valueOf()) / 1000,
+                'account_name': req.vAuthAccount.username,
+                'account_roles': req.vAuthAccount.roles,
+                'account_id': req.vAuthAccount.id
+            };
+        }
+        else {
+            req.vRestResp.respondFailure('incorrect scope');
+        };
     }
     else {
-      req.vRestResp.respondFailure('incorrect scope');
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
     };
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
-  next();
+    next();
 };
 
 export const name = '/api/v1/token/new';

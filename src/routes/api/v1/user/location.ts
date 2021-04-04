@@ -27,14 +27,14 @@ import { IsNotNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
 
 const procPutUserLocation: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    const updates = await updateLocationInfo(req);
-    await Accounts.updateEntityFields(req.vAuthAccount, updates);
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
-  next();
+    if (req.vAuthAccount) {
+        const updates = await updateLocationInfo(req);
+        await Accounts.updateEntityFields(req.vAuthAccount, updates);
+    }
+    else {
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
+    };
+    next();
 };
 
 export const name = '/api/v1/user/location';

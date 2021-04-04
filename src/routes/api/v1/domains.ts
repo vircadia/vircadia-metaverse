@@ -34,109 +34,109 @@ import { Logger } from '@Tools/Logging';
 
 // GET /api/v1/domains
 const procGetDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
+    if (req.vAuthAccount) {
 
-    const pager = new PaginationInfo();
-    const scoper = new AccountScopeFilter(req.vAuthAccount, "sponsorAccountId");
-    const visibilitier = new VisibilityFilter(req.vAuthAccount);
+        const pager = new PaginationInfo();
+        const scoper = new AccountScopeFilter(req.vAuthAccount, "sponsorAccountId");
+        const visibilitier = new VisibilityFilter(req.vAuthAccount);
 
-    pager.parametersFromRequest(req);
-    scoper.parametersFromRequest(req);
-    // NOTE: until the DB uses aggregation queries, visibilitier cannot be used as a criteriaFilter
-    visibilitier.parametersFromRequest(req);
+        pager.parametersFromRequest(req);
+        scoper.parametersFromRequest(req);
+        // NOTE: until the DB uses aggregation queries, visibilitier cannot be used as a criteriaFilter
+        visibilitier.parametersFromRequest(req);
 
-    const domainArray: any[] = [];
-    for await (const aDomain of Domains.enumerateAsync(scoper, pager)) {
-        if (await visibilitier.criteriaTestAsync(req.vAuthAccount, aDomain)) {
-            domainArray.push( await buildDomainInfoV1(aDomain) );
-        }
-    };
-    req.vRestResp.Data = {
-      'domains': domainArray
-    };
-
-    visibilitier.addResponseFields(req);
-    scoper.addResponseFields(req);
-    pager.addResponseFields(req);
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-    req.vRestResp.HTTPStatus = HTTPStatusCode.Unauthorized;
-  };
-  next();
-};
-
-// Create a domain entry
-const procPostDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    if (req.body && req.body.domain && req.body.domain.label) {
-      const newDomainName = req.body.domain.label;
-      if (IsNotNullOrEmpty(newDomainName)) {
-        const ifValid = await DomainFields.name.validate(DomainFields.name, req.vAuthAccount, newDomainName);
-        if (ifValid.valid) {
-          const generatedAPIkey: string = GenUUID();
-
-          const newDomain = Domains.createDomain();
-          newDomain.name = newDomainName;
-          newDomain.apiKey = generatedAPIkey;
-          if (req.vSenderKey) {
-            newDomain.iPAddrOfFirstContact = req.vSenderKey;
-          };
-
-          if (req.body.domain.network_address) {
-            newDomain.networkAddr = req.body.domain.network_address;
-          };
-          if (req.body.domain.network_port) {
-            newDomain.networkPort = req.body.domain.network_port;
-          };
-
-          // Creating a domain also creates a Place for that domain
-          // Note that place names are unique so we modify the place name if there is already one.
-          const newPlacename = await Places.uniqifyPlaceName(newDomain.name);
-          const newPlace = await Places.createPlace(req.vAuthToken.accountId);
-          newPlace.domainId = newDomain.id;
-          newPlace.name = newPlacename;
-          newPlace.description = 'A place in ' + newDomain.name;
-          newPlace.maturity = newDomain.maturity;
-          newPlace.iPAddrOfFirstContact = req.vSenderKey;
-
-          // If the requestor is logged in, associate that account with the new domain/place
-          if (req.vAuthToken) {
-            Logger.debug(`procPostDomains: associating account ${req.vAuthToken.accountId} with new domain ${newDomain.id}`)
-            newDomain.sponsorAccountId = req.vAuthToken.accountId;
-          };
-
-          // Now that the local structures are updated, store the new entries
-          Domains.addDomain(newDomain);
-          Places.addPlace(newPlace);
-
-          const domainInfo = await buildDomainInfo(newDomain);
-          domainInfo.api_key = newDomain.apiKey;
-
-          req.vRestResp.Data = {
-            'domain': domainInfo,
-            'place': await buildPlaceInfo(newPlace, newDomain)
-          };
-
-          // some legacy requests want the domain information at the top level
-          req.vRestResp.addAdditionalField('domain', domainInfo);
-        }
-        else {
-          req.vRestResp.respondFailure(ifValid.reason ?? 'invalid domain name');
+        const domainArray: any[] = [];
+        for await (const aDomain of Domains.enumerateAsync(scoper, pager)) {
+            if (await visibilitier.criteriaTestAsync(req.vAuthAccount, aDomain)) {
+                domainArray.push( await buildDomainInfoV1(aDomain) );
+            }
         };
-      }
-      else {
-        req.vRestResp.respondFailure('label was empty');
-      };
+        req.vRestResp.Data = {
+            'domains': domainArray
+        };
+
+        visibilitier.addResponseFields(req);
+        scoper.addResponseFields(req);
+        pager.addResponseFields(req);
     }
     else {
-      req.vRestResp.respondFailure('no label supplied');
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
+        req.vRestResp.HTTPStatus = HTTPStatusCode.Unauthorized;
     };
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
-  next();
+    next();
+};
+
+    // Create a domain entry
+const procPostDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+    if (req.vAuthAccount) {
+        if (req.body && req.body.domain && req.body.domain.label) {
+            const newDomainName = req.body.domain.label;
+            if (IsNotNullOrEmpty(newDomainName)) {
+                const ifValid = await DomainFields.name.validate(DomainFields.name, req.vAuthAccount, newDomainName);
+                if (ifValid.valid) {
+                    const generatedAPIkey: string = GenUUID();
+
+                    const newDomain = Domains.createDomain();
+                    newDomain.name = newDomainName;
+                    newDomain.apiKey = generatedAPIkey;
+                    if (req.vSenderKey) {
+                        newDomain.iPAddrOfFirstContact = req.vSenderKey;
+                    };
+
+                    if (req.body.domain.network_address) {
+                        newDomain.networkAddr = req.body.domain.network_address;
+                    };
+                    if (req.body.domain.network_port) {
+                        newDomain.networkPort = req.body.domain.network_port;
+                    };
+
+                    // Creating a domain also creates a Place for that domain
+                    // Note that place names are unique so we modify the place name if there is already one.
+                    const newPlacename = await Places.uniqifyPlaceName(newDomain.name);
+                    const newPlace = await Places.createPlace(req.vAuthToken.accountId);
+                    newPlace.domainId = newDomain.id;
+                    newPlace.name = newPlacename;
+                    newPlace.description = 'A place in ' + newDomain.name;
+                    newPlace.maturity = newDomain.maturity;
+                    newPlace.iPAddrOfFirstContact = req.vSenderKey;
+
+                    // If the requestor is logged in, associate that account with the new domain/place
+                    if (req.vAuthToken) {
+                        Logger.debug(`procPostDomains: associating account ${req.vAuthToken.accountId} with new domain ${newDomain.id}`)
+                        newDomain.sponsorAccountId = req.vAuthToken.accountId;
+                    };
+
+                    // Now that the local structures are updated, store the new entries
+                    Domains.addDomain(newDomain);
+                    Places.addPlace(newPlace);
+
+                    const domainInfo = await buildDomainInfo(newDomain);
+                    domainInfo.api_key = newDomain.apiKey;
+
+                    req.vRestResp.Data = {
+                        'domain': domainInfo,
+                        'place': await buildPlaceInfo(newPlace, newDomain)
+                    };
+
+                    // some legacy requests want the domain information at the top level
+                    req.vRestResp.addAdditionalField('domain', domainInfo);
+                }
+                else {
+                    req.vRestResp.respondFailure(ifValid.reason ?? 'invalid domain name');
+                };
+            }
+            else {
+                req.vRestResp.respondFailure('label was empty');
+            };
+        }
+        else {
+            req.vRestResp.respondFailure('no label supplied');
+        };
+    }
+    else {
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
+    };
+    next();
 };
 
 export const name = '/api/v1/domains';

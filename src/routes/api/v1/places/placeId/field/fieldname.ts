@@ -38,31 +38,31 @@ const procGetField: RequestHandler = async (req: Request, resp: Response, next: 
 
 // Change a field in a place
 const procPostField: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    if (req.vPlace && req.vParam1) {
-      if (req.body.hasOwnProperty('set')) {
-        const updates: VKeyedCollection = {};
-        const success = await Places.setField(req.vAuthToken, req.vPlace, req.vParam1, req.body.set, req.vAuthAccount, updates);
-        if (success.valid) {
-          // Setting worked so update the database
-          Places.updateEntityFields(req.vPlace, updates);
+    if (req.vAuthAccount) {
+        if (req.vPlace && req.vParam1) {
+            if (req.body.hasOwnProperty('set')) {
+                const updates: VKeyedCollection = {};
+                const success = await Places.setField(req.vAuthToken, req.vPlace, req.vParam1, req.body.set, req.vAuthAccount, updates);
+                if (success.valid) {
+                    // Setting worked so update the database
+                    Places.updateEntityFields(req.vPlace, updates);
+                }
+                else {
+                    req.vRestResp.respondFailure('value could not be set: ' + success.reason);
+                };
+            }
+            else {
+                req.vRestResp.respondFailure('no set value given');
+            };
         }
         else {
-          req.vRestResp.respondFailure('value could not be set: ' + success.reason);
+            req.vRestResp.respondFailure('no such place');
         };
-      }
-      else {
-        req.vRestResp.respondFailure('no set value given');
-      };
     }
     else {
-        req.vRestResp.respondFailure('no such place');
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
     };
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
-  next();
+    next();
 };
 
 export const name = '/api/v1/places/:placeId/field/:fieldname';

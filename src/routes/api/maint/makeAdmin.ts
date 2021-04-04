@@ -29,31 +29,31 @@ import { SArray, VKeyedCollection } from '@Tools/vTypes';
 
 // Temporary maint function to create the first admin account
 const procMakeAdmin: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  const adminAccountName =  Config["metaverse-server"]["base-admin-account"] ?? 'wilma';
-  if (req.vRestResp) {
-    const adminAccount = await Accounts.getAccountWithUsername(adminAccountName);
-    if (IsNotNullOrEmpty(adminAccount)) {
-      if (SArray.has(adminAccount.roles, Roles.ADMIN)) {
-        Logger.debug(`procMakeAdmin: ${adminAccountName} already has role "admin"`);
-      }
-      else {
-        const updates: VKeyedCollection = {};
-        const adminToken = Tokens.createSpecialAdminToken();
-        const success = await Accounts.setField(adminToken, adminAccount, 'roles', { 'add': Roles.ADMIN }, adminAccount, updates);
-        if (success.valid) {
-          await Accounts.updateEntityFields(adminAccount, updates);
+    const adminAccountName =  Config["metaverse-server"]["base-admin-account"] ?? 'wilma';
+    if (req.vRestResp) {
+        const adminAccount = await Accounts.getAccountWithUsername(adminAccountName);
+        if (IsNotNullOrEmpty(adminAccount)) {
+            if (SArray.has(adminAccount.roles, Roles.ADMIN)) {
+                Logger.debug(`procMakeAdmin: ${adminAccountName} already has role "admin"`);
+            }
+            else {
+                const updates: VKeyedCollection = {};
+                const adminToken = Tokens.createSpecialAdminToken();
+                const success = await Accounts.setField(adminToken, adminAccount, 'roles', { 'add': Roles.ADMIN }, adminAccount, updates);
+                if (success.valid) {
+                    await Accounts.updateEntityFields(adminAccount, updates);
+                }
+                else {
+                    req.vRestResp.respondFailure('could not set admin: ' + success.reason);
+                };
+            };
         }
         else {
-          req.vRestResp.respondFailure('could not set admin: ' + success.reason);
+            Logger.error(`procMakeAdmin: could not fetch account "${adminAccountName}"`);
+            req.vRestResp.respondFailure('No account named admin account name exists');
         };
-      };
-    }
-    else {
-      Logger.error(`procMakeAdmin: could not fetch account "${adminAccountName}"`);
-      req.vRestResp.respondFailure('No account named admin account name exists');
     };
-  };
-  next();
+    next();
 };
 
 export const name = '/api/maint/makeAdmin';

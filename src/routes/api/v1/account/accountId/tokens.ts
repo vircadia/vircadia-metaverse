@@ -29,25 +29,24 @@ import { AuthToken } from '@Entities/AuthToken';
 // Return the tokens for the specified account.
 // One needs to be an admin in order to see other than one's own tokens
 const procGetAccountTokens: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vRestResp && req.vAuthAccount && req.vAccount) {
-    const pager = new PaginationInfo();
-    const scoper = new AccountScopeFilter(req.vAuthAccount, 'accountId');
-    pager.parametersFromRequest(req);
-    scoper.parametersFromRequest(req);
-    const acctFilter = new GenericFilter( { 'accountId': req.vAccount.id } );
+    if (req.vRestResp && req.vAuthAccount && req.vAccount) {
+        const pager = new PaginationInfo();
+        const scoper = new AccountScopeFilter(req.vAuthAccount, 'accountId');
+        pager.parametersFromRequest(req);
+        scoper.parametersFromRequest(req);
+        const acctFilter = new GenericFilter( { 'accountId': req.vAccount.id } );
 
-    const toks: AuthToken[] = [];
-    for await (const tok of Tokens.enumerateAsync(acctFilter, pager, scoper)) {
-      toks.push(tok);
-    };
-    req.vRestResp.Data = {
-      'tokens': toks
-    };
+        const toks: AuthToken[] = [];
+        for await (const tok of Tokens.enumerateAsync(acctFilter, pager, scoper)) {
+            toks.push(tok);
+        };
+        req.vRestResp.Data = {
+            'tokens': toks
+        };
 
-    pager.addResponseFields(req);
-  };
-  next();
-  next();
+        pager.addResponseFields(req);
+    };
+    next();
 };
 
 export const name = '/api/v1/account/:accountId/tokens';

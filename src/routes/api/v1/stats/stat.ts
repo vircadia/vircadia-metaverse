@@ -25,32 +25,32 @@ import { Monitoring } from '@Monitoring/Monitoring';
 import { Logger } from '@Tools/Logging';
 
 const procGetStat: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    if (req.vParam1) {
-      let includeHistory = true;
-      if (req.query.history) {
-        if (typeof(req.query.history) === 'string') {
-          includeHistory = [ 'false', 'no' ].includes(req.query.history) ? false : true;
+    if (req.vAuthAccount) {
+        if (req.vParam1) {
+            let includeHistory = true;
+            if (req.query.history) {
+                if (typeof(req.query.history) === 'string') {
+                    includeHistory = [ 'false', 'no' ].includes(req.query.history) ? false : true;
+                };
+            };
+            const stat = Monitoring.getStat(req.vParam1);
+            if (stat) {
+                req.vRestResp.Data = {
+                    'stat': stat.Report(includeHistory)
+                };
+            }
+            else {
+                req.vRestResp.respondFailure('Unknown stat');
+            };
+        }
+        else {
+            req.vRestResp.respondFailure('missing parameter');
         };
-      };
-      const stat = Monitoring.getStat(req.vParam1);
-      if (stat) {
-        req.vRestResp.Data = {
-          'stat': stat.Report(includeHistory)
-        };
-      }
-      else {
-        req.vRestResp.respondFailure('Unknown stat');
-      };
     }
     else {
-      req.vRestResp.respondFailure('missing parameter');
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
     };
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
-  next();
+    next();
 };
 
 export const name = '/api/v1/stats/stat/:name';

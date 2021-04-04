@@ -33,35 +33,35 @@ import { PlaceFilterInfo } from '@Entities/EntityFilters/PlaceFilterInfo';
 import { Domains } from '@Entities/Domains';
 
 const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    const pager = new PaginationInfo();
-    const placer = new PlaceFilterInfo();
+    if (req.vAuthAccount) {
+        const pager = new PaginationInfo();
+        const placer = new PlaceFilterInfo();
 
-    pager.parametersFromRequest(req);
-    placer.parametersFromRequest(req);
+        pager.parametersFromRequest(req);
+        placer.parametersFromRequest(req);
 
-    const allPlaces: any[] = [];
-    for await (const place of Places.enumerateAsync(placer, pager)) {
-      // Make sure the place "belongs" to the requestor
-      if (place.domainId) {
-        const aDomain = await Domains.getDomainWithId(place.domainId);
-        if (aDomain && aDomain.sponsorAccountId === req.vAuthAccount.id) {
-          allPlaces.push(await buildPlaceInfo(place));
+        const allPlaces: any[] = [];
+        for await (const place of Places.enumerateAsync(placer, pager)) {
+            // Make sure the place "belongs" to the requestor
+            if (place.domainId) {
+                const aDomain = await Domains.getDomainWithId(place.domainId);
+                if (aDomain && aDomain.sponsorAccountId === req.vAuthAccount.id) {
+                    allPlaces.push(await buildPlaceInfo(place));
+                };
+            };
         };
-      };
-    };
 
-    req.vRestResp.Data = {
-      'places': allPlaces,
-      'maturity-categories': Maturity.MaturityCategories
-    };
+        req.vRestResp.Data = {
+            'places': allPlaces,
+            'maturity-categories': Maturity.MaturityCategories
+        };
 
-    pager.addResponseFields(req);
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
-  next();
+        pager.addResponseFields(req);
+    }
+    else {
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
+    };
+    next();
 };
 
 export const name = '/api/v1/user/places';

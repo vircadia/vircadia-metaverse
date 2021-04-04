@@ -24,27 +24,27 @@ import { HTTPStatusCode } from '@Route-Tools/RESTResponse';
 import { Config } from '@Base/config';
 
 const procGetUserTokensNew: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    const forDomainServer = req.query.for_domain_server;
-    const scope = forDomainServer ? TokenScope.DOMAIN : TokenScope.OWNER;
-    const tokenInfo = await Tokens.createToken(req.vAuthAccount.id, [ scope ]);
-    await Tokens.addToken(tokenInfo);
+    if (req.vAuthAccount) {
+        const forDomainServer = req.query.for_domain_server;
+        const scope = forDomainServer ? TokenScope.DOMAIN : TokenScope.OWNER;
+        const tokenInfo = await Tokens.createToken(req.vAuthAccount.id, [ scope ]);
+        await Tokens.addToken(tokenInfo);
 
-    const body = `<center><h2>Your domain's access token is ${tokenInfo.token}</h2></center>`;
-    resp.setHeader('content-type', 'text/html');
-    resp.send(body);
-  }
-  else {
-    // if the user is not logged in, go to a page to login and set things up
-    let tokengenURL = Config["metaverse-server"].tokengen_url;
-    tokengenURL = tokengenURL.replace('METAVERSE_SERVER_URL', Config.metaverse['metaverse-server-url']);
-    tokengenURL = tokengenURL.replace('DASHBOARD_URL', Config.metaverse['dashboard-url']);
+        const body = `<center><h2>Your domain's access token is ${tokenInfo.token}</h2></center>`;
+        resp.setHeader('content-type', 'text/html');
+        resp.send(body);
+    }
+    else {
+        // if the user is not logged in, go to a page to login and set things up
+        let tokengenURL = Config["metaverse-server"].tokengen_url;
+        tokengenURL = tokengenURL.replace('METAVERSE_SERVER_URL', Config.metaverse['metaverse-server-url']);
+        tokengenURL = tokengenURL.replace('DASHBOARD_URL', Config.metaverse['dashboard-url']);
 
-    resp.statusCode = HTTPStatusCode.Found;
-    resp.setHeader('Location', tokengenURL);
-    resp.setHeader('content-type', 'text/html');
-    resp.send();
-  };
+        resp.statusCode = HTTPStatusCode.Found;
+        resp.setHeader('Location', tokengenURL);
+        resp.setHeader('content-type', 'text/html');
+        resp.send();
+    };
 };
 
 export const name = '/user/tokens/new';

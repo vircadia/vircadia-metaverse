@@ -20,9 +20,9 @@ import { Config } from '@Base/config';
 import { Logger } from '@Tools/Logging';
 
 const procAllDebug: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.cdebug('request-detail', `procAllDebug: ${req.method} ${req.url}`);
-  Logger.cdebug('request-body', `procAllDebug: body: ` + JSON.stringify(req.body));
-  next();
+    Logger.cdebug('request-detail', `procAllDebug: ${req.method} ${req.url}`);
+    Logger.cdebug('request-body', `procAllDebug: body: ` + JSON.stringify(req.body));
+    next();
 };
 
 export const name = "Debug";

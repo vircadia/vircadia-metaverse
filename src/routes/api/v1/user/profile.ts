@@ -24,21 +24,21 @@ import { IsNotNullOrEmpty } from '@Tools/Misc';
 // Get old profile information.
 // This request will get greatly expanded.
 const procGetUserProfile: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    req.vRestResp.Data = {
-      'user': {
-        'username': req.vAuthAccount.username,
-        'accountid': req.vAuthAccount.id,
-        'xmpp_password': req.vAuthAccount.xmppPassword,
-        'discourse_api_key': req.vAuthAccount.discourseApiKey,
-        'wallet_id': req.vAuthAccount.walletId
-      }
+    if (req.vAuthAccount) {
+        req.vRestResp.Data = {
+            'user': {
+                'username': req.vAuthAccount.username,
+                'accountid': req.vAuthAccount.id,
+                'xmpp_password': req.vAuthAccount.xmppPassword,
+                'discourse_api_key': req.vAuthAccount.discourseApiKey,
+                'wallet_id': req.vAuthAccount.walletId
+            }
+        };
+    }
+    else {
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
     };
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
-  next();
+    next();
 };
 
 export const name = '/api/v1/user/profile';

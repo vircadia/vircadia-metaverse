@@ -24,44 +24,44 @@ import { VKeyedCollection } from '@Tools/vTypes';
 
 // Get the scope of the logged in account
 const procGetField: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    if (req.vDomain) {
-      req.vRestResp.Data = await Domains.getField(req.vAuthToken, req.vDomain, req.vParam1);
+    if (req.vAuthAccount) {
+        if (req.vDomain) {
+            req.vRestResp.Data = await Domains.getField(req.vAuthToken, req.vDomain, req.vParam1);
+        }
+        else {
+            req.vRestResp.respondFailure(req.vDomainError ?? 'Target domain not found');
+        };
     }
     else {
-      req.vRestResp.respondFailure(req.vDomainError ?? 'Target domain not found');
-    };
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  }
-  next();
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
+    }
+    next();
 };
 
 // Add a role to my roles collection.
 // Not implemented as something needs to be done with request_connection, etc
 const procPostField: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    if (req.vDomain) {
-      const updates: VKeyedCollection = {};
-      const success = await Domains.setField(req.vAuthToken, req.vDomain, req.vParam1,
-                                        req.body.set, req.vAuthAccount, updates);
-      if (success.valid) {
-        // Setting worked so update the database
-        Domains.updateEntityFields(req.vDomain, updates);
-      }
-      else {
-        req.vRestResp.respondFailure('value could not be set: ' + success.reason);
-      };
+    if (req.vAuthAccount) {
+        if (req.vDomain) {
+            const updates: VKeyedCollection = {};
+            const success = await Domains.setField(req.vAuthToken, req.vDomain, req.vParam1,
+                                            req.body.set, req.vAuthAccount, updates);
+            if (success.valid) {
+                // Setting worked so update the database
+                Domains.updateEntityFields(req.vDomain, updates);
+            }
+            else {
+                req.vRestResp.respondFailure('value could not be set: ' + success.reason);
+            };
+        }
+        else {
+            req.vRestResp.respondFailure(req.vDomainError ?? 'Target domain not found');
+        };
     }
     else {
-      req.vRestResp.respondFailure(req.vDomainError ?? 'Target domain not found');
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
     };
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
-  next();
+    next();
 };
 
 export const name = '/api/v1/domains/:domainId/field/:fieldname';

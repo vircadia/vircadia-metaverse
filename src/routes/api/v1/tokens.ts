@@ -25,39 +25,39 @@ import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
 import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
 
 const procGetTokens: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Logger.debug('procGetTokens');
-  if (req.vAuthAccount) {
-    const pager = new PaginationInfo();
-    const scoper = new AccountScopeFilter(req.vAuthAccount, 'accountId');
-    pager.parametersFromRequest(req);
-    scoper.parametersFromRequest(req);
+    Logger.debug('procGetTokens');
+    if (req.vAuthAccount) {
+        const pager = new PaginationInfo();
+        const scoper = new AccountScopeFilter(req.vAuthAccount, 'accountId');
+        pager.parametersFromRequest(req);
+        scoper.parametersFromRequest(req);
 
-    // Loop through all the filtered accounts and create array of info
-    const toks: any[] = [];
-    for await (const tok of Tokens.enumerateAsync(pager, scoper)) {
-      toks.push({
-        'tokenId': tok.id,
-        'id': tok.id,
-        'token': tok.token,
-        'accountId': tok.accountId,
-        'refresh_token': tok.refreshToken,
-        'scope': tok.scope,
-        'creation_time': tok.whenCreated ? tok.whenCreated.toISOString() : undefined,
-        'expiration_time': tok.expirationTime ? tok.expirationTime.toISOString() : undefined,
-      });
+        // Loop through all the filtered accounts and create array of info
+        const toks: any[] = [];
+        for await (const tok of Tokens.enumerateAsync(pager, scoper)) {
+            toks.push({
+                'tokenId': tok.id,
+                'id': tok.id,
+                'token': tok.token,
+                'accountId': tok.accountId,
+                'refresh_token': tok.refreshToken,
+                'scope': tok.scope,
+                'creation_time': tok.whenCreated ? tok.whenCreated.toISOString() : undefined,
+                'expiration_time': tok.expirationTime ? tok.expirationTime.toISOString() : undefined,
+            });
+        };
+
+        req.vRestResp.Data = {
+            tokens: toks
+        };
+
+        scoper.addResponseFields(req);
+        pager.addResponseFields(req);
+    }
+    else {
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
     };
-
-    req.vRestResp.Data = {
-      tokens: toks
-    };
-
-    scoper.addResponseFields(req);
-    pager.addResponseFields(req);
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
-  next();
+    next();
 };
 
 export const name = '/api/v1/tokens';

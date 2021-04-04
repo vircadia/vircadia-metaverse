@@ -25,46 +25,46 @@ import { RequestScopeFilter } from '@Entities/EntityFilters/RequestScopeFilter';
 import { Logger } from '@Tools/Logging';
 
 const procGetRequests: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    const pager = new PaginationInfo();
-    const scoper = new RequestScopeFilter(req.vAuthAccount);
-    pager.parametersFromRequest(req);
-    scoper.parametersFromRequest(req);
+    if (req.vAuthAccount) {
+        const pager = new PaginationInfo();
+        const scoper = new RequestScopeFilter(req.vAuthAccount);
+        pager.parametersFromRequest(req);
+        scoper.parametersFromRequest(req);
 
-    // Loop through all the filtered accounts and create array of info
-    const reqs: any[] = [];
-    for await (const aReq of Requests.enumerateAsync(scoper, pager)) {
-      const thisReq: any = {
-        'id': aReq.id,
-        'type': aReq.requestType,
-        'requesting_account_id': aReq.requestingAccountId,
-        'target_account_id': aReq.targetAccountId,
-        'when_created': aReq.whenCreated ? aReq.whenCreated.toISOString() : undefined,
-        'expiration_time': aReq.expirationTime ? aReq.expirationTime.toISOString() : undefined
-      };
-      switch (aReq.requestType) {
-        case RequestType.HANDSHAKE:
-          thisReq.handshake = {
-            'requester_id': aReq.requesterNodeId,
-            'target_id': aReq.targetNodeId,
-            'requester_accepted': aReq.requesterAccepted,
-            'target_accepted': aReq.targetAccepted
-          };
-      };
-      reqs.push(thisReq);
+        // Loop through all the filtered accounts and create array of info
+        const reqs: any[] = [];
+        for await (const aReq of Requests.enumerateAsync(scoper, pager)) {
+            const thisReq: any = {
+                'id': aReq.id,
+                'type': aReq.requestType,
+                'requesting_account_id': aReq.requestingAccountId,
+                'target_account_id': aReq.targetAccountId,
+                'when_created': aReq.whenCreated ? aReq.whenCreated.toISOString() : undefined,
+                'expiration_time': aReq.expirationTime ? aReq.expirationTime.toISOString() : undefined
+            };
+            switch (aReq.requestType) {
+                case RequestType.HANDSHAKE:
+                    thisReq.handshake = {
+                        'requester_id': aReq.requesterNodeId,
+                        'target_id': aReq.targetNodeId,
+                        'requester_accepted': aReq.requesterAccepted,
+                        'target_accepted': aReq.targetAccepted
+                    };
+            };
+            reqs.push(thisReq);
+        };
+
+        req.vRestResp.Data = {
+            requests: reqs
+        };
+
+        scoper.addResponseFields(req);
+        pager.addResponseFields(req);
+    }
+    else {
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
     };
-
-    req.vRestResp.Data = {
-      requests: reqs
-    };
-
-    scoper.addResponseFields(req);
-    pager.addResponseFields(req);
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
-  next();
+    next();
 };
 
 export const name = '/api/v1/requests';

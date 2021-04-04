@@ -30,21 +30,21 @@ import { Logger } from '@Tools/Logging';
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
 const procGetProfileAccountId: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAccount) {
-    if (await checkAccessToEntity(req.vAuthToken, req.vAccount, [ Perm.PUBLIC, Perm.OWNER, Perm.ADMIN ])) {
-      req.vRestResp.Data = {
-        account: await buildAccountProfile(req, req.vAccount)
-      };
+    if (req.vAccount) {
+        if (await checkAccessToEntity(req.vAuthToken, req.vAccount, [ Perm.PUBLIC, Perm.OWNER, Perm.ADMIN ])) {
+            req.vRestResp.Data = {
+                account: await buildAccountProfile(req, req.vAccount)
+            };
+        }
+        else {
+            req.vRestResp.respondFailure('Unauthorized');
+        };
     }
     else {
-      req.vRestResp.respondFailure('Unauthorized');
+        req.vRestResp.respondFailure('Target account not found');
     };
-  }
-  else {
-    req.vRestResp.respondFailure('Target account not found');
-  };
 
-  next();
+    next();
 };
 
 export const name = '/api/v1/profile/:accountId';

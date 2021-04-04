@@ -19,21 +19,21 @@ import { IsNotNullOrEmpty } from "@Tools/Misc";
 // Class to manage the manipulations on entities scope of application
 // Note: *Entity classes cannot have instance functions because they are created from the database
 export class RequestEntity {
-  public id: string;
-  public requestType: string;
+    public id: string;
+    public requestType: string;
 
-  // requestor and target
-  public requestingAccountId: string;
-  public targetAccountId: string;
+    // requestor and target
+    public requestingAccountId: string;
+    public targetAccountId: string;
 
-  // administration
-  public expirationTime: Date;
-  public whenCreated: Date;
+    // administration
+    public expirationTime: Date;
+    public whenCreated: Date;
 
-  // requestType == HANDSHAKE
-  public requesterNodeId: string;
-  public targetNodeId: string;
-  public requesterAccepted: boolean;
-  public targetAccepted: boolean;
+    // requestType == HANDSHAKE
+    public requesterNodeId: string;
+    public targetNodeId: string;
+    public requesterAccepted: boolean;
+    public targetAccepted: boolean;
 };
 

@@ -27,42 +27,42 @@ import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 
 // Get the connections of the logged in account
 const procGetUserConnections: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    const pager = new PaginationInfo();
-    pager.parametersFromRequest(req);
+    if (req.vAuthAccount) {
+        const pager = new PaginationInfo();
+        pager.parametersFromRequest(req);
 
-    let connections = await Accounts.getField(req.vAuthToken, req.vAuthAccount, 'connections', req.vAuthAccount);
-    connections = IsNullOrEmpty(connections)
-              ? []        // if no connections info, return empty list
-              : connections;
-    req.vRestResp.Data = {
-      'connections': connections
+        let connections = await Accounts.getField(req.vAuthToken, req.vAuthAccount, 'connections', req.vAuthAccount);
+        connections = IsNullOrEmpty(connections)
+                ? []        // if no connections info, return empty list
+                : connections;
+        req.vRestResp.Data = {
+            'connections': connections
+        };
+
+        pager.addResponseFields(req);
+    }
+    else {
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
     };
-
-    pager.addResponseFields(req);
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
-  next();
+    next();
 };
 
 // Upgrade a connection to a friend.
 // Not implemented as something needs to be done with request_connection, etc
 const procPostUserConnections: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  req.vRestResp.respondFailure('cannot add connections this way');
-  next();
+    req.vRestResp.respondFailure('cannot add connections this way');
+    next();
 };
 
 // Remove a friend from my friend list.
 const procDeleteUserConnections: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    await Accounts.removeConnection(req.vAuthAccount, req.vParam1);
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
-  next();
+    if (req.vAuthAccount) {
+        await Accounts.removeConnection(req.vAuthAccount, req.vParam1);
+    }
+    else {
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
+    };
+    next();
 };
 
 export const name = '/api/v1/user/connections';

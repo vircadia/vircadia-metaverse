@@ -22,13 +22,13 @@ import { Logger } from '@Tools/Logging';
 
 // PUT /api/v1/commerce/htc_account
 const procPutCommerceHfcAccount: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    Logger.debug('procPutCommerceHfcAccount');
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
-  next();
+    if (req.vAuthAccount) {
+        Logger.debug('procPutCommerceHfcAccount');
+    }
+    else {
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
+    };
+    next();
 };
 
 export const name = '/api/v1/commerce/hfc_account';

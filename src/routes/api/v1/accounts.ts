@@ -30,31 +30,31 @@ import { Logger } from '@Tools/Logging';
 // Return account information
 // The accounts returned depend on the scope (whether admin) and the search criteria (infoer)
 const procGetAccounts: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    const pager = new PaginationInfo();
-    const scoper = new AccountScopeFilter(req.vAuthAccount);
-    const infoer = new AccountFilterInfo();
-    pager.parametersFromRequest(req);
-    scoper.parametersFromRequest(req);
-    infoer.parametersFromRequest(req);
+    if (req.vAuthAccount) {
+        const pager = new PaginationInfo();
+        const scoper = new AccountScopeFilter(req.vAuthAccount);
+        const infoer = new AccountFilterInfo();
+        pager.parametersFromRequest(req);
+        scoper.parametersFromRequest(req);
+        infoer.parametersFromRequest(req);
 
-    // Loop through all the filtered accounts and create array of info
-    const accts: any[] = [];
-    for await (const acct of Accounts.enumerateAsync(scoper, infoer, pager)) {
-      accts.push(await buildAccountInfo(req, acct));
-    };
+        // Loop through all the filtered accounts and create array of info
+        const accts: any[] = [];
+        for await (const acct of Accounts.enumerateAsync(scoper, infoer, pager)) {
+            accts.push(await buildAccountInfo(req, acct));
+        };
 
-    req.vRestResp.Data = {
-      accounts: accts
+        req.vRestResp.Data = {
+            accounts: accts
+        };
+        pager.addResponseFields(req);
+        scoper.addResponseFields(req);
+        infoer.addResponseFields(req);
+    }
+    else {
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
     };
-    pager.addResponseFields(req);
-    scoper.addResponseFields(req);
-    infoer.addResponseFields(req);
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
-  next();
+    next();
 };
 
 export const name = '/api/v1/accounts';

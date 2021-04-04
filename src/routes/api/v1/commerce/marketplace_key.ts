@@ -20,12 +20,12 @@ import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
 const procGetCommerceMarketplaceKey: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vRestResp) {
-    req.vRestResp.Data = {
-      'public_key': 'laksdjfioasdofuoavanvowieroiawueroaijsdlkfajsdlfjalsdkfjlasdjfaklhkoiu'
-    };
-  }
-  next();
+    if (req.vRestResp) {
+        req.vRestResp.Data = {
+            'public_key': 'laksdjfioasdofuoavanvowieroiawueroaijsdlkfajsdlfjalsdkfjlasdjfaklhkoiu'
+        };
+    }
+    next();
 };
 
 export const name = '/api/v1/commerce/marketplace_key';

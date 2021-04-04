@@ -26,23 +26,23 @@ import { IsNotNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
 
 const procPutUserHeartbeat: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    const updates = await updateLocationInfo(req);
-    if (IsNotNullOrEmpty(updates)) {
-      updates.timeOfLastHeartbeat = new Date();
-      await Accounts.updateEntityFields(req.vAuthAccount, updates);
-      if (IsNotNullOrEmpty(req.vAuthAccount.locationNodeId)) {
-        req.vRestResp.Data = {
-          // 'session_id': req.vSession.id
-          'session_id': req.vAuthAccount.locationNodeId
+    if (req.vAuthAccount) {
+        const updates = await updateLocationInfo(req);
+        if (IsNotNullOrEmpty(updates)) {
+            updates.timeOfLastHeartbeat = new Date();
+            await Accounts.updateEntityFields(req.vAuthAccount, updates);
+            if (IsNotNullOrEmpty(req.vAuthAccount.locationNodeId)) {
+                req.vRestResp.Data = {
+                    // 'session_id': req.vSession.id
+                    'session_id': req.vAuthAccount.locationNodeId
+                };
+            };
         };
-      };
+    }
+    else {
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
     };
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
-  next();
+    next();
 };
 
 export const name = '/api/v1/user/heartbeat';

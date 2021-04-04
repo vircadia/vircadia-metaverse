@@ -26,18 +26,18 @@ export const router = Router();
 
 // catch 404 and forward to error handler
 router.use( (req: Request, res: Response, next: NextFunction) => {
-  Logger.debug('procCreateError: no response so returning 404');
-  next(createError(404));
+    Logger.debug('procCreateError: no response so returning 404');
+    next(createError(404));
 });
 
 // error handler
 router.use( (err: HttpError, req: Request, res: Response, next: NextFunction) => {
-  Logger.debug('procFinalError: generating final error');
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+    Logger.debug('procFinalError: generating final error');
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.end();
+    // render the error page
+    res.status(err.status || 500);
+    res.end();
 });

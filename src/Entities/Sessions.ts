@@ -30,75 +30,75 @@ let _currentSessions: Map<string, SessionEntity>;
 //    and, if the server is restarted, re-creating sessions is OK.
 // Mostly starts a periodic function that deletes expired sessions.
 export function initSessions(): void {
-  _currentSessions = new Map<string, SessionEntity>();
+    _currentSessions = new Map<string, SessionEntity>();
 
-  // Expire tokens that have pased their prime
-  setInterval( async () => {
-    const timeoutTime = new Date(Date.now() - 1000 * 60 * Config["metaverse-server"]["session-timeout-minutes"]).valueOf();
-    const toDelete: SessionEntity[] = [];
-    _currentSessions.forEach( sess => {
-      if (sess.timeOfLastReference.valueOf() < timeoutTime) {
-        toDelete.push(sess);
-      }
-    });
-    if (toDelete.length > 0) {
-      Logger.debug(`Session.Expiration: expired ${toDelete.length} sessions`);
-      toDelete.forEach( sess => {
-        _currentSessions.delete(sess.senderKey);
-      });
-    };
-  }, 1000 * 60 * 2 );
+    // Expire tokens that have pased their prime
+    setInterval( async () => {
+        const timeoutTime = new Date(Date.now() - 1000 * 60 * Config["metaverse-server"]["session-timeout-minutes"]).valueOf();
+        const toDelete: SessionEntity[] = [];
+        _currentSessions.forEach( sess => {
+            if (sess.timeOfLastReference.valueOf() < timeoutTime) {
+                toDelete.push(sess);
+            }
+        });
+        if (toDelete.length > 0) {
+            Logger.debug(`Session.Expiration: expired ${toDelete.length} sessions`);
+            toDelete.forEach( sess => {
+                _currentSessions.delete(sess.senderKey);
+            });
+        };
+    }, 1000 * 60 * 2 );
 };
 
 export const Sessions = {
-  // Create a new AuthToken.
-  createSession(pSenderKey?: string): SessionEntity {
-    const aSession = new SessionEntity();
-    aSession.id = GenUUID();
-    aSession.senderKey = pSenderKey;
-    aSession.whenSessionCreated = new Date();
-    aSession.timeOfLastReference = new Date();
-    return aSession;
-  },
-  getSessionWithSessionId(pSessionId: string): SessionEntity {
-    _currentSessions.forEach( sess => {
-      if (pSessionId === sess.id) {
-        return sess;
-      }
-    });
-    return null;
-  },
-  getSessionWithSenderKey(pSenderKey: string): SessionEntity {
-    return _currentSessions.get(pSenderKey);
-  },
-  addSession(pSessionEntity: SessionEntity) : SessionEntity {
-    _currentSessions.set(pSessionEntity.senderKey, pSessionEntity);
-    return pSessionEntity;
-  },
-  removeSession(pSessionEntity: SessionEntity) : void {
-    _currentSessions.delete(pSessionEntity.senderKey);
-  },
-  // touch a session to not that it has been used
-  touchSession(pSession: SessionEntity): void {
-    pSession.countReference++;
-    pSession.timeOfLastReference = new Date();
-  },
-  // clear activity count to start over
-  clearCounts(pSession: SessionEntity): void {
-    pSession.countReference = 0;
-  },
-  *enumerate(pFilter?: CriteriaFilter): Generator<SessionEntity> {
-    for (const sess of _currentSessions.values()) {
-      if (pFilter) {
-         if (pFilter.criteriaTest(sess)) {
-           yield sess;
-         };
-      }
-      else {
-        yield sess;
-      };
-    };
-  },
+    // Create a new AuthToken.
+    createSession(pSenderKey?: string): SessionEntity {
+        const aSession = new SessionEntity();
+        aSession.id = GenUUID();
+        aSession.senderKey = pSenderKey;
+        aSession.whenSessionCreated = new Date();
+        aSession.timeOfLastReference = new Date();
+        return aSession;
+    },
+    getSessionWithSessionId(pSessionId: string): SessionEntity {
+        _currentSessions.forEach( sess => {
+            if (pSessionId === sess.id) {
+                return sess;
+            }
+        });
+        return null;
+    },
+    getSessionWithSenderKey(pSenderKey: string): SessionEntity {
+        return _currentSessions.get(pSenderKey);
+    },
+    addSession(pSessionEntity: SessionEntity) : SessionEntity {
+        _currentSessions.set(pSessionEntity.senderKey, pSessionEntity);
+        return pSessionEntity;
+    },
+    removeSession(pSessionEntity: SessionEntity) : void {
+        _currentSessions.delete(pSessionEntity.senderKey);
+    },
+    // touch a session to not that it has been used
+    touchSession(pSession: SessionEntity): void {
+        pSession.countReference++;
+        pSession.timeOfLastReference = new Date();
+    },
+    // clear activity count to start over
+    clearCounts(pSession: SessionEntity): void {
+        pSession.countReference = 0;
+    },
+    *enumerate(pFilter?: CriteriaFilter): Generator<SessionEntity> {
+        for (const sess of _currentSessions.values()) {
+            if (pFilter) {
+                if (pFilter.criteriaTest(sess)) {
+                    yield sess;
+                };
+            }
+            else {
+                yield sess;
+            };
+        };
+    },
 };
 
 

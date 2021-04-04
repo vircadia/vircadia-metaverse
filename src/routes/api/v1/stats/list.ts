@@ -24,23 +24,23 @@ import { Logger } from '@Tools/Logging';
 import { Monitoring } from '@Monitoring/Monitoring';
 
 const procGetStatList: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    const statInfo: any[] = [];
-    for (const stat of Monitoring.getStats()) {
-      statInfo.push({
-        'name': stat.name,
-        'category': stat.category,
-        'unit': stat.unit
-      });
+    if (req.vAuthAccount) {
+        const statInfo: any[] = [];
+        for (const stat of Monitoring.getStats()) {
+            statInfo.push({
+                'name': stat.name,
+                'category': stat.category,
+                'unit': stat.unit
+            });
+        };
+        req.vRestResp.Data = {
+            'stats': statInfo
+        };
+    }
+    else {
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
     };
-    req.vRestResp.Data = {
-      'stats': statInfo
-    };
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
-  next();
+    next();
 };
 
 export const name = '/api/v1/stats/list';

@@ -30,87 +30,87 @@ interface BucketValue {
 //    histogram returns the average of the values in that bucket interval.
 export class ValueHistogram extends Histogram {
 
-  _timeBase: number;
-  _numBuckets: number;
-  _bucketMilliseconds: number;
-  _lastBucket: number;
-  _totalHistogramMilliseconds: number;
-  _histogram: BucketValue[];
+    _timeBase: number;
+    _numBuckets: number;
+    _bucketMilliseconds: number;
+    _lastBucket: number;
+    _totalHistogramMilliseconds: number;
+    _histogram: BucketValue[];
 
-  constructor(pNumberOfBuckets: number, pMillisecondsPerBucket: number) {
-    super();
-    this._numBuckets = pNumberOfBuckets;
-    this._bucketMilliseconds = pMillisecondsPerBucket;
-    this._totalHistogramMilliseconds = this._numBuckets * this._bucketMilliseconds;
+    constructor(pNumberOfBuckets: number, pMillisecondsPerBucket: number) {
+        super();
+        this._numBuckets = pNumberOfBuckets;
+        this._bucketMilliseconds = pMillisecondsPerBucket;
+        this._totalHistogramMilliseconds = this._numBuckets * this._bucketMilliseconds;
 
-    this.Zero();
-    this._lastBucket = 0
-    this._timeBase = Date.now().valueOf();
-  };
-
-  // Add some events to the histogram.
-  Event(pNewValue: number) {
-    const bucketTime = Date.now().valueOf() - this._timeBase;
-
-    // from the base of the array, where could this item go
-    let bucket = Math.floor(bucketTime / this._bucketMilliseconds);
-
-    // Advance _lastBucket to the new bucket. Zero any buckets skipped over
-    while (bucket !== this._lastBucket) {
-      if (this._lastBucket === this._numBuckets) {
-        this._lastBucket = 0;
-        bucket -= this._numBuckets;
-        this._timeBase += this._totalHistogramMilliseconds;
-      }
-      else {
-        this._lastBucket++;
-      }
-      this._histogram[this._lastBucket] = { 'values': [] };
+        this.Zero();
+        this._lastBucket = 0
+        this._timeBase = Date.now().valueOf();
     };
-    this._histogram[this._lastBucket].values.push(pNewValue);
-    this._histogram[this._lastBucket].average = undefined;
-  };
 
-  // Returns an object with all the information about the histogram
-  GetHistogram(): any {
-    const values: number[] = [];
-    let idx = this._lastBucket;
-    for (let ii=0; ii < this._numBuckets; ii++) {
-      if (++idx >= this._numBuckets) {
-        idx = 0;
-      };
-      const bucketInfo = this._histogram[idx];
-      let average = this._histogram[idx].average;
-      if (typeof(average) === 'undefined') {
-        if (bucketInfo.values.length > 0) {
-          const sum = bucketInfo.values.reduce( (a,b) => a + b );
-          average = sum / bucketInfo.values.length;
-        }
-        else {
-          average = 0;
+    // Add some events to the histogram.
+    Event(pNewValue: number) {
+        const bucketTime = Date.now().valueOf() - this._timeBase;
+
+        // from the base of the array, where could this item go
+        let bucket = Math.floor(bucketTime / this._bucketMilliseconds);
+
+        // Advance _lastBucket to the new bucket. Zero any buckets skipped over
+        while (bucket !== this._lastBucket) {
+            if (this._lastBucket === this._numBuckets) {
+                this._lastBucket = 0;
+                bucket -= this._numBuckets;
+                this._timeBase += this._totalHistogramMilliseconds;
+            }
+            else {
+                this._lastBucket++;
+            }
+            this._histogram[this._lastBucket] = { 'values': [] };
         };
-        this._histogram[idx].average = average;
-      }
-      values.push(average);
+        this._histogram[this._lastBucket].values.push(pNewValue);
+        this._histogram[this._lastBucket].average = undefined;
     };
 
-    return {
-      "buckets": this._numBuckets,
-      "bucketMilliseconds": this._bucketMilliseconds,
-      "totalMilliseconds": this._totalHistogramMilliseconds,
-      "timeBase": this._timeBase - (this._bucketMilliseconds * (this._numBuckets - this._lastBucket)),
-      "baseNumber": Math.floor((this._timeBase / this._bucketMilliseconds)) + this._lastBucket + 1,
-      "type": "average",
-      "values": values
-    };
-  };
+    // Returns an object with all the information about the histogram
+    GetHistogram(): any {
+        const values: number[] = [];
+        let idx = this._lastBucket;
+        for (let ii=0; ii < this._numBuckets; ii++) {
+            if (++idx >= this._numBuckets) {
+                idx = 0;
+            };
+            const bucketInfo = this._histogram[idx];
+            let average = this._histogram[idx].average;
+            if (typeof(average) === 'undefined') {
+                if (bucketInfo.values.length > 0) {
+                    const sum = bucketInfo.values.reduce( (a,b) => a + b );
+                    average = sum / bucketInfo.values.length;
+                }
+                else {
+                    average = 0;
+                };
+                this._histogram[idx].average = average;
+            }
+            values.push(average);
+        };
 
-  // Zero out the current histogram
-  Zero(): void {
-    this._histogram = [];
-    this._histogram.length = this._numBuckets;
-    for (let ii=0; ii < this._numBuckets; ii++) {
-      this._histogram[ii] = { 'values': [] };
+        return {
+            "buckets": this._numBuckets,
+            "bucketMilliseconds": this._bucketMilliseconds,
+            "totalMilliseconds": this._totalHistogramMilliseconds,
+            "timeBase": this._timeBase - (this._bucketMilliseconds * (this._numBuckets - this._lastBucket)),
+            "baseNumber": Math.floor((this._timeBase / this._bucketMilliseconds)) + this._lastBucket + 1,
+            "type": "average",
+            "values": values
+        };
     };
-  };
+
+    // Zero out the current histogram
+    Zero(): void {
+        this._histogram = [];
+        this._histogram.length = this._numBuckets;
+        for (let ii=0; ii < this._numBuckets; ii++) {
+            this._histogram[ii] = { 'values': [] };
+        };
+    };
 };

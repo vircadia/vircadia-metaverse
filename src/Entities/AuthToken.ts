@@ -15,11 +15,11 @@
 
 // NOTE: these cannot have instance functions in them as they are just JSON to and from the database
 export class AuthToken {
-  public id: string;
-  public token: string;
-  public refreshToken: string;
-  public scope: string[];         // a array of symbols in Scope class
-  public accountId: string;       // AccountId of associated account
-  public whenCreated: Date;
-  public expirationTime: Date;
+    public id: string;
+    public token: string;
+    public refreshToken: string;
+    public scope: string[];         // a array of symbols in Scope class
+    public accountId: string;       // AccountId of associated account
+    public whenCreated: Date;
+    public expirationTime: Date;
 };

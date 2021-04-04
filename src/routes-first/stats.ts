@@ -22,9 +22,9 @@ import { Config } from '@Base/config';
 import { Logger } from '@Tools/Logging';
 
 const procAllStats: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  Monitoring.event('apiRequests', 1);
-  // TODO: maybe have specific request stats...
-  next();
+    Monitoring.event('apiRequests', 1);
+    // TODO: maybe have specific request stats...
+    next();
 };
 
 export const name = "Request stats";

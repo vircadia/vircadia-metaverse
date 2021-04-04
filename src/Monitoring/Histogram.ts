@@ -14,7 +14,7 @@
 'use strict'
 
 export abstract class Histogram {
-  abstract Event(pCount: number): void;
-  abstract GetHistogram(): any;
+    abstract Event(pCount: number): void;
+    abstract GetHistogram(): any;
 }
 

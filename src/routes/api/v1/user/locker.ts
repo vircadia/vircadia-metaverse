@@ -22,28 +22,28 @@ import { IsNullOrEmpty } from '@Tools/Misc';
 import { Accounts } from '@Entities/Accounts';
 
 const procGetUserLocker: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    if (IsNullOrEmpty(req.vAuthAccount.locker)) {
-      req.vRestResp.Data = {};  // legacy code wants something back
+    if (req.vAuthAccount) {
+        if (IsNullOrEmpty(req.vAuthAccount.locker)) {
+            req.vRestResp.Data = {};  // legacy code wants something back
+        }
+        else {
+            req.vRestResp.Data = req.vAuthAccount.locker;
+        };
     }
     else {
-      req.vRestResp.Data = req.vAuthAccount.locker;
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
     };
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
 
-  next();
+    next();
 };
 const procPostUserLocker: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    await Accounts.updateEntityFields(req.vAuthAccount, { 'locker': req.body } );
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
-  next();
+    if (req.vAuthAccount) {
+        await Accounts.updateEntityFields(req.vAuthAccount, { 'locker': req.body } );
+    }
+    else {
+        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
+    };
+    next();
 };
 
 export const name = '/api/v1/user/locker';

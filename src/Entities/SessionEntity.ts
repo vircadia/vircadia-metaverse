@@ -14,16 +14,13 @@
 
 'use strict'
 
-import { IsNotNullOrEmpty } from "@Tools/Misc";
-import { pseudoRandomBytes } from "crypto";
-
 // Class to manage the manipulations on entities scope of application
 // Note: *Entity classes cannot have instance functions because they are created from the database
 export class SessionEntity {
-  public id: string;
-  public senderKey: string;
+    public id: string;
+    public senderKey: string;
 
-  public whenSessionCreated: Date;
-  public timeOfLastReference: Date;
-  public countReference: number;
+    public whenSessionCreated: Date;
+    public timeOfLastReference: Date;
+    public countReference: number;
 };

@@ -25,30 +25,30 @@ import { IsNotNullOrEmpty } from '@Tools/Misc';
 import deepmerge from 'deepmerge';
 
 const procMetaverseInfo: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  let data:any = {
-    'metaverse_name': Config.metaverse["metaverse-name"],
-    'metaverse_nick_name': Config.metaverse["metaverse-nick-name"],
-    'metaverse_url': Config.metaverse["metaverse-server-url"],
-    'ice_server_url': Config.metaverse["default-ice-server-url"],
-    'metaverse_server_version': Config.server["server-version"],
-  };
-
-  // If the additional information file exists, read and include the contents
-  const additionUrl: string = Config["metaverse-server"]["metaverse-info-addition-file"];
-  try {
-    if (IsNotNullOrEmpty(additionUrl)) {
-      const additional = await readInJSON(additionUrl);
-      if (IsNotNullOrEmpty(additional)) {
-        data = deepmerge(data, additional);
-      };
+    let data:any = {
+        'metaverse_name': Config.metaverse["metaverse-name"],
+        'metaverse_nick_name': Config.metaverse["metaverse-nick-name"],
+        'metaverse_url': Config.metaverse["metaverse-server-url"],
+        'ice_server_url': Config.metaverse["default-ice-server-url"],
+        'metaverse_server_version': Config.server["server-version"],
     };
-  }
-  catch (err) {
-    Logger.error(`procMetaverseInfo: exception reading additional info file: ${err}`);
-  };
 
-  req.vRestResp.Data = data;
-  next();
+    // If the additional information file exists, read and include the contents
+    const additionUrl: string = Config["metaverse-server"]["metaverse-info-addition-file"];
+    try {
+        if (IsNotNullOrEmpty(additionUrl)) {
+            const additional = await readInJSON(additionUrl);
+            if (IsNotNullOrEmpty(additional)) {
+                data = deepmerge(data, additional);
+            };
+        };
+    }
+    catch (err) {
+        Logger.error(`procMetaverseInfo: exception reading additional info file: ${err}`);
+    };
+
+    req.vRestResp.Data = data;
+    next();
 };
 
 export const name = "/api/v1/metaverse_info";

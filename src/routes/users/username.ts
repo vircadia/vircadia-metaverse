@@ -23,20 +23,20 @@ import { HTTPStatusCode } from '@Route-Tools/RESTResponse';
 // When a user goes to "METAVERSE_URL/users/:username", redirect to
 //        "https://dashboard.vircadia.com?metaverse=METAVERSE_URL&page=user/profile&user=username"
 const procGetUserProfile: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vUsername && typeof(req.vUsername) === 'string') {
-    const dashboardURL = Config.metaverse["dashboard-url"];
-    const metaverseURL = encodeURIComponent(Config.metaverse["metaverse-server-url"]);
-    const username = encodeURIComponent(req.vUsername);
-    const redirectionURL = `${dashboardURL}?metaverse=${metaverseURL}&page=profile/${username}`;
-    resp.statusCode = HTTPStatusCode.Found;
-    resp.setHeader('Location', redirectionURL),
-    resp.setHeader('content-type', 'text/html');
-    resp.send();
-  }
-  else {
-    req.vRestResp.respondFailure('usename not specified');
-  }
-  next();
+    if (req.vUsername && typeof(req.vUsername) === 'string') {
+        const dashboardURL = Config.metaverse["dashboard-url"];
+        const metaverseURL = encodeURIComponent(Config.metaverse["metaverse-server-url"]);
+        const username = encodeURIComponent(req.vUsername);
+        const redirectionURL = `${dashboardURL}?metaverse=${metaverseURL}&page=profile/${username}`;
+        resp.statusCode = HTTPStatusCode.Found;
+        resp.setHeader('Location', redirectionURL),
+        resp.setHeader('content-type', 'text/html');
+        resp.send();
+    }
+    else {
+        req.vRestResp.respondFailure('usename not specified');
+    }
+    next();
 };
 
 export const name = '/users/:username';

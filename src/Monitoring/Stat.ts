@@ -23,66 +23,69 @@ import { VKeyedCollection } from '@Tools/vTypes';
 export type updateValueFunction = ( pStat: Stat ) => Promise<void>;
 
 export abstract class Stat {
-  public name: string;      // the name of the statistic
-  public category: string;  // a grouping category for the statistic
-  public unit: string;      // the unit of the statistic
-  public value: number;     // the value
-  public pullAction: updateValueFunction; // if defined, called before using value
-  // Many of the stats use Gather() to do the PullAction for histogram generation.
-  //    Gather() is called once a second and this can be too often.
-  //    The following can be optionally set to the number of seconds between pulls.
-  //    If this is 'undefined', DoPullAction() does the pullAction every time it's called.
-  public secondsBetweenPulls: number; // seconds between doing pull operation
-  public pullCount: number;
+    public name: string;      // the name of the statistic
+    public category: string;  // a grouping category for the statistic
+    public unit: string;      // the unit of the statistic
+    public value: number;     // the value
+    public pullAction: updateValueFunction; // if defined, called before using value
+    // Many of the stats use Gather() to do the PullAction for histogram generation.
+    //    Gather() is called once a second and this can be too often.
+    //    The following can be optionally set to the number of seconds between pulls.
+    //    If this is 'undefined', DoPullAction() does the pullAction every time it's called.
+    public secondsBetweenPulls: number; // seconds between doing pull operation
+    public pullCount: number;
 
-  _histograms: Map<string,Histogram>;
+    _histograms: Map<string,Histogram>;
 
-  constructor(pName:string, pCategory: string, pUnit: string, pPullAction?: updateValueFunction) {
-    this.name = pName;
-    this.category = pCategory;
-    this.unit = pUnit;
-    this.value = 0;
-    this.pullAction = pPullAction;
-    this._histograms = new Map<string,Histogram>();
-  };
+    constructor(pName:string, pCategory: string, pUnit: string, pPullAction?: updateValueFunction) {
+        this.name = pName;
+        this.category = pCategory;
+        this.unit = pUnit;
+        this.value = 0;
+        this.pullAction = pPullAction;
+        this._histograms = new Map<string,Histogram>();
+    };
 
-  // Add a histogram to this value
-  AddHistogram(pHistogramName: string, pHistogram: Histogram) {
-    this._histograms.set(pHistogramName, pHistogram);
-  };
-  async DoPullAction(): Promise<void> {
-    if (this.pullAction) {
-      if (this.secondsBetweenPulls) {
-        if (this.pullCount-- < 0) {
-          await this.pullAction(this);
-          this.pullCount = this.secondsBetweenPulls;
+    // Add a histogram to this value
+    AddHistogram(pHistogramName: string, pHistogram: Histogram) {
+        this._histograms.set(pHistogramName, pHistogram);
+    };
+    async DoPullAction(): Promise<void> {
+        if (this.pullAction) {
+            if (this.secondsBetweenPulls) {
+                if (this.pullCount-- < 0) {
+                    await this.pullAction(this);
+                    this.pullCount = this.secondsBetweenPulls;
+                };
+            }
+            else {
+                await this.pullAction(this);
+            };
         };
-      }
-      else {
-        await this.pullAction(this);
-      };
     };
-  };
-  // Record one or more events
-  abstract Event(pCount: number): void;
-  // Called once a second to do any gathering operation
-  abstract Gather(): void;
-  // Return an object containing the values in this stat
-  Report(pReturnHistogram: boolean = true): any {
-    const report: VKeyedCollection = {
-      'name': this.name,
-      'category': this.category,
-      'unit': this.unit,
-      'value': this.value
+
+    // Record one or more events
+    abstract Event(pCount: number): void;
+    // Called once a second to do any gathering operation
+
+    abstract Gather(): void;
+    // Return an object containing the values in this stat
+
+    Report(pReturnHistogram: boolean = true): any {
+        const report: VKeyedCollection = {
+            'name': this.name,
+            'category': this.category,
+            'unit': this.unit,
+            'value': this.value
+        };
+        if (pReturnHistogram && this._histograms.size > 0) {
+            const history: any = {};
+            this._histograms.forEach( (histo, name) => {
+                history[name] = histo.GetHistogram();
+            });
+            report.history = history;
+        };
+        return report;
     };
-    if (pReturnHistogram && this._histograms.size > 0) {
-      const history: any = {};
-      this._histograms.forEach( (histo, name) => {
-        history[name] = histo.GetHistogram();
-      });
-      report.history = history;
-    };
-    return report;
-  };
 };
 

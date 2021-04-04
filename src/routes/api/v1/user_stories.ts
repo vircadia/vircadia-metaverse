@@ -20,11 +20,11 @@ import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
 // Sample request from Interface scripts
 // GET /api/v1/user_stories?include_actions=announcement&restriction=open,hifi&require_online=true&protocol=Qa12Qv2cYYxmNV8c%2Fqlf5A%3D%3D&per_page=10 4
 const procGetUserStories: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vRestResp) {
-    req.vRestResp.Data = {
-    };
-  }
-  next();
+    if (req.vRestResp) {
+        req.vRestResp.Data = {
+        };
+    }
+    next();
 };
 
 export const name = '/api/v1/user_stories';
