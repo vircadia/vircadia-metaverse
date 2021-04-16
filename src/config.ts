@@ -20,6 +20,7 @@ import { Logger } from '@Tools/Logging';
 // This sets defaults values and is over-written by environment variables and
 //     supplied configuration file contents.
 export let Config = {
+    // The metaverse identity
     'metaverse': {
       'metaverse-name': 'Vircadia noobie',
       'metaverse-nick-name': 'Noobie',
@@ -27,6 +28,7 @@ export let Config = {
       'default-ice-server-url': '', // if empty, set to self
       'dashboard-url': 'https://dashboard.vircadia.com'
     },
+    // Server network parameters
     'server': {
       'listen-host': '0.0.0.0',
       'listen-port': 9400,
@@ -39,28 +41,35 @@ export let Config = {
         'version-tag': '1.1.1-20200101-abcdefg'
       }
     },
+    // Authorization token parameters
     'auth': {
       'domain-token-expire-hours': 24 * 365,  // one year
       'owner-token-expire-hours': 24 * 7      // one week
     },
+    // Control of the metaverse operations
     'metaverse-server': {
       'http-error-on-failure': true,  // whether to include x-vircadia error header
       'error-header': 'x-vircadia-error-handle',
+
       'heartbeat-seconds-until-offline': 5 * 60,  // five minutes
       'domain-seconds-until-offline': 10 * 60,    // ten minutes
       'metaverse-info-addition-file': './metaverse_info.json',
       'session-timeout-minutes': 5,
+
       'handshake-request-expiration-minutes': 1,            // one minute handshake
       'connection-request-expiration-minutes': 60 * 24 * 4, // 4 days
       'friend-request-expiration-minutes': 60 * 24 * 4,     // 4 days
+
       'place-current-timeout-minutes': 60,  // minutes until current place info is stale
       // redirection URL used for initial domain token generation,
-      // "METAVERSE_SERVER_URL" is replaced (from Config.metaverse.metaverse-server-url)
-      // "DASHBOARD_URL" is replaced (from Config.metaverse.dashboard-url)
+      //   "METAVERSE_SERVER_URL" is replaced (from Config.metaverse.metaverse-server-url)
+      //   "DASHBOARD_URL" is replaced (from Config.metaverse.dashboard-url)
       'tokengen_url': 'METAVERSE_SERVER_URL/static/DomainTokenLogin.html',
       // 'tokengen_url': 'DASHBOARD_URL?metaverse=METAVERSE_SERVER_URL&page=domain',
+
       // When account of this name is created, add 'admin' role to it
       'base-admin-account': 'adminer',
+
       // If to assume domain network_address if on is not set
       'fix-domain-network-address': true,
       // Whether allowing temp domain name creation
@@ -70,8 +79,17 @@ export let Config = {
       'enable-account-email-verification': false,
       'email-verification-timeout-minutes': 60, // minutes to wait for email verification
       // default is in 'static' dir. If you put in 'config' dir, use 'config/verificationEmail.html'.
+      //   "METAVERSE_NAME" is replaced (from Config.metaverse.metaverse-name)
+      //   "SHORT_METAVERSE_NAME" is replaced (from Config.metaverse.metaverse-nick-name)
       'email-verification-email-body': 'dist/static/verificationEmail.html',  // file to send
       'email-verification-from': '', // who the email is From
+      // When user follows the verification URL, they are redirected to one of these two URLs
+      //   "METAVERSE_SERVER_URL" is replaced (from Config.metaverse.metaverse-server-url)
+      //   "DASHBOARD_URL" is replaced (from Config.metaverse.dashboard-url)
+      //   "ACCOUNT_ID" is replaced with the verifying account id
+      //   "FAILURE_REASON" is replaced with the reason for verification failure (url encoded)
+      'email-verification-success-redirect': 'METAVERSE_SERVER_URL/static/verificationEmailSuccess.html',
+      'email-verification-failure-redirect': 'METAVERSE_SERVER_URL/static/verificationEmailFailure.html?r=FAILURE_REASON'
     },
     // SMTP mail parameters for out-bound email
     // This is the structure that is passed to NodeMailer's SMTP transport.
@@ -91,6 +109,7 @@ export let Config = {
       'enable': true,           // enable value monitoring
       'history': true           // whether to keep value history
     },
+    // Setup for MongoDB access
     'database': {
       'db-host': 'localhost',
       'db-port': 27017,
@@ -100,6 +119,7 @@ export let Config = {
       'db-authdb': 'admin',
       'db-connection': ''   // connection string replaces above if supplied
     },
+    // MongoDB account configured for database backup script
     'backup': {
         "backup-user": "backuper",  // database backup user account (for BackupDb.sh)
         "backup-pw": "nooneknowsit", // database backup user password (for BackupDb.sh)
