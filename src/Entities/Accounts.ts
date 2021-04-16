@@ -33,9 +33,10 @@ import { ValidateResponse } from '@Route-Tools/EntityFieldDefn';
 import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/GetterSetter';
 
 import { createObject, getObject, getObjects, updateObjectFields, deleteOne, noCaseCollation, countObjects } from '@Tools/Db';
-import { GenUUID, genRandomString, IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
+import { GenUUID, genRandomString, IsNullOrEmpty, IsNotNullOrEmpty, SendVerificationEmail } from '@Tools/Misc';
 import { VKeyedCollection, SArray } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
+import { Requests } from './Requests';
 
 export let accountCollection = 'accounts';
 
@@ -171,14 +172,47 @@ export const Accounts = {
         newAcct.friends = []
         newAcct.connections = []
         newAcct.whenCreated = new Date();
-        if (Config['metaverse-server']['enable-account-email-verification']) {
-            newAcct.accountEmailVerified = false;
-        };
 
         // Remember the password
         Accounts.storePassword(newAcct, pPassword);
 
         return newAcct;
+    },
+    // When an account is created, do what is necessary to enable the account.
+    // This might include verifying the email address, etc.
+    enableAccount(pAccount: AccountEntity): void {
+        if (Config['metaverse-server']['enable-account-email-verification']) {
+            pAccount.accountEmailVerified = false;
+            const verifyCode = GenUUID();
+            // Create a pending request and wait for the user to check back
+            const request = Requests.createEmailVerificationRequest(pAccount.id, verifyCode);
+            void Requests.add(request);
+            void SendVerificationEmail(pAccount, verifyCode);
+        }
+        else {
+            // If not doing email verification, just turn on the account
+            Accounts.doEnableAccount(pAccount);
+        };
+    },
+    // The 'enableAccount' function can start a process of account enablement.
+    // This function is called to actually turn on the account
+    doEnableAccount(pAccount: AccountEntity): void {
+        if (Config['metaverse-server']['enable-account-email-verification']) {
+            pAccount.accountEmailVerified = true;
+            const updates: VKeyedCollection = {
+                'accountEmailVerified': true
+            };
+            void Accounts.updateEntityFields(pAccount, updates);
+        }
+        else {
+            // If accounts are not verified by email, this value does not exist on the
+            //     account and thus enablement is assumed to be 'true'.
+            delete pAccount.accountEmailVerified;
+            const updates: VKeyedCollection = {
+                'accountEmailVerified': null
+            };
+            void Accounts.updateEntityFields(pAccount, updates);
+        };
     },
     // TODO: add scope (admin) and filter criteria filtering
     //    It's push down to this routine so we could possibly use DB magic for the queries

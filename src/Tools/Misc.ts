@@ -16,11 +16,18 @@
 import http from 'http';
 import https from 'https';
 import os from 'os';
+import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
 
+import fsPromises from 'fs/promises';
+
+import { createTransport } from 'nodemailer';
+
 import { Logger } from '@Tools/Logging';
 import { VKeyedCollection } from '@Tools/vTypes';
+import { Config } from '@Base/config';
+import { AccountEntity } from '@Entities/AccountEntity';
 
 // Clamp the passed value between a high and low
 export function Clamp(pVal: number, pLow: number, pHigh: number): number {
@@ -144,3 +151,40 @@ export async function httpsRequest(pUrl: string): Promise<string> {
     });
   });
 };
+
+export async function SendVerificationEmail(pAccount: AccountEntity, pVerifyCode: string): Promise<void> {
+    try {
+        const verificationURL = Config.metaverse['metaverse-server-url']
+                + `/api/v1/account/verify/email?a=${pAccount.id}&v=${pVerifyCode}`;
+        const metaverseName = Config.metaverse['metaverse-name'];
+        const shortMetaverseName = Config.metaverse['metaverse-nick-name'];
+
+        const verificationFile = path.join(__dirname, '../..', Config['metaverse-server']['email-verification-email-body']);
+        Logger.debug(`SendVerificationEmail: using verificationFile from ${verificationFile}`);
+        let emailBody = await fsPromises.readFile(verificationFile, 'utf-8');
+        emailBody = emailBody.replace('VERIFICATION_URL', verificationURL)
+            .replace('METAVERSE_NAME', metaverseName)
+            .replace('SHORT_METAVERSE_NAME', shortMetaverseName);
+
+        Logger.debug(`SendVerificationEmail: SMTPhost=${Config['nodemailer-transport-config'].host}`);
+        const transporter = createTransport(Config['nodemailer-transport-config']);
+        if (transporter) {
+            Logger.debug(`SendVerificationEmail: sending email verification for new account ${pAccount.id}/${pAccount.username}`);
+            const msg = {
+                from: Config['metaverse-server']['email-verification-from'],
+                to: pAccount.email,
+                subject: `${shortMetaverseName} account verification`,
+                html: emailBody
+            };
+            transporter.sendMail(msg);
+            transporter.close();
+        }
+        else {
+            Logger.error(`SendVerificationEmail: failed to recreate transporter`);
+        };
+    }
+    catch (e) {
+        Logger.error(`SendVerificationEmail: exception sending verification email. Acct=${pAccount.id}/${pAccount.username}. e=${e}`);
+    }
+    return;
+}

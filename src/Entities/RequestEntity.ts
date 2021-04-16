@@ -35,5 +35,9 @@ export class RequestEntity {
     public targetNodeId: string;
     public requesterAccepted: boolean;
     public targetAccepted: boolean;
+
+    // requestType == VERIFYEMAIL
+    // 'requestingAccountId' is the account being verified
+    public verificationCode: string;    // the code we're waiting for
 };
 

@@ -94,6 +94,7 @@ export const Requests = {
         return aRequest;
     },
     // A 'handshake' request is special request between session NodeIds
+    // Note, this does not add the request to the database. Caller needs a "Request.add(...)".
     createHandshakeRequest(pRequesterNodeId: string, pTargetNodeId: string): RequestEntity {
         const newRequest = Requests.create();
         newRequest.requestType = RequestType.HANDSHAKE;
@@ -101,11 +102,20 @@ export const Requests = {
         newRequest.requesterAccepted = false;
         newRequest.targetNodeId = pTargetNodeId;
         newRequest.targetAccepted = false;
-
         // A connection request lasts only for so long
         const expirationMinutes = Config["metaverse-server"]["handshake-request-expiration-minutes"];
         newRequest.expirationTime = new Date(Date.now() + 1000 * 60 * expirationMinutes);
 
+        return newRequest;
+    },
+    // Note, this does not add the request to the database. Caller needs a "Request.add(...)".
+    createEmailVerificationRequest(pAccountId: string, pVerificationCode: string): RequestEntity {
+        const newRequest = Requests.create();
+        newRequest.requestType = RequestType.VERIFYEMAIL;
+        newRequest.requestingAccountId = pAccountId;
+        newRequest.verificationCode = pVerificationCode;
+        const expirationMinutes = Config["metaverse-server"]['email-verification-timeout-minutes'];
+        newRequest.expirationTime = new Date(Date.now() + 1000 * 60 * expirationMinutes);
         return newRequest;
     },
     add(pRequestEntity: RequestEntity) : Promise<RequestEntity> {

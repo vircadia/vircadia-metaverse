@@ -65,8 +65,27 @@ export let Config = {
       'fix-domain-network-address': true,
       // Whether allowing temp domain name creation
       'allow-temp-domain-creation': false,
+
       // Email verification on account creation
       'enable-account-email-verification': false,
+      'email-verification-timeout-minutes': 60, // minutes to wait for email verification
+      // default is in 'static' dir. If you put in 'config' dir, use 'config/verificationEmail.html'.
+      'email-verification-email-body': 'dist/static/verificationEmail.html',  // file to send
+      'email-verification-from': '', // who the email is From
+    },
+    // SMTP mail parameters for out-bound email
+    // This is the structure that is passed to NodeMailer's SMTP transport.
+    // Check out the documentation at https://nodemailer.com/smtp/
+    // For SMTP outbound, setup your email account on your service and
+    //     update SMTP-HOSTNAME, SMTP-USER, and SMTP-PASSWORD with your info.
+    'nodemailer-transport-config': {
+        'host': 'SMTP-HOSTNAME',
+        'port': 465,    // 587 if secure=false
+        'secure': true,
+        'auth': {
+            'user': 'SMTP-USER',
+            'pass': 'SMTP-PASSWORD'
+        }
     },
     'monitoring': {
       'enable': true,           // enable value monitoring
