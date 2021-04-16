@@ -77,7 +77,7 @@ export let Config = {
 
         // Email verification on account creation
         'enable-account-email-verification': false,
-        'email-verification-timeout-minutes': 60, // minutes to wait for email verification
+        'email-verification-timeout-minutes': 1440, // minutes to wait for email verification (1440=one day)
         // default is in 'static' dir. If you put in 'config' dir, use 'config/verificationEmail.html'.
         //   "METAVERSE_NAME" is replaced (from Config.metaverse.metaverse-name)
         //   "SHORT_METAVERSE_NAME" is replaced (from Config.metaverse.metaverse-nick-name)
