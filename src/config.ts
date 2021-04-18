@@ -68,7 +68,9 @@ export let Config = {
         // 'tokengen_url': 'DASHBOARD_URL?metaverse=METAVERSE_SERVER_URL&page=domain',
 
         // When account of this name is created, add 'admin' role to it
-        'base-admin-account': 'adminer',
+        //    Initially as empty so random people cannot create an admin account
+        //    This account named here MUST be controlled by the server's admin
+        'base-admin-account': '',
 
         // If to assume domain network_address if on is not set
         'fix-domain-network-address': true,

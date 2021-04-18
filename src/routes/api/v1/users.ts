@@ -93,11 +93,13 @@ const procPostUsers: RequestHandler = async (req: Request, resp: Response, next:
                                     // A special kludge to create the initial admin account
                                     // If we're creating an account that has the name of the admin account
                                     //    then add the 'admin' role to it.
-                                    const adminAccountName =  Config["metaverse-server"]["base-admin-account"] ?? 'wilma';
-                                    if (newAcct.username === adminAccountName) {
-                                        if (IsNullOrEmpty(newAcct.roles)) newAcct.roles = [];
-                                            SArray.add(newAcct.roles, Roles.ADMIN);
-                                            Logger.info(`procPostUsers: setting new account ${adminAccountName} as admin`);
+                                    const adminAccountName =  Config["metaverse-server"]["base-admin-account"];
+                                    if (IsNotNullOrEmpty(adminAccountName)) {
+                                        if (newAcct.username === adminAccountName) {
+                                            if (IsNullOrEmpty(newAcct.roles)) newAcct.roles = [];
+                                                SArray.add(newAcct.roles, Roles.ADMIN);
+                                                Logger.info(`procPostUsers: setting new account ${adminAccountName} as admin`);
+                                        }
                                     }
                                     // Remember the address of the creator
                                     newAcct.IPAddrOfCreator = req.vSenderKey;
