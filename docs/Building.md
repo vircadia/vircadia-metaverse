@@ -6,6 +6,9 @@ and running the server.
 For development or other running configurations, refer to
 [Notes On Development] and [Running Docker Image].
 
+For more advanced notes on running an Iamus metaverse-server,
+check out [Administration Notes].
+
 ## Build Instructions
 
 The application is a [NodeJS]/[ExpressJS]/[TypeScript] application so the
@@ -202,6 +205,7 @@ into a mounted volume for easy reference.
 ## Troubleshooting
 
 [Running Docker Image]: ./RunningDockerImage.md
+[Administration Notes]: ./AdministrationNotes.md
 [Notes On Development]: ./NotesOnDevelopment.md
 [NodeJS]: https://nodejs.org/
 [ExpressJS]: https://expressjs.com/

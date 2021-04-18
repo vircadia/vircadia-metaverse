@@ -113,7 +113,7 @@ const procPostUsers: RequestHandler = async (req: Request, resp: Response, next:
                                     req.vRestResp.Data = {
                                         accountId: newAcct.id,
                                         username: newAcct.username,
-                                        accountIsActive: accountIsActive,
+                                        accountIsActive,
                                         accountWaitingVerification: !accountIsActive
                                     };
                                 }

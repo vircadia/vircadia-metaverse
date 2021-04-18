@@ -42,6 +42,7 @@ The API requests to the metaverse-server are:
 | POST   | /api/v1/account/:accountId/field/:fieldname | [doc](./API-Accounts.md#post-apiv1accountaccountidfieldfieldname) update specific account parameter |
 | GET    | /api/v1/account/:accountId/tokens | [doc](./API-Accounts.md#get-apiv1accountaccountidtokens) fetch tokens associated with account |
 | DELETE | /api/v1/account/:accountId/tokens/:tokenId | [doc](./API-Accounts.md#delete-apiv1accountaccountidtokenstokenid) delete accounts token |
+| GET    | /api/v1/account/verify/email       | [doc](./API-Accounts.md#get-apiv1accountverifyemail) email verification URL |
 | GET    | /api/v1/commerce/available_updates | legacy request |
 | GET    | /api/v1/commerce/hfc_accounts      | legacy request |
 | GET    | /api/v1/commerce/history           | legacy request |
