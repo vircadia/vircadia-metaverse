@@ -180,7 +180,9 @@ export const Accounts = {
     },
     // When an account is created, do what is necessary to enable the account.
     // This might include verifying the email address, etc.
-    enableAccount(pAccount: AccountEntity): void {
+    // Returns true if account is active now. False if waiting for some verification
+    enableAccount(pAccount: AccountEntity): boolean {
+        let accountIsActive = false;
         if (Config['metaverse-server']['enable-account-email-verification']) {
             pAccount.accountEmailVerified = false;
             const verifyCode = GenUUID();
@@ -192,7 +194,9 @@ export const Accounts = {
         else {
             // If not doing email verification, just turn on the account
             Accounts.doEnableAccount(pAccount);
+            accountIsActive = true;
         };
+        return accountIsActive;
     },
     // The 'enableAccount' function can start a process of account enablement.
     // This function is called to actually turn on the account
@@ -303,5 +307,11 @@ export const Accounts = {
     // getter property that is 'true' if the user is a grid administrator
     isAdmin(pAcct: AccountEntity): boolean {
         return SArray.has(pAcct.roles, Roles.ADMIN);
+    },
+    // Any logic to test of account is active
+    //   Currently checks if account email is verified or is legacy
+    //   account (no 'accountEmailVerified' variable)
+    isEnabled(pAcct: AccountEntity): boolean {
+        return pAcct.accountEmailVerified ?? true;
     }
 };

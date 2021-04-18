@@ -102,10 +102,18 @@ const procPostUsers: RequestHandler = async (req: Request, resp: Response, next:
                                     // Remember the address of the creator
                                     newAcct.IPAddrOfCreator = req.vSenderKey;
                                     // Enable the account (email verification, etc)
-                                    Accounts.enableAccount(newAcct);
+                                    const accountIsActive = Accounts.enableAccount(newAcct);
                                     // Put it into the database
                                     // Note that this puts everything that's in 'newAcct' into the DB
                                     await Accounts.addAccount(newAcct);
+
+                                    // Return the status of the account
+                                    req.vRestResp.Data = {
+                                        accountId: newAcct.id,
+                                        username: newAcct.username,
+                                        accountIsActive: accountIsActive,
+                                        accountWaitingVerification: !accountIsActive
+                                    };
                                 }
                                 catch (err) {
                                     Logger.error('procPostUsers: exception adding user: ' + err);

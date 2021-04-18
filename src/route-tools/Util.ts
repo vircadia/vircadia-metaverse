@@ -221,6 +221,7 @@ export async function buildAccountInfo(pReq: Request, pAccount: AccountEntity): 
     'username': pAccount.username,
     'email': pAccount.email,
     'administrator': Accounts.isAdmin(pAccount),
+    'enabled': Accounts.isEnabled(pAccount),
     'roles': pAccount.roles,
     'availability': pAccount.availability,
     'public_key': createSimplifiedPublicKey(pAccount.sessionPublicKey),

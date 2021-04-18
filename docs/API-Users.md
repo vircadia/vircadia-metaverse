@@ -223,6 +223,44 @@ The `username` is percent-encoded for inclusion to the URL.
 
 ## POST /api/v1/users
 
+Create user account.
+
+```
+    {
+        "username": "name",
+        "password": "password",
+        "email": "email@example.com"
+    }
+```
+
+On successful account creation:
+
+```
+    {
+        "status": "success",
+        "data": {
+            "accountId": "id",
+            "username": "name",
+            "accountIsActive": true,
+            "accountWaitingVerification": false
+        }
+    }
+```
+
+Note that, if account email validation is enabled, the account will be created
+but it will not be able to create access tokens until verified.
+If awaiting verification, `accountWaitingVerification` will be `true`
+and `accountIsActive` will be `false`.
+
+If creation failed:
+
+```
+    {
+        "status": "failure",
+        "error": "Reason for failure"
+    }
+```
+
 ## PUT /api/v1/user/heartbeat
 
 

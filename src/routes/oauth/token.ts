@@ -63,7 +63,7 @@ const procPostOauthToken: RequestHandler = async (req: Request, resp: Response, 
                         aAccount = await Accounts.getAccountWithEmail(userName);
                     };
                     if (aAccount) {
-                        if (aAccount.accountEmailVerified ?? true) {
+                        if (Accounts.isEnabled(aAccount)) {
                             if (await Accounts.validatePassword(aAccount, userPassword)) {
                                 Logger.debug(`procPostOAuthToken: login of user ${userName}`);
                                 const tokenInfo = await Tokens.createToken(aAccount.id, [ userScope ]);

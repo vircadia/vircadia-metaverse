@@ -46,6 +46,7 @@ are returned (limited by pagination).
                     "friends": [ "friendName", "friendName", ... ],
                     "connections": [ "connectionName", "connectionName", ...],
                     "administator": false,              // 'true' if has "admin" role
+                    "enabled": true,                    // 'false' if waiting for email verification
                     "roles": [ "role", "role", ... ],   // roles of "user", "admin", ...
                     "when_account_created": "YYYY-MM-DDTHH:MM:SS.MMMZ",
                     "time_of_last_heartbeat": "YYYY-MM-DDTHH:MM:SS.MMMZ"
@@ -283,3 +284,13 @@ The passed "accountId" can be either the accountId (exact string as returned by
 Delete a particular token held by account.
 
 ---
+
+## GET /ap1/v1/account/verify/email
+
+When an account is created, verification of the account's email can be optionally enabled.
+When enabled, an email is sent with a "verification URL" that points here.
+
+This request takes two query
+parameters: "a" which is the account ID, and "v" which is the verification code.
+
+See ?? for a description of email verification.
