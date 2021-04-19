@@ -41,6 +41,7 @@ const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next:
   // if (req.vAuthAccount) {
     const pager = new PaginationInfo();
     const placer = new PlaceFilterInfo();
+    // you can only see friends, connections, etc
     const visibilitier = new VisibilityFilter(req.vAuthAccount);
 
     pager.parametersFromRequest(req);

@@ -123,6 +123,7 @@ export async function buildLocationInfo(pAcct: AccountEntity): Promise<any> {
   return ret;
 };
 
+// A smaller, top-level domain info block
 export async function buildDomainInfo(pDomain: DomainEntity): Promise<any> {
   return {
     'id': pDomain.id,

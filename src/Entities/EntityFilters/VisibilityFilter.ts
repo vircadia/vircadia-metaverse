@@ -22,6 +22,10 @@ import { AccountEntity } from '@Entities/AccountEntity';
 import { Logger } from '@Tools/Logging';
 import { DomainEntity } from '@Entities/DomainEntity';
 
+// A filter to return entities the requestor can "see".
+// This checks for 'friend', 'connection' and 'asAdmin' relationships
+//     and returns entities that are friends, etc of the requestor.
+//  
 // NOTE NOTE NOTE NOTE NOTE
 // This filter can't be used as a usual criteria filter because the test
 //    requires a DB $LOOKUP operation (to lookup the account of the Place's domain)
