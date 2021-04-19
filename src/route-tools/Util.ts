@@ -130,6 +130,7 @@ export async function buildDomainInfo(pDomain: DomainEntity): Promise<any> {
     'domainId': pDomain.id,
     'name': pDomain.name,
     'visibility': pDomain.visibility ?? Visibility.OPEN,
+    'capacity': pDomain.capacity,
     'sponsorAccountId': pDomain.sponsorAccountId,
     'label': pDomain.name,
     'network_address': pDomain.networkAddr,
