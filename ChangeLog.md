@@ -1,4 +1,28 @@
 # Iamus Changelog
+## Version 2.3.16
+
+<ul>
+<li><a href="http://github.com/vircadia/Iamus/commit/747ea7b94c816798397d8da6227f7bd25cf47156">view &bull;</a> Bump version to 2.3.15</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/2243f6f0e48e9799b8b7190da68a9813034b5648">view &bull;</a> Update ChangeLog.md</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/6d84f98bc640840d8066412e0a5351f18ad4d42b">view &bull;</a> Add initial version of docs/ResrouceLimitNotes.md</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/e49048b332558bff0c5751c80de07fae08440bac">view &bull;</a> Small formatting tweaks to docs/ResourceLimitNotes.md</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/94a1633651306025652742f536f4c40b74585322">view &bull;</a> Make temp domain name creation optional. Defaults to disabled.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/608e8a2f33cbc7eb12b694608ff58152e4a5d643">view &bull;</a> Update tabbing to 4 spaces in token.ts. No functional change.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/6a482b7a6f3f0a3df285a45f4a2d39f6fbb10ad7">view &bull;</a> Add Config.metaverse-server.enable-account-email-verificiation Add AccountEntity.accountEmailVerified boolean field Add logic to not create account auth token if account email not verified     Assume verified if 'accountEmailVerified' field not present for backward compatability</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/16b965bf886283d03d23024255ecd953c026b372">view &bull;</a> Gigantic reformatting changing tabs from 2 to 4. No functional changes.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/418811fdd22ecf724da04d03ca2da521c4463ba7">view &bull;</a> Initial version of verify account email on account creation. Add configuration parameters for optionally enabling account email validation step.     Default 'false'.     Configuration parameters for Nodemailer SMTP out-bound permissions. Add 'validated' property to account.     Limit creation of access tokens to validated accounts. Add 'verifyEmail' Request type. Add /api/v1/account/verify/email to accept GET request for validation. Add /static/verificationEmail.html as template for sent email.     Replacement parameters in template for metaverse name</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/f374a6d3c403cfbc157c376a921c2262e48221bf">view &bull;</a> Add very minimal Account email verification redirection targets</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/f96504d463712d02f0c02874cb3b1e0b4d3712fd">view &bull;</a> Add redirection configuration and URLs for account email verification success and failure.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/a690b49982cc56fec1f09c747ac8fa410a6a28d8">view &bull;</a> Make config.ts have consistant 4 space indents. No function changes.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/6e2ae14e7c31b8c1d4bb4e9a15f069db7dff865e">view &bull;</a> Make default account email verification period to be one day.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/5fac583ee1d027b68ad384c13c079125b6854215">view &bull;</a> Add "enabled" to information returned with account Return enabled information when account created (so requestor can know if awaiting enablement) Centralize logic to test for account enabled in Accounts.isEnabled() Documentation     Add additional information returned by create account request</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/641112cffcdb5cceef5652e91bbdf89ca449a807">view &bull;</a> Fix problem where admin account name has no default in configuration file.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/8a2af18961f9c402f545d86fdb6ed9b24f740766">view &bull;</a> Update documentation with new file "AdministrationNotes.md" which has explanation of account email verification and initial admin account creation.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/91d566452f16893fea8896761a3146c36e4e4c79">view &bull;</a> Add comment in config.ts for VERIFICATION_URL replacement</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/5c8d002b8f5b8119d16832b6cdae3566e7decd9c">view &bull;</a> Adding some comments</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/787c7903761bcb376d296569aeafa1e6a77197c4">view &bull;</a> Bump version to 2.3.16</li> 
+</ul>
+
 ## Version 2.3.15
 
 <ul>
@@ -99,21 +123,5 @@
 <li><a href="http://github.com/vircadia/Iamus/commit/715e9fbfa0f5d66e26a007d553069ffc27f891a4">view &bull;</a> Add "backup" section to config.ts for the BackupDb.sh script.</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/8a5b14e99d11cc834377104f0223bc6d96dc51a8">view &bull;</a> Fix wrong calculation of monitoring histogram 'timeBase'     'timeBase' should now be the start time of the first bucket.</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/3db9af9be1ce2dd77d56cc20fe671455b9bca9ec">view &bull;</a> Bump version to 2.3.8</li> 
-</ul>
-
-## Version 2.3.7
-
-<ul>
-<li><a href="http://github.com/vircadia/Iamus/commit/c2350d627178836c5edcd7f2516bdcaf8b28ec59">view &bull;</a> Update ChangeLog.md</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/ad8adc9dd94fa797e978131ccf0e840eda7e77df">view &bull;</a> Update documentation     Clarify that fetching of accounts can be done either by accountId or username. Add comments to AccountScopeFilter to describe its use.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/c692f2b4081a33673dc5e6006407637a20f21e7d">view &bull;</a> Replace build bash scripts with node.js scripts. (#68)</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/37a4dbee5137ef2da8cb1b876ac86c22baa2c4d5">view &bull;</a> Clean up some code in Util.buildLocationInfo(). No functional changes.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/12f31a4f23e14d264b7e0feddef3cc5214f3dd8f">view &bull;</a> Limit the size of input JSON to Config.server.max-body-size.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/249b26d0989caa820a2d9d79db30f05083d56c72">view &bull;</a> Fix pagination so it returns the proper number of items on a page.     Makes the "?per_page=N&page_num=M" work properly.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/47bab57be416826773550493430844b113fe2188">view &bull;</a> Add Perm.PUBLIC to check if accessing an AccountEntity that is "public"     ie, 'availability' is either unspecified or Perm.ALL.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/d7c169fd05782d45fa5b76915b410e89b95a8d09">view &bull;</a> Add AccountEntity.profileDetail that just stores a JSON object. Modify AccountEntity.locker to accept a JSON object. Add validators for 'object' that allows storing JSON object values.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/696007d84fa5752acb165c28be5c1bd586a50e3f">view &bull;</a> Modify returned Account fields to include 'profileDetail'. Update documentation.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/43813c4ff380e3e7f6704b479593d149e0e745e9">view &bull;</a> Add /api/v1/profile and /api/v1/profile/:accountId Add documentation for same.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/dfda90f4731c4f0aa16d8fc8a5d6cd840403965d">view &bull;</a> Bump to 2.3.7</li> 
 </ul>
 
