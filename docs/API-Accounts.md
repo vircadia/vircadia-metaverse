@@ -243,6 +243,12 @@ A successful creation, will return:
 ```
     {
         "status": "success"
+        "data": {
+            "accountId": stringAccountId,
+            "username": stringUsername,
+            "accountIsActive": true/false,
+            "accountAwaitingVerification": true/false
+        }
     }
 ```
 
