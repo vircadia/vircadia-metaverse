@@ -1,0 +1,59 @@
+# Build Docker image of Iamus metaverse-server and publish in
+#     Github Container Registry as "vircadia/Iamus".
+
+name: Iamus Docker image
+
+on:
+  # Create Docker image on push to 'master'
+  push:
+    branches:
+      - master
+
+env:
+  # Names used to tag built Docker image
+  IMAGE_NAME: Iamus
+  IMAGE_OWNER: vircadia
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository into current runner context
+      - name: checkout
+        uses: actions/checkout@v2
+
+      # Setup buildx environment (used if building for multiple platforms)
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v1
+        
+      # Build Iamus
+      - name: Build
+        uses: docker/build-push-action@v2
+        with:
+          context: ./docker
+          platforms: linux/amd64
+          # platforms: linux/amd64,linux/arm64
+
+      # Get version information from built image
+      - name: Fetch version information
+        run: |
+          IVERSION=$(/home/cadia/GetVersion.sh)
+          echo "IVERSION=$IVERSION"
+          echo "IVERSION=$IVERSION" >> $GITHUB_ENV
+
+      # Login to Github Container Registry with this registry's tokens
+      - name: Login to Github Container registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+        
+      # Push to Github Container Registry
+      - name: Push to Github Container Registry
+        run: |
+          docker push ghcr.io/${{ env.IMAGE_OWNER }}/${{ env.IMAGE_NAME }}:latest
+          docker push ghcr.io/${{ env.IMAGE_OWNER }}/${{ env.IMAGE_NAME }}:${{ env.IVERSION }}
+
+# vim: tabstop=2 shiftwidth=2 autoindent expandtab
