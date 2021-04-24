@@ -36,10 +36,11 @@ jobs:
           # platforms: linux/amd64,linux/arm64
           tags: ${{ env.IMAGE_TAG }}
 
-      # Get version information from built image
+      # Get version information from built image.
+      # The unique version tag is generated during the build. Extract version string for image tagging.
       - name: Fetch version information
         run: |
-          IVERSION=$(docker run --rm -it --entrypoint "./GetVersion.sh" ${{ env.IMAGE_TAG }})
+          IVERSION=$(docker run --rm --entrypoint "./GetVersion.sh" ${{ env.IMAGE_TAG }})
           echo "IVERSION=$IVERSION"
           echo "IVERSION=$IVERSION" >> $GITHUB_ENV
 
