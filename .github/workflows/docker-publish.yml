@@ -12,7 +12,7 @@ on:
 env:
   # Names used to tag built Docker image
   IMAGE_NAME: Iamus
-  IMAGE_OWNER: vircadia
+  IMAGE_TAG: Iamus:latest
 
 jobs:
   push:
@@ -34,11 +34,12 @@ jobs:
           context: ./docker
           platforms: linux/amd64
           # platforms: linux/amd64,linux/arm64
+          tags: ${{ env.IMAGE_TAG }}
 
       # Get version information from built image
       - name: Fetch version information
         run: |
-          IVERSION=$(/home/cadia/GetVersion.sh)
+          IVERSION=$(docker run --rm -it --entrypoint "./GetVersion.sh" ${{ env.IMAGE_TAG }})
           echo "IVERSION=$IVERSION"
           echo "IVERSION=$IVERSION" >> $GITHUB_ENV
 
@@ -53,7 +54,11 @@ jobs:
       # Push to Github Container Registry
       - name: Push to Github Container Registry
         run: |
-          docker push ghcr.io/${{ env.IMAGE_OWNER }}/${{ env.IMAGE_NAME }}:latest
-          docker push ghcr.io/${{ env.IMAGE_OWNER }}/${{ env.IMAGE_NAME }}:${{ env.IVERSION }}
+          docker image tag ${{ env.IMAGE_TAG }} ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
+          docker image tag ${{ env.IMAGE_TAG }} ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ env.IVERSION }}
+          docker image push --all-tags ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
+
+          # docker push --quiet ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
+          # docker push --quiet ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ env.IVERSION }}
 
 # vim: tabstop=2 shiftwidth=2 autoindent expandtab
