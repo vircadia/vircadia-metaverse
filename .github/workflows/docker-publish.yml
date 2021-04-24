@@ -11,8 +11,8 @@ on:
 
 env:
   # Names used to tag built Docker image
-  IMAGE_NAME: Iamus
-  IMAGE_TAG: Iamus:latest
+  IMAGE_NAME: iamus
+  IMAGE_TAG: iamus:latest
 
 jobs:
   push:
