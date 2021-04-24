@@ -2,7 +2,7 @@
     "name": "iamus-metaverse-server",
     "version": "2.3.17",
     "private": true,
-    "description": "metaverse-server for Vircadia using ActivityPub",
+    "description": "metaverse-server for Vircadia",
     "author": "Robert Adams <misterblue@misterblue.com>",
     "repository": {
         "type": "git",
@@ -14,7 +14,6 @@
     "homepage": "https://github.com/vircadia/Iamus",
     "keywords": [
         "Vircadia",
-        "ActivityPub",
         "virtual world"
     ],
     "license": "Apache-2.0",
