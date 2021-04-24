@@ -1,4 +1,12 @@
 # Iamus Changelog
+## Version 2.4.1
+
+<ul>
+<li><a href="http://github.com/vircadia/Iamus/commit/a269b7015d5993b0f84a7a2c1bfa11c4036434fc">view &bull;</a> Update ChangeLog.md</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/2982560c3749eacf6b29d4210052ff9bf220bd79">view &bull;</a> Remove comment and README references to ActivityPub since that is not     an explicit goal. Some federation system will be used but one has     not been chosen.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/03b96cb03447c774328fd927265025dec2a9172b">view &bull;</a> Bump version to 2.4.1</li> 
+</ul>
+
 ## Version 2.3.17
 
 <ul>
@@ -114,14 +122,5 @@
 <li><a href="http://github.com/vircadia/Iamus/commit/0020502f1cf894860332643fa977c39e575fa18e">view &bull;</a> Properly copy /static directory into /dist output directory. Closes #74</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/b232e2f571f5fe27dc9fa0d103b86e3f5c18b916">view &bull;</a> Add preliminary documentation for new Place design.</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/327e5263de6e8b102e27798d206e4c1d49ce7c5b">view &bull;</a> Bump version to 2.3.10</li> 
-</ul>
-
-## Version 2.3.9
-
-<ul>
-<li><a href="http://github.com/vircadia/Iamus/commit/75d22ab6786b25262a09face4037ff5b3ba3bc08">view &bull;</a> Update ChangeLog.md</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/8dd3770b043351a8b35a7c52c47ae1608b58163d">view &bull;</a> Update histogram begin time calculation for both EventHistogram and ValueHistogram.     Beginning and end dates were not calculated correctly.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/0e33a26e983055ee37d2245fb187506e4c36aeaa">view &bull;</a> Add tracking of connected sockets so can force shutdown.     ExpressJS http.server will not close if there are open sockets     so close open sockets when shutting down.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/d6f162c9f335c1fe528e89f8b52149191a36316e">view &bull;</a> Bump version to 2.3.9</li> 
 </ul>
 
