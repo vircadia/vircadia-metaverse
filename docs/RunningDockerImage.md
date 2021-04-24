@@ -2,16 +2,14 @@
 
 ## Docker Image
 
-A Docker image is made of the latest release.
-As of 20200819, the Docker image is stored at
-hub.docker.com with the name "misterblue/vircadia-metaverse-server".
-Someday CI will be integrated with this project and then the image may move.
+Iamus can be packaged and run as a Docker image.
+As of 20210424, the latest Docker image is stored in the
+Github Container Registry
+with the name "ghcr.io/vircadia/iamus".
 
-As of 20200819, there is an instance of the Docker image running
-at `metaverse.bluestuff.org`. For a description of that instance,
-refer to the [test setup] document.
-
-To create your own Docker image, the process is:
+The latest Docker image is created with Github Actions
+(see `.github/workflows/docker-publish.yml`)
+but, to create your own Docker image, the process is:
 
 ```sh
 git clone https://github.com/vircadia/Iamus.git
@@ -130,12 +128,16 @@ EOFFF
 ```
 
 This configuration file points the metaverse-server's storage to
-the created directory and sets up logging to be verbose.
-The `ConsoleLog` setting to `false` says to not log to the console
-and let all logging go to the `content/Logs` directory.
+the created directory.
 
 The `THE_ADDRESS_OF_ICE_SERVER` must be replaced with the IP address
 or domain name of the ice-server.
+
+There are MANY, MANY more configuration parameters.
+Refer to [https://github.com/vircadia/Iamus/blob/master/src/config.ts]
+for the complete list of parameters.
+What you put in `config/iamus.json` will overlay the defaults given
+in that file.
 
 ## Run the Metaverse-Server Docker Image
 
@@ -149,7 +151,7 @@ docker run -d \
         -p 9400:9400 \
         -e IAMUS_CONFIG_FILE=/home/cadia/config/iamus.json \
         --volume ${BASE}/config:/home/cadia/config \
-        misterblue/vircadia-metaverse-server
+        ghcr.io/vircadia/iamus:latest
 ```
 
 If you change the port in the configuration file, remember to change the `-p`
