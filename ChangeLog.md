@@ -1,4 +1,19 @@
 # Iamus Changelog
+## Version 2.3.17
+
+<ul>
+<li><a href="http://github.com/vircadia/Iamus/commit/91d5b790e49ee1353e466e9e2469b74cc0af9d68">view &bull;</a> Update ChangeLog.md</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/6b7ca04fee6831ec3fefe50b77407619451f7a74">view &bull;</a> Add domain capacity to domain info returned for Places. Closes #84</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/7138965758c463861b2cd43f635093f800247723">view &bull;</a> Add documentation on what's returned when an account is created.     Includes information on whether account is awaiting verification.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/c4b7bdaaa42a441cef0f215af98c67f90247d54b">view &bull;</a> Initial version of Github Action to build Iamus Docker image on     push to 'master' branch.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/f42e2db4b7d8e88297d36734aaaa0d2e8226fd02">view &bull;</a> workflows/docker-publish.yml: Correct version fetch of built Docker image.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/48a6a59114a128337060afc2c07476875b7fe710">view &bull;</a> workflows/docker-publish.yml: Docker image tag names must be lower case</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/9931a92b1755c65600b23942b5efa5670b6e94fa">view &bull;</a> workflows/docker-publish.yml: remove interactive parameters from version docker invocation.     Add explanation comments.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/e28c49c6831cc1a7b4c9b2b4e8aa47a13412b782">view &bull;</a> workflows/docker-publish.yml: remove comments and add some explanation comments</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/b38b693ee7c37a268fe9c4a18fe74393912ecea1">view &bull;</a> Add scripts for running, updating, restarting, and stopping Docker image. Add docker/README.md to explain the use of the Docker image scripts. Update docs/RunningDockerImage.md with new repository location and     updated notes on running.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/33847c790d8740f6466cf5a0fd0185957f8c0f53">view &bull;</a> Bump version to 2.3.17</li> 
+</ul>
+
 ## Version 2.3.16
 
 <ul>
@@ -108,20 +123,5 @@
 <li><a href="http://github.com/vircadia/Iamus/commit/8dd3770b043351a8b35a7c52c47ae1608b58163d">view &bull;</a> Update histogram begin time calculation for both EventHistogram and ValueHistogram.     Beginning and end dates were not calculated correctly.</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/0e33a26e983055ee37d2245fb187506e4c36aeaa">view &bull;</a> Add tracking of connected sockets so can force shutdown.     ExpressJS http.server will not close if there are open sockets     so close open sockets when shutting down.</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/d6f162c9f335c1fe528e89f8b52149191a36316e">view &bull;</a> Bump version to 2.3.9</li> 
-</ul>
-
-## Version 2.3.8
-
-<ul>
-<li><a href="http://github.com/vircadia/Iamus/commit/c1671fa5576c2c7f2aced46647654592882f16ae">view &bull;</a> Update ChangeLog.md</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/8300f8aa96626a7aa5337c7a2af8e92b3047ce32">view &bull;</a> Update DockerFile to pull from the official location: 'vircadia/Iamus'.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/4d46a409ee853b7bd541603db690e278026b6f54">view &bull;</a> Fix line endings to be UNIX format.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/73b2b91cc867e54332964652c29a8d4d14d50bf5">view &bull;</a> Remove 'friends' and 'connections' from buildAccountProfile() response.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/f1bb24c6d42dad66f154d8733d8a20c9b37e4a85">view &bull;</a> Separate error messages for /api/v1/domain/:domainId     separate 'not logged in' from 'domain not found' Add comments on request processors for set variables. Change no auth info error to "Not logged in"</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/198550c165fdd9af55c407fa785b39a0cf71b4e3">view &bull;</a> Clean up 'imports' in Db.ts so all @Tools are together</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/2be04a3f53c56bee58e47db90a68a38ca8c5881c">view &bull;</a> Add comments to request processors making clear set request variables.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/715e9fbfa0f5d66e26a007d553069ffc27f891a4">view &bull;</a> Add "backup" section to config.ts for the BackupDb.sh script.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/8a5b14e99d11cc834377104f0223bc6d96dc51a8">view &bull;</a> Fix wrong calculation of monitoring histogram 'timeBase'     'timeBase' should now be the start time of the first bucket.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/3db9af9be1ce2dd77d56cc20fe671455b9bca9ec">view &bull;</a> Bump version to 2.3.8</li> 
 </ul>
 
