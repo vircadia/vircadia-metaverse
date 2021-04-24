@@ -12,6 +12,7 @@ on:
 env:
   # Names used to tag built Docker image
   IMAGE_NAME: iamus
+  # The local Docker image is named env.IMAGE_TAG so it can be referenced and pushed
   IMAGE_TAG: iamus:latest
 
 jobs:
@@ -58,8 +59,5 @@ jobs:
           docker image tag ${{ env.IMAGE_TAG }} ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
           docker image tag ${{ env.IMAGE_TAG }} ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ env.IVERSION }}
           docker image push --all-tags ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
-
-          # docker push --quiet ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
-          # docker push --quiet ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ env.IVERSION }}
 
 # vim: tabstop=2 shiftwidth=2 autoindent expandtab
