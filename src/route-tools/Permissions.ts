@@ -114,7 +114,7 @@ export async function checkAccessToEntity(pAuthToken: AuthToken,  // token being
           }
           else {
             // If the authToken is an account, has access if admin
-            if (SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
+            if (pAuthToken && SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
               Logger.cdebug('field-setting', `checkAccessToEntity: admin. auth.AccountId=${pAuthToken.accountId}`);
               requestingAccount = requestingAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
               canAccess = Accounts.isAdmin(requestingAccount);
