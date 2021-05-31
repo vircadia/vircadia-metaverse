@@ -36,7 +36,10 @@ import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
 
 // Return places information
-// The accounts returned depend on the scope (whether admin) and the search criteria (infoer)
+// As of 20210501, the Places information is public and the requestor does not need to
+//    be logged in to fetch all the information about Places. This request is used to
+//    create the list of places to explore. This is also related to the fact that scripts
+//    do not have authentication information for fetching.
 const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   // if (req.vAuthAccount) {
     const pager = new PaginationInfo();
@@ -62,6 +65,7 @@ const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next:
 
     req.vRestResp.Data = {
       'places': places,
+      // Maturity catagories added so client knows what is defined in the metaverse-server
       'maturity-categories': Maturity.MaturityCategories
     };
 
