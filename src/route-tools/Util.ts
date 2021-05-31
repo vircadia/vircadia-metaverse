@@ -29,7 +29,7 @@ import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
 
 import { createPublicKey } from 'crypto';
 import { VKeyedCollection, VKeyValue } from '@Tools/vTypes';
-import { IsNotNullOrEmpty } from '@Tools/Misc';
+import { IsNotNullOrEmpty, IsNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
 
 import { Maturity } from '@Entities/Sets/Maturity';
@@ -292,6 +292,14 @@ export async function buildPlaceInfoSmall(pPlace: PlaceEntity, pDomain?: DomainE
     'current_info': pPlace.currentInfo,
     'current_last_update_time': pPlace.currentLastUpdateTime
   };
+  // Return the domain's last heartbeat time if the current info has not been updated
+  if (IsNullOrEmpty(ret.current_last_update_time)) {
+      const thisDomain = pDomain ?? await Domains.getDomainWithId(pPlace.domainId);
+      if (thisDomain) {
+          const domainHeartbeat = thisDomain.timeOfLastHeartbeat;
+          ret.current_last_update_time = domainHeartbeat ? domainHeartbeat.toISOString() : undefined;
+      }
+  }
   return ret;
 };
 // Return an array of Places names that are associated with the passed domain
