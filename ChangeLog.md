@@ -1,4 +1,16 @@
 # Iamus Changelog
+## Version 2.4.2
+
+<ul>
+<li><a href="http://github.com/vircadia/Iamus/commit/2521dc9e79fd1ceaabae68636bf659ce9b1659a9">view &bull;</a> Update ChangeLog.md</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/24e561e8701591b4f38d5c290cab095367b91abf">view &bull;</a> Update NPM package versions.     Gets rid of a possible security problem in one of the libraries.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/6d064b757e8b68ba77d90b9ea0ff39481435e52c">view &bull;</a> Fix access permission bug where request would not complete if the a non-logged in user checked ADMIN access to an entity.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/881162de6cd704ea7bf132db51f7d5f69b03d572">view &bull;</a> In returned Places info, return the domain's last heartbeat time     for current_last_update_time if there was not a current time set.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/36359c2197035e4b0671e317d6df02a2e4c6c9a3">view &bull;</a> Add comments in api/v1/places about not needing to be logged in to fetch place info</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/2a42438b1b0d3f21c0a14016738ee4909723b7b0">view &bull;</a> Fix DELETE of places when using "DELETE /api/v1/user/places/:placeId". Also fix fetching info of single place using "GET /api/v1/user/places/:placeId". Closes issue #88</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/07816497bc136d4ebceb34249fd87369dfede9bb">view &bull;</a> Bump version to 2.4.2</li> 
+</ul>
+
 ## Version 2.4.1
 
 <ul>
@@ -109,18 +121,5 @@
 <li><a href="http://github.com/vircadia/Iamus/commit/94d95e5d2c47d0db6b3d58448bb2e8be2216a62d">view &bull;</a> Correct test logic for /api/v1/places/current so APIKey works. Remove cut-and-paste error code from same.</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/eb4e3283517de57f5fed15afb8c89824416f1875">view &bull;</a> Update ChangeLog.md</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/42d2162e2f9f4044f74e9855eb35700383bd9912">view &bull;</a> Bump version to 2.3.11</li> 
-</ul>
-
-## Version 2.3.10
-
-<ul>
-<li><a href="http://github.com/vircadia/Iamus/commit/5cf0673a7e34260743fb834f7cf031fafa8f1657">view &bull;</a> Update ChangeLog.md</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/dc1db4ca1dd6eab7e147048f7c2790483bce939c">view &bull;</a> Have every request return "Not logged in" if an access token is not     included in the request. This makes the user interface more understandable. Modify several requests to report different errors if not logged in     or if parameters are not specified. Makes error more specific. Closes #70</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/c5228616f001f7073b4ab21179cc510dc9de682b">view &bull;</a> Make sure all calls to checkAccessToEntity() are await'ed.     Should fix some wrong access checking.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/d3568dfe8f95b441009cd492ea19035290d27c8e">view &bull;</a> Change field permissions to use Perm definitions rather than explicit strings.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/c1676c81d8b972fdd6c7af16729c601867762926">view &bull;</a> Update npm modules.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/0020502f1cf894860332643fa977c39e575fa18e">view &bull;</a> Properly copy /static directory into /dist output directory. Closes #74</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/b232e2f571f5fe27dc9fa0d103b86e3f5c18b916">view &bull;</a> Add preliminary documentation for new Place design.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/327e5263de6e8b102e27798d206e4c1d49ce7c5b">view &bull;</a> Bump version to 2.3.10</li> 
 </ul>
 
