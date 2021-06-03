@@ -17,7 +17,7 @@
 import Config from '@Base/config';
 
 import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI, param1FromParams } from '@Route-Tools/middleware';
+import { setupMetaverseAPI, finishMetaverseAPI, param1FromParams, placeFromParams } from '@Route-Tools/middleware';
 import { accountFromAuthToken } from '@Route-Tools/middleware';
 
 import { procGetPlacesPlaceId, procDeletePlacesPlaceId } from '../places/placeId';
@@ -78,15 +78,16 @@ router.post(   '/api/v1/user/places',
                                       accountFromAuthToken, // req.vAuthAccount
                                       procPostPlaces,
                                       finishMetaverseAPI ] );
-router.get(   '/api/v1/user/places/:param1',
-                                     [ setupMetaverseAPI,   // req.vRESTResp
-                                      param1FromParams,     // req.vParam1
-                                      procGetPlacesPlaceId,
-                                      finishMetaverseAPI ] );
-router.delete(   '/api/v1/user/places/:param1',
+router.get(   '/api/v1/user/places/:placeId',
                                      [ setupMetaverseAPI,   // req.vRESTResp
                                       accountFromAuthToken, // req.vAuthAccount
-                                      param1FromParams,     // req.vParam1
+                                      placeFromParams,      // req.vPlace, req.vDomain
+                                      procGetPlacesPlaceId,
+                                      finishMetaverseAPI ] );
+router.delete(   '/api/v1/user/places/:placeId',
+                                     [ setupMetaverseAPI,   // req.vRESTResp
+                                      accountFromAuthToken, // req.vAuthAccount
+                                      placeFromParams,      // req.vPlace, req.vDomain
                                       procDeletePlacesPlaceId,
                                       finishMetaverseAPI ] );
 
