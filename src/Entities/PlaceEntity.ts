@@ -41,4 +41,6 @@ export class PlaceEntity implements Entity {
     // admin stuff
     public iPAddrOfFirstContact: string; // IP address that registered this place
     public whenCreated: Date; // What the variable name says
+    // 'lastActivity' is computed by Places.initPlaces and used for aliveness checks
+    public lastActivity: Date;  // newest of currentLastUpdateTime and Domain.timeOfLastHeartbeat
 };

@@ -32,6 +32,7 @@ import { Router, RequestHandler, Request, Response, NextFunction } from 'express
 
 import { initAccounts } from '@Entities/Accounts';
 import { initDomains } from '@Entities/Domains';
+import { initPlaces } from '@Entities/Places';
 import { initTokens } from '@Entities/Tokens';
 import { initSessions } from '@Entities/Sessions';
 import { initRequests } from '@Entities/Requests';
@@ -54,6 +55,7 @@ initializeConfiguration()
   initRequests();
   initAccounts();
   initDomains();
+  initPlaces();
   return setupDB();
 })
 .catch( err => {

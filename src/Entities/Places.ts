@@ -36,8 +36,82 @@ import { createObject, getObject, getObjects, updateObjectFields, deleteOne, del
 import { GenUUID, IsNullOrEmpty, IsNotNullOrEmpty, genRandomString } from '@Tools/Misc';
 import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
+import { PlaceFilterInfo } from './EntityFilters/PlaceFilterInfo';
 
 export let placeCollection = 'places';
+
+// Initialize place management.
+export function initPlaces(): void {
+
+    const placer = new PlaceFilterInfo();
+
+    // Update current attendance and aliveness for places
+    // This saves reading the domain information on every place fetch
+    // [Note: There is a lot of checking for values changing to reduce database updates]
+    setInterval( async () => {
+
+        let numPlaces = 0;
+        let numUnhookedPlaces = 0;
+        let numInactivePlaces = 0;
+
+        // The date when a place is considered "inactive" (could be the domain)
+        const inactivePlaceTime = new Date(Date.now()
+                    - (Config['metaverse-server']['place-inactive-timeout-minutes'] * 60 * 1000));
+        // The date when a Place's "current" update information is considered stale
+        const lastGoodUpdateTime = new Date(Date.now()
+                    - (Config['metaverse-server']['place-current-timeout-minutes'] * 60 * 1000));
+        // Logger.debug(`PlaceActivity: inactive=${inactivePlaceTime.toISOString()}, stale=${lastGoodUpdateTime.toISOString()}`);
+
+        for await (const aPlace of Places.enumerateAsync(placer)) {
+            numPlaces++;
+            const updates: VKeyedCollection = {};
+            // If the Place hasn't set the current info or the information is stale, update
+            if (IsNullOrEmpty(aPlace.currentLastUpdateTime) || aPlace.currentLastUpdateTime < lastGoodUpdateTime) {
+                // Logger.debug(`PlaceActivity: place ${aPlace.name} has no currentLastUpdateTime`);
+                // The place has stale current update info. Use domain attendance information
+                const aDomain = await Domains.getDomainWithId(aPlace.domainId);
+                if (aDomain) {
+                    // Logger.debug(`   PlaceActivity: found domain for place ${aPlace.name}`);
+                    const domainAttendance = (aDomain.numUsers ?? 0) + (aDomain.anonUsers ?? 0);
+                    // If the Place doesn't have an attendance number or that number doesn't match the domain, update
+                    if (IsNullOrEmpty(aPlace.currentAttendance) || aPlace.currentAttendance !== domainAttendance) {
+                        aPlace.currentAttendance = domainAttendance;
+                        updates.currentAttendance = aPlace.currentAttendance;
+                    };
+                    // If the Place doesn't have a last activity or it doesn't match the domain, update
+                    if (IsNullOrEmpty(aPlace.lastActivity) || aPlace.lastActivity !== aDomain.timeOfLastHeartbeat) {
+                        aPlace.lastActivity = aDomain.timeOfLastHeartbeat ?? inactivePlaceTime;
+                        updates.lastActivity = aPlace.lastActivity;
+                    };
+                }
+                else {
+                    // can't find the domain to go with the place. Set everything to zero and update DB
+                    // Logger.debug(`   PlaceActivity: no domain found for place ${aPlace.name}`);
+                    numUnhookedPlaces++;
+                    aPlace.currentAttendance = 0;
+                    aPlace.lastActivity = inactivePlaceTime;
+                    updates.currentAttendance = aPlace.currentAttendance;
+                    updates.lastActivity = aPlace.lastActivity;
+                };
+            }
+            else {
+                // The Place has updated current info so just set the current activity time
+                // Logger.debug(`PlaceActivity: place ${aPlace.name} has currentLastUpdateTime so updating activity`);
+                if (IsNullOrEmpty(aPlace.lastActivity) || aPlace.lastActivity !== aPlace.currentLastUpdateTime) {
+                    aPlace.lastActivity = aPlace.currentLastUpdateTime;
+                    updates.lastActivity = aPlace.lastActivity;
+                };
+            };
+            if (aPlace.lastActivity <= inactivePlaceTime) {
+                // Logger.debug(`   PlaceActivity: place ${aPlace.name} deemed inactive`);
+                numInactivePlaces++;
+            };
+            // This updateEntityFields does nothing if 'updates' is empty
+            await Places.updateEntityFields(aPlace, updates);
+        };
+        Logger.debug(`PlaceActivity: numPlaces=${numPlaces}, unhookedPlaces=${numUnhookedPlaces}, inactivePlaces=${numInactivePlaces}`);
+    }, 1000 * 58 );
+};
 
 export const Places = {
     async getPlaceWithId(pPlaceId: string): Promise<PlaceEntity> {
@@ -59,6 +133,7 @@ export const Places = {
         newPlace.name = 'UNKNOWN-' + genRandomString(5);
         newPlace.path = '/0,0,0/0,0,0,1';
         newPlace.whenCreated = new Date();
+        newPlace.currentAttendance = 0;
         const APItoken = await Tokens.createToken(pAccountId, [ TokenScope.PLACE ], -1);
         await Tokens.addToken(APItoken);  // put token into DB
         newPlace.currentAPIKeyTokenId = APItoken.id;
@@ -131,32 +206,6 @@ export const Places = {
     async updateEntityFields(pEntity: PlaceEntity, pFields: VKeyedCollection): Promise<PlaceEntity> {
         return updateObjectFields(placeCollection,
                                 new GenericFilter({ 'id': pEntity.id }), pFields);
-    },
-
-    async getCurrentAttendance(pPlace: PlaceEntity, pDomain?: DomainEntity): Promise<number> {
-        // Attendance is either reported by a beacon script or defaults to the domain's numbers
-        // If the last current update is stale (older than a few minutes), the domain's number is used
-        let attendance: number = 0;
-        let useDomain: boolean = true;
-        const lastGoodUpdateTime = new Date(Date.now()
-                    - (Config['metaverse-server']['place-current-timeout-minutes'] * 60 * 1000));
-        if (IsNotNullOrEmpty(pPlace.currentLastUpdateTime) && pPlace.currentLastUpdateTime > lastGoodUpdateTime) {
-            attendance = pPlace.currentAttendance;
-            useDomain = IsNullOrEmpty(attendance);
-        };
-        if (useDomain) {
-            // There isn't current attendance info. Default to domain's numbers
-            let aDomain = pDomain;
-            if (IsNullOrEmpty(aDomain)) {
-                if (IsNotNullOrEmpty(pPlace.domainId)) {
-                    aDomain = await Domains.getDomainWithId(pPlace.domainId);
-                };
-            };
-            if (IsNotNullOrEmpty(aDomain)) {
-                attendance = (aDomain.numUsers ?? 0) + (aDomain.anonUsers ?? 0);
-            };
-        };
-        return attendance;
     },
 
     async getCurrentInfoAPIKey(pPlace: PlaceEntity): Promise<string> {

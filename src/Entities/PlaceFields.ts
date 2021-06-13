@@ -199,15 +199,7 @@ export const placeFields: { [key: string]: FieldDefn } = {
         set_permissions: [ Perm.DOMAINACCESS, Perm.ADMIN ],
         validate: isNumberValidator,
         setter: simpleSetter,
-        getter: async (pField: FieldDefn, pEntity: Entity): Promise<any> => {
-            const aPlace = pEntity as PlaceEntity;
-            const attendance = await Places.getCurrentAttendance(aPlace);
-            // If the database record does not match the current attendance, update DB
-            if (aPlace.currentAttendance !== attendance) {
-                void Places.updateEntityFields(aPlace, { 'currentAttendance': attendance });
-            };
-            return attendance;
-        }
+        getter: simpleGetter
     },
     'current_images': {
         entity_field: 'currentImages',

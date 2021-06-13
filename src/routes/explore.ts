@@ -62,7 +62,7 @@ const procGetExplore: RequestHandler = async (req: Request, resp: Response, next
 
             // 'People' is number of people at place for old Explore script
             // placeDesc.People = aDomain.numUsers + aDomain.anonUsers;
-            placeDesc.People = await Places.getCurrentAttendance(place, aDomain);
+            placeDesc.People = place.currentAttendance ?? 0;
 
             placeDesc.Place = await buildPlaceInfoSmall(place, aDomain);
 

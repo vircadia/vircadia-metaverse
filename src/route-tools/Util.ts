@@ -287,7 +287,7 @@ export async function buildPlaceInfoSmall(pPlace: PlaceEntity, pDomain?: DomainE
     'tags': pPlace.tags,
     'thumbnail': pPlace.thumbnail,
     'images': pPlace.images,
-    'current_attendance': await Places.getCurrentAttendance(pPlace, pDomain),
+    'current_attendance': pPlace.currentAttendance ?? 0,
     'current_images': pPlace.currentImages,
     'current_info': pPlace.currentInfo,
     'current_last_update_time': pPlace.currentLastUpdateTime
