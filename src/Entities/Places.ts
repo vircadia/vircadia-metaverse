@@ -55,8 +55,7 @@ export function initPlaces(): void {
         let numInactivePlaces = 0;
 
         // The date when a place is considered "inactive" (could be the domain)
-        const inactivePlaceTime = new Date(Date.now()
-                    - (Config['metaverse-server']['place-inactive-timeout-minutes'] * 60 * 1000));
+        const inactivePlaceTime = Places.dateWhenNotActive();
         // The date when a Place's "current" update information is considered stale
         const lastGoodUpdateTime = new Date(Date.now()
                     - (Config['metaverse-server']['place-current-timeout-minutes'] * 60 * 1000));
@@ -206,6 +205,10 @@ export const Places = {
     async updateEntityFields(pEntity: PlaceEntity, pFields: VKeyedCollection): Promise<PlaceEntity> {
         return updateObjectFields(placeCollection,
                                 new GenericFilter({ 'id': pEntity.id }), pFields);
+    },
+
+    dateWhenNotActive() : Date {
+        return new Date(Date.now() - (Config['metaverse-server']['place-inactive-timeout-minutes'] * 60 * 1000));
     },
 
     async getCurrentInfoAPIKey(pPlace: PlaceEntity): Promise<string> {
