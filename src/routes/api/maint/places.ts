@@ -58,6 +58,9 @@ const procPlacesUnhooked: RequestHandler = async (req: Request, resp: Response, 
         else {
             req.vRestResp.respondFailure('not admin');
         };
+    }
+    else {
+        req.vRestResp.respondFailure('must have account for access');
     };
 
     placer.addResponseFields(req);
@@ -83,6 +86,9 @@ const procPlacesDeleteUnhooked: RequestHandler = async (req: Request, resp: Resp
         else {
             req.vRestResp.respondFailure('not admin');
         };
+    }
+    else {
+        req.vRestResp.respondFailure('must have account for access');
     };
 
     placer.addResponseFields(req);
@@ -124,6 +130,9 @@ const procPlacesInactive: RequestHandler = async (req: Request, resp: Response, 
         else {
             req.vRestResp.respondFailure('not admin');
         };
+    }
+    else {
+        req.vRestResp.respondFailure('must have account for access');
     };
 
     placer.addResponseFields(req);
@@ -149,6 +158,9 @@ const procPlacesDeleteInactive: RequestHandler = async (req: Request, resp: Resp
         else {
             req.vRestResp.respondFailure('not admin');
         };
+    }
+    else {
+        req.vRestResp.respondFailure('must have account for access');
     };
 
     placer.addResponseFields(req);
