@@ -71,7 +71,7 @@ export const router = Router();
 
 router.get( '/api/v1/places/:placeId/field/:param1',
                                           [ setupMetaverseAPI,    // req.vRestResp
-                                            placeFromParams,      // req.vPlace, req.vDomain
+                                            placeFromParams,      // req.vPlace
                                             param1FromParams,     // req.vParam1 (field name)
                                             procGetField,
                                             finishMetaverseAPI
@@ -79,7 +79,7 @@ router.get( '/api/v1/places/:placeId/field/:param1',
 router.post('/api/v1/places/:placeId/field/:param1',
                                           [ setupMetaverseAPI,    // req.vRestResp
                                             accountFromAuthToken, // req.vAuthAccount
-                                            placeFromParams,      // req.vPlace, req.vDomain
+                                            placeFromParams,      // req.vPlace
                                             param1FromParams,     // req.vParam1 (field name)
                                             procPostField,
                                             finishMetaverseAPI

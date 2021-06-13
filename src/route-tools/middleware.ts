@@ -231,7 +231,7 @@ export const domainFromParams: RequestHandler = async (req: Request, resp: Respo
   next();
 };
 
-// Look for :placeId label and lookup and set req.vPlace and req.vDomain.
+// Look for :placeId label and lookup and set req.vPlace
 // The accepts either the 'placeId' or the name of the place
 export const placeFromParams: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
   if (req.params && req.params.placeId) {
@@ -240,15 +240,8 @@ export const placeFromParams: RequestHandler = async (req: Request, resp: Respon
       if (IsNullOrEmpty(aPlace)) {
         aPlace = await Places.getPlaceWithName(decodeURIComponent(req.params.placeId));
       };
-      if (aPlace) {
-        const aDomain = await Domains.getDomainWithId(aPlace.domainId);
-        if (aDomain) {
+      if (IsNotNullOrEmpty(aPlace)) {
           req.vPlace = aPlace;
-          req.vDomain = aDomain;
-        }
-        else {
-          Logger.error(`placeFromParams: lookup Place with bad domain. placeId=${req.params.placeId}, domainId=${aPlace.domainId}`);
-        };
       };
     };
   };

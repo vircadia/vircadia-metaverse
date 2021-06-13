@@ -25,7 +25,9 @@ import { checkAccessToEntity } from '@Route-Tools/Permissions';
 
 import { buildPlaceInfo } from '@Route-Tools/Util';
 
+import { Accounts } from '@Entities/Accounts';
 import { Places } from '@Entities/Places';
+import { Domains } from '@Entities/Domains';
 import { Maturity } from '@Entities/Sets/Maturity';
 
 import { IsNotNullOrEmpty, IsNullOrEmpty } from '@Tools/Misc';
@@ -55,35 +57,30 @@ export const procGetPlacesPlaceId: RequestHandler = async (req: Request, resp: R
 export const procPutPlacesPlaceId: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
     if (req.vAuthAccount) {
         if (req.vPlace) {
-            if (req.vDomain) {
-                if (await checkAccessToEntity(req.vAuthToken, req.vDomain, [ Perm.SPONSOR, Perm.ADMIN ], req.vAuthAccount)) {
-                    if (req.body.place) {
-                        const updates: VKeyedCollection = {};
-                        if (req.body.place.pointee_query) {
-                            // The caller specified a domain. Either the same domain or changing
-                            if (req.body.place.pointee_query !== req.vPlace.domainId) {
-                                Logger.info(`procPutPlacesPlaceId: domain changing from ${req.vPlace.domainId} to ${req.body.place.pointee_query}`)
-                                req.vPlace.domainId = req.body.place.pointee_query;
-                                updates.domainId = req.vPlace.domainId;
-                            };
+            if (await checkAccessToEntity(req.vAuthToken, req.vPlace, [ Perm.DOMAINACCESS, Perm.ADMIN ], req.vAuthAccount)) {
+                if (req.body.place) {
+                    const updates: VKeyedCollection = {};
+                    if (req.body.place.pointee_query) {
+                        // The caller specified a domain. Either the same domain or changing
+                        if (req.body.place.pointee_query !== req.vPlace.domainId) {
+                            Logger.info(`procPutPlacesPlaceId: domain changing from ${req.vPlace.domainId} to ${req.body.place.pointee_query}`)
+                            req.vPlace.domainId = req.body.place.pointee_query;
+                            updates.domainId = req.vPlace.domainId;
                         };
-                        for (const field of [ 'path', 'description', 'thumbnail' ]) {
-                            if (req.body.place.hasOwnProperty(field)) {
-                                await Places.setField(req.vAuthToken, req.vPlace, field, req.body.place[field], req.vAuthAccount, updates);
-                            };
-                        };
-                        Places.updateEntityFields(req.vPlace, updates);
-                    }
-                    else {
-                        req.vRestResp.respondFailure('badly formed data');
                     };
+                    for (const field of [ 'path', 'description', 'thumbnail' ]) {
+                        if (req.body.place.hasOwnProperty(field)) {
+                            await Places.setField(req.vAuthToken, req.vPlace, field, req.body.place[field], req.vAuthAccount, updates);
+                        };
+                    };
+                    Places.updateEntityFields(req.vPlace, updates);
                 }
                 else {
-                    req.vRestResp.respondFailure('unauthorized');
+                    req.vRestResp.respondFailure('badly formed data');
                 };
             }
             else {
-                req.vRestResp.respondFailure('Target domain not found');
+                req.vRestResp.respondFailure('unauthorized');
             };
         }
         else {
@@ -99,9 +96,9 @@ export const procPutPlacesPlaceId: RequestHandler = async (req: Request, resp: R
 export const procDeletePlacesPlaceId: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
     if (req.vAuthAccount) {
         if (req.vPlace) {
-            if (await checkAccessToEntity(req.vAuthToken, req.vDomain, [ Perm.SPONSOR, Perm.ADMIN ], req.vAuthAccount)) {
-                Logger.info(`procDeletePlacesPlaceId: deleting place "${req.vPlace.name}", id=${req.vPlace.id}`);
-                await Places.removePlace(req.vPlace);
+            if (await checkAccessToEntity(req.vAuthToken, req.vPlace, [ Perm.DOMAINACCESS, Perm.ADMIN ], req.vAuthAccount)) {
+                    Logger.info(`procDeletePlacesPlaceId: deleting place "${req.vPlace.name}", id=${req.vPlace.id}`);
+                    await Places.removePlace(req.vPlace);
             }
             else {
                 req.vRestResp.respondFailure('unauthorized');
@@ -124,19 +121,19 @@ export const router = Router();
 router.get(   '/api/v1/places/:placeId',
                                      [ setupMetaverseAPI,   // req.vRESTResp
                                       accountFromAuthToken, // req.vAuthAccount
-                                      placeFromParams,      // req.vPlace, req.vDomain
+                                      placeFromParams,      // req.vPlace
                                       procGetPlacesPlaceId,
                                       finishMetaverseAPI ] );
 router.put( '/api/v1/places/:placeId',
                                      [ setupMetaverseAPI,   // req.vRESTResp
                                       accountFromAuthToken, // req.vAuthAccount
-                                      placeFromParams,      // req.vPlace, req.vDomain
+                                      placeFromParams,      // req.vPlace
                                       procPutPlacesPlaceId,
                                       finishMetaverseAPI ] );
 router.delete( '/api/v1/places/:placeId',
                                      [ setupMetaverseAPI,   // req.vRESTResp
                                       accountFromAuthToken, // req.vAuthAccount
-                                      placeFromParams,      // req.vPlace, req.vDomain
+                                      placeFromParams,      // req.vPlace
                                       procDeletePlacesPlaceId,
                                       finishMetaverseAPI ] );
 
