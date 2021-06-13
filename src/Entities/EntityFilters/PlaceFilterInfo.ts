@@ -14,6 +14,7 @@
 'use strict'
 
 import { Request } from 'express';
+import { Places } from '@Entities/Places';
 import { PlaceEntity } from '@Entities/PlaceEntity';
 
 import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
@@ -34,6 +35,8 @@ import { Logger } from '@Tools/Logging';
 export class PlaceFilterInfo extends CriteriaFilter {
 
     private _maturity: string[];
+    private _checkIfOnline: boolean = false;
+    private _checkIfActive: boolean = false;
     private _tags: string[];
     private _ascending: number = 1;
     private _orderByName: boolean = false;
@@ -87,8 +90,10 @@ export class PlaceFilterInfo extends CriteriaFilter {
                 for (const stat of statuses) {
                     switch (stat) {
                         case 'online':
+                            this._checkIfOnline = true;
                             break;
                         case 'active':
+                            this._checkIfActive = true;
                             break;
                         default:
                             break;
@@ -183,15 +188,21 @@ export class PlaceFilterInfo extends CriteriaFilter {
         const criteria:VKeyedCollection = {};
         if (this._maturity) {
             /* tslint:disable-next-line */
-            criteria['maturity'] = { '$in': this._maturity }
+            criteria['maturity'] = { '$in': this._maturity };
+        };
+        if (this._checkIfActive) {
+            criteria.currentAttendance = { '$gt': 0 };
+        };
+        if (this._checkIfOnline) {
+            criteria.lastActivity = { '$gte': Places.dateWhenNotActive() };
         };
         if (this._tags) {
             /* tslint:disable-next-line */
-            criteria['tags'] = { '$in': this._tags }
+            criteria['tags'] = { '$in': this._tags };
         };
         if (this._search) {
             /* tslint:disable-next-line */
-            criteria['name'] = { '$regex': this._search, '$options': 'i' }
+            criteria['name'] = { '$regex': this._search, '$options': 'i' };
         };
         return criteria;
     };
