@@ -132,7 +132,7 @@ export const procPostPlaces: RequestHandler = async (req: Request, resp: Respons
             };
         }
         else {
-            req.vRestResp.respondFailure('no domain specified');
+            req.vRestResp.respondFailure('name, address, and domainId must be specified');
         };
     }
     else {
