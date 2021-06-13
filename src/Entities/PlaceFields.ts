@@ -56,13 +56,18 @@ export const placeFields: { [key: string]: FieldDefn } = {
             // Verify that the placename is unique
             let validity: ValidateResponse;
             if (typeof(pVal) === 'string') {
-                const maybePlace = await Places.getPlaceWithName(pVal);
-                // If no other place with this name or we're setting our own name
-                if (IsNullOrEmpty(maybePlace) || (pEntity as PlaceEntity).id === maybePlace.id) {
-                    validity = { valid: true };
+                if (pVal.length <= Config['metaverse-server']['max-name-length']) {
+                    const maybePlace = await Places.getPlaceWithName(pVal);
+                    // If no other place with this name or we're setting our own name
+                    if (IsNullOrEmpty(maybePlace) || (pEntity as PlaceEntity).id === maybePlace.id) {
+                        validity = { valid: true };
+                    }
+                    else {
+                        validity = { valid: false, reason: 'place name already exists' };
+                    };
                 }
                 else {
-                    validity = { valid: false, reason: 'place name already exists' };
+                    validity = { valid: false, reason: 'place name too long' };
                 };
             }
             else {

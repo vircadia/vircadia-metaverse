@@ -51,11 +51,12 @@ export let Config = {
         'http-error-on-failure': true,  // whether to include x-vircadia error header
         'error-header': 'x-vircadia-error-handle',
 
-        'heartbeat-seconds-until-offline': 5 * 60,  // five minutes
-        'domain-seconds-until-offline': 10 * 60,    // ten minutes
         'metaverse-info-addition-file': './metaverse_info.json',
-        'session-timeout-minutes': 5,
+        'max-name-length': 32,      // the max characters a domain, place, account, ... name
 
+        'session-timeout-minutes': 5,
+        'heartbeat-seconds-until-offline': 5 * 60,            // five minutes
+        'domain-seconds-until-offline': 10 * 60,              // ten minutes
         'handshake-request-expiration-minutes': 1,            // one minute handshake
         'connection-request-expiration-minutes': 60 * 24 * 4, // 4 days
         'friend-request-expiration-minutes': 60 * 24 * 4,     // 4 days
@@ -70,7 +71,7 @@ export let Config = {
 
         // When account of this name is created, add 'admin' role to it
         //    Initially as empty so random people cannot create an admin account
-        //    This account named here MUST be controlled by the server's admin
+        //    The account named here MUST be controlled by the server's admin
         'base-admin-account': '',
 
         // If to assume domain network_address if on is not set

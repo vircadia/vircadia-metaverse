@@ -30,6 +30,7 @@ import { FieldDefn, ValidateResponse } from '@Route-Tools/EntityFieldDefn';
 import { VKeyedCollection } from '@Tools/vTypes';
 import { IsNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
+import Config from '@Base/config';
 
 export function CheckAccountFields(): void {
     // DEBUG DEBUG: for unknown reasons some field ops end up 'undefined'
@@ -68,18 +69,23 @@ export const accountFields: { [key: string]: FieldDefn } = {
         validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {
             let validity: ValidateResponse;
             if (typeof(pVal) === 'string') {
-                if (/^[A-Za-z][A-Za-z0-9+\-_\.]*$/.test(pVal)) {
-                    // Make sure no other account has this username
-                    const otherAccount = await Accounts.getAccountWithUsername(pVal);
-                    if (IsNullOrEmpty(otherAccount) || otherAccount.id === (pEntity as AccountEntity).id) {
-                        validity = { valid: true };
+                if (pVal.length <= Config['metaverse-server']['max-name-length']) {
+                    if (/^[A-Za-z][A-Za-z0-9+\-_\.]*$/.test(pVal)) {
+                        // Make sure no other account has this username
+                        const otherAccount = await Accounts.getAccountWithUsername(pVal);
+                        if (IsNullOrEmpty(otherAccount) || otherAccount.id === (pEntity as AccountEntity).id) {
+                            validity = { valid: true };
+                        }
+                        else {
+                            validity = { valid: false, reason: 'username already exists' };
+                        };
                     }
                     else {
-                        validity = { valid: false, reason: 'username already exists' };
+                        validity = { valid: false, reason: 'username can contain only A-Za-z0-9+-_.' };
                     };
                 }
                 else {
-                    validity = { valid: false, reason: 'username can contain only A-Za-z0-9+-_.' };
+                    validity = { valid: false, reason: 'username too long' };
                 };
             }
             else {

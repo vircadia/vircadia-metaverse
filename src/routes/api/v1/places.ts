@@ -34,6 +34,7 @@ import { Maturity } from '@Entities/Sets/Maturity';
 
 import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 import { Logger } from '@Tools/Logging';
+import { placeFields } from '@Entities/PlaceFields';
 
 // Return places information
 // As of 20210501, the Places information is public and the requestor does not need to
@@ -106,8 +107,8 @@ export const procPostPlaces: RequestHandler = async (req: Request, resp: Respons
             const aDomain = await Domains.getDomainWithId(requestedDomainId);
             if (aDomain) {
                 if (await checkAccessToEntity(req.vAuthToken, aDomain, [ Perm.SPONSOR, Perm.ADMIN ], req.vAuthAccount)) {
-                    const maybePlace = await Places.getPlaceWithName(requestedName);
-                    if (IsNullOrEmpty(maybePlace)) {
+                    const ifValid = await placeFields.name.validate(placeFields.name, req.vAuthAccount, requestedName);
+                    if (ifValid.valid) {
                         const newPlace = await Places.createPlace(aDomain.sponsorAccountId);
                         newPlace.name = requestedName;
                         newPlace.description = requestedDesc;
@@ -119,7 +120,7 @@ export const procPostPlaces: RequestHandler = async (req: Request, resp: Respons
                         req.vRestResp.Data = buildPlaceInfo(newPlace, aDomain);
                     }
                     else {
-                        req.vRestResp.respondFailure('place name already exists');
+                        req.vRestResp.respondFailure(ifValid.reason ?? 'place name already exists or is too long');
                     };
                 }
                 else {

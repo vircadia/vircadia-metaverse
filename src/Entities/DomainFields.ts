@@ -66,11 +66,16 @@ export const DomainFields: { [key: string]: FieldDefn } = {
         validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {
             let validity: ValidateResponse;
             if (typeof(pVal) === 'string' && (pVal as string).length > 0) {
-                if( /^[A-Za-z][A-Za-z0-9+\-_\.]*$/.test(pVal) ) {
-                    validity = { valid: true };
+                if (pVal.length <= Config['metaverse-server']['max-name-length']) {
+                    if( /^[A-Za-z][A-Za-z0-9+\-_\.]*$/.test(pVal) ) {
+                        validity = { valid: true };
+                    }
+                    else {
+                        validity = { valid: false, reason: 'domain name characters must be A-Za-z0-9+-_.'};
+                    };
                 }
                 else {
-                    validity = { valid: false, reason: 'domain name characters must be A-Za-z0-9+-_.'};
+                    validity = { valid: false, reason: 'domain name too long'};
                 };
             }
             else {
