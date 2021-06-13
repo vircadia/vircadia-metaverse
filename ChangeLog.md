@@ -1,4 +1,15 @@
 # Iamus Changelog
+## Version 2.4.4
+
+<ul>
+<li><a href="http://github.com/vircadia/Iamus/commit/2dc2adfbf745a483e3f8c8f39d736795468f5d08">view &bull;</a> Update ChangeLog.md</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/f665ee214b9ef6b0b4b7fa34a94f6007a16de6fc">view &bull;</a> Add limit to number of characters in names for Domains, Users, and Places. Add config parameter metaverse-server.max-name-lenght defaulted to 32. Closes #91</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/a871f5982570b0c5a18c8e0a4142cccca9b53822">view &bull;</a> Non-functional tweek to make an error message more informative</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/edb3c26041b014d1750297a843c64262704a3a98">view &bull;</a> Non-functional fixing of source indentation in route-tools/Permissions.ts.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/1f055a6c7d3762d44aafcda19d57195bdc161182">view &bull;</a> Rework Places request data setup and permissions     Don't lookup Place's domain when doing initial request parameter setup     Fix permission lookup to use DOMAINACCESS Closes #92</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/6ca25d3a8cb3aefd1afe542f004daf5519611109">view &bull;</a> Bump version to 2.4.4</li> 
+</ul>
+
 ## Version 2.4.3
 
 <ul>
@@ -97,15 +108,5 @@
 <li><a href="http://github.com/vircadia/Iamus/commit/b43084967d9c940cc06272fa2744808caca183c9">view &bull;</a> When generating Place address, check for domain address of "undefined" as     there are a bunch of bad entries in the database.</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/b72262c3210dcce6eac32a96cf8a5cc4792a53f1">view &bull;</a> Constrain Domain.Restriction to "open", "hifi", or "acl".</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/b7c32fc799f6709ef7f395f1925b4a837979bdef">view &bull;</a> Bump version to 2.3.13</li> 
-</ul>
-
-## Version 2.3.12
-
-<ul>
-<li><a href="http://github.com/vircadia/Iamus/commit/190bf213309b02dd23ef40ea81e5431fc6a46944">view &bull;</a> Update ChangeLog.md</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/55f42d7bf336d112a54dd097ea7a4b4dba38256b">view &bull;</a> Add "world_name" as an alias for "name" in the domain information     return JSON to enable some legacy scripts/code.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/f69fc3d6d087c33c03782be2cc558b0e6a0791e4">view &bull;</a> Update defintions of property getters and setters so they are clearly async.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/9ba59b51b7a47e46eb2620bf38d8766d24f23aad">view &bull;</a> Update redirect URL. (#79)</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/3dfd4c4bc76c8a0080960bb70c7edbf068a4e0db">view &bull;</a> Bump version to 2.3.12</li> 
 </ul>
 
