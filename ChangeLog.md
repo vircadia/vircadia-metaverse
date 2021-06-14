@@ -1,4 +1,16 @@
 # Iamus Changelog
+## Version 2.4.5
+
+<ul>
+<li><a href="http://github.com/vircadia/Iamus/commit/41fb4e3e210834d68768e1aef234fb699c585a61">view &bull;</a> Update ChangeLog.md</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/4cd620c01bb8986af037f5e6e2fb5971ad0501f9">view &bull;</a> Return "no account" error for /api/maint/places requests if account is not specified.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/9b174a791c0e28e82d68380ab50b8221a1776f89">view &bull;</a> Non-functional fix of indention in Util.ts (2 to 4)</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/7029f557ef52a5efcc2c64456670b9c1d9765a53">view &bull;</a> Add list of managers to Places and enable manager list and permissions:     Add Permission.MANAGER     Add PlaceEntity.managers     Update Place field definitions so allow setting by managers     Validate manager name settings</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/c713094481e6c6a1a0342e3630cae0e501548656">view &bull;</a> Places: fix logic for computing PlaceEntity.lastActivity that wasn't computing     correctly if the host domain didn't have an heartbeats.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/2319e072ee3f54e66da1599fdab8460ac57f2d37">view &bull;</a> Places: add configuration for interval for checking Place lastActivity timeout     Tune times for inactivity and current info update activity.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/b505cd940579c8a5d0cc019543717a36d7f2cb57">view &bull;</a> Bump verion to 2.4.5</li> 
+</ul>
+
 ## Version 2.4.4
 
 <ul>
@@ -98,15 +110,5 @@
 <li><a href="http://github.com/vircadia/Iamus/commit/2992085df3d9032f89669f7b61bbd268f3715385">view &bull;</a> Fix formatting of docs/API-Explore.md</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/2cef6bad6551d7ff12569259e83a984d47674bae">view &bull;</a> Fix missing definition that caused compilation error.</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/3c368663b3385d3b00e233b3553c1b9f38b51fb4">view &bull;</a> Bump version to 2.3.14</li> 
-</ul>
-
-## Version 2.3.13
-
-<ul>
-<li><a href="http://github.com/vircadia/Iamus/commit/7bdfdb0bc899dcc7a81941d47777d8321fbbd10b">view &bull;</a> Update ChangeLog.md</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/0b84cfb886e38c0bad07a79a0da8517bf6e62ebe">view &bull;</a> Fix return data for /explore.json so results are returned rather than the Promise</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/b43084967d9c940cc06272fa2744808caca183c9">view &bull;</a> When generating Place address, check for domain address of "undefined" as     there are a bunch of bad entries in the database.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/b72262c3210dcce6eac32a96cf8a5cc4792a53f1">view &bull;</a> Constrain Domain.Restriction to "open", "hifi", or "acl".</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/b7c32fc799f6709ef7f395f1925b4a837979bdef">view &bull;</a> Bump version to 2.3.13</li> 
 </ul>
 
