@@ -16,6 +16,7 @@
 import Config from '@Base/config';
 
 import { Entity } from '@Entities/Entity';
+import { Accounts } from '@Entities/Accounts';
 
 import { Maturity } from '@Entities/Sets/Maturity';
 import { Visibility } from '@Entities/Sets/Visibility';
@@ -26,6 +27,9 @@ import { Perm } from '@Route-Tools/Perm';
 import { FieldDefn, ValidateResponse } from '@Route-Tools/EntityFieldDefn';
 import { isStringValidator, isNumberValidator, isBooleanValidator, isSArraySet, isDateValidator } from '@Route-Tools/Validators';
 import { simpleGetter, simpleSetter, noGetter, noSetter, noOverwriteSetter, sArraySetter, dateStringGetter } from '@Route-Tools/Validators';
+import { verifyAllSArraySetValues} from '@Route-Tools/Validators';
+
+import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
 
 import { Logger } from '@Tools/Logging';
 
@@ -291,8 +295,15 @@ export const DomainFields: { [key: string]: FieldDefn } = {
         entity_field: 'managers',
         request_field_name: 'managers',
         get_permissions: [ Perm.ALL ],
-        set_permissions: [ Perm.DOMAIN, Perm.SPONSOR, Perm.ADMIN ],
-        validate: isSArraySet,
+        set_permissions: [ Perm.SPONSOR, Perm.ADMIN ],
+        validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {
+            if (await verifyAllSArraySetValues(pVal, async ( name: string ) => {
+                return IsNotNullOrEmpty(await Accounts.getAccountWithUsername(name));
+                        } ) ) {
+                return { valid: true };
+            }
+            return { valid: false, reason: 'unknown user names'};
+        },
         setter: sArraySetter,
         getter: simpleGetter
     },

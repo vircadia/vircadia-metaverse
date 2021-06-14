@@ -37,6 +37,7 @@ import { GenUUID, IsNullOrEmpty, IsNotNullOrEmpty, genRandomString } from '@Tool
 import { VKeyedCollection } from '@Tools/vTypes';
 import { Logger } from '@Tools/Logging';
 import { PlaceFilterInfo } from './EntityFilters/PlaceFilterInfo';
+import { Accounts } from './Accounts';
 
 export let placeCollection = 'places';
 
@@ -108,7 +109,7 @@ export function initPlaces(): void {
             // This updateEntityFields does nothing if 'updates' is empty
             await Places.updateEntityFields(aPlace, updates);
         };
-        Logger.debug(`PlaceActivity: numPlaces=${numPlaces}, unhookedPlaces=${numUnhookedPlaces}, inactivePlaces=${numInactivePlaces}`);
+        // Logger.debug(`PlaceActivity: numPlaces=${numPlaces}, unhookedPlaces=${numUnhookedPlaces}, inactivePlaces=${numInactivePlaces}`);
     }, 1000 * 58 );
 };
 
@@ -242,5 +243,23 @@ export const Places = {
             };
         };
         return addr;
+    },
+
+    // Function that checks to see if there are managers and, if none specified,
+    //    updates place with the name of the domain's sponser.
+    // This fixes up legacy places with the proper name of the domain owner.
+    async getManagers(pPlace: PlaceEntity): Promise<string[]> {
+        if (IsNullOrEmpty(pPlace.managers)) {
+            pPlace.managers = [];
+            const aDomain = await Domains.getDomainWithId(pPlace.domainId);
+            if (aDomain) {
+                const aAccount = await Accounts.getAccountWithId(aDomain.sponsorAccountId);
+                if (aAccount) {
+                    pPlace.managers = [ aAccount.username ];
+                };
+            };
+            await Places.updateEntityFields(pPlace, { 'managers': pPlace.managers })
+        }
+        return pPlace.managers;
     }
 };

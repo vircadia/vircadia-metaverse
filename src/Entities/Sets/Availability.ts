@@ -23,7 +23,7 @@ export class Availability {
   public static ALL: string = 'all';          // available to all
 
   // See if the passed availability code is a known availability token
-  static KnownAvailability(pAvailability: string): boolean {
+  static async KnownAvailability(pAvailability: string): Promise<boolean> {
     return [ Availability.NONE,
             Availability.FRIENDS,
             Availability.CONNECTIONS,

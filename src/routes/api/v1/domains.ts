@@ -89,6 +89,9 @@ const procPostDomains: RequestHandler = async (req: Request, resp: Response, nex
                     if (req.body.domain.network_port) {
                         newDomain.networkPort = req.body.domain.network_port;
                     };
+                    // Domain is associated with the account that is logged in for the creation
+                    Logger.debug(`procPostDomains: associating account ${req.vAuthToken.accountId} with new domain ${newDomain.id}`)
+                    newDomain.sponsorAccountId = req.vAuthToken.accountId;
 
                     // Creating a domain also creates a Place for that domain
                     // Note that place names are unique so we modify the place name if there is already one.
@@ -99,12 +102,7 @@ const procPostDomains: RequestHandler = async (req: Request, resp: Response, nex
                     newPlace.description = 'A place in ' + newDomain.name;
                     newPlace.maturity = newDomain.maturity;
                     newPlace.iPAddrOfFirstContact = req.vSenderKey;
-
-                    // If the requestor is logged in, associate that account with the new domain/place
-                    if (req.vAuthToken) {
-                        Logger.debug(`procPostDomains: associating account ${req.vAuthToken.accountId} with new domain ${newDomain.id}`)
-                        newDomain.sponsorAccountId = req.vAuthToken.accountId;
-                    };
+                    newPlace.managers = [ req.vAuthAccount.username ];
 
                     // Now that the local structures are updated, store the new entries
                     Domains.addDomain(newDomain);

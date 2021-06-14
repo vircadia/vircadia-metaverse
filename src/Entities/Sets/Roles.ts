@@ -23,7 +23,7 @@ export class Roles {
   public static USER: string = 'user';     // a 'user' or 'person'
 
   // See if the passed role code is a known role token
-  static KnownRole(pScope: string): boolean {
+  static async KnownRole(pScope: string): Promise<boolean> {
     return [ Roles.ADMIN, Roles.USER ].includes(pScope);
   };
 

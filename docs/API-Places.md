@@ -99,6 +99,7 @@ This request return JSON formatted as:
                     "description": string,
                     "maturity": string,     // one of 'unrated', 'everyone', 'teen', 'mature', 'adult'
                     "tags": string[],       // tags describing place categories
+                    "managers": string[],   // usernames of place managers
                     "domain": {
                         "id": domainId,
                         "name": domainName,
@@ -233,19 +234,20 @@ The place fields that can be fetched:
 | ---------  | -------- | --------    | ---- |
 | placeId    |   all    |    none     | string |
 | name       |   all    | domainOwner, admin | string |
-| description |  all    | domainOwner, admin | string |
-| visibility |    all   | domainOwner, admin | string |
+| description |  all    | domainOwner, manager, admin | string |
+| visibility |    all   | domainOwner, manager, admin | string |
 | domainId   |   all    |    none     | string |
-| maturity   |   all    | domainOwner, admin | string |
-| tags       |   all    | domainOwner, admin | stringArray |
-| address    |   all    | domainOwner, admin | addressString |
-| thumbnail  |   all    | domainOwner, admin | string |
-| images     |   all    | domainOwner, admin | stringArray |
-| current_attendance | all | none | number |
-| current_images | all | domainOwner, admin | stringArray |
-| current_info | all | domainOwner, admin | string |
+| maturity   |   all    | domainOwner, manager, admin | string |
+| tags       |   all    | domainOwner, manager, admin | stringArray |
+| managers   |   all    | domainOwner, admin | stringArray |
+| address    |   all    | domainOwner, manager, admin | addressString |
+| thumbnail  |   all    | domainOwner, manager, admin | string |
+| images     |   all    | domainOwner, manager, admin | stringArray |
+| current_attendance    | all | none | number |
+| current_images        | all | domainOwner, manager, admin | stringArray |
+| current_info          | all | domainOwner, manager, admin | string |
 | current_last_update_time | all | none | ISODateString |
-| current_api_key | domainOwner, admin | none | string |
+| current_api_key       | domainOwner, admin | none | string |
 | addr_of_first_contact | all | none | string |
 | when_place_entry_created | all | none | ISODateString |
 

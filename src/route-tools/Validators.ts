@@ -170,13 +170,13 @@ export function *walkSArraySetter(pValue:any): Generator<string> {
 // Verify that all values in the passed SArray setting structure are
 //    valid by applying the check function.
 // Returns 'true' if all values are valid. 'false' otherwise.
-export type ValidCheckFunction = (pVal: string) => boolean;
+export type ValidCheckFunction = (pVal: string) => Promise<boolean>;
 export async function verifyAllSArraySetValues(pValue: any, pCheckFunction: ValidCheckFunction): Promise<boolean> {
   let ret = false;
   if (IsNotNullOrEmpty(pCheckFunction) && isValidSArraySet(pValue)) {
     ret = true;
     for (const aVal of walkSArraySetter(pValue)) {
-      if (!pCheckFunction(aVal)) {
+      if (! await pCheckFunction(aVal)) {
         ret = false;
         break;
       };

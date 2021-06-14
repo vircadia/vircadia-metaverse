@@ -132,6 +132,21 @@ export async function checkAccessToEntity(pAuthToken: AuthToken,  // token being
                         };
                     };
                     break;
+                case Perm.MANAGER:
+                    // See if requesting account is in the list of managers of this entity
+                    if (pAuthToken && SArray.has(pAuthToken.scope, TokenScope.OWNER)) {
+                        if (pTargetEntity.hasOwnProperty('managers')) {
+                            requestingAccount = requestingAccount ?? await Accounts.getAccountWithId(pAuthToken.accountId);
+                            if (requestingAccount) {
+                                const managers: string[] = (pTargetEntity as DomainEntity).managers;
+                                // Logger.debug(`Perm.MANAGER: managers=${JSON.stringify(managers)}, target=${requestingAccount.username}`);
+                                if (managers && managers.includes(requestingAccount.username.toLowerCase())) {
+                                    canAccess = true;
+                                };
+                            };
+                        };
+                    };
+                    break;
                 case Perm.DOMAINACCESS:
                     // Target entity has a domain reference and verify the requestor is able to reference that domain
                     if (pAuthToken && pTargetEntity.hasOwnProperty('domainId')) {

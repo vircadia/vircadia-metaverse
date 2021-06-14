@@ -115,6 +115,7 @@ export const procPostPlaces: RequestHandler = async (req: Request, resp: Respons
                         newPlace.path = requestedAddr;
                         newPlace.domainId = aDomain.id;
                         newPlace.maturity = aDomain.maturity ?? Maturity.UNRATED;
+                        newPlace.managers = [ req.vAuthAccount.username ];
                         Places.addPlace(newPlace);
 
                         req.vRestResp.Data = buildPlaceInfo(newPlace, aDomain);

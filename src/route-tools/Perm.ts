@@ -33,6 +33,7 @@ export class Perm {
   public static CONNECTION = 'connection';// check member of .connections
   public static ADMIN    = 'admin';       // check if isAdmin
   public static SPONSOR  = 'sponsor';     // check against .sponsorAccountId
+  public static MANAGER  = 'manager';     // check against .managers
   public static DOMAINACCESS  = 'domainaccess'; // check that entity's domain has access
 };
 

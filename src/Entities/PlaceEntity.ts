@@ -26,6 +26,7 @@ export class PlaceEntity implements Entity {
     public maturity: string;      // maturity level of the place (see Sets/Maturity.ts)
     public tags: string[];        // tags defining the string content
     public domainId: string;      // domain the place is in
+    public managers: string[];    // Usernames of people who are domain admins
     public path: string;          // address within the domain: "optional-domain/x,y,z/x,y,z,x"
     public thumbnail: string;     // thumbnail for place
     public images: string[];      // images for the place

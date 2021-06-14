@@ -285,6 +285,7 @@ export async function buildPlaceInfoSmall(pPlace: PlaceEntity, pDomain?: DomainE
         'description': pPlace.description,
         'maturity': pPlace.maturity ?? Maturity.UNRATED,
         'tags': pPlace.tags,
+        'managers': await Places.getManagers(pPlace),
         'thumbnail': pPlace.thumbnail,
         'images': pPlace.images,
         'current_attendance': pPlace.currentAttendance ?? 0,
@@ -307,7 +308,7 @@ export async function buildPlaceInfoSmall(pPlace: PlaceEntity, pDomain?: DomainE
 export async function buildPlacesForDomain(pDomain: DomainEntity): Promise<any[]> {
     const ret: any[] = [];
     for await (const aPlace of Places.enumerateAsync(new GenericFilter({ 'domainId': pDomain.id }))) {
-        ret.push(await buildPlaceInfoSmall(aPlace));
+        ret.push(await buildPlaceInfoSmall(aPlace, pDomain));
     };
     return ret;
 };
