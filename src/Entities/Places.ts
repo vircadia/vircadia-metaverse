@@ -116,7 +116,7 @@ export function initPlaces(): void {
             await Places.updateEntityFields(aPlace, updates);
         };
         // Logger.debug(`PlaceActivity: numPlaces=${numPlaces}, unhookedPlaces=${numUnhookedPlaces}, inactivePlaces=${numInactivePlaces}`);
-    }, 1000 * 58 );
+    }, 1000 * Config['metaverse-server']['place-check-last-activity-seconds'] );
 };
 
 export const Places = {

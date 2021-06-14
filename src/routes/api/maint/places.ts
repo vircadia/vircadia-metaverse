@@ -170,8 +170,7 @@ const procPlacesDeleteInactive: RequestHandler = async (req: Request, resp: Resp
 };
 // Return a stream of PlaceEntity's that do not have a domain or a domain that isn't addressable
 async function *inactivePlaces(pPager: CriteriaFilter, pInfoer?: CriteriaFilter): AsyncGenerator<PlaceEntity> {
-    const inactivePlaceTime = new Date(Date.now()
-                    - (Config['metaverse-server']['place-inactive-timeout-minutes'] * 60 * 1000));
+    const inactivePlaceTime = Places.dateWhenNotActive();
     for await (const aPlace of Places.enumerateAsync(pPager, pInfoer)) {
         if (IsNotNullOrEmpty(aPlace.lastActivity) || aPlace.lastActivity < inactivePlaceTime) {
             yield aPlace;
