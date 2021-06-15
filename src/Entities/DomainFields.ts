@@ -69,7 +69,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
         set_permissions: [ Perm.DOMAIN, Perm.SPONSOR, Perm.ADMIN ],
         validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {
             let validity: ValidateResponse;
-            if (typeof(pVal) === 'string' && (pVal as string).length > 0) {
+            if (typeof(pVal) === 'string' && pVal.length > 0) {
                 if (pVal.length <= Config['metaverse-server']['max-name-length']) {
                     if( /^[A-Za-z][A-Za-z0-9+\-_\.]*$/.test(pVal) ) {
                         validity = { valid: true };
@@ -112,7 +112,7 @@ export const DomainFields: { [key: string]: FieldDefn } = {
         set_permissions: [ Perm.DOMAIN, Perm.SPONSOR, Perm.ADMIN ],
         validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {
             let validity: ValidateResponse;
-            if (typeof(pVal) === 'string' && (pVal as string).length > 0) {
+            if (typeof(pVal) === 'string' && pVal.length > 0) {
                 if (/^[A-Za-z][A-Za-z0-9+\-_\.]*$/.test(pVal)) {
                     validity = { valid: true };
                 }

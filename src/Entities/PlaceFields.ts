@@ -56,7 +56,7 @@ export const placeFields: { [key: string]: FieldDefn } = {
         validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {
             // Verify that the placename is unique
             let validity: ValidateResponse;
-            if (typeof(pVal) === 'string') {
+            if (typeof(pVal) === 'string' && pVal.length > 0) {
                 if (pVal.length <= Config['metaverse-server']['max-name-length']) {
                     const maybePlace = await Places.getPlaceWithName(pVal);
                     // If no other place with this name or we're setting our own name

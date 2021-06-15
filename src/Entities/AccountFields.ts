@@ -103,7 +103,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
         set_permissions: [ Perm.OWNER, Perm.ADMIN ],
         validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {
             let validity: ValidateResponse;
-            if (typeof(pVal) === 'string') {
+            if (typeof(pVal) === 'string' && pVal.length > 0) {
                 // Check email for sanity
                 // Old style check which doesn't cover all the RFC complient email addresses possible
                 // if (/^[A-Za-z0-9+\-_\.]+@[A-Za-z0-9-\.]+$/.test(pVal)) {
