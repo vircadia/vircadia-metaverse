@@ -78,17 +78,8 @@ export function initPlaces(): void {
                         aPlace.currentAttendance = domainAttendance;
                         updates.currentAttendance = aPlace.currentAttendance;
                     };
-                    // If the Place doesn't have a last activity set it to the domain's
-                    if (IsNullOrEmpty(aPlace.lastActivity)) {
-                        if (IsNullOrEmpty(aDomain.timeOfLastHeartbeat)) {
-                            // If the domain doesn't have a last update time either, assume stale Place
-                            aPlace.lastActivity = inactivePlaceTime;
-                        }
-                        else {
-                            aPlace.lastActivity = aDomain.timeOfLastHeartbeat;
-                        };
-                        updates.lastActivity = aPlace.lastActivity;
-                    };
+                    aPlace.lastActivity = aDomain.timeOfLastHeartbeat ?? inactivePlaceTime;
+                    updates.lastActivity = aPlace.lastActivity;
                 }
                 else {
                     // can't find the domain to go with the place. Set everything to zero and update DB

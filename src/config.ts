@@ -61,9 +61,9 @@ export let Config = {
         'connection-request-expiration-minutes': 60 * 24 * 4, // 4 days
         'friend-request-expiration-minutes': 60 * 24 * 4,     // 4 days
 
-        'place-current-timeout-minutes': 30,            // minutes until current place info is stale
+        'place-current-timeout-minutes': 5,             // minutes until current place info is stale
         'place-inactive-timeout-minutes': 60,           // minutes until place is considered inactive
-        'place-check-last-activity-seconds': (5*60)-5,  // seconds between checks for Place lastActivity updates
+        'place-check-last-activity-seconds': (3*60)-5,  // seconds between checks for Place lastActivity updates
 
         // redirection URL used for initial domain token generation,
         //   "METAVERSE_SERVER_URL" is replaced (from Config.metaverse.metaverse-server-url)

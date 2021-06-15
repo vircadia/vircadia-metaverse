@@ -291,15 +291,8 @@ export async function buildPlaceInfoSmall(pPlace: PlaceEntity, pDomain?: DomainE
         'current_attendance': pPlace.currentAttendance ?? 0,
         'current_images': pPlace.currentImages,
         'current_info': pPlace.currentInfo,
-        'current_last_update_time': pPlace.currentLastUpdateTime
-    };
-    // Return the domain's last heartbeat time if the current info has not been updated
-    if (IsNullOrEmpty(ret.current_last_update_time)) {
-        const thisDomain = pDomain ?? await Domains.getDomainWithId(pPlace.domainId);
-        if (thisDomain) {
-            const domainHeartbeat = thisDomain.timeOfLastHeartbeat;
-            ret.current_last_update_time = domainHeartbeat ? domainHeartbeat.toISOString() : undefined;
-        };
+        'current_last_update_time': pPlace.currentLastUpdateTime,
+        'last_activity_update': pPlace.lastActivity
     };
     return ret;
 };
