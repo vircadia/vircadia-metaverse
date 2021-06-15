@@ -141,7 +141,7 @@ export const placeFields: { [key: string]: FieldDefn } = {
         entity_field: 'path',
         request_field_name: 'address',
         get_permissions: [ Perm.ALL ],
-        set_permissions: [ Perm.DOMAINACCESS, Perm.MANAGER, Perm.ADMIN ],
+        set_permissions: [ Perm.NONE ],
         validate: isPathValidator,
         setter: noSetter,
         getter: async (pField: FieldDefn, pEntity: Entity): Promise<any> => {
@@ -155,9 +155,7 @@ export const placeFields: { [key: string]: FieldDefn } = {
         set_permissions: [ Perm.DOMAINACCESS, Perm.MANAGER, Perm.ADMIN ],
         validate: isPathValidator,
         setter: simpleSetter,
-        getter: async (pField: FieldDefn, pEntity: Entity): Promise<any> => {
-            return Places.getAddressString(pEntity as PlaceEntity);
-        }
+        getter: simpleGetter
     },
     'maturity': {
         entity_field: 'maturity',
