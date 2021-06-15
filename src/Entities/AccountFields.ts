@@ -68,7 +68,7 @@ export const accountFields: { [key: string]: FieldDefn } = {
         set_permissions: [ Perm.OWNER, Perm.ADMIN ],
         validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {
             let validity: ValidateResponse;
-            if (typeof(pVal) === 'string') {
+            if (typeof(pVal) === 'string' && pVal.length > 0) {
                 if (pVal.length <= Config['metaverse-server']['max-name-length']) {
                     if (/^[A-Za-z][A-Za-z0-9+\-_\.]*$/.test(pVal)) {
                         // Make sure no other account has this username
@@ -93,7 +93,14 @@ export const accountFields: { [key: string]: FieldDefn } = {
             };
             return validity;
         },
-        setter: simpleSetter,
+        // Changing the username requires searching the database and changing the name
+        //     in friend, connection, and manager lists.
+        setter: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<any> => {
+            // await Accounts.updateUsername((pEntity as AccountEntity).username, pVal as string);
+            // await Domains.updateUsername((pEntity as AccountEntity).username, pVal as string);
+            // await Places.updateUsername((pEntity as AccountEntity).username, pVal as string);
+            return simpleSetter(pField, pEntity, pVal);
+        },
         getter: simpleGetter
     },
     'email': {
