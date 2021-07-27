@@ -46,8 +46,13 @@ export function initDomains(): void {
     setInterval( async () => {
         // Find domains that are not heartbeating and reset activity if not talking
         for await (const aDomain of Domains.enumerateAsync(new GenericFilter(
-                        { 'timeOfLastHeartbeat': { '$lt': Domains.dateWhenNotActive() },
-                        '$or': [ { 'numUsers': { '$gt': 0 } }, { 'anonUsers': { '$gt': 0 } } ]
+                        {
+                            'timeOfLastHeartbeat': { '$lt': Domains.dateWhenNotActive() },
+                            '$or': [
+                                { 'numUsers': { '$gt': 0 } },
+                                { 'anonUsers': { '$gt': 0 } },
+                                { 'active': true }
+                            ]
                         }) ) ) {
             Logger.info(`Domains: domain ${aDomain.name} not heartbeating. Zeroing users.`);
             aDomain.numUsers = 0;
@@ -55,11 +60,12 @@ export function initDomains(): void {
             aDomain.active = false;
             const updates: VKeyedCollection = {
                 'numUsers': 0,
-                'anonUsers': 0
+                'anonUsers': 0,
+                'active': false
             };
-            await Domains.updateEntityFields(aDomain, updates);
+            void Domains.updateEntityFields(aDomain, updates);
         };
-    }, 1000 * 60 * 2 );
+    }, 1000 * Config['metaverse-server']['domain-seconds-check-if-online']);
 };
 
 export const Domains = {

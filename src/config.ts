@@ -55,9 +55,10 @@ export let Config = {
         'max-name-length': 32,      // the max characters a domain, place, account, ... name
 
         'session-timeout-minutes': 5,
-        'heartbeat-seconds-until-offline': 5 * 60,            // five minutes
-        'domain-seconds-until-offline': 10 * 60,              // ten minutes
-        'handshake-request-expiration-minutes': 1,            // one minute handshake
+        'heartbeat-seconds-until-offline': 5 * 60,      // seconds until non-heartbeating user is offline
+        'domain-seconds-until-offline': 10 * 60,        // seconds until non-heartbeating domain is offline
+        'domain-seconds-check-if-online': 2 * 60,       // how often to check if a domain is online
+        'handshake-request-expiration-minutes': 1,      // minutes that a handshake friend request is active
         'connection-request-expiration-minutes': 60 * 24 * 4, // 4 days
         'friend-request-expiration-minutes': 60 * 24 * 4,     // 4 days
 
