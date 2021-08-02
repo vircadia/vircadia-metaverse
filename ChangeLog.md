@@ -1,4 +1,17 @@
 # Iamus Changelog
+## Version 2.4.6
+
+<ul>
+<li><a href="http://github.com/vircadia/Iamus/commit/116736262060732ac43544b4ad3a92cd4c63845f">view &bull;</a> update ChangeLog.md for 2.4.5</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/a0b63aa5989a74dcb75510df61ee4a288e349746">view &bull;</a> Places: fix 'path' so it just returns the domain local address while     'address' returns the join of the domain's network address and the 'path'. Disables setting PlaceEntity.address.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/5f5a7f1cef0d30af0a1821bc6d843bbf8c971e91">view &bull;</a> Add checks to make sure Place, Domain, and User names are not set to zero length strings.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/1e353bfe7a9daa70259fd543c44fcd8be9f46d00">view &bull;</a> Places: minor tweeking to how last activity time is computed for a Place     Now only updated by periodic Place activity check process.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/82f3b18687c353c5363aa18f8855a17f85087f8b">view &bull;</a> Add comments about changing usernames and what must be done in all the name lists.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/5e3732b76f171912860f2bc17a010cc6019f1592">view &bull;</a> Repair setting of domain to active=false when domain stops heartbeating.     Closes #95 Add config parameter 'domain-seconds-check-if-online' for domain active polling interval. Add some descriptive comments to some configuration parameters.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/d750b4eee0d616a831a24aa67178a264d781c882">view &bull;</a> Add alternate date format fields for all returned JSON status. Adds "_s" version of string date formats with time represented as a UNIX epoch time integer. Fixes #93</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/c1fe41f5a93edd0bbd248839753cf59294e33cf5">view &bull;</a> Bump version to 2.4.6</li> 
+</ul>
+
 ## Version 2.4.5
 
 <ul>
@@ -99,16 +112,5 @@
 <li><a href="http://github.com/vircadia/Iamus/commit/1201064098fabd50b490081310cc546b9d341998">view &bull;</a> Fix DB error when filtering Places for openness. Modify /api/v1/places to only return Places that have an associated domain. Modify /api/v1/places to not require logging in to get Places list.</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/b6799ed94315f9d25e5d5eb78c122f505b6d5fb0">view &bull;</a> Add VisibilityFilter and rework logic that returns Places and Domains     so "open" and "private" work depending on the 'visibility' setting.</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/1f58e1575963312a9ac1d57bbc5988e389ef4d92">view &bull;</a> Add 'active' boolean to a domain to denote if the domain is heartbeating Include 'active', 'protocol', and 'version' is domain information in Place returned info Update number of domain reported users to be sum of logged in and anonymous avatars Reorder Place return tests so /api/v1/places does not return Places with no domains Update documentation on return of added fields for Places</li> 
-</ul>
-
-## Version 2.3.14
-
-<ul>
-<li><a href="http://github.com/vircadia/Iamus/commit/da3e3628f0bb0e003bc332d245071518a61dad95">view &bull;</a> Update ChangeLog.md</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/6ad6fde681ecde16a5686b71e02e8e5999136e14">view &bull;</a> Finish query search criteria for Places     Added code for "search="     Completed and debugged code for "order=" Completed and debugged Db sortCriteria code.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/cd62e04bea6a1478475713e6f2697840a20cd935">view &bull;</a> Add 'visibility' field to Places and Domains.     Currently default to "OPEN" but allow "PRIVATE"</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/2992085df3d9032f89669f7b61bbd268f3715385">view &bull;</a> Fix formatting of docs/API-Explore.md</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/2cef6bad6551d7ff12569259e83a984d47674bae">view &bull;</a> Fix missing definition that caused compilation error.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/3c368663b3385d3b00e233b3553c1b9f38b51fb4">view &bull;</a> Bump version to 2.3.14</li> 
 </ul>
 
