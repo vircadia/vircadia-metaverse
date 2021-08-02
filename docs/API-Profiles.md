@@ -43,7 +43,9 @@ have "availability" set to "all" are returned.
                     "friends": [ "friendName", "friendName", ... ],
                     "connections": [ "connectionName", "connectionName", ...],
                     "when_account_created": "YYYY-MM-DDTHH:MM:SS.MMMZ",
+                    "when_account_created_s": integerUnixTimeSeconds,
                     "time_of_last_heartbeat": "YYYY-MM-DDTHH:MM:SS.MMMZ"
+                    "time_of_last_heartbeat_s": integerUnixTimeSeconds
                 },
                 ...
             ]

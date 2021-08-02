@@ -40,7 +40,8 @@ are returned (limited by pagination).
                         "path": "/X,Y,Z/X,Y,Z,W",
                         "placeid": stringIdOfPlace,
                         "domainid": stringIdOfDomain,
-                        "availability": stringWhoCanSee // one of "all", "none", "connections", "friends"
+                        "availability": stringWhoCanSee // one of "all", "none", "connections",
+                        "friends": []
                     },
                     "profile_detail": {},               // account detail information
                     "friends": [ "friendName", "friendName", ... ],
@@ -49,7 +50,9 @@ are returned (limited by pagination).
                     "enabled": true,                    // 'false' if waiting for email verification
                     "roles": [ "role", "role", ... ],   // roles of "user", "admin", ...
                     "when_account_created": "YYYY-MM-DDTHH:MM:SS.MMMZ",
+                    "when_account_created_s": 1617405661,
                     "time_of_last_heartbeat": "YYYY-MM-DDTHH:MM:SS.MMMZ"
+                    "time_of_last_heartbeat_s": 1627921261
                 },
                 ...
             ]
@@ -146,7 +149,9 @@ The account fields that can be fetched:
 |roles        |   all    | admin       |   stringArray |
 |ip_addr_of_creator | all | noone       |   string |
 |when_account_created | all | noone     |   ISODateString |
+|when_account_created_s | all | noone     |   integerUnixTimeSeconds |
 |time_of_last_heartbeat | all | noone   |   ISODateString |
+|time_of_last_heartbeat_s | all | noone   |   integerUnixTimeSeconds |
 
 The JSON structure returned looks like the regular REST response
 with the "data" object being the value requests.

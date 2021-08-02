@@ -64,7 +64,8 @@ The response is a JSON array of Place descriptions.
             "current_attendance': number,   // reported attendance at place
             "current_images': stringURLS[],
             "current_info': string,
-            "current_last_update_time': "ISODateString"
+            "current_last_update_time': "ISODateString",
+            "current_last_update_time_s': integerUnixTimeSeconds
         },
     },
     ...

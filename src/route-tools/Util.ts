@@ -139,7 +139,8 @@ export async function buildDomainInfo(pDomain: DomainEntity): Promise<any> {
         'version': pDomain.version,
         'protocol_version': pDomain.protocol,
         'active': pDomain.active ?? false,
-        'time_of_last_heartbeat': pDomain.timeOfLastHeartbeat ? pDomain.timeOfLastHeartbeat.toISOString() : undefined,
+        'time_of_last_heartbeat': pDomain.timeOfLastHeartbeat?.toISOString(),
+        'time_of_last_heartbeat_s': pDomain.timeOfLastHeartbeat?.getTime().toString(),
         'num_users': pDomain.numUsers + pDomain.anonUsers
     };
 };
@@ -188,10 +189,12 @@ export async function buildDomainInfoV1(pDomain: DomainEntity): Promise<any> {
             'num_users': pDomain.numUsers,
             'user_hostnames': pDomain.hostnames
         },
-        'time_of_last_heartbeat': pDomain.timeOfLastHeartbeat ? pDomain.timeOfLastHeartbeat.toISOString() : undefined,
+        'time_of_last_heartbeat': pDomain.timeOfLastHeartbeat?.toISOString(),
+        'time_of_last_heartbeat_s': pDomain.timeOfLastHeartbeat?.getTime().toString(),
         'last_sender_key': pDomain.lastSenderKey,
         'addr_of_first_contact': pDomain.iPAddrOfFirstContact,
-        'when_domain_entry_created': pDomain.whenCreated ? pDomain.whenCreated.toISOString() : undefined
+        'when_domain_entry_created': pDomain.whenCreated?.toISOString(),
+        'when_domain_entry_created_s': pDomain.whenCreated?.getTime().toString()
     };
 };
 
@@ -236,8 +239,10 @@ export async function buildAccountInfo(pReq: Request, pAccount: AccountEntity): 
         'location': await buildLocationInfo(pAccount),
         'friends': pAccount.friends,
         'connections': pAccount.connections,
-        'when_account_created': pAccount.whenCreated ? pAccount.whenCreated.toISOString() : undefined,
-        'time_of_last_heartbeat': pAccount.timeOfLastHeartbeat ? pAccount.timeOfLastHeartbeat.toISOString() : undefined
+        'when_account_created': pAccount.whenCreated?.toISOString(),
+        'when_account_created_s': pAccount.whenCreated?.getTime().toString(),
+        'time_of_last_heartbeat': pAccount.timeOfLastHeartbeat?.toISOString(),
+        'time_of_last_heartbeat_s': pAccount.timeOfLastHeartbeat?.getTime().toString(),
     };
 };
 // Return the block of account information used as the account 'profile'.
@@ -254,8 +259,10 @@ export async function buildAccountProfile(pReq: Request, pAccount: AccountEntity
         },
         'profile_detail': pAccount.profileDetail,
         'location': await buildLocationInfo(pAccount),
-        'when_account_created': pAccount.whenCreated ? pAccount.whenCreated.toISOString() : undefined,
-        'time_of_last_heartbeat': pAccount.timeOfLastHeartbeat ? pAccount.timeOfLastHeartbeat.toISOString() : undefined
+        'when_account_created': pAccount.whenCreated?.toISOString(),
+        'when_account_created_s': pAccount.whenCreated?.getTime().toString(),
+        'time_of_last_heartbeat': pAccount.timeOfLastHeartbeat?.toISOString(),
+        'time_of_last_heartbeat_s': pAccount.timeOfLastHeartbeat?.getTime().toString(),
     };
 };
 
@@ -291,8 +298,10 @@ export async function buildPlaceInfoSmall(pPlace: PlaceEntity, pDomain?: DomainE
         'current_attendance': pPlace.currentAttendance ?? 0,
         'current_images': pPlace.currentImages,
         'current_info': pPlace.currentInfo,
-        'current_last_update_time': pPlace.currentLastUpdateTime,
-        'last_activity_update': pPlace.lastActivity
+        'current_last_update_time': pPlace.currentLastUpdateTime?.toISOString(),
+        'current_last_update_time_s': pPlace.currentLastUpdateTime?.getTime().toString(),
+        'last_activity_update': pPlace.lastActivity?.toISOString(),
+        'last_activity_update_s': pPlace.lastActivity?.getTime().toString()
     };
     return ret;
 };

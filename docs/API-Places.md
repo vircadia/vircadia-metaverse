@@ -110,6 +110,7 @@ This request return JSON formatted as:
                         'protocol_version': string, // protocol version for domain-server
                         'active': boolean,          // true if domain is heartbeating
                         "time_of_last_heartbeat": ISOStringDate,
+                        "time_of_last_heartbeat_s": integerUnixTimeSeconds,
                         "num_users": integer
                     },
                     "thumbnail": URL,
@@ -117,7 +118,8 @@ This request return JSON formatted as:
                     "current_attendance": number,
                     "current_images": string[],
                     "current_info": string,
-                    "current_last_update_time": ISOStringDate
+                    "current_last_update_time": ISOStringDate,
+                    "current_last_update_time_s": integerUnixTimeSeconds
                 },
                 ...
             ],
@@ -247,9 +249,11 @@ The place fields that can be fetched:
 | current_images        | all | domainOwner, manager, admin | stringArray |
 | current_info          | all | domainOwner, manager, admin | string |
 | current_last_update_time | all | none | ISODateString |
+| current_last_update_time_s | all | none | integerUnixTimeSeconds |
 | current_api_key       | domainOwner, admin | none | string |
 | addr_of_first_contact | all | none | string |
 | when_place_entry_created | all | none | ISODateString |
+| when_place_entry_created_s | all | none | integerUnixTimeSeconds |
 
 The JSON structure returned looks like the regular REST response
 with the "data" object being the value requests.

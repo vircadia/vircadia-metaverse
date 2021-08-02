@@ -39,8 +39,10 @@ const procGetRequests: RequestHandler = async (req: Request, resp: Response, nex
                 'type': aReq.requestType,
                 'requesting_account_id': aReq.requestingAccountId,
                 'target_account_id': aReq.targetAccountId,
-                'when_created': aReq.whenCreated ? aReq.whenCreated.toISOString() : undefined,
-                'expiration_time': aReq.expirationTime ? aReq.expirationTime.toISOString() : undefined
+                'when_created': aReq.whenCreated?.toISOString(),
+                'when_created_s': aReq.whenCreated?.getTime().toString(),
+                'expiration_time': aReq.expirationTime?.toISOString(),
+                'expiration_time_s': aReq.expirationTime?.getTime().toString()
             };
             switch (aReq.requestType) {
                 case RequestType.HANDSHAKE:

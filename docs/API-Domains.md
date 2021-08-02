@@ -60,9 +60,11 @@ A request returns an array of domain descriptions:
                         "user_hostnames": [];
                   },
                   "time_of_last_heartbeat": "YYYY-MM-DDTHH:MM:SS.MMMZ",
+                  "time_of_last_heartbeat_s": 1627921261
                   "last_sender_key": stringHostPortSourceOfLastMessage,
                   "addr_of_first_contact": stringHostPortOfDomainEntryCreation,
-                  "when_domain_entry_created": "YYYY-MM-DDTHH:MM:SS.MMMZ"
+                  "when_domain_entry_created": "YYYY-MM-DDTHH:MM:SS.MMMZ",
+                  "when_domain_entry_created_s": 1617405661
               },
               ...
           ]
@@ -158,7 +160,9 @@ The domain fields that can be fetched:
 | images        |    all   | domain sponsor admin | stringArray |
 | addr_of_first_contact    | all   | noone | string |
 | when_domain_entry_created | all  | noone | ISODateString |
+| when_domain_entry_created_s | all  | noone | integerUnixTimeSeconds |
 | time_of_last_heartbeat   | all   | noone | ISODateString |
+| time_of_last_heartbeat_s   | all   | noone | integerUnixTimeSeconds |
 | last_sender_key | all    | noone | string |
 
 The JSON structure returned looks like the regular REST response
