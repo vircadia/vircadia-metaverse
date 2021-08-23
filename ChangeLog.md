@@ -1,4 +1,13 @@
 # Iamus Changelog
+## Version 2.4.7
+
+<ul>
+<li><a href="http://github.com/vircadia/Iamus/commit/d0495f3dc7c2d085d5f06cfaf8144a37ae1f8896">view &bull;</a> Update ChangeLog.md</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/fd1ef936e9853ff24c8b561e4a9580f8ae98ccb7">view &bull;</a> Bump path-parse from 1.0.6 to 1.0.7 (#97)</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/7e22410662d7f59ca17f80986734c736bc730d1e">view &bull;</a> Fixes problem of anon users being counted twice. Problem was that Iamus interpreted the domain-server "num_users" and "anon_users" as two separate sets when, actually, the domain-server heartbeats "num_users" as the total number of users and "anon_users" is the number, of that total, that are anonymous. Fixes #98</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/fae9dea95dfe9cefb2059a06f312adcb007fef14">view &bull;</a> Bump version to 2.4.7</li> 
+</ul>
+
 ## Version 2.4.6
 
 <ul>
@@ -103,14 +112,5 @@
 <li><a href="http://github.com/vircadia/Iamus/commit/91d566452f16893fea8896761a3146c36e4e4c79">view &bull;</a> Add comment in config.ts for VERIFICATION_URL replacement</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/5c8d002b8f5b8119d16832b6cdae3566e7decd9c">view &bull;</a> Adding some comments</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/787c7903761bcb376d296569aeafa1e6a77197c4">view &bull;</a> Bump version to 2.3.16</li> 
-</ul>
-
-## Version 2.3.15
-
-<ul>
-<li><a href="http://github.com/vircadia/Iamus/commit/e58ece2f451b33971c6d4de2f4d8985771661082">view &bull;</a> Update Changelog.md</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/1201064098fabd50b490081310cc546b9d341998">view &bull;</a> Fix DB error when filtering Places for openness. Modify /api/v1/places to only return Places that have an associated domain. Modify /api/v1/places to not require logging in to get Places list.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/b6799ed94315f9d25e5d5eb78c122f505b6d5fb0">view &bull;</a> Add VisibilityFilter and rework logic that returns Places and Domains     so "open" and "private" work depending on the 'visibility' setting.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/1f58e1575963312a9ac1d57bbc5988e389ef4d92">view &bull;</a> Add 'active' boolean to a domain to denote if the domain is heartbeating Include 'active', 'protocol', and 'version' is domain information in Place returned info Update number of domain reported users to be sum of logged in and anonymous avatars Reorder Place return tests so /api/v1/places does not return Places with no domains Update documentation on return of added fields for Places</li> 
 </ul>
 
