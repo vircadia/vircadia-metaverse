@@ -141,7 +141,7 @@ export async function buildDomainInfo(pDomain: DomainEntity): Promise<any> {
         'active': pDomain.active ?? false,
         'time_of_last_heartbeat': pDomain.timeOfLastHeartbeat?.toISOString(),
         'time_of_last_heartbeat_s': pDomain.timeOfLastHeartbeat?.getTime().toString(),
-        'num_users': pDomain.numUsers + pDomain.anonUsers
+        'num_users': pDomain.numUsers
     };
 };
 
@@ -166,7 +166,7 @@ export async function buildDomainInfoV1(pDomain: DomainEntity): Promise<any> {
         'restricted': pDomain.restricted,
         'num_users': pDomain.numUsers,
         'anon_users': pDomain.anonUsers,
-        'total_users': pDomain.numUsers + pDomain.anonUsers,
+        'total_users': pDomain.numUsers,
         'capacity': pDomain.capacity,
         'description': pDomain.description,
         'maturity': pDomain.maturity ?? Maturity.UNRATED,

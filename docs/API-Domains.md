@@ -33,7 +33,7 @@ A request returns an array of domain descriptions:
                   "network_address": stringNetworkAddress,
                   "automatic_networking": stringMode,  // one of "full", "ip", or "disabled"
                   "restricted": boolWhetherRestricted,
-                  "num_users": intCurrentLoggedInUsers,
+                  "num_users": intCurrentUsers,
                   "anon_users": intCurrentAnonomousUsers,
                   "total_users": intTotalUsers,
                   "capacity": intMaxCapacity,
@@ -55,7 +55,7 @@ A request returns an array of domain descriptions:
                         "world_name": stringName
                   },
                   "users": {
-                        "num_users": intCurrentLoggedInUsers,
+                        "num_users": intCurrentUsers,
                         "anon_users": intCurrentAnonomousUsers,
                         "user_hostnames": [];
                   },

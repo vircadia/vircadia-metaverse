@@ -72,7 +72,7 @@ export function initPlaces(): void {
                 const aDomain = await Domains.getDomainWithId(aPlace.domainId);
                 if (aDomain) {
                     // Logger.debug(`   PlaceActivity: found domain for place ${aPlace.name}`);
-                    const domainAttendance = (aDomain.numUsers ?? 0) + (aDomain.anonUsers ?? 0);
+                    const domainAttendance = aDomain.numUsers ?? 0;
                     // If the Place doesn't have an attendance number or that number doesn't match the domain, update
                     if (IsNullOrEmpty(aPlace.currentAttendance) || aPlace.currentAttendance !== domainAttendance) {
                         aPlace.currentAttendance = domainAttendance;

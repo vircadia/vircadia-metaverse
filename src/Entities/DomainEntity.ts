@@ -34,7 +34,7 @@ export class DomainEntity implements Entity {
     public networkPort: string;  // reported network address
     public networkingMode: string;   // one of "full", "ip", "disabled"
     public restricted: boolean;  // 'true' if restricted to users with accounts
-    public numUsers: number;     // regular users logged in
+    public numUsers: number;     // total number of logged in users
     public anonUsers: number;    // number of anonymous users
     public hostnames: string[];  // User segmentation
 

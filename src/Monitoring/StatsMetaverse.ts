@@ -53,7 +53,7 @@ export class StatsMetaverse extends Stat {
             for await (const aDomain of Domains.enumerateAsync(new GenericFilter(
                             { '$or': [ { 'numUsers': { '$gt': 0 } }, { 'anonUsers': { '$gt': 0 } } ]
                             }) ) ) {
-                totalUsers += aDomain.numUsers + aDomain.anonUsers;
+                totalUsers += aDomain.numUsers;
                 anonUsers += aDomain.anonUsers;
             };
             stat.Event(totalUsers);
