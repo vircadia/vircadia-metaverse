@@ -1,4 +1,14 @@
 # Iamus Changelog
+## Version 2.4.8
+
+<ul>
+<li><a href="http://github.com/vircadia/Iamus/commit/b21a2da4d064b3a7660524bb6ebbc8c0732c0b27">view &bull;</a> Update ChangeLog.md</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/764bbd7a029082aada2a899808dffd83ec847b7a">view &bull;</a> Bump color-string from 1.5.4 to 1.6.0 (#96)</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/2bbc0ad8780f9df2bdef33f287a5695b417f80f4">view &bull;</a> Fix bug of not allowing URLs for base configuration file.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/2839c9393b0d88a783be0a2bb7112911986705b0">view &bull;</a> Update build_scripts/cleanDist.js to remove deprecated warnings.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/3537384daf46a206366b75c1e3421e26ca06f2ef">view &bull;</a> Bump version to 2.4.8</li> 
+</ul>
+
 ## Version 2.4.7
 
 <ul>
@@ -88,29 +98,5 @@
 <li><a href="http://github.com/vircadia/Iamus/commit/e28c49c6831cc1a7b4c9b2b4e8aa47a13412b782">view &bull;</a> workflows/docker-publish.yml: remove comments and add some explanation comments</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/b38b693ee7c37a268fe9c4a18fe74393912ecea1">view &bull;</a> Add scripts for running, updating, restarting, and stopping Docker image. Add docker/README.md to explain the use of the Docker image scripts. Update docs/RunningDockerImage.md with new repository location and     updated notes on running.</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/33847c790d8740f6466cf5a0fd0185957f8c0f53">view &bull;</a> Bump version to 2.3.17</li> 
-</ul>
-
-## Version 2.3.16
-
-<ul>
-<li><a href="http://github.com/vircadia/Iamus/commit/747ea7b94c816798397d8da6227f7bd25cf47156">view &bull;</a> Bump version to 2.3.15</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/2243f6f0e48e9799b8b7190da68a9813034b5648">view &bull;</a> Update ChangeLog.md</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/6d84f98bc640840d8066412e0a5351f18ad4d42b">view &bull;</a> Add initial version of docs/ResrouceLimitNotes.md</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/e49048b332558bff0c5751c80de07fae08440bac">view &bull;</a> Small formatting tweaks to docs/ResourceLimitNotes.md</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/94a1633651306025652742f536f4c40b74585322">view &bull;</a> Make temp domain name creation optional. Defaults to disabled.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/608e8a2f33cbc7eb12b694608ff58152e4a5d643">view &bull;</a> Update tabbing to 4 spaces in token.ts. No functional change.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/6a482b7a6f3f0a3df285a45f4a2d39f6fbb10ad7">view &bull;</a> Add Config.metaverse-server.enable-account-email-verificiation Add AccountEntity.accountEmailVerified boolean field Add logic to not create account auth token if account email not verified     Assume verified if 'accountEmailVerified' field not present for backward compatability</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/16b965bf886283d03d23024255ecd953c026b372">view &bull;</a> Gigantic reformatting changing tabs from 2 to 4. No functional changes.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/418811fdd22ecf724da04d03ca2da521c4463ba7">view &bull;</a> Initial version of verify account email on account creation. Add configuration parameters for optionally enabling account email validation step.     Default 'false'.     Configuration parameters for Nodemailer SMTP out-bound permissions. Add 'validated' property to account.     Limit creation of access tokens to validated accounts. Add 'verifyEmail' Request type. Add /api/v1/account/verify/email to accept GET request for validation. Add /static/verificationEmail.html as template for sent email.     Replacement parameters in template for metaverse name</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/f374a6d3c403cfbc157c376a921c2262e48221bf">view &bull;</a> Add very minimal Account email verification redirection targets</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/f96504d463712d02f0c02874cb3b1e0b4d3712fd">view &bull;</a> Add redirection configuration and URLs for account email verification success and failure.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/a690b49982cc56fec1f09c747ac8fa410a6a28d8">view &bull;</a> Make config.ts have consistant 4 space indents. No function changes.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/6e2ae14e7c31b8c1d4bb4e9a15f069db7dff865e">view &bull;</a> Make default account email verification period to be one day.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/5fac583ee1d027b68ad384c13c079125b6854215">view &bull;</a> Add "enabled" to information returned with account Return enabled information when account created (so requestor can know if awaiting enablement) Centralize logic to test for account enabled in Accounts.isEnabled() Documentation     Add additional information returned by create account request</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/641112cffcdb5cceef5652e91bbdf89ca449a807">view &bull;</a> Fix problem where admin account name has no default in configuration file.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/8a2af18961f9c402f545d86fdb6ed9b24f740766">view &bull;</a> Update documentation with new file "AdministrationNotes.md" which has explanation of account email verification and initial admin account creation.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/91d566452f16893fea8896761a3146c36e4e4c79">view &bull;</a> Add comment in config.ts for VERIFICATION_URL replacement</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/5c8d002b8f5b8119d16832b6cdae3566e7decd9c">view &bull;</a> Adding some comments</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/787c7903761bcb376d296569aeafa1e6a77197c4">view &bull;</a> Bump version to 2.3.16</li> 
 </ul>
 
