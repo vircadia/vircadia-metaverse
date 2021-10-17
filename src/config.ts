@@ -180,7 +180,7 @@ export async function initializeConfiguration(): Promise<void> {
     // Read in the configuration file if it exists and overlay the values.
     try {
         const userConfigFile = Config.server["user-config-file"];
-        if (fs.existsSync(userConfigFile)) {
+        if (IsNotNullOrEmpty(userConfigFile)) {
             Logger.debug(`initializeConfiguration: reading configuration file ${userConfigFile}`);
             const userConfig = await readInJSON(userConfigFile);
             if (IsNotNullOrEmpty(userConfig)) {
@@ -269,15 +269,17 @@ export async function initializeConfiguration(): Promise<void> {
 // Returns the parsed JSON object or 'undefined' if any errors.
 export async function readInJSON(pFilenameOrURL: string): Promise<any> {
     let configBody: string;
-    if (pFilenameOrURL.startsWith('http:')) {
+    if (pFilenameOrURL.startsWith('http://')) {
         configBody = await httpRequest(pFilenameOrURL);
     }
     else {
-        if (pFilenameOrURL.startsWith('https:')) {
+        if (pFilenameOrURL.startsWith('https://')) {
             configBody = await httpsRequest(pFilenameOrURL);
         }
         else {
             try {
+                // We should technically sanitize this filename but if one can change the environment
+                //    or config file variables, the app is already poned.
                 configBody = fs.readFileSync(pFilenameOrURL, 'utf-8');
             }
             catch (err) {
