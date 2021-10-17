@@ -8,10 +8,15 @@
     See the accompanying file LICENSE or http://www.apache.org/licenses/LICENSE-2.0.html
 */
 
-const fs = require('fs').promises;
+const fs = require("fs").promises;
 
 const directory = './dist';
 
-fs.rmdir(directory, { recursive: true })
-.then(() => console.log('Dist folder cleared!'));
+fs.rm(directory, { recursive: true, force: true })
+.then(() => {
+    console.log(`Dist folder cleared!`)
+})
+.catch( (err) => {
+    console.log(`Clearing of Dist folder failed! ${JSON.stringify(err)}`)
+});
   
