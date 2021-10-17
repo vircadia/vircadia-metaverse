@@ -1,6 +1,6 @@
 {
     "name": "iamus-metaverse-server",
-    "version": "2.4.7",
+    "version": "2.4.8",
     "private": true,
     "description": "metaverse-server for Vircadia",
     "author": "Robert Adams <misterblue@misterblue.com>",

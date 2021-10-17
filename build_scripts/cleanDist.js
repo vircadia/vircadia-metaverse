@@ -19,4 +19,3 @@ fs.rm(directory, { recursive: true, force: true })
 .catch( (err) => {
     console.log(`Clearing of Dist folder failed! ${JSON.stringify(err)}`)
 });
-  
