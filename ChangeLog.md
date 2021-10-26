@@ -1,4 +1,12 @@
 # Iamus Changelog
+## Version 2.4.9
+
+<ul>
+<li><a href="http://github.com/vircadia/Iamus/commit/afa01d0e67adcb9dee407827f3a4819b9107cf97">view &bull;</a> Update ChangeLog.md</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/4dced54f8a6f50cd3ac90b2e66f217b237252cb6">view &bull;</a> Allow setting of Place 'address' field with full path address.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/0c745918e46a2d1f739107b11a9504de8c0dab89">view &bull;</a> Bump version to 2.4.9</li> 
+</ul>
+
 ## Version 2.4.8
 
 <ul>
@@ -83,20 +91,5 @@
 <li><a href="http://github.com/vircadia/Iamus/commit/a269b7015d5993b0f84a7a2c1bfa11c4036434fc">view &bull;</a> Update ChangeLog.md</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/2982560c3749eacf6b29d4210052ff9bf220bd79">view &bull;</a> Remove comment and README references to ActivityPub since that is not     an explicit goal. Some federation system will be used but one has     not been chosen.</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/03b96cb03447c774328fd927265025dec2a9172b">view &bull;</a> Bump version to 2.4.1</li> 
-</ul>
-
-## Version 2.3.17
-
-<ul>
-<li><a href="http://github.com/vircadia/Iamus/commit/91d5b790e49ee1353e466e9e2469b74cc0af9d68">view &bull;</a> Update ChangeLog.md</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/6b7ca04fee6831ec3fefe50b77407619451f7a74">view &bull;</a> Add domain capacity to domain info returned for Places. Closes #84</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/7138965758c463861b2cd43f635093f800247723">view &bull;</a> Add documentation on what's returned when an account is created.     Includes information on whether account is awaiting verification.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/c4b7bdaaa42a441cef0f215af98c67f90247d54b">view &bull;</a> Initial version of Github Action to build Iamus Docker image on     push to 'master' branch.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/f42e2db4b7d8e88297d36734aaaa0d2e8226fd02">view &bull;</a> workflows/docker-publish.yml: Correct version fetch of built Docker image.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/48a6a59114a128337060afc2c07476875b7fe710">view &bull;</a> workflows/docker-publish.yml: Docker image tag names must be lower case</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/9931a92b1755c65600b23942b5efa5670b6e94fa">view &bull;</a> workflows/docker-publish.yml: remove interactive parameters from version docker invocation.     Add explanation comments.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/e28c49c6831cc1a7b4c9b2b4e8aa47a13412b782">view &bull;</a> workflows/docker-publish.yml: remove comments and add some explanation comments</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/b38b693ee7c37a268fe9c4a18fe74393912ecea1">view &bull;</a> Add scripts for running, updating, restarting, and stopping Docker image. Add docker/README.md to explain the use of the Docker image scripts. Update docs/RunningDockerImage.md with new repository location and     updated notes on running.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/33847c790d8740f6466cf5a0fd0185957f8c0f53">view &bull;</a> Bump version to 2.3.17</li> 
 </ul>
 
