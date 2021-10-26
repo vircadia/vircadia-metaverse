@@ -29,7 +29,7 @@ import { Perm } from '@Route-Tools/Perm';
 import { checkAccessToEntity } from '@Route-Tools/Permissions';
 
 import { FieldDefn, ValidateResponse } from '@Route-Tools/EntityFieldDefn';
-import { isStringValidator, isSArraySet, isPathValidator, isDateValidator, isObjectValidator, isNumberValidator } from '@Route-Tools/Validators';
+import { isStringValidator, isSArraySet, isPathValidator, isLongPathValidator, isDateValidator, isObjectValidator, isNumberValidator } from '@Route-Tools/Validators';
 import { simpleGetter, simpleSetter, noSetter, sArraySetter, dateStringGetter, verifyAllSArraySetValues} from '@Route-Tools/Validators';
 
 import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
@@ -141,11 +141,11 @@ export const placeFields: { [key: string]: FieldDefn } = {
         entity_field: 'path',
         request_field_name: 'address',
         get_permissions: [ Perm.ALL ],
-        set_permissions: [ Perm.NONE ],
-        validate: isPathValidator,
-        setter: noSetter,
+        set_permissions: [ Perm.DOMAINACCESS, Perm.MANAGER, Perm.ADMIN ],
+        validate: isLongPathValidator,
+        setter: simpleSetter,
         getter: async (pField: FieldDefn, pEntity: Entity): Promise<any> => {
-            return Places.getAddressString(pEntity as PlaceEntity);
+            return await Places.getAddressString(pEntity as PlaceEntity);
         }
     },
     'path': { // the address within the domain

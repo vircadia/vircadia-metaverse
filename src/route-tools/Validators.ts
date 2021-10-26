@@ -53,10 +53,20 @@ export async function isPathValidator(pField: FieldDefn, pEntity: Entity, pValue
   // if  (/^[\w\.:+_-]*\/-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?\/-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?$/.test(pValue)) {
   // Regexp to check format of "/float,float,float/float,float,float,float"
   //    This make a "path" just the position and rotation within a domain
-  if  (/^\/-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?\/-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?$/.test(pValue)) {
-    return { valid: true };
+  if (typeof(pValue) === 'string') {
+    if  (/^\/-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?\/-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?$/.test(pValue)) {
+      return { valid: true };
+    };
   };
-  return { valid: false, reason: 'path must have the form "optional-network-addr/f,f,f/f,f,f,f' };
+  return { valid: false, reason: 'path must be a string of the form "/f,f,f/f,f,f,f' };
+};
+export async function isLongPathValidator(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<ValidateResponse> {
+  if (typeof(pValue) === 'string') {
+    if  (/^.*\/-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?\/-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?,-?\d+(\.\d*)?$/.test(pValue)) {
+      return { valid: true };
+    };
+  };
+  return { valid: false, reason: 'path must be a string of the form "optional-domain/f,f,f/f,f,f,f' };
 };
 export async function isDateValidator(pField: FieldDefn, pEntity: Entity, pValue: any): Promise<ValidateResponse> {
   if (pValue instanceof Date) {
