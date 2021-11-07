@@ -52,7 +52,7 @@ export const placeFields: { [key: string]: FieldDefn } = {
         entity_field: 'name',
         request_field_name: 'name',
         get_permissions: [ Perm.ALL ],
-        set_permissions: [ Perm.DOMAIN, Perm.ADMIN ],
+        set_permissions: [ Perm.DOMAIN, Perm.DOMAINACCESS, Perm.MANAGER, Perm.ADMIN ],
         validate: async (pField: FieldDefn, pEntity: Entity, pVal: any): Promise<ValidateResponse> => {
             // Verify that the placename is unique
             let validity: ValidateResponse;
