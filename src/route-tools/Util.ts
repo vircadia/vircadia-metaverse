@@ -286,6 +286,7 @@ export async function buildPlaceInfoSmall(pPlace: PlaceEntity, pDomain?: DomainE
         'placeId': pPlace.id,
         'id': pPlace.id,
         'name': pPlace.name,
+        'displayName': pPlace.displayName,
         'visibility': pPlace.visibility ?? Visibility.OPEN,
         'address': await Places.getAddressString(pPlace),
         'path': pPlace.path,

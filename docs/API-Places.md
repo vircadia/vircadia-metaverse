@@ -15,7 +15,14 @@ or an account that is flagged as a manager of the domain).
 
 A Place is described with a name, description, images, and other
 identifying information. The Place name is unique within the metaverse-server.
+The Place.name is limited in the characters it can be made from so
+the place name can be used in URLs for teleport links and re-direction
+domain names.
+The name can only have alphabetic or numeric charaters and hyphen.
+A human readable version of the place name is kept in Place.displayName.
+
 A Place also has an identifying ID.
+
 A Place owner/manager can update several of the Place information items with
 [PUT /api/v1/places/{placeID}](./API-Places.md#post-apiv1placesplaceid)
 or can update values individually with
@@ -92,7 +99,8 @@ This request return JSON formatted as:
             "places": [
                 {
                     "placeId": string,
-                    "name": string,
+                    "name": string,         // name characters limited to "A-Za-z0-9\."
+                    "displayName": string,
                     "visibility": string,   // one of 'open', 'friends', 'connections', 'private'
                     "path": string,
                     "address": string,
@@ -235,7 +243,8 @@ The place fields that can be fetched:
 | FIELDNAME  | GET PERM | SET PERM    | TYPE |
 | ---------  | -------- | --------    | ---- |
 | placeId    |   all    |    none     | string |
-| name       |   all    | domainOwner, admin | string |
+| name       |   all    | domainOwner, manager, admin | string |
+| displayName |   all   | domainOwner, manager, admin | string |
 | description |  all    | domainOwner, manager, admin | string |
 | visibility |    all   | domainOwner, manager, admin | string |
 | domainId   |   all    |    none     | string |

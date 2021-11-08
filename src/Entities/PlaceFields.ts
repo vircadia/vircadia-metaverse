@@ -58,13 +58,18 @@ export const placeFields: { [key: string]: FieldDefn } = {
             let validity: ValidateResponse;
             if (typeof(pVal) === 'string' && pVal.length > 0) {
                 if (pVal.length <= Config['metaverse-server']['max-name-length']) {
-                    const maybePlace = await Places.getPlaceWithName(pVal);
-                    // If no other place with this name or we're setting our own name
-                    if (IsNullOrEmpty(maybePlace) || (pEntity as PlaceEntity).id === maybePlace.id) {
-                        validity = { valid: true };
+                    if( /^[A-Za-z][A-Za-z0-9\-]*$/.test(pVal) ) {
+                        const maybePlace = await Places.getPlaceWithName(pVal);
+                        // If no other place with this name or we're setting our own name
+                        if (IsNullOrEmpty(maybePlace) || (pEntity as PlaceEntity).id === maybePlace.id) {
+                            validity = { valid: true };
+                        }
+                        else {
+                            validity = { valid: false, reason: 'place name already exists' };
+                        };
                     }
                     else {
-                        validity = { valid: false, reason: 'place name already exists' };
+                        validity = { valid: false, reason: 'place name characters must be A-Za-z0-9-.'};
                     };
                 }
                 else {
@@ -76,6 +81,15 @@ export const placeFields: { [key: string]: FieldDefn } = {
             };
             return validity;
         },
+        setter: simpleSetter,
+        getter: simpleGetter
+    },
+    'displayName': {
+        entity_field: 'displayName',
+        request_field_name: 'displayName',
+        get_permissions: [ Perm.ALL ],
+        set_permissions: [ Perm.DOMAINACCESS, Perm.MANAGER, Perm.ADMIN ],
+        validate: isStringValidator,
         setter: simpleSetter,
         getter: simpleGetter
     },
