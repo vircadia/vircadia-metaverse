@@ -1,4 +1,13 @@
 # Iamus Changelog
+## Version 2.4.10
+
+<ul>
+<li><a href="http://github.com/vircadia/Iamus/commit/c3f4f06d7d2f8ed9df0935d60bd0d83c4c90b2c8">view &bull;</a> Update Changelog.md</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/5d1c74f913317e1a171c8c6e5a58ce34c11b64be">view &bull;</a> Allow the domain owner and managers to edit a place name. Closes #103</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/36769fca41662c284d656171f6d3b3ef86703d60">view &bull;</a> Limit Place.name to alphanumeric and hyphen. Closes #104. Add Place.displayName Update documentation.</li> 
+<li><a href="http://github.com/vircadia/Iamus/commit/ead065514835eb51e3c11ede4e7d73af4fbc63b8">view &bull;</a> Bump version to 2.4.10</li> 
+</ul>
+
 ## Version 2.4.9
 
 <ul>
@@ -83,13 +92,5 @@
 <li><a href="http://github.com/vircadia/Iamus/commit/36359c2197035e4b0671e317d6df02a2e4c6c9a3">view &bull;</a> Add comments in api/v1/places about not needing to be logged in to fetch place info</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/2a42438b1b0d3f21c0a14016738ee4909723b7b0">view &bull;</a> Fix DELETE of places when using "DELETE /api/v1/user/places/:placeId". Also fix fetching info of single place using "GET /api/v1/user/places/:placeId". Closes issue #88</li> 
 <li><a href="http://github.com/vircadia/Iamus/commit/07816497bc136d4ebceb34249fd87369dfede9bb">view &bull;</a> Bump version to 2.4.2</li> 
-</ul>
-
-## Version 2.4.1
-
-<ul>
-<li><a href="http://github.com/vircadia/Iamus/commit/a269b7015d5993b0f84a7a2c1bfa11c4036434fc">view &bull;</a> Update ChangeLog.md</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/2982560c3749eacf6b29d4210052ff9bf220bd79">view &bull;</a> Remove comment and README references to ActivityPub since that is not     an explicit goal. Some federation system will be used but one has     not been chosen.</li> 
-<li><a href="http://github.com/vircadia/Iamus/commit/03b96cb03447c774328fd927265025dec2a9172b">view &bull;</a> Bump version to 2.4.1</li> 
 </ul>
 
