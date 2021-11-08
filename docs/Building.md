@@ -19,6 +19,14 @@ npm install
 npm run build
 ```
 
+These commands build a runnable NodeJS application into the `dist\` directory.
+
+This building requires a newer version of npm (V6 or greater) and a newer version
+of NodeJS (V14 or greater).
+The build also invokes "git" interally to get the current version information
+so "git" must be available (might have to set the command PATH if building on
+Windows systems).
+
 ## Running
 
 For testing and simple opertion, you can run Iamus in the build directory.
@@ -92,7 +100,6 @@ The environment variables are:
 - IAMUS_LOGLEVEL: logging level. One of 'error', 'info', 'warn', 'debug'. Default 'info'.
 - IAMUS_LISTEN_HOST: host to listen for requests on. Default '0.0.0.0'.
 - IAMUS_LISTEN_PORT: port to listen for requests on. Default 9400.
-- IAMUS_EXTERNAL_HOSTNAME: hostname to report as referencing back to this server. This is mostly used by ActivityPub for links to users. Default 'localhost'. This value MUST be set for proper metavserse-server operation.
 - IAMUS_CONFIG_FILE: filename or URL of a JSON formatted configuration file that over-rides the values. Default "./iamus.json".
 
 The configuration file, if it exists, is read and its values overlay
@@ -141,6 +148,8 @@ parameter which is just the connection string.
 All the configuration parameter default values are defined in `src/config.ts`.
 
 ## Setup MongoDB
+
+Iamus uses MongoDb as the backend database.
 
 Install MongoDb following the instructions at https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/ :
 
