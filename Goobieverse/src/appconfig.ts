@@ -40,6 +40,17 @@ const metaverseServer = {
   listen_host: process.env.LISTEN_HOST ??'0.0.0.0',
   listen_port: process.env.LISTEN_PORT ?? 9400,
   metaverseInfoAdditionFile: process.env.METAVERSE_INFO_File ?? '',
+  session_timeout_minutes: 5,
+  heartbeat_seconds_until_offline: 5 * 60,      // seconds until non-heartbeating user is offline
+  domain_seconds_until_offline: 10 * 60,        // seconds until non-heartbeating domain is offline
+  domain_seconds_check_if_online: 2 * 60,       // how often to check if a domain is online
+  handshake_request_expiration_minutes: 1,      // minutes that a handshake friend request is active
+  connection_request_expiration_minutes: 60 * 24 * 4, // 4 days
+  friend_request_expiration_minutes: 60 * 24 * 4,     // 4 days
+
+  place_current_timeout_minutes: 5,             // minutes until current place info is stale
+  place_inactive_timeout_minutes: 60,           // minutes until place is considered inactive
+  place_check_last_activity_seconds: (3*60)-5,  // seconds between checks for Place lastActivity updates
 };
 
 /**
@@ -82,6 +93,7 @@ const metaverse = {
   metaverseServerUrl: process.env.METAVERSE_SERVER_URL ?? '',   // if empty, set to self
   defaultIceServerUrl: process.env.DEFAULT_ICE_SERVER_URL ?? '', // if empty, set to self
   dashboardUrl: process.env.DASHBOARD_URL
+  
 };
 
 if (IsNullOrEmpty(metaverse.metaverseServerUrl) || IsNullOrEmpty(metaverse.defaultIceServerUrl)) {
@@ -97,6 +109,12 @@ if (IsNullOrEmpty(metaverse.metaverseServerUrl) || IsNullOrEmpty(metaverse.defau
 }
 
 
+const dbCollections = {
+  domains : 'domains',
+  accounts : 'accounts',
+  places : 'places',
+  tokens : 'tokens'
+};
 
 
 /**
@@ -107,7 +125,8 @@ const config = {
   authentication,
   server,
   metaverse,
-  metaverseServer
+  metaverseServer,
+  dbCollections
 };
 
 export default config;

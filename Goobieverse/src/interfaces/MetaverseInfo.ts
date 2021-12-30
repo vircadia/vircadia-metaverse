@@ -1,4 +1,3 @@
-
 export interface MetaverseInfoModel{
     metaverse_name:string,
     metaverse_nick_name:string,
