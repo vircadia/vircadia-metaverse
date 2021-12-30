@@ -10,7 +10,6 @@ declare module './declarations' {
     'authentication': AuthenticationService & ServiceAddons<any>;
   }
 }
-
 export default function(app: Application): void {
   const authentication = new AuthenticationService(app);
 

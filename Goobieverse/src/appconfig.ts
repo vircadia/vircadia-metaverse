@@ -51,7 +51,7 @@ const metaverseServer = {
  */
 const authentication = {
   entity: 'user',
-  service: 'users',
+  service: 'auth',
   secret: process.env.AUTH_SECRET ?? 'testing',
   authStrategies: ['jwt', 'local'],
   jwtOptions: {
