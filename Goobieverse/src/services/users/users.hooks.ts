@@ -18,7 +18,7 @@ export default {
       },
     ],
     create: [hashPassword('password')],
-    update: [],
+    update: [hashPassword('password')],
     patch: [],
     remove: [],
   },
