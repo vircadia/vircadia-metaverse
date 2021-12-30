@@ -17,7 +17,7 @@ export class Users extends Service {
     const client: Promise<Db> = app.get("mongoClient");
 
     client.then((db) => {
-      this.Model = db.collection("users");
+      this.Model = db.collection("accounts");
     });
   }
 
