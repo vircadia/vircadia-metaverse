@@ -1,0 +1,47 @@
+export const messages = {
+  common_messages_error: "Something went wrong please try again later.",
+  common_messages_record_available: "Record is available.",
+  common_messages_record_not_available: "Record is not available.",
+  common_messages_records_available: "Records are available.",
+  common_messages_records_not_available: "Records are not available.",
+  login_success: "Login Successfully.",
+  common_messages_record_added: "Record added successfully.",
+  common_messages_record_added_failed: "Failed to added record.",
+  common_messages_record_updated: "Record updated successfully.",
+  common_messages_record_deleted: "Record deleted successfully.",
+  common_messages_record_update_failed: "Failed to Record Update",
+  common_messages_record_deleted_failed: "Failed to  Delete Record",
+  common_messages_user_invitation_failed: "Failed to send User Invitation",
+  common_messages_no_invitation_available: "No Invitation available",
+  common_messages_invitation_accepted: "Invitation approved Successfully.",
+  common_messages_invitation_rejected: "Invitation rejected Successfully.",
+  common_messages_user_invitation_success:
+    "Invitation Sent to User Successfully.",
+  common_messages_record_not_found: "record not found",
+  common_messages_user_not_found: "User not active or found",
+  in_correct_email_psw_error:
+    " The email/password you entered does not match. Please enter the correct email/password",
+  required_parameters_null_or_missing:
+    "Required parameters value null or missing.",
+  email_already_exist: "This Email Id already exists in our records.",
+  something_went_wrong: "Something went wrong.",
+  otp_sent_successfully: "OTP sent successfully.",
+  your_not_Authorize: "Your not Authorize to perform this action",
+  report_generated_success: "Report generated successfully.",
+  item_from_other_store: "Please add items from same store as in cart.",
+  db_error_message:
+    "Sorry, we can not proceed further, due to some technical issue",
+  access_for_organization_to_device_error:
+    "Your organization does not have access to this device",
+  access_for_organization_to_device_success:
+    "Your organization have created access to this device",
+  no_such_email_found: "No such type of Email found in our data",
+  valid_email_address_error: "Please Enter valid Email Address",
+  otp_send_success: "OTP sent successfully",
+  otp_correct_success: "OTP entered was correct",
+  otp_correct_error: "OTP entered was incorrect",
+  password_updated_success: "Your password has been updated successfully",
+  password_updated_error: "Failed to update your password",
+  token_period_is_expired: "Your token has been expired",
+  please_select_weightBridge: "Please select a Weight Bridge!!!",
+};
