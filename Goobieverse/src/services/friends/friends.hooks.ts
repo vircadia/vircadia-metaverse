@@ -1,4 +1,4 @@
-import { HooksObject } from "@feathersjs/feathers";
+import { HooksObject } from '@feathersjs/feathers';
 
 export default {
   before: {

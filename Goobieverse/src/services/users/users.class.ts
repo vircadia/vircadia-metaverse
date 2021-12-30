@@ -1,23 +1,24 @@
-import { Db } from "mongodb";
-import { Service, MongoDBServiceOptions } from "feathers-mongodb";
-import { Application } from "../../declarations";
-import { Id, Params } from "@feathersjs/feathers";
-import { AccountModel } from "../../interfaces/AccountModel";
-import { isValidObject, isValidArray } from "../../utils/Misc";
-import { Response } from "../../utils/response";
-import { messages } from "../../utils/messages";
-import { GenUUID } from "../../utils/Misc";
-const trim = require("trim");
+import { Db } from 'mongodb';
+import { Service, MongoDBServiceOptions } from 'feathers-mongodb';
+import { Application } from '../../declarations';
+import { Id, Params } from '@feathersjs/feathers';
+import { AccountModel } from '../../interfaces/AccountModel';
+import { isValidObject, isValidArray } from '../../utils/Misc';
+import { Response } from '../../utils/response';
+import { messages } from '../../utils/messages';
+import { GenUUID } from '../../utils/Misc';
+import trim from 'trim';
+//  const trim = require('trim');
 
 export class Users extends Service {
   //eslint-disable-next-line @typescript-eslint/no-unused-vars
   constructor(options: Partial<MongoDBServiceOptions>, app: Application) {
     super(options);
 
-    const client: Promise<Db> = app.get("mongoClient");
+    const client: Promise<Db> = app.get('mongoClient');
 
     client.then((db) => {
-      this.Model = db.collection("accounts");
+      this.Model = db.collection('accounts');
     });
   }
 
@@ -28,14 +29,14 @@ export class Users extends Service {
       const email = trim(data.email);
       const password = trim(data.password);
       if (
-        id != "" &&
-        typeof id != "undefined" &&
-        username != "" &&
-        typeof username != "undefined" &&
-        email != "" &&
-        typeof email != "undefined" &&
-        password != "" &&
-        typeof password != "undefined"
+        id != '' &&
+        typeof id != 'undefined' &&
+        username != '' &&
+        typeof username != 'undefined' &&
+        email != '' &&
+        typeof email != 'undefined' &&
+        password != '' &&
+        typeof password != 'undefined'
       ) {
         const newData = { ...data, id: id };
         const UserData = await super

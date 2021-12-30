@@ -76,6 +76,7 @@
     "@types/mongodb": "^4.0.7",
     "@types/morgan": "^1.9.3",
     "@types/serve-favicon": "^2.5.3",
+    "@types/trim": "^0.1.1",
     "@typescript-eslint/eslint-plugin": "^5.8.0",
     "@typescript-eslint/parser": "^5.8.0",
     "axios": "^0.24.0",

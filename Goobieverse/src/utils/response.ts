@@ -1,8 +1,8 @@
 export const Response = {
   success: (data: any) => {
-    return { status: "success", data: data };
+    return { status: 'success', data: data };
   },
   error: (message: string) => {
-    return { status: "failure", message: message };
+    return { status: 'failure', message: message };
   },
 };

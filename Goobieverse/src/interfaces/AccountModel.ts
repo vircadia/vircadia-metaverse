@@ -23,8 +23,8 @@ export interface AccountModel {
   profileDetail: any; // JSON blob stored for user from server
 
   // User authentication
-  passwordHash: string;
-  passwordSalt: string;
+  // passwordHash: string;
+  // passwordSalt: string;
   sessionPublicKey: string; // PEM public key generated for this session
   accountEmailVerified: boolean; // default true if not present
 

@@ -1,15 +1,15 @@
-import fs from "fs";
-import http from "http";
-import https from "https";
-import os from "os";
-import { v4 as uuidv4 } from "uuid";
+import fs from 'fs';
+import http from 'http';
+import https from 'https';
+import os from 'os';
+import { v4 as uuidv4 } from 'uuid';
 
 // Return 'true' if the passed value is null or empty
 export function IsNullOrEmpty(pVal: any): boolean {
   return (
-    typeof pVal === "undefined" ||
+    typeof pVal === 'undefined' ||
     pVal === null ||
-    (typeof pVal === "string" && String(pVal).length === 0)
+    (typeof pVal === 'string' && String(pVal).length === 0)
   );
 }
 
@@ -26,18 +26,18 @@ export function IsNotNullOrEmpty(pVal: any): boolean {
 // Returns the parsed JSON object or 'undefined' if any errors.
 export async function readInJSON(pFilenameOrURL: string): Promise<any> {
   let configBody: string;
-  if (pFilenameOrURL.startsWith("http://")) {
+  if (pFilenameOrURL.startsWith('http://')) {
     configBody = await httpRequest(pFilenameOrURL);
   } else {
-    if (pFilenameOrURL.startsWith("https://")) {
+    if (pFilenameOrURL.startsWith('https://')) {
       configBody = await httpsRequest(pFilenameOrURL);
     } else {
       try {
         // We should technically sanitize this filename but if one can change the environment
         //    or config file variables, the app is already poned.
-        configBody = fs.readFileSync(pFilenameOrURL, "utf-8");
+        configBody = fs.readFileSync(pFilenameOrURL, 'utf-8');
       } catch (err) {
-        configBody = "";
+        configBody = '';
         console.debug(
           `readInJSON: failed read of user config file ${pFilenameOrURL}: ${err}`
         );
@@ -55,15 +55,15 @@ export async function httpsRequest(pUrl: string): Promise<string> {
   return new Promise((resolve, reject) => {
     https
       .get(pUrl, (resp: any) => {
-        let data = "";
-        resp.on("data", (chunk: string) => {
+        let data = '';
+        resp.on('data', (chunk: string) => {
           data += chunk;
         });
-        resp.on("end", () => {
+        resp.on('end', () => {
           resolve(data);
         });
       })
-      .on("error", (err: any) => {
+      .on('error', (err: any) => {
         reject(err);
       });
   });
@@ -74,15 +74,15 @@ export async function httpRequest(pUrl: string): Promise<string> {
   return new Promise((resolve, reject) => {
     http
       .get(pUrl, (resp: any) => {
-        let data = "";
-        resp.on("data", (chunk: string) => {
+        let data = '';
+        resp.on('data', (chunk: string) => {
           data += chunk;
         });
-        resp.on("end", () => {
+        resp.on('end', () => {
           resolve(data);
         });
       })
-      .on("error", (err: any) => {
+      .on('error', (err: any) => {
         reject(err);
       });
   });
@@ -94,7 +94,7 @@ export async function getMyExternalIPAddress(): Promise<string> {
     return Promise.resolve(myExternalAddr);
   }
   return new Promise((resolve, reject) => {
-    httpsRequest("https://api.ipify.org")
+    httpsRequest('https://api.ipify.org')
       .then((resp) => {
         myExternalAddr = resp;
         resolve(myExternalAddr);
@@ -104,20 +104,20 @@ export async function getMyExternalIPAddress(): Promise<string> {
         const networkInterfaces = os.networkInterfaces();
         // { 'lo1': [ info, info ], 'eth0': [ info, info ]} where 'info' could be v4 and v6 addr infos
 
-        let addressv4 = "";
-        let addressv6 = "";
+        let addressv4 = '';
+        let addressv6 = '';
 
         Object.keys(networkInterfaces).forEach((dev) => {
           networkInterfaces[dev]?.filter((details) => {
-            if (details.family === "IPv4" && details.internal === false) {
+            if (details.family === 'IPv4' && details.internal === false) {
               addressv4 = details.address;
             }
-            if (details.family === "IPv6" && details.internal === false) {
+            if (details.family === 'IPv6' && details.internal === false) {
               addressv6 = details.address;
             }
           });
         });
-        let address = "";
+        let address = '';
         if (IsNullOrEmpty(addressv4)) {
           address = addressv6;
         } else {
@@ -125,7 +125,7 @@ export async function getMyExternalIPAddress(): Promise<string> {
         }
 
         if (IsNullOrEmpty(address)) {
-          reject("No address found");
+          reject('No address found');
         }
         myExternalAddr = address.toString();
         resolve(myExternalAddr);
