@@ -2,6 +2,10 @@ import { HooksObject } from '@feathersjs/feathers';
 import { myHook } from '../../hooks/userData';
 import * as feathersAuthentication from '@feathersjs/authentication';
 import * as local from '@feathersjs/authentication-local';
+import  requestFail  from '../../hooks/requestFail';
+import requestSuccess from '../../hooks/requestSuccess';
+import { Perm } from '../../utils/Perm';
+import   checkAccessToAccount from '../../hooks/checkAccessToAccount';
 
 const { authenticate } = feathersAuthentication.hooks;
 const { hashPassword, protect } = local.hooks;
@@ -10,13 +14,7 @@ export default {
   before: {
     all: [],
     find: [],
-    get: [
-      (context: any) => {
-        // delete context.params.user
-        console.log(context.params.user, 'context');
-        return context;
-      },
-    ],
+    get: [],
     create: [hashPassword('password')],
     update: [hashPassword('password')],
     patch: [],
@@ -24,7 +22,7 @@ export default {
   },
 
   after: {
-    all: [protect('password')],
+    all: [protect('password'),requestSuccess()],
     find: [],
     get: [],
     create: [],
@@ -34,7 +32,7 @@ export default {
   },
 
   error: {
-    all: [],
+    all: [requestFail()],
     find: [],
     get: [],
     create: [],

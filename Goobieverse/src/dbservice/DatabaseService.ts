@@ -17,6 +17,7 @@ export class DatabaseService extends Service {
     this.loadDatabase();
   }
 
+  
   async loadDatabase() {
     if(IsNotNullOrEmpty(this.app) && this.app){
       this.db = await this.app.get('mongoClient');
@@ -36,10 +37,10 @@ export class DatabaseService extends Service {
     return await (await this.getDatabase()).collection(tableName);
   }
 
-  async findData(tableName: string, filter?:Filter<any> ): Promise<FindCursor<WithId<any>>>{
-    
+
+  async findData(tableName: string, filter?:Filter<any> ): Promise<FindCursor<WithId<any>>>{ 
     if(IsNotNullOrEmpty(filter)){
-      console.log(filter);
+      console.log(filter,'filter');
       return await (await (this.getService(tableName))).find(filter!);
     } else {
       return await (await (this.getService(tableName))).find();
@@ -48,6 +49,11 @@ export class DatabaseService extends Service {
 
   async findDataAsArray(tableName: string, filter?:Filter<any>): Promise<any[]> {
     return (await this.findData(tableName,filter)).toArray();
+  }
+
+  async CreateData(tableName: string, data: any): Promise<any[]> {
+    console.log(this.getService(tableName),'all');
+    return (await this.findData(tableName)).toArray();
   }
 
 }
