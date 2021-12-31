@@ -1,4 +1,5 @@
 import { AccountModel } from './../interfaces/AccountModel';
+import {Application} from '@feathersjs/feathers';
 import { HookContext } from '@feathersjs/feathers';
 import { IsNotNullOrEmpty } from '../utils/Misc';
 import { Perm } from '../utils/Perm';
@@ -6,12 +7,14 @@ import config from '../appconfig';
 import {HTTPStatusCode} from '../utils/response';
 import {Availability} from '../utils/sets/Availability';
 import { SArray } from '../utils/vTypes';
+import { DatabaseService } from '../dbservice/DatabaseService';
 
 export default (pRequiredAccess: Perm[]) => {
   return async (context: HookContext): Promise<HookContext> => {
-    const db = await context.app.get('mongoClient');
+    const  dbService = new DatabaseService({},undefined,context);
     
-    const accounts = await db.collection(config.dbCollections.accounts).find({id:context.id}).toArray();
+    const accounts = await dbService.findDataAsArray(config.dbCollections.accounts,{id:context.id});
+    console.log(accounts);
     let canAccess = false;
 
     if (IsNotNullOrEmpty(accounts)) {

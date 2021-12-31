@@ -4,9 +4,9 @@ import { AccountModel } from '../../interfaces/AccountModel';
 import config from '../../appconfig';
 import { Availability } from '../../utils/sets/Availability';
 import { Params, Id } from '@feathersjs/feathers';
-import { Service, MongoDBServiceOptions } from 'feathers-mongodb';
+import {  MongoDBServiceOptions } from 'feathers-mongodb';
 import { Application } from '../../declarations';
-import { buildAccountProfile } from '../../utils/Utils';
+import { buildAccountProfile } from '../../responsebuilder/accountsBuilder';
 import { IsNotNullOrEmpty } from '../../utils/Misc';
 
 export class Profiles extends DatabaseService {
@@ -22,7 +22,7 @@ export class Profiles extends DatabaseService {
 
     const accounts = await this.findDataAsArray(config.dbCollections.accounts,{
       query: {
-        $or: [{ availability: undefined }, { availability: Availability.ALL }],
+        $or: [{availability:undefined },{availability:Availability.ALL}],
         $skip: skip,
         $limit: perPage,
       },

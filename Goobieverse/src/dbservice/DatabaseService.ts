@@ -1,22 +1,28 @@
 import { Service } from 'feathers-mongodb';
 import { Application } from '../declarations';
+import { HookContext } from '@feathersjs/feathers';
 import { DatabaseServiceOptions } from './DatabaseServiceOptions';
-import { Db, Collection, Document, FindCursor, WithId, DeleteResult } from 'mongodb';
-import { IsNullOrEmpty } from '../utils/Misc';
+import { Db, Collection, Document, FindCursor, WithId,Filter } from 'mongodb';
+import { IsNotNullOrEmpty, IsNullOrEmpty } from '../utils/Misc';
  
 
 export class DatabaseService extends Service {
-  app: Application;
+  app?: Application;
   db?:Db;
-  
-  constructor(options: Partial<DatabaseServiceOptions>, app: Application) {
+  context?:HookContext;
+  constructor(options: Partial<DatabaseServiceOptions>,app?: Application,context?: HookContext) {
     super(options);
     this.app = app;
+    this.context = context;
     this.loadDatabase();
   }
 
   async loadDatabase() {
-    this.db = await this.app.get('mongoClient');
+    if(IsNotNullOrEmpty(this.app) && this.app){
+      this.db = await this.app.get('mongoClient');
+    }else if(IsNotNullOrEmpty(this.context) && this.context){
+      this.db = await this.context.app.get('mongoClient');
+    }
   }
 
   async getDatabase(): Promise<Db>  {
@@ -30,15 +36,17 @@ export class DatabaseService extends Service {
     return await (await this.getDatabase()).collection(tableName);
   }
 
-  async findData(tableName: string, filter?:Document ): Promise<FindCursor<WithId<any>>>{
-    if(IsNullOrEmpty(filter)){
+  async findData(tableName: string, filter?:Filter<any> ): Promise<FindCursor<WithId<any>>>{
+    
+    if(IsNotNullOrEmpty(filter)){
+      console.log(filter);
       return await (await (this.getService(tableName))).find(filter!);
-    }else{
+    } else {
       return await (await (this.getService(tableName))).find();
     }
   }
 
-  async findDataAsArray(tableName: string, filter?:Document): Promise<any[]> {
+  async findDataAsArray(tableName: string, filter?:Filter<any>): Promise<any[]> {
     return (await this.findData(tableName,filter)).toArray();
   }
 
