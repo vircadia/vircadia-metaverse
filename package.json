@@ -28,7 +28,6 @@
     "scripts": {
         "run": "node dist/index.js",
         "build": "npm-run-all -s \"clean-dist\" \"create-version\" \"copy-static\" \"build:iamus\"",
-        "prebuild:iamus": "eslint ./",
         "build:iamus": "tsc",
         "prestart": "npm run build",
         "start": "node dist/index.js",
