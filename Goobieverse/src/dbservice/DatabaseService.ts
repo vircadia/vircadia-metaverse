@@ -46,4 +46,15 @@ export class DatabaseService extends Service {
       return await super.find();
     }
   }
+
+  async findDataToArray(tableName: string, filter?:Filter<any> ): Promise<any[]>{
+    await (this.getService(tableName));
+    const data = await this.findData(tableName,filter);
+    if(data instanceof Array){
+      return data;
+    }else{
+      return data.data;
+    }
+  }
+
 }
