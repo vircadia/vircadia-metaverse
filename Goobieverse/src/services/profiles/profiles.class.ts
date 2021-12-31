@@ -20,13 +20,22 @@ export class Profiles extends DatabaseService {
     const perPage = parseInt(params?.query?.per_page) || 10;
     const skip = ((parseInt(params?.query?.page) || 1) - 1) * perPage;
 
-    const accounts = await this.findDataAsArray(config.dbCollections.accounts,{
+    const accountData = await this.findData(config.dbCollections.accounts,{
       query: {
-        $or: [{availability:undefined },{availability:Availability.ALL}],
+        $or: [{availability:undefined},{availability: Availability.ALL }],
         $skip: skip,
         $limit: perPage,
-      },
+      }, 
     });
+
+    let accounts:AccountModel[] = [];
+
+    if(accountData instanceof Array){
+      accounts = accountData as Array<AccountModel>;
+    }else{
+      accounts = accountData.data as Array<AccountModel>;  
+    }
+
 
     const domainIds = (accounts as Array<AccountModel>)
       ?.map((item) => item.locationDomainId)
@@ -35,7 +44,15 @@ export class Profiles extends DatabaseService {
           self.indexOf(value) === index && value !== undefined
       );
       
-    const domains: DomainModel[] = await this.findDataAsArray(config.dbCollections.accounts,{ query:{id: { $in: domainIds }}});
+    const domainData= await this.findData(config.dbCollections.domains,{ query:{id: { $in: domainIds }}});
+
+    let domains:DomainModel[] = [];
+
+    if(domainData instanceof Array){
+      domains = domainData as Array<DomainModel>;
+    }else{
+      domains = domainData.data as Array<DomainModel>;  
+    }   
 
     const profiles: Array<any> = [];
 
@@ -53,10 +70,29 @@ export class Profiles extends DatabaseService {
   }
 
   async get(id: Id, params: Params): Promise<any> {
-    const accounts = await this.findDataAsArray(config.dbCollections.accounts,{query:{id:id}});
+    const accountData = await this.findData(config.dbCollections.accounts,{query:{id:id}});
+   
+    let accounts:AccountModel[] = [];
+
+    if(accountData instanceof Array){
+      accounts = accountData as Array<AccountModel>;
+    }else{
+      accounts = accountData.data as Array<AccountModel>;  
+    }
+
     if(IsNotNullOrEmpty(accounts)){
       const account = (accounts as Array<AccountModel>)[0];    
-      const domains: Array<DomainModel> = await this.findDataAsArray(config.dbCollections.domains,{ id: { $eq: account.locationDomainId } });
+      
+      const domainData = await this.findData(config.dbCollections.domains,{ id: { $eq: account.locationDomainId } });
+      
+      let domains:DomainModel[] = [];
+
+      if(domainData instanceof Array){
+        domains = domainData as Array<DomainModel>;
+      }else{
+        domains = domainData.data as Array<DomainModel>;  
+      }  
+
       let domainModel: any;
       if(IsNotNullOrEmpty(domains)){domainModel = domains[0];}
       const profile = await buildAccountProfile(account, domainModel);

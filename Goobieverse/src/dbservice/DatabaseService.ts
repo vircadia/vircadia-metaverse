@@ -1,6 +1,6 @@
 import { Service } from 'feathers-mongodb';
 import { Application } from '../declarations';
-import { HookContext } from '@feathersjs/feathers';
+import { HookContext, Paginated } from '@feathersjs/feathers';
 import { DatabaseServiceOptions } from './DatabaseServiceOptions';
 import { Db, Collection, Document, FindCursor, WithId,Filter } from 'mongodb';
 import { IsNotNullOrEmpty, IsNullOrEmpty } from '../utils/Misc';
@@ -34,16 +34,17 @@ export class DatabaseService extends Service {
   }
 
   async getService(tableName:string):Promise<Collection<Document>>{
-    return await (await this.getDatabase()).collection(tableName);
+    this.Model = await (await this.getDatabase()).collection(tableName);
+    return this.Model;
   }
 
-
-  async findData(tableName: string, filter?:Filter<any> ): Promise<FindCursor<WithId<any>>>{ 
+  async findData(tableName: string, filter?:Filter<any> ): Promise<Paginated<any> | any[]>{
+    await (this.getService(tableName));
     if(IsNotNullOrEmpty(filter)){
-      console.log(filter,'filter');
-      return await (await (this.getService(tableName))).find(filter!);
+      console.log(filter);
+      return await super.find(filter!);
     } else {
-      return await (await (this.getService(tableName))).find();
+      return await super.find();
     }
   }
 

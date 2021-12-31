@@ -1,5 +1,5 @@
 import { AccountModel } from './../interfaces/AccountModel';
-import {Application} from '@feathersjs/feathers';
+import { Application, Paginated } from '@feathersjs/feathers';
 import { HookContext } from '@feathersjs/feathers';
 import { IsNotNullOrEmpty } from '../utils/Misc';
 import { Perm } from '../utils/Perm';
@@ -13,12 +13,22 @@ export default (pRequiredAccess: Perm[]) => {
   return async (context: HookContext): Promise<HookContext> => {
     const  dbService = new DatabaseService({},undefined,context);
     
-    const accounts = await dbService.findDataAsArray(config.dbCollections.accounts,{id:context.id});
+    const accounts = await dbService.findData(config.dbCollections.accounts,{query:{id:context.id}});
     console.log(accounts);
     let canAccess = false;
 
     if (IsNotNullOrEmpty(accounts)) {
-      const pTargetEntity = accounts[0];
+
+
+      let pTargetEntity:AccountModel;
+
+      if(accounts instanceof Array){
+        pTargetEntity = (accounts as Array<AccountModel>)[0];
+      }else{
+        pTargetEntity = accounts.data[0];  
+      }
+
+
       for (const perm of pRequiredAccess) {
         switch (perm) {
         case Perm.ALL:
@@ -28,7 +38,7 @@ export default (pRequiredAccess: Perm[]) => {
           // The target entity is publicly visible
           // Mostly AccountEntities that must have an 'availability' field
           if (pTargetEntity.hasOwnProperty('availability')) {
-            if ((pTargetEntity as AccountModel).availability.includes(Availability.ALL)) {
+            if ((pTargetEntity).availability.includes(Availability.ALL)) {
               canAccess = true;
             }
           }
