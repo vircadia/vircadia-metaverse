@@ -1,33 +1,26 @@
+import { DatabaseService } from './../../dbservice/DatabaseService';
 import { DomainModel } from './../../interfaces/DomainModel';
 import { AccountModel } from '../../interfaces/AccountModel';
 import config from '../../appconfig';
 import { Availability } from '../../utils/sets/Availability';
-import { Db } from 'mongodb';
 import { Params, Id } from '@feathersjs/feathers';
 import { Service, MongoDBServiceOptions } from 'feathers-mongodb';
 import { Application } from '../../declarations';
 import { buildAccountProfile } from '../../utils/Utils';
 import { IsNotNullOrEmpty } from '../../utils/Misc';
 
-export class Profiles extends Service {
-  //eslint-disable-next-line @typescript-eslint/no-unused-vars
-  app: Application;
-  constructor(options: Partial<MongoDBServiceOptions>, app: Application) {
-    super(options);
-    this.app = app;
+export class Profiles extends DatabaseService {
 
-    const client: Promise<Db> = app.get('mongoClient');
-    client.then((database) => {
-      this.Model = database.collection(config.dbCollections.accounts);
-    });
+  constructor(options: Partial<MongoDBServiceOptions>, app: Application) {
+    super(options,app);
   }
 
   async find(params?: Params): Promise<any> {
-    const db = await this.app.get('mongoClient');
+    
     const perPage = parseInt(params?.query?.per_page) || 10;
     const skip = ((parseInt(params?.query?.page) || 1) - 1) * perPage;
 
-    const accounts = await super.find({
+    const accounts = await this.findDataAsArray(config.dbCollections.accounts,{
       query: {
         $or: [{ availability: undefined }, { availability: Availability.ALL }],
         $skip: skip,
@@ -41,11 +34,8 @@ export class Profiles extends Service {
         (value, index, self) =>
           self.indexOf(value) === index && value !== undefined
       );
-
-    const domains: Array<DomainModel> = await db
-      .collection(config.dbCollections.domains)
-      .find({ query:{id: { $in: domainIds }}})
-      .toArray();
+      
+    const domains: DomainModel[] = await this.findDataAsArray(config.dbCollections.accounts,{ query:{id: { $in: domainIds }}});
 
     const profiles: Array<any> = [];
 
@@ -59,15 +49,14 @@ export class Profiles extends Service {
       }
       profiles.push(await buildAccountProfile(element, domainModel));
     });
-    return Promise.resolve({ profiles });
+    return Promise.resolve({ profiles }); 
   }
 
   async get(id: Id, params: Params): Promise<any> {
-    const db = await this.app.get('mongoClient');
-    const accounts = await super.find({query:{id:id}});
+    const accounts = await this.findDataAsArray(config.dbCollections.accounts,{query:{id:id}});
     if(IsNotNullOrEmpty(accounts)){
       const account = (accounts as Array<AccountModel>)[0];    
-      const domains: Array<DomainModel> = await db.collection(config.dbCollections.domains).find({ id: { $eq: account.locationDomainId } }).toArray();
+      const domains: Array<DomainModel> = await this.findDataAsArray(config.dbCollections.domains,{ id: { $eq: account.locationDomainId } });
       let domainModel: any;
       if(IsNotNullOrEmpty(domains)){domainModel = domains[0];}
       const profile = await buildAccountProfile(account, domainModel);

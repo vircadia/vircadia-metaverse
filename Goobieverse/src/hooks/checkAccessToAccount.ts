@@ -30,7 +30,7 @@ export default (pRequiredAccess: Perm[]) => {
             }
           }
           break;
-        /*case Perm.DOMAIN:
+        /* case Perm.DOMAIN:
           // requestor is a domain and it's account is the domain's sponsoring account
           if (pAuthToken && SArray.has(pAuthToken.scope, TokenScope.DOMAIN)) {
             if (pTargetEntity.hasOwnProperty('sponsorAccountId')) {
