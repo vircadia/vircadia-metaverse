@@ -187,7 +187,7 @@ export class PlaceFilterInfo extends CriteriaFilter {
         this._doingQuery = true;
         const criteria:VKeyedCollection = {};
         if (this._maturity) {
-            /* tslint:disable-next-line */
+            // eslint-disable-next-line
             criteria['maturity'] = { '$in': this._maturity };
         };
         if (this._checkIfActive) {
@@ -197,11 +197,11 @@ export class PlaceFilterInfo extends CriteriaFilter {
             criteria.lastActivity = { '$gte': Places.dateWhenNotActive() };
         };
         if (this._tags) {
-            /* tslint:disable-next-line */
+            // eslint-disable-next-line
             criteria['tags'] = { '$in': this._tags };
         };
         if (this._search) {
-            /* tslint:disable-next-line */
+            // eslint-disable-next-line
             criteria['name'] = { '$regex': this._search, '$options': 'i' };
         };
         return criteria;

@@ -136,7 +136,7 @@ export class VisibilityFilter extends CriteriaFilter {
         this._doingQuery = true;
         const criteria: any = {};
         if (! this._asAdmin) {
-            /* tslint:disable-next-line */
+            // eslint-disable-next-line
             criteria['$or'] = [ { 'visibility': { '$exists': false }},
                                 { 'visibility': Visibility.OPEN },
                             ];

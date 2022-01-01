@@ -92,12 +92,12 @@ initializeConfiguration()
       if ('body' in err) {
         Logger.error(`JSON parseError: have body and trying reparse with terminator`);
         try {
-          /* tslint:disable-next-line */
+          // eslint-disable-next-line
           req.body = JSON.parse(err['body'] + '}');
           next();
         }
         catch (ex) {
-          /* tslint:disable-next-line */
+          // eslint-disable-next-line
           Logger.error(`parseError: ${err['body']}`);
           resp.status(400).send({ 'status': 'failure', 'error': 'JSON parse error'});
         };
@@ -134,7 +134,7 @@ initializeConfiguration()
         key:  fs.readFileSync(Config.server["key-file"], 'utf8'),
         cert: fs.readFileSync(Config.server["cert-file"], 'utf8'),
         secureProtocol: 'SSLv23_server_method',
-        /* tslint:disable-next-line */
+        // eslint-disable-next-line
         secureOptions: crypto.constants.SSL_OP_NO_SSLv3 | crypto.constants.SSL_OP_NO_TLSv1
       };
       server = https.createServer(httpsOptions, expr);
