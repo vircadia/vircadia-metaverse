@@ -12,7 +12,6 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
 
 // import { createObject, getObject, getObjects, updateObjectFields, deleteOne, noCaseCollation } from '@Tools/Db';
 // import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
@@ -47,5 +46,4 @@ export abstract class Entity {
         };
     };
     */
-};
-
+}

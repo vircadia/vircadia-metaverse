@@ -12,17 +12,16 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict'
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
-import { accountFromAuthToken } from '@Route-Tools/middleware';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
+import { setupMetaverseAPI, finishMetaverseAPI } from "@Route-Tools/middleware";
+import { accountFromAuthToken } from "@Route-Tools/middleware";
 
-import { Requests, RequestType } from '@Entities/Requests';
+import { Requests, RequestType } from "@Entities/Requests";
 
-import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
-import { RequestScopeFilter } from '@Entities/EntityFilters/RequestScopeFilter';
-import { Logger } from '@Tools/Logging';
+import { PaginationInfo } from "@Entities/EntityFilters/PaginationInfo";
+import { RequestScopeFilter } from "@Entities/EntityFilters/RequestScopeFilter";
+import { Logger } from "@Tools/Logging";
 
 const procGetRequests: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
     if (req.vAuthAccount) {
@@ -35,26 +34,26 @@ const procGetRequests: RequestHandler = async (req: Request, resp: Response, nex
         const reqs: any[] = [];
         for await (const aReq of Requests.enumerateAsync(scoper, pager)) {
             const thisReq: any = {
-                'id': aReq.id,
-                'type': aReq.requestType,
-                'requesting_account_id': aReq.requestingAccountId,
-                'target_account_id': aReq.targetAccountId,
-                'when_created': aReq.whenCreated?.toISOString(),
-                'when_created_s': aReq.whenCreated?.getTime().toString(),
-                'expiration_time': aReq.expirationTime?.toISOString(),
-                'expiration_time_s': aReq.expirationTime?.getTime().toString()
+                "id": aReq.id,
+                "type": aReq.requestType,
+                "requesting_account_id": aReq.requestingAccountId,
+                "target_account_id": aReq.targetAccountId,
+                "when_created": aReq.whenCreated?.toISOString(),
+                "when_created_s": aReq.whenCreated?.getTime().toString(),
+                "expiration_time": aReq.expirationTime?.toISOString(),
+                "expiration_time_s": aReq.expirationTime?.getTime().toString()
             };
             switch (aReq.requestType) {
                 case RequestType.HANDSHAKE:
                     thisReq.handshake = {
-                        'requester_id': aReq.requesterNodeId,
-                        'target_id': aReq.targetNodeId,
-                        'requester_accepted': aReq.requesterAccepted,
-                        'target_accepted': aReq.targetAccepted
+                        "requester_id": aReq.requesterNodeId,
+                        "target_id": aReq.targetNodeId,
+                        "requester_accepted": aReq.requesterAccepted,
+                        "target_accepted": aReq.targetAccepted
                     };
-            };
+            }
             reqs.push(thisReq);
-        };
+        }
 
         req.vRestResp.Data = {
             requests: reqs
@@ -62,18 +61,19 @@ const procGetRequests: RequestHandler = async (req: Request, resp: Response, nex
 
         scoper.addResponseFields(req);
         pager.addResponseFields(req);
+    } else {
+        req.vRestResp.respondFailure(req.vAccountError ?? "Not logged in");
     }
-    else {
-        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-    };
     next();
 };
 
-export const name = '/api/v1/requests';
+export const name = "/api/v1/requests";
 
 export const router = Router();
 
-router.get(   '/api/v1/requests', [ setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
-                                    accountFromAuthToken, // req.vAuthAccount
-                                    procGetRequests,
-                                    finishMetaverseAPI ] );
+router.get("/api/v1/requests", [
+    setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
+    accountFromAuthToken, // req.vAuthAccount
+    procGetRequests,
+    finishMetaverseAPI
+]);

@@ -12,28 +12,25 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
 
-import { setupMetaverseAPI, finishMetaverseAPI, domainFromParams } from '@Route-Tools/middleware';
-import { accountFromAuthToken, param1FromParams } from '@Route-Tools/middleware';
+import { setupMetaverseAPI, finishMetaverseAPI, domainFromParams } from "@Route-Tools/middleware";
+import { accountFromAuthToken, param1FromParams } from "@Route-Tools/middleware";
 
-import { Domains } from '@Entities/Domains';
-import { VKeyedCollection } from '@Tools/vTypes';
+import { Domains } from "@Entities/Domains";
+import { VKeyedCollection } from "@Tools/vTypes";
 
 // Get the scope of the logged in account
 const procGetField: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
     if (req.vAuthAccount) {
         if (req.vDomain) {
             req.vRestResp.Data = await Domains.getField(req.vAuthToken, req.vDomain, req.vParam1);
+        } else {
+            req.vRestResp.respondFailure(req.vDomainError ?? "Target domain not found");
         }
-        else {
-            req.vRestResp.respondFailure(req.vDomainError ?? 'Target domain not found');
-        };
-    }
-    else {
-        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
+    } else {
+        req.vRestResp.respondFailure(req.vAccountError ?? "Not logged in");
     }
     next();
 };
@@ -45,43 +42,41 @@ const procPostField: RequestHandler = async (req: Request, resp: Response, next:
         if (req.vDomain) {
             const updates: VKeyedCollection = {};
             const success = await Domains.setField(req.vAuthToken, req.vDomain, req.vParam1,
-                                            req.body.set, req.vAuthAccount, updates);
+                req.body.set, req.vAuthAccount, updates);
             if (success.valid) {
                 // Setting worked so update the database
                 Domains.updateEntityFields(req.vDomain, updates);
+            } else {
+                req.vRestResp.respondFailure("value could not be set: " + success.reason);
             }
-            else {
-                req.vRestResp.respondFailure('value could not be set: ' + success.reason);
-            };
+        } else {
+            req.vRestResp.respondFailure(req.vDomainError ?? "Target domain not found");
         }
-        else {
-            req.vRestResp.respondFailure(req.vDomainError ?? 'Target domain not found');
-        };
+    } else {
+        req.vRestResp.respondFailure(req.vAccountError ?? "Not logged in");
     }
-    else {
-        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-    };
     next();
 };
 
-export const name = '/api/v1/domains/:domainId/field/:fieldname';
+export const name = "/api/v1/domains/:domainId/field/:fieldname";
 
 export const router = Router();
 
-router.get( '/api/v1/domains/:domainId/field/:param1',
-                                          [ setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
-                                            accountFromAuthToken, // req.vAuthAccount
-                                            domainFromParams,     // req.vDomain
-                                            param1FromParams,     // req.vParam1
-                                            procGetField,
-                                            finishMetaverseAPI
-                                          ] );
-router.post('/api/v1/domains/:domainId/field/:param1',
-                                          [ setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
-                                            accountFromAuthToken, // req.vAuthAccount
-                                            domainFromParams,     // req.vDomain
-                                            param1FromParams,     // req.vParam1
-                                            procPostField,
-                                            finishMetaverseAPI
-                                          ] );
-
+router.get("/api/v1/domains/:domainId/field/:param1",
+    [
+        setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
+        accountFromAuthToken, // req.vAuthAccount
+        domainFromParams,     // req.vDomain
+        param1FromParams,     // req.vParam1
+        procGetField,
+        finishMetaverseAPI
+    ]);
+router.post("/api/v1/domains/:domainId/field/:param1",
+    [
+        setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
+        accountFromAuthToken, // req.vAuthAccount
+        domainFromParams,     // req.vDomain
+        param1FromParams,     // req.vParam1
+        procPostField,
+        finishMetaverseAPI
+    ]);

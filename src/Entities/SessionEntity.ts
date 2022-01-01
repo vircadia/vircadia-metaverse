@@ -12,7 +12,6 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict'
 
 // Class to manage the manipulations on entities scope of application
 // Note: *Entity classes cannot have instance functions because they are created from the database
@@ -23,4 +22,4 @@ export class SessionEntity {
     public whenSessionCreated: Date;
     public timeOfLastReference: Date;
     public countReference: number;
-};
+}

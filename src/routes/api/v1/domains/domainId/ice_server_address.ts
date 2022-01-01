@@ -12,39 +12,39 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
-import { domainFromParams, domainAPIkeyFromBody, verifyDomainAccess } from '@Route-Tools/middleware';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
+import { setupMetaverseAPI, finishMetaverseAPI } from "@Route-Tools/middleware";
+import { domainFromParams, domainAPIkeyFromBody, verifyDomainAccess } from "@Route-Tools/middleware";
 
-import { Logger } from '@Tools/Logging';
-import { Domains } from '@Entities/Domains';
+import { Logger } from "@Tools/Logging";
+import { Domains } from "@Entities/Domains";
 
 // PUT /domains/:domainId/ice_server_address
 const procPutDomainsIceServerAddress: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-    Logger.debug('procPutDomainsIceServerAddress');
+    Logger.debug("procPutDomainsIceServerAddress");
     if (req.vDomain) {
         if (req.body && req.body.domain && req.body.domain.ice_server_address) {
             const updates: any = {
-                'iceServerAddr': req.body.domain.ice_server_address
+                "iceServerAddr": req.body.domain.ice_server_address
             };
             Domains.updateEntityFields(req.vDomain, updates);
-        };
+        }
+    } else {
+        req.vRestResp.respondFailure(req.vDomainError ?? "unauthorized");
     }
-    else {
-        req.vRestResp.respondFailure(req.vDomainError ?? 'unauthorized');
-    };
     next();
 };
 
-export const name = '/api/v1/domains/:domainId/ice_server_address';
+export const name = "/api/v1/domains/:domainId/ice_server_address";
 
 export const router = Router();
 
-router.put(   '/api/v1/domains/:domainId/ice_server_address', [ setupMetaverseAPI, // req.vRestResp, req.vAuthToken
-                                                  domainFromParams,     // req.vDomain
-                                                  domainAPIkeyFromBody, // req.vDomainAPIKey
-                                                  verifyDomainAccess,
-                                                  procPutDomainsIceServerAddress,
-                                                  finishMetaverseAPI ] );
+router.put("/api/v1/domains/:domainId/ice_server_address", [
+    setupMetaverseAPI, // req.vRestResp, req.vAuthToken
+    domainFromParams,     // req.vDomain
+    domainAPIkeyFromBody, // req.vDomainAPIKey
+    verifyDomainAccess,
+    procPutDomainsIceServerAddress,
+    finishMetaverseAPI
+]);

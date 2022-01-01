@@ -12,29 +12,28 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict'
 
-import Config from '@Base/config';
+import Config from "@Base/config";
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
-import { accountFromAuthToken } from '@Route-Tools/middleware';
-import { buildPlaceInfo } from '@Route-Tools/Util';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
+import { setupMetaverseAPI, finishMetaverseAPI } from "@Route-Tools/middleware";
+import { accountFromAuthToken } from "@Route-Tools/middleware";
+import { buildPlaceInfo } from "@Route-Tools/Util";
 
-import { Domains } from '@Entities/Domains';
-import { Places } from '@Entities/Places';
+import { Domains } from "@Entities/Domains";
+import { Places } from "@Entities/Places";
 
-import { Perm } from '@Route-Tools/Perm';
-import { checkAccessToEntity } from '@Route-Tools/Permissions';
+import { Perm } from "@Route-Tools/Perm";
+import { checkAccessToEntity } from "@Route-Tools/Permissions";
 
-import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
-import { PlaceFilterInfo } from '@Entities/EntityFilters/PlaceFilterInfo';
-import { VisibilityFilter } from '@Entities/EntityFilters/VisibilityFilter';
-import { Maturity } from '@Entities/Sets/Maturity';
+import { PaginationInfo } from "@Entities/EntityFilters/PaginationInfo";
+import { PlaceFilterInfo } from "@Entities/EntityFilters/PlaceFilterInfo";
+import { VisibilityFilter } from "@Entities/EntityFilters/VisibilityFilter";
+import { Maturity } from "@Entities/Sets/Maturity";
 
-import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
-import { Logger } from '@Tools/Logging';
-import { placeFields } from '@Entities/PlaceFields';
+import { IsNullOrEmpty, IsNotNullOrEmpty } from "@Tools/Misc";
+import { Logger } from "@Tools/Logging";
+import { placeFields } from "@Entities/PlaceFields";
 
 // Return places information
 // As of 20210501, the Places information is public and the requestor does not need to
@@ -42,7 +41,7 @@ import { placeFields } from '@Entities/PlaceFields';
 //    create the list of places to explore. This is also related to the fact that scripts
 //    do not have authentication information for fetching.
 const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  // if (req.vAuthAccount) {
+    // if (req.vAuthAccount) {
     const pager = new PaginationInfo();
     const placer = new PlaceFilterInfo();
     // you can only see friends, connections, etc
@@ -60,24 +59,24 @@ const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next:
         if (aDomain && IsNotNullOrEmpty(aDomain.networkAddr)) {
             if (await visibilitier.criteriaTestAsync(place, aDomain)) {
                 places.push(await buildPlaceInfo(place, aDomain));
-            };
-        };
-    };
+            }
+        }
+    }
 
     req.vRestResp.Data = {
-      'places': places,
-      // Maturity catagories added so client knows what is defined in the metaverse-server
-      'maturity-categories': Maturity.MaturityCategories
+        places,
+        // Maturity catagories added so client knows what is defined in the metaverse-server
+        "maturity-categories": Maturity.MaturityCategories
     };
 
     visibilitier.addResponseFields(req);
     placer.addResponseFields(req);
     pager.addResponseFields(req);
-  // }
-  // else {
-  //   req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  // };
-  next();
+    // }
+    // else {
+    //   req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
+    // };
+    next();
 };
 
 // Create a Place.
@@ -96,17 +95,16 @@ export const procPostPlaces: RequestHandler = async (req: Request, resp: Respons
             requestedDesc = req.body.place.description;
             requestedAddr = req.body.place.address;
             requestedDomainId = req.body.place.domainId;
-        }
-        else {
+        } else {
             requestedName = req.body.place_id;
             requestedAddr = req.body.path;
             requestedDomainId = req.body.domain_id;
-        };
+        }
 
         if (requestedName && requestedAddr && requestedDomainId) {
             const aDomain = await Domains.getDomainWithId(requestedDomainId);
             if (aDomain) {
-                if (await checkAccessToEntity(req.vAuthToken, aDomain, [ Perm.SPONSOR, Perm.ADMIN ], req.vAuthAccount)) {
+                if (await checkAccessToEntity(req.vAuthToken, aDomain, [Perm.SPONSOR, Perm.ADMIN], req.vAuthAccount)) {
                     const ifValid = await placeFields.name.validate(placeFields.name, req.vAuthAccount, requestedName);
                     if (ifValid.valid) {
                         const newPlace = await Places.createPlace(aDomain.sponsorAccountId);
@@ -115,43 +113,42 @@ export const procPostPlaces: RequestHandler = async (req: Request, resp: Respons
                         newPlace.path = requestedAddr;
                         newPlace.domainId = aDomain.id;
                         newPlace.maturity = aDomain.maturity ?? Maturity.UNRATED;
-                        newPlace.managers = [ req.vAuthAccount.username ];
+                        newPlace.managers = [req.vAuthAccount.username];
                         Places.addPlace(newPlace);
 
                         req.vRestResp.Data = buildPlaceInfo(newPlace, aDomain);
+                    } else {
+                        req.vRestResp.respondFailure(ifValid.reason ?? "place name already exists or is too long");
                     }
-                    else {
-                        req.vRestResp.respondFailure(ifValid.reason ?? 'place name already exists or is too long');
-                    };
+                } else {
+                    req.vRestResp.respondFailure("unauthorized");
                 }
-                else {
-                    req.vRestResp.respondFailure('unauthorized');
-                };
+            } else {
+                req.vRestResp.respondFailure("name/address/domainId not specified");
             }
-            else {
-                req.vRestResp.respondFailure('name/address/domainId not specified');
-            };
+        } else {
+            req.vRestResp.respondFailure("name, address, and domainId must be specified");
         }
-        else {
-            req.vRestResp.respondFailure('name, address, and domainId must be specified');
-        };
+    } else {
+        req.vRestResp.respondFailure(req.vAccountError ?? "Not logged in");
     }
-    else {
-        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-    };
     next();
 };
 
-export const name = '/api/v1/places';
+export const name = "/api/v1/places";
 
 export const router = Router();
 
-router.get(   '/api/v1/places',   [ setupMetaverseAPI,      // req.vRestResp, req.vAuthToken
-                                    accountFromAuthToken,   // req.vAuthAccount
-                                    procGetPlaces,
-                                    finishMetaverseAPI ] );
-router.post(   '/api/v1/places',
-                                  [ setupMetaverseAPI,   // req.vRESTResp, req.vAuthToken
-                                    accountFromAuthToken, // req.vAuthAccount
-                                    procPostPlaces,
-                                    finishMetaverseAPI ] );
+router.get("/api/v1/places", [
+    setupMetaverseAPI,      // req.vRestResp, req.vAuthToken
+    accountFromAuthToken,   // req.vAuthAccount
+    procGetPlaces,
+    finishMetaverseAPI
+]);
+router.post("/api/v1/places",
+    [
+        setupMetaverseAPI,   // req.vRESTResp, req.vAuthToken
+        accountFromAuthToken, // req.vAuthAccount
+        procPostPlaces,
+        finishMetaverseAPI
+    ]);

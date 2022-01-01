@@ -12,26 +12,27 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
+import { setupMetaverseAPI, finishMetaverseAPI } from "@Route-Tools/middleware";
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
 const procGetCommerceMarketplaceKey: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
     if (req.vRestResp) {
         req.vRestResp.Data = {
-            'public_key': 'laksdjfioasdofuoavanvowieroiawueroaijsdlkfajsdlfjalsdkfjlasdjfaklhkoiu'
+            "public_key": "laksdjfioasdofuoavanvowieroiawueroaijsdlkfajsdlfjalsdkfjlasdjfaklhkoiu"
         };
     }
     next();
 };
 
-export const name = '/api/v1/commerce/marketplace_key';
+export const name = "/api/v1/commerce/marketplace_key";
 
 export const router = Router();
 
-router.get('/api/v1/commerce/marketplace_key',  [ setupMetaverseAPI,
-                                                  procGetCommerceMarketplaceKey,
-                                                  finishMetaverseAPI ] );
+router.get("/api/v1/commerce/marketplace_key", [
+    setupMetaverseAPI,
+    procGetCommerceMarketplaceKey,
+    finishMetaverseAPI
+]);

@@ -11,7 +11,7 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
-'use strict'
+
 
 // NOTE: these cannot have instance functions in them as they are just JSON to and from the database
 export class AuthToken {
@@ -22,4 +22,4 @@ export class AuthToken {
     public accountId: string;       // AccountId of associated account
     public whenCreated: Date;
     public expirationTime: Date;
-};
+}

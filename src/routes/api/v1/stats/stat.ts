@@ -12,55 +12,51 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict'
 
-import os from 'os';
+import os from "os";
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI, param1FromParams } from '@Route-Tools/middleware';
-import { accountFromAuthToken } from '@Route-Tools/middleware';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
+import { setupMetaverseAPI, finishMetaverseAPI, param1FromParams } from "@Route-Tools/middleware";
+import { accountFromAuthToken } from "@Route-Tools/middleware";
 
-import { Monitoring } from '@Monitoring/Monitoring';
+import { Monitoring } from "@Monitoring/Monitoring";
 
-import { Logger } from '@Tools/Logging';
+import { Logger } from "@Tools/Logging";
 
 const procGetStat: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
     if (req.vAuthAccount) {
         if (req.vParam1) {
             let includeHistory = true;
             if (req.query.history) {
-                if (typeof(req.query.history) === 'string') {
-                    includeHistory = [ 'false', 'no' ].includes(req.query.history) ? false : true;
-                };
-            };
+                if (typeof req.query.history === "string") {
+                    includeHistory = !["false", "no"].includes(req.query.history);
+                }
+            }
             const stat = Monitoring.getStat(req.vParam1);
             if (stat) {
                 req.vRestResp.Data = {
-                    'stat': stat.Report(includeHistory)
+                    "stat": stat.Report(includeHistory)
                 };
+            } else {
+                req.vRestResp.respondFailure("Unknown stat");
             }
-            else {
-                req.vRestResp.respondFailure('Unknown stat');
-            };
+        } else {
+            req.vRestResp.respondFailure("missing parameter");
         }
-        else {
-            req.vRestResp.respondFailure('missing parameter');
-        };
+    } else {
+        req.vRestResp.respondFailure(req.vAccountError ?? "Not logged in");
     }
-    else {
-        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-    };
     next();
 };
 
-export const name = '/api/v1/stats/stat/:name';
+export const name = "/api/v1/stats/stat/:name";
 
 export const router = Router();
 
-router.get('/api/v1/stats/stat/:param1', [ setupMetaverseAPI,      // req.vRestResp
-                                           accountFromAuthToken,   // req.vAuthAccount
-                                           param1FromParams,       // req.vParam1
-                                           procGetStat,
-                                           finishMetaverseAPI ] );
-
-
+router.get("/api/v1/stats/stat/:param1", [
+    setupMetaverseAPI,      // req.vRestResp
+    accountFromAuthToken,   // req.vAuthAccount
+    param1FromParams,       // req.vParam1
+    procGetStat,
+    finishMetaverseAPI
+]);

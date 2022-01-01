@@ -12,31 +12,30 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
-import { accountFromAuthToken } from '@Route-Tools/middleware';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
+import { setupMetaverseAPI, finishMetaverseAPI } from "@Route-Tools/middleware";
+import { accountFromAuthToken } from "@Route-Tools/middleware";
 
-import { Logger } from '@Tools/Logging';
+import { Logger } from "@Tools/Logging";
 
 // PUT /api/v1/commerce/htc_account
 const procPutCommerceHfcAccount: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
     if (req.vAuthAccount) {
-        Logger.debug('procPutCommerceHfcAccount');
+        Logger.debug("procPutCommerceHfcAccount");
+    } else {
+        req.vRestResp.respondFailure(req.vAccountError ?? "Not logged in");
     }
-    else {
-        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-    };
     next();
 };
 
-export const name = '/api/v1/commerce/hfc_account';
+export const name = "/api/v1/commerce/hfc_account";
 
 export const router = Router();
 
-router.put('/api/v1/commerce/hfc_account', [ setupMetaverseAPI,
-                                             accountFromAuthToken,
-                                             procPutCommerceHfcAccount,
-                                             finishMetaverseAPI ] );
-
+router.put("/api/v1/commerce/hfc_account", [
+    setupMetaverseAPI,
+    accountFromAuthToken,
+    procPutCommerceHfcAccount,
+    finishMetaverseAPI
+]);

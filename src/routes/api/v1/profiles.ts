@@ -12,36 +12,36 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict'
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
-import { buildAccountProfile } from '@Route-Tools/Util';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
+import { setupMetaverseAPI, finishMetaverseAPI } from "@Route-Tools/middleware";
+import { buildAccountProfile } from "@Route-Tools/Util";
 
-import { Accounts } from '@Entities/Accounts';
+import { Accounts } from "@Entities/Accounts";
 
-import { Availability } from '@Entities/Sets/Availability';
+import { Availability } from "@Entities/Sets/Availability";
 
-import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
+import { PaginationInfo } from "@Entities/EntityFilters/PaginationInfo";
 
-import { Logger } from '@Tools/Logging';
-import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
+import { Logger } from "@Tools/Logging";
+import { GenericFilter } from "@Entities/EntityFilters/GenericFilter";
 
 // Return account information
 // The accounts returned depend on the scope (whether admin) and the search criteria (infoer)
 const procGetProfiles: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
     const pager = new PaginationInfo();
     // Can only see accounts that have unspecified availability or "all"
-    const scoper = new GenericFilter( { "$or": [ { "availability": { "$exists": false }},
-                                                { "availability": Availability.ALL },
-                                                ] } );
+    const scoper = new GenericFilter({ "$or": [
+        { "availability": { "$exists": false } },
+        { "availability": Availability.ALL }
+    ] });
     pager.parametersFromRequest(req);
 
     // Loop through all the filtered accounts and create array of info
     const accts: any[] = [];
     for await (const acct of Accounts.enumerateAsync(scoper, pager)) {
         accts.push(await buildAccountProfile(req, acct));
-    };
+    }
 
     req.vRestResp.Data = {
         profiles: accts
@@ -53,10 +53,12 @@ const procGetProfiles: RequestHandler = async (req: Request, resp: Response, nex
     next();
 };
 
-export const name = '/api/v1/profiles';
+export const name = "/api/v1/profiles";
 
 export const router = Router();
 
-router.get(   '/api/v1/profiles',                 [ setupMetaverseAPI,      // req.vRestResp, req.vAuthToken
-                                                    procGetProfiles,
-                                                    finishMetaverseAPI ] );
+router.get("/api/v1/profiles", [
+    setupMetaverseAPI,      // req.vRestResp, req.vAuthToken
+    procGetProfiles,
+    finishMetaverseAPI
+]);

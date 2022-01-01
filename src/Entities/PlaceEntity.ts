@@ -11,11 +11,11 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
-'use strict'
 
-import Config from '@Base/config';
 
-import { Entity } from '@Entities/Entity';
+import Config from "@Base/config";
+
+import { Entity } from "@Entities/Entity";
 
 // NOTE: this class cannot have functions in them as they are just JSON to and from the database
 export class PlaceEntity implements Entity {
@@ -34,15 +34,15 @@ export class PlaceEntity implements Entity {
 
     // A Place can have a beacon that updates current state and information
     // If current information is not supplied, attendance defaults to domain's
-    public currentAttendance: number    // current attendance at the Place
-    public currentImages: string[]      // images at the session
-    public currentInfo: string          // JSON information about the session
-    public currentLastUpdateTime: Date  // time that the last session information was updated
-    public currentAPIKeyTokenId: string // API key for updating the session information
+    public currentAttendance: number;    // current attendance at the Place
+    public currentImages: string[];      // images at the session
+    public currentInfo: string;          // JSON information about the session
+    public currentLastUpdateTime: Date;  // time that the last session information was updated
+    public currentAPIKeyTokenId: string; // API key for updating the session information
 
     // admin stuff
     public iPAddrOfFirstContact: string; // IP address that registered this place
     public whenCreated: Date; // What the variable name says
     // 'lastActivity' is computed by Places.initPlaces and used for aliveness checks
     public lastActivity: Date;  // newest of currentLastUpdateTime and Domain.timeOfLastHeartbeat
-};
+}

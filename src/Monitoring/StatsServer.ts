@@ -11,50 +11,52 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
-'use strict'
 
-import { Config } from '@Base/config';
 
-import os from 'os';
+import { Config } from "@Base/config";
 
-import { Monitoring } from '@Monitoring/Monitoring';
-import { Stat } from '@Monitoring/Stat';
-import { CounterStat } from '@Monitoring/CounterStat';
-import { EventHistogram } from '@Monitoring/EventHistogram';
+import os from "os";
+
+import { Monitoring } from "@Monitoring/Monitoring";
+import { Stat } from "@Monitoring/Stat";
+import { CounterStat } from "@Monitoring/CounterStat";
+import { EventHistogram } from "@Monitoring/EventHistogram";
 
 // All the OS statistics
 export class StatsServer extends Stat {
     constructor() {
-        super('server', 'server', '');
+        super("server", "server", "");
 
         // Number of API requests
-        const apiStat = new CounterStat('apiRequests', 'server', 'request');
+        const apiStat = new CounterStat("apiRequests", "server", "request");
         if (Config.monitoring.history) {
-            apiStat.AddHistogram('perHour', new EventHistogram(60, 60*1000));   // 60 one minute buckets
-            apiStat.AddHistogram('perDay', new EventHistogram(24*12, 5*60*1000));// one day's worth of 5 minute buckets
-            apiStat.AddHistogram('perWeek', new EventHistogram(7*24, 60*60*1000));// one weeks worth of one hour buckets
-        };
+            apiStat.AddHistogram("perHour", new EventHistogram(60, 60 * 1000));   // 60 one minute buckets
+            apiStat.AddHistogram("perDay", new EventHistogram(24 * 12, 5 * 60 * 1000));// one day's worth of 5 minute buckets
+            apiStat.AddHistogram("perWeek", new EventHistogram(7 * 24, 60 * 60 * 1000));// one weeks worth of one hour buckets
+        }
         Monitoring.addStat(apiStat);
 
         // Number of requests that generated errors
-        const apiErrors = new CounterStat('apiErrors', 'server', 'request');
+        const apiErrors = new CounterStat("apiErrors", "server", "request");
         if (Config.monitoring.history) {
-            apiStat.AddHistogram('perHour', new EventHistogram(60, 60*1000));   // 60 one minute buckets
-            apiStat.AddHistogram('perDay', new EventHistogram(24*12, 5*60*1000));// one day's worth of 5 minute buckets
-        };
+            apiStat.AddHistogram("perHour", new EventHistogram(60, 60 * 1000));   // 60 one minute buckets
+            apiStat.AddHistogram("perDay", new EventHistogram(24 * 12, 5 * 60 * 1000));// one day's worth of 5 minute buckets
+        }
         Monitoring.addStat(apiErrors);
-    };
+    }
 
     Event(pCount: number): void {
-        throw new Error('Method not implemented.');
+        throw new Error("Method not implemented.");
     }
+
     Gather(): void {
-        return;
+
     }
-    Report(pReturnHistogram: boolean = true) {
+
+    Report(pReturnHistogram = true) {
         return {
-            'apiRequests': Monitoring.getStat('apiRequests')?.Report(pReturnHistogram),
-            'apiErrors': Monitoring.getStat('apiErrors')?.Report(pReturnHistogram),
+            "apiRequests": Monitoring.getStat("apiRequests")?.Report(pReturnHistogram),
+            "apiErrors": Monitoring.getStat("apiErrors")?.Report(pReturnHistogram)
         };
     }
-};
+}

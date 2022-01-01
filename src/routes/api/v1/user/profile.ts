@@ -12,41 +12,40 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
 
-import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
-import { accountFromAuthToken } from '@Route-Tools/middleware';
+import { setupMetaverseAPI, finishMetaverseAPI } from "@Route-Tools/middleware";
+import { accountFromAuthToken } from "@Route-Tools/middleware";
 
-import { IsNotNullOrEmpty } from '@Tools/Misc';
+import { IsNotNullOrEmpty } from "@Tools/Misc";
 
 // Get old profile information.
 // This request will get greatly expanded.
 const procGetUserProfile: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
     if (req.vAuthAccount) {
         req.vRestResp.Data = {
-            'user': {
-                'username': req.vAuthAccount.username,
-                'accountid': req.vAuthAccount.id,
-                'xmpp_password': req.vAuthAccount.xmppPassword,
-                'discourse_api_key': req.vAuthAccount.discourseApiKey,
-                'wallet_id': req.vAuthAccount.walletId
+            "user": {
+                "username": req.vAuthAccount.username,
+                "accountid": req.vAuthAccount.id,
+                "xmpp_password": req.vAuthAccount.xmppPassword,
+                "discourse_api_key": req.vAuthAccount.discourseApiKey,
+                "wallet_id": req.vAuthAccount.walletId
             }
         };
+    } else {
+        req.vRestResp.respondFailure(req.vAccountError ?? "Not logged in");
     }
-    else {
-        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-    };
     next();
 };
 
-export const name = '/api/v1/user/profile';
+export const name = "/api/v1/user/profile";
 
 export const router = Router();
 
-router.get(   '/api/v1/user/profile', [ setupMetaverseAPI,
-                                        accountFromAuthToken,
-                                        procGetUserProfile,
-                                        finishMetaverseAPI
-                                      ] );
+router.get("/api/v1/user/profile", [
+    setupMetaverseAPI,
+    accountFromAuthToken,
+    procGetUserProfile,
+    finishMetaverseAPI
+]);

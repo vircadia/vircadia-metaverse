@@ -12,48 +12,46 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI, domainAPIkeyFromBody, verifyDomainAccess } from '@Route-Tools/middleware';
-import { HTTPStatusCode } from '@Route-Tools/RESTResponse';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
+import { setupMetaverseAPI, finishMetaverseAPI, domainAPIkeyFromBody, verifyDomainAccess } from "@Route-Tools/middleware";
+import { HTTPStatusCode } from "@Route-Tools/RESTResponse";
 
-import { accountFromAuthToken } from '@Route-Tools/middleware';
-import { domainFromParams } from '@Route-Tools/middleware';
-import { Perm } from '@Route-Tools/Perm';
-import { checkAccessToEntity } from '@Route-Tools/Permissions';
-import { buildDomainInfoV1 } from '@Route-Tools/Util';
+import { accountFromAuthToken } from "@Route-Tools/middleware";
+import { domainFromParams } from "@Route-Tools/middleware";
+import { Perm } from "@Route-Tools/Perm";
+import { checkAccessToEntity } from "@Route-Tools/Permissions";
+import { buildDomainInfoV1 } from "@Route-Tools/Util";
 
-import { Domains } from '@Entities/Domains';
-import { Accounts } from '@Entities/Accounts';
+import { Domains } from "@Entities/Domains";
+import { Accounts } from "@Entities/Accounts";
 
-import { VKeyedCollection } from '@Tools/vTypes';
-import { Logger } from '@Tools/Logging';
-import Config from '@Base/config';
-import { IsNullOrEmpty } from '@Tools/Misc';
-import { updateObjectFields } from '@Tools/Db';
+import { VKeyedCollection } from "@Tools/vTypes";
+import { Logger } from "@Tools/Logging";
+import Config from "@Base/config";
+import { IsNullOrEmpty } from "@Tools/Misc";
+import { updateObjectFields } from "@Tools/Db";
 
 // GET /api/v1/domains/:domainId
 // Return a small snippet if domain data for the domainId specified in the request
 const procGetDomainsDomainid: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vDomain) {
-    const aDomain = req.vDomain;
-    const domainInfo = await buildDomainInfoV1(aDomain);
-    // A few copies are added for compatibiliity with legacy code
-    domainInfo.id = domainInfo.domainId;
+    if (req.vDomain) {
+        const aDomain = req.vDomain;
+        const domainInfo = await buildDomainInfoV1(aDomain);
+        // A few copies are added for compatibiliity with legacy code
+        domainInfo.id = domainInfo.domainId;
 
-    req.vRestResp.Data = {
-      'domain': domainInfo
-    };
-    // For legacy code which expects the domain information at the top level
-    req.vRestResp.addAdditionalField('domain', domainInfo);
-  }
-  else {
-    req.vRestResp.respondFailure(req.vDomainError ?? 'Domain not found');
-    // HTTP error will force domain renegotation
-    req.vRestResp.HTTPStatus = HTTPStatusCode.Unauthorized;
-  };
-  next();
+        req.vRestResp.Data = {
+            "domain": domainInfo
+        };
+        // For legacy code which expects the domain information at the top level
+        req.vRestResp.addAdditionalField("domain", domainInfo);
+    } else {
+        req.vRestResp.respondFailure(req.vDomainError ?? "Domain not found");
+        // HTTP error will force domain renegotation
+        req.vRestResp.HTTPStatus = HTTPStatusCode.Unauthorized;
+    }
+    next();
 };
 
 // PUT /api/v1/domains/:domainId
@@ -62,34 +60,56 @@ const procGetDomainsDomainid: RequestHandler = async (req: Request, resp: Respon
 const procPutDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
     if (req.vDomain) {
         // Either the domain itself or an admin can update the domain information
-        if (await checkAccessToEntity(req.vAuthToken, req.vDomain, [ Perm.DOMAIN, Perm.SPONSOR, Perm.ADMIN ])) {
+        if (await checkAccessToEntity(req.vAuthToken, req.vDomain, [Perm.DOMAIN, Perm.SPONSOR, Perm.ADMIN])) {
             const updated: VKeyedCollection = {};
             let valuesToSet = req.body.domain;
             if (valuesToSet) {
                 // 'valuesToSet' are the values sent to use in the request.
                 // Collect the specific values set. Cannot just accept all because the
                 //     requestor could do things like set the password hash or other bad things.
-                for (const field of ['version', 'protocol', 'network_address', 'network_port', 'automatic_networking',
-                            'restricted', 'capacity', 'description', 'maturity', 'restriction', 'managers', 'tags' ]) {
+                for (const field of [
+                    "version",
+                    "protocol",
+                    "network_address",
+                    "network_port",
+                    "automatic_networking",
+                    "restricted",
+                    "capacity",
+                    "description",
+                    "maturity",
+                    "restriction",
+                    "managers",
+                    "tags"
+                ]) {
                     if (valuesToSet.hasOwnProperty(field)) {
                         await Domains.setField(req.vAuthToken, req.vDomain, field, valuesToSet[field], req.vAuthAccount, updated);
-                    };
-                };
-                if (valuesToSet.hasOwnProperty('heartbeat')) {
-                    await Domains.setField(req.vAuthToken, req.vDomain, 'num_users', valuesToSet.heartbeat.num_users, req.vAuthAccount, updated);
-                    await Domains.setField(req.vAuthToken, req.vDomain, 'num_anon_users', valuesToSet.heartbeat.num_anon_users, req.vAuthAccount, updated);
-                };
+                    }
+                }
+                if (valuesToSet.hasOwnProperty("heartbeat")) {
+                    await Domains.setField(req.vAuthToken, req.vDomain, "num_users", valuesToSet.heartbeat.num_users, req.vAuthAccount, updated);
+                    await Domains.setField(req.vAuthToken, req.vDomain, "num_anon_users", valuesToSet.heartbeat.num_anon_users, req.vAuthAccount, updated);
+                }
 
                 if (valuesToSet.meta) {
                     // Setting the domain specs with the domain settings pages returns 'meta' informtion
                     valuesToSet = valuesToSet.meta;
-                    for (const field of [ 'capacity', 'contact_info', 'description', 'managers', 'tags', 'images',
-                                'maturity', 'restriction', 'thumbnail', 'world_name' ]) {
+                    for (const field of [
+                        "capacity",
+                        "contact_info",
+                        "description",
+                        "managers",
+                        "tags",
+                        "images",
+                        "maturity",
+                        "restriction",
+                        "thumbnail",
+                        "world_name"
+                    ]) {
                         if (valuesToSet.hasOwnProperty(field)) {
                             await Domains.setField(req.vAuthToken, req.vDomain, field, valuesToSet[field], req.vAuthAccount, updated);
-                        };
-                    };
-                };
+                        }
+                    }
+                }
 
                 /* FOLLOWING CODE DOES NOT WORK: the socket.remoteAddress is the IP addr
                             of the front end proxy server. Need to use 'x-forwarded-for:' header
@@ -111,22 +131,19 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
                 // This 'POST" is used as the domain heartbeat. Remember it's alive.
                 updated.timeOfLastHeartbeat = new Date();
                 updated.active = true;
-                Logger.debug('procPutDomains. updating=' + JSON.stringify(updated));
+                Logger.debug("procPutDomains. updating=" + JSON.stringify(updated));
                 Domains.updateEntityFields(req.vDomain, updated);
+            } else {
+                req.vRestResp.respondFailure("badly formed data");
             }
-            else {
-                req.vRestResp.respondFailure('badly formed data');
-            };
+        } else {
+            req.vRestResp.respondFailure("Unauthorized");
         }
-        else {
-            req.vRestResp.respondFailure('Unauthorized');
-        };
-    }
-    else {
-        req.vRestResp.respondFailure(req.vDomainError ?? 'Domain not found');
+    } else {
+        req.vRestResp.respondFailure(req.vDomainError ?? "Domain not found");
         // HTTP error will force domain renegotation
         req.vRestResp.HTTPStatus = HTTPStatusCode.Unauthorized;
-    };
+    }
     next();
 };
 
@@ -134,40 +151,43 @@ const procPutDomains: RequestHandler = async (req: Request, resp: Response, next
 const procDeleteDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
     if (req.vAuthAccount) {
         if (req.vDomain) {
-            if (await checkAccessToEntity(req.vAuthToken, req.vDomain, [ Perm.SPONSOR, Perm.ADMIN ])) {
+            if (await checkAccessToEntity(req.vAuthToken, req.vDomain, [Perm.SPONSOR, Perm.ADMIN])) {
                 await Domains.removeDomain(req.vDomain);
                 await Domains.removeDomainContext(req.vDomain);
+            } else {
+                req.vRestResp.respondFailure("Not authorized");
             }
-            else {
-                req.vRestResp.respondFailure('Not authorized');
-            };
+        } else {
+            req.vRestResp.respondFailure(req.vDomainError ?? "Domain not found");
         }
-        else {
-            req.vRestResp.respondFailure(req.vDomainError ?? 'Domain not found');
-        };
+    } else {
+        req.vRestResp.respondFailure(req.vAccountError ?? "Not logged in");
     }
-    else {
-        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-    };
     next();
 };
 
-export const name = '/api/v1/domains/:domainId';
+export const name = "/api/v1/domains/:domainId";
 
 export const router = Router();
 
-router.get(   '/api/v1/domains/:domainId',      [ setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
-                                                  domainFromParams,     // req.vDomain
-                                                  procGetDomainsDomainid,
-                                                  finishMetaverseAPI ] );
-router.put(   '/api/v1/domains/:domainId',      [ setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
-                                                  domainFromParams,     // req.vDomain
-                                                  domainAPIkeyFromBody, // req.vDomainAPIKey
-                                                  verifyDomainAccess,
-                                                  procPutDomains,
-                                                  finishMetaverseAPI ] );
-router.delete('/api/v1/domains/:domainId',      [ setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
-                                                  domainFromParams,     // req.vDomain
-                                                  accountFromAuthToken, // req.vAuthAccount
-                                                  procDeleteDomains,
-                                                  finishMetaverseAPI ] );
+router.get("/api/v1/domains/:domainId", [
+    setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
+    domainFromParams,     // req.vDomain
+    procGetDomainsDomainid,
+    finishMetaverseAPI
+]);
+router.put("/api/v1/domains/:domainId", [
+    setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
+    domainFromParams,     // req.vDomain
+    domainAPIkeyFromBody, // req.vDomainAPIKey
+    verifyDomainAccess,
+    procPutDomains,
+    finishMetaverseAPI
+]);
+router["delete"]("/api/v1/domains/:domainId", [
+    setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
+    domainFromParams,     // req.vDomain
+    accountFromAuthToken, // req.vAuthAccount
+    procDeleteDomains,
+    finishMetaverseAPI
+]);

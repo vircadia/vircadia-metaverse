@@ -12,32 +12,32 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { accountFromAuthToken } from '@Route-Tools/middleware';
-import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
+import { accountFromAuthToken } from "@Route-Tools/middleware";
+import { setupMetaverseAPI, finishMetaverseAPI } from "@Route-Tools/middleware";
 
-import { Logger } from '@Tools/Logging';
+import { Logger } from "@Tools/Logging";
 
 const procPostUserActivities: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
     if (req.body.action_name) {
         const activity = req.body.action_name;
         if (req.vAuthAccount) {
             Logger.debug(`procPostUserActivities: Received user activity "${activity}" from ${req.vAuthAccount.username}`);
-        }
-        else {
+        } else {
             Logger.debug(`procPostUserActivities: Received user activity "${activity}" from unknown user`);
-        };
-    };
+        }
+    }
     next();
 };
 
-export const name = '/api/v1/user_activities';
+export const name = "/api/v1/user_activities";
 
 export const router = Router();
 
-router.post( '/api/v1/user_activities', [ setupMetaverseAPI,      // req.vRestResp, req.vAuthToken
-                                          accountFromAuthToken,   // req.vAuthAccount
-                                          procPostUserActivities,
-                                          finishMetaverseAPI ] );
+router.post("/api/v1/user_activities", [
+    setupMetaverseAPI,      // req.vRestResp, req.vAuthToken
+    accountFromAuthToken,   // req.vAuthAccount
+    procPostUserActivities,
+    finishMetaverseAPI
+]);

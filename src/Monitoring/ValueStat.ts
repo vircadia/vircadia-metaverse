@@ -11,34 +11,34 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
-'use strict'
 
-import { Config } from '@Base/config';
 
-import { Stat, updateValueFunction } from '@Monitoring/Stat';
+import { Config } from "@Base/config";
+
+import { Stat, updateValueFunction } from "@Monitoring/Stat";
 
 export class ValueStat extends Stat {
 
     constructor(pName: string, pCatagory: string, pUnit: string, pPullAction?: updateValueFunction) {
-        super(pName, pCatagory, pUnit, pPullAction)
-    };
+        super(pName, pCatagory, pUnit, pPullAction);
+    }
 
     // Remember the current value for this stat
     Event(pValue: number): void {
         this.value = pValue;
-        this._histograms.forEach( (histo) => {
+        this._histograms.forEach((histo) => {
             histo.Event(pValue);
         });
-    };
+    }
 
     // Called once a second. We don't gather numbers every time
     async Gather(): Promise<void> {
         await this.DoPullAction();
-        return;
-    };
 
-    Report(pReturnHistogram: boolean = true): any {
+    }
+
+    Report(pReturnHistogram = true): any {
         const report = super.Report(pReturnHistogram);
         return report;
-    };
+    }
 }

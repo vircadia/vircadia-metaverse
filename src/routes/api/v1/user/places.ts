@@ -12,25 +12,24 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
 
-import Config from '@Base/config';
+import Config from "@Base/config";
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI, param1FromParams, placeFromParams } from '@Route-Tools/middleware';
-import { accountFromAuthToken } from '@Route-Tools/middleware';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
+import { setupMetaverseAPI, finishMetaverseAPI, param1FromParams, placeFromParams } from "@Route-Tools/middleware";
+import { accountFromAuthToken } from "@Route-Tools/middleware";
 
-import { procGetPlacesPlaceId, procDeletePlacesPlaceId } from '../places/placeId';
-import { procPostPlaces } from '../places';
+import { procGetPlacesPlaceId, procDeletePlacesPlaceId } from "../places/placeId";
+import { procPostPlaces } from "../places";
 
-import { buildPlaceInfo } from '@Route-Tools/Util';
+import { buildPlaceInfo } from "@Route-Tools/Util";
 
-import { Places } from '@Entities/Places';
-import { Maturity } from '@Entities/Sets/Maturity';
+import { Places } from "@Entities/Places";
+import { Maturity } from "@Entities/Sets/Maturity";
 
-import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
-import { PlaceFilterInfo } from '@Entities/EntityFilters/PlaceFilterInfo';
-import { Domains } from '@Entities/Domains';
+import { PaginationInfo } from "@Entities/EntityFilters/PaginationInfo";
+import { PlaceFilterInfo } from "@Entities/EntityFilters/PlaceFilterInfo";
+import { Domains } from "@Entities/Domains";
 
 const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
     if (req.vAuthAccount) {
@@ -47,47 +46,53 @@ const procGetPlaces: RequestHandler = async (req: Request, resp: Response, next:
                 const aDomain = await Domains.getDomainWithId(place.domainId);
                 if (aDomain && aDomain.sponsorAccountId === req.vAuthAccount.id) {
                     allPlaces.push(await buildPlaceInfo(place));
-                };
-            };
-        };
+                }
+            }
+        }
 
         req.vRestResp.Data = {
-            'places': allPlaces,
-            'maturity-categories': Maturity.MaturityCategories
+            "places": allPlaces,
+            "maturity-categories": Maturity.MaturityCategories
         };
 
         pager.addResponseFields(req);
+    } else {
+        req.vRestResp.respondFailure(req.vAccountError ?? "Not logged in");
     }
-    else {
-        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-    };
     next();
 };
 
-export const name = '/api/v1/user/places';
+export const name = "/api/v1/user/places";
 
 export const router = Router();
 
 // Some of these are under 'user' as that was a legacy configuration.
-router.get(   '/api/v1/user/places', [ setupMetaverseAPI,   // req.vRESTResp
-                                      accountFromAuthToken, // req.vAuthAccount
-                                      procGetPlaces,
-                                      finishMetaverseAPI ] );
-router.post(   '/api/v1/user/places',
-                                     [ setupMetaverseAPI,   // req.vRESTResp
-                                      accountFromAuthToken, // req.vAuthAccount
-                                      procPostPlaces,
-                                      finishMetaverseAPI ] );
-router.get(   '/api/v1/user/places/:placeId',
-                                     [ setupMetaverseAPI,   // req.vRESTResp
-                                      accountFromAuthToken, // req.vAuthAccount
-                                      placeFromParams,      // req.vPlace, req.vDomain
-                                      procGetPlacesPlaceId,
-                                      finishMetaverseAPI ] );
-router.delete(   '/api/v1/user/places/:placeId',
-                                     [ setupMetaverseAPI,   // req.vRESTResp
-                                      accountFromAuthToken, // req.vAuthAccount
-                                      placeFromParams,      // req.vPlace, req.vDomain
-                                      procDeletePlacesPlaceId,
-                                      finishMetaverseAPI ] );
-
+router.get("/api/v1/user/places", [
+    setupMetaverseAPI,   // req.vRESTResp
+    accountFromAuthToken, // req.vAuthAccount
+    procGetPlaces,
+    finishMetaverseAPI
+]);
+router.post("/api/v1/user/places",
+    [
+        setupMetaverseAPI,   // req.vRESTResp
+        accountFromAuthToken, // req.vAuthAccount
+        procPostPlaces,
+        finishMetaverseAPI
+    ]);
+router.get("/api/v1/user/places/:placeId",
+    [
+        setupMetaverseAPI,   // req.vRESTResp
+        accountFromAuthToken, // req.vAuthAccount
+        placeFromParams,      // req.vPlace, req.vDomain
+        procGetPlacesPlaceId,
+        finishMetaverseAPI
+    ]);
+router["delete"]("/api/v1/user/places/:placeId",
+    [
+        setupMetaverseAPI,   // req.vRESTResp
+        accountFromAuthToken, // req.vAuthAccount
+        placeFromParams,      // req.vPlace, req.vDomain
+        procDeletePlacesPlaceId,
+        finishMetaverseAPI
+    ]);

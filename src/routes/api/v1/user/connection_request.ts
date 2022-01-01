@@ -12,20 +12,19 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
 
-import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
+import { setupMetaverseAPI, finishMetaverseAPI } from "@Route-Tools/middleware";
 
-import { Requests, RequestType } from '@Entities/Requests';
-import { RequestEntity } from '@Entities/RequestEntity';
+import { Requests, RequestType } from "@Entities/Requests";
+import { RequestEntity } from "@Entities/RequestEntity";
 
-import { Accounts } from '@Entities/Accounts';
-import { accountFromAuthToken, usernameFromParams } from '@Route-Tools/middleware';
+import { Accounts } from "@Entities/Accounts";
+import { accountFromAuthToken, usernameFromParams } from "@Route-Tools/middleware";
 
-import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
-import { Logger } from '@Tools/Logging';
+import { IsNullOrEmpty, IsNotNullOrEmpty } from "@Tools/Misc";
+import { Logger } from "@Tools/Logging";
 
 const procPostUserConnectionRequest: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
     if (req.vAuthAccount) {
@@ -48,19 +47,14 @@ const procPostUserConnectionRequest: RequestHandler = async (req: Request, resp:
             if (req.vAuthAccount.locationNodeId) {
                 if (req.vAuthAccount.locationNodeId === thisNode) {
                     Logger.debug(`procPostUserConnectionRequest: request from ${req.vAuthAccount.username} and locationNodeid matches main node`);
+                } else if (req.vAuthAccount.locationNodeId === otherNode) {
+                    Logger.debug(`procPostUserConnectionRequest: request from ${req.vAuthAccount.username} and locationNodeid matches proposed node`);
+                } else {
+                    Logger.debug(`procPostUserConnectionRequest: request from ${req.vAuthAccount.username} and locationNodeid does not match either node`);
                 }
-                else {
-                    if (req.vAuthAccount.locationNodeId === otherNode) {
-                        Logger.debug(`procPostUserConnectionRequest: request from ${req.vAuthAccount.username} and locationNodeid matches proposed node`);
-                    }
-                    else {
-                        Logger.debug(`procPostUserConnectionRequest: request from ${req.vAuthAccount.username} and locationNodeid does not match either node`);
-                    };
-                };
-            }
-            else {
+            } else {
                 Logger.debug(`procPostUserConnectionRequest: request from ${req.vAuthAccount.username} and no nodeID info`);
-            };
+            }
             // END sanity check DEBUG DEBUG
 
             let pending = true;   // assume request is still pending
@@ -68,8 +62,8 @@ const procPostUserConnectionRequest: RequestHandler = async (req: Request, resp:
             // Find if there is another requests between these two nodes
             // Note: this is not the accountID but the session nodeId of the avatars
             const previousAsk = await Requests.getWithRequestBetween(thisNode, otherNode,
-                                        RequestType.HANDSHAKE,
-                                        'requesterNodeId', 'targetNodeId');
+                RequestType.HANDSHAKE,
+                "requesterNodeId", "targetNodeId");
             if (IsNotNullOrEmpty(previousAsk)) {
                 Logger.debug(`procPostUserConnectionRequest: previous ask. by=${req.vAuthAccount.id}, this=${thisNode}, other=${otherNode}`);
                 // There is an existing connection request
@@ -82,55 +76,49 @@ const procPostUserConnectionRequest: RequestHandler = async (req: Request, resp:
                         await BuildConnectionResponse(req, previousAsk.targetAccountId);
                         pending = false;
                         // The request itself will timeout and expire
-                    }
-                    else {
+                    } else {
                         Logger.debug(`procPostUserConnectionRequest: other hasn't accepted. by=${req.vAuthAccount.id}, this=${thisNode}, other=${otherNode}`);
-                    };
-                }
-                else {
+                    }
+                } else {
                     Logger.debug(`procPostUserConnectionRequest: I accept. by=${req.vAuthAccount.id}, this=${thisNode}, other=${otherNode}`);
                     // There is an existing request to me.
                     // Since I'm making the same request, we are mutually involved
                     previousAsk.targetAccepted = true;
                     previousAsk.targetAccountId = req.vAuthAccount.id;
-                    Requests.update(previousAsk, { 'targetAccepted': true,
-                                            'targetAccountId': req.vAuthAccount.id })
+                    Requests.update(previousAsk, { "targetAccepted": true,
+                        "targetAccountId": req.vAuthAccount.id });
 
                     const areConnected = await BuildNewConnection(previousAsk);
                     if (areConnected) {
                         await BuildConnectionResponse(req, previousAsk.requestingAccountId);
                         pending = false;
-                    }
-                    else {
+                    } else {
                         Logger.error(`procPostUserConnectionRequest: BuildNewConnection failed. by=${req.vAuthAccount.id}, this=${thisNode}, other=${otherNode}`);
-                        req.vRestResp.respondFailure('error making connection');
-                    };
+                        req.vRestResp.respondFailure("error making connection");
+                    }
                     // The request itself will timeout and expire
-                };
-            }
-            else {
+                }
+            } else {
                 // There is not a pending request between us. Create one
                 Logger.debug(`procPostUserConnectionRequest: new request. by=${req.vAuthAccount.id}, this=${thisNode}, other=${otherNode}`);
                 const newRequest = await Requests.createHandshakeRequest(thisNode, otherNode);
                 newRequest.requesterAccepted = true;
                 newRequest.requestingAccountId = req.vAuthAccount.id;
                 await Requests.add(newRequest);
-            };
+            }
 
             if (pending) {
                 // The above didn't create a response so we're just waiting
                 req.vRestResp.Data = {
-                    'connection': 'pending'
+                    "connection": "pending"
                 };
-            };
+            }
+        } else {
+            req.vRestResp.respondFailure("badly formed request");
         }
-        else {
-            req.vRestResp.respondFailure('badly formed request');
-        };
+    } else {
+        req.vRestResp.respondFailure(req.vAccountError ?? "Not logged in");
     }
-    else {
-        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-    };
     next();
 };
 
@@ -142,46 +130,48 @@ async function BuildNewConnection(pRequest: RequestEntity): Promise<boolean> {
     if (requestingAccount && targetAccount) {
         await Accounts.makeAccountsConnected(requestingAccount, targetAccount);
         wasConnected = true;
-    }
-    else {
+    } else {
         Logger.error(`connection_request: acceptance for connection but accounts not found`);
         Logger.error(`connection_request:   reqAccId=${pRequest.requestingAccountId}, tgtAccId=${pRequest.targetAccountId}`);
-    };
+    }
     return wasConnected;
-};
+}
 
 // Build the response that says a connection has been made
 async function BuildConnectionResponse(req: Request, pOtherAccountId: string): Promise<void> {
     const otherAccount = await Accounts.getAccountWithId(pOtherAccountId);
     req.vRestResp.Data = {
-        'connection': {
-            'new_connection': true,
-            'username': otherAccount ? otherAccount.username : 'UNKNOWN'
+        "connection": {
+            "new_connection": true,
+            "username": otherAccount ? otherAccount.username : "UNKNOWN"
         }
     };
-};
+}
 
 // A user is asking for all it's handshake requests to be removed
 const procDeleteUserConnectionRequest: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
     if (req.vAuthAccount) {
         Logger.debug(`procDeleteUserConnectionRequest: deleting for ${req.vAuthAccount.id}`);
         await Requests.removeAllMyRequests(req.vAuthAccount.id, RequestType.HANDSHAKE);
+    } else {
+        req.vRestResp.respondFailure(req.vAccountError ?? "Not logged in");
     }
-    else {
-        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-    };
     next();
 };
 
-export const name = '/api/v1/user/connection_request';
+export const name = "/api/v1/user/connection_request";
 
 export const router = Router();
 
-router.post(  '/api/v1/user/connection_request', [ setupMetaverseAPI,
-                                                  accountFromAuthToken,
-                                                  procPostUserConnectionRequest,
-                                                  finishMetaverseAPI ] );
-router.delete('/api/v1/user/connection_request', [ setupMetaverseAPI,
-                                                  accountFromAuthToken,
-                                                  procDeleteUserConnectionRequest,
-                                                  finishMetaverseAPI ] );
+router.post("/api/v1/user/connection_request", [
+    setupMetaverseAPI,
+    accountFromAuthToken,
+    procPostUserConnectionRequest,
+    finishMetaverseAPI
+]);
+router["delete"]("/api/v1/user/connection_request", [
+    setupMetaverseAPI,
+    accountFromAuthToken,
+    procDeleteUserConnectionRequest,
+    finishMetaverseAPI
+]);

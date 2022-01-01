@@ -11,11 +11,11 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
-'use strict'
 
-import Config from '@Base/config';
 
-import { Entity } from '@Entities/Entity';
+import Config from "@Base/config";
+
+import { Entity } from "@Entities/Entity";
 
 // NOTE: this class cannot have functions in them as they are just JSON to and from the database
 export class DomainEntity implements Entity {
@@ -56,5 +56,4 @@ export class DomainEntity implements Entity {
     public timeOfLastHeartbeat: Date;    // time of last heartbeat
     public lastSenderKey: string;        // a key identifying the sender
 
-};
-
+}

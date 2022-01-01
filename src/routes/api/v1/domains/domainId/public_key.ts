@@ -12,35 +12,33 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { Domains } from '@Entities/Domains';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
+import { Domains } from "@Entities/Domains";
 
-import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
-import { domainFromParams, domainAPIkeyFromMultipart, verifyDomainAccess } from '@Route-Tools/middleware';
+import { setupMetaverseAPI, finishMetaverseAPI } from "@Route-Tools/middleware";
+import { domainFromParams, domainAPIkeyFromMultipart, verifyDomainAccess } from "@Route-Tools/middleware";
 
-import multer from 'multer';
+import multer from "multer";
 
-import { Logger } from '@Tools/Logging';
-import { createSimplifiedPublicKey, convertBinKeyToPEM } from '@Route-Tools/Util';
-import { HTTPStatusCode } from '@Route-Tools/RESTResponse';
+import { Logger } from "@Tools/Logging";
+import { createSimplifiedPublicKey, convertBinKeyToPEM } from "@Route-Tools/Util";
+import { HTTPStatusCode } from "@Route-Tools/RESTResponse";
 
 // GET /domains/:domainId/public_key
 // For backward-compatibility, the PEM formatted public key is returned by this
 //     request as a single line string without the BEGIN and END texts.
 const procGetDomainsPublicKey: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-    Logger.debug('procGetDomainsPublicKey');
+    Logger.debug("procGetDomainsPublicKey");
     if (req.vDomain) {
         // Response is a simple public_key field
         req.vRestResp.Data = {
-            'public_key': createSimplifiedPublicKey(req.vDomain.publicKey)
+            "public_key": createSimplifiedPublicKey(req.vDomain.publicKey)
         };
-    }
-    else {
+    } else {
         req.vRestResp.HTTPStatus = HTTPStatusCode.Unauthorized;
-        req.vRestResp.respondFailure('No domain');
-    };
+        req.vRestResp.respondFailure("No domain");
+    }
     next();
 };
 
@@ -50,7 +48,7 @@ const procGetDomainsPublicKey: RequestHandler = async (req: Request, resp: Respo
 // To keep backward compatibility, we convert the PKCS1 key into a SPKI key in PEM format
 //      ("PEM" format is "Privacy Enhanced Mail" format and has the "BEGIN" and "END" text included).
 const procPutDomainsPublicKey: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-    Logger.debug('procPutDomainsPublicKey');
+    Logger.debug("procPutDomainsPublicKey");
     if (req.vDomain) {
         if (req.files) {
             try {
@@ -58,46 +56,46 @@ const procPutDomainsPublicKey: RequestHandler = async (req: Request, resp: Respo
                 const publicKeyBin: Buffer = (req.files as any).public_key[0].buffer;
 
                 const fieldsToUpdate = {
-                    'publicKey': convertBinKeyToPEM(publicKeyBin)
+                    "publicKey": convertBinKeyToPEM(publicKeyBin)
                 };
                 await Domains.updateEntityFields(req.vDomain, fieldsToUpdate);
+            } catch (e) {
+                Logger.error("procPutDomainsPublicKey: exception converting: " + e);
+                req.vRestResp.respondFailure("exception converting public key");
             }
-            catch (e) {
-                Logger.error('procPutDomainsPublicKey: exception converting: ' + e);
-                req.vRestResp.respondFailure('exception converting public key');
-            }
+        } else {
+            Logger.error("procPutDomainsPublicKey: no files part of body");
+            req.vRestResp.respondFailure("no public key supplied");
         }
-        else {
-            Logger.error('procPutDomainsPublicKey: no files part of body');
-            req.vRestResp.respondFailure('no public key supplied');
-        };
-    }
-    else {
+    } else {
         req.vRestResp.HTTPStatus = HTTPStatusCode.Unauthorized;
-        req.vRestResp.respondFailure(req.vDomainError ?? 'no such domain');
-    };
+        req.vRestResp.respondFailure(req.vDomainError ?? "no such domain");
+    }
     next();
 };
 
-export const name = '/api/v1/domains/public_key';
+export const name = "/api/v1/domains/public_key";
 
 export const router = Router();
 
-router.get(   '/api/v1/domains/:domainId/public_key',  [ setupMetaverseAPI,
-                                                  domainFromParams,
-                                                  procGetDomainsPublicKey,
-                                                  finishMetaverseAPI ] );
+router.get("/api/v1/domains/:domainId/public_key", [
+    setupMetaverseAPI,
+    domainFromParams,
+    procGetDomainsPublicKey,
+    finishMetaverseAPI
+]);
 
 // The public key is sent in binary in a multipart-form.
 // This creates an unpacker to catch fields 'api_key' and 'public_key'
 const multiStorage = multer.memoryStorage();
-const uploader = multer( { storage: multiStorage, });
-const multiParser = uploader.fields( [ { name: 'api_key' }, { name: 'public_key' }]);
-router.put(   '/api/v1/domains/:domainId/public_key',  [ setupMetaverseAPI,
-                                                  domainFromParams,           // vRESTResp.vDomain
-                                                  multiParser,    // body['api_key'], files['public_key'].buffer
-                                                  domainAPIkeyFromMultipart,  // vRestRest.vDomainAPIKey
-                                                  verifyDomainAccess,
-                                                  procPutDomainsPublicKey,
-                                                  finishMetaverseAPI ] );
-
+const uploader = multer({ storage: multiStorage });
+const multiParser = uploader.fields([{ name: "api_key" }, { name: "public_key" }]);
+router.put("/api/v1/domains/:domainId/public_key", [
+    setupMetaverseAPI,
+    domainFromParams,           // vRESTResp.vDomain
+    multiParser,    // body['api_key'], files['public_key'].buffer
+    domainAPIkeyFromMultipart,  // vRestRest.vDomainAPIKey
+    verifyDomainAccess,
+    procPutDomainsPublicKey,
+    finishMetaverseAPI
+]);

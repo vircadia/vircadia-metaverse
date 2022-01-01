@@ -12,25 +12,24 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict'
 
-import Config from '@Base/config';
+import Config from "@Base/config";
 
-import { Logger } from '@Tools/Logging';
+import { Logger } from "@Tools/Logging";
 
 export class Restriction {
-  public static OPEN: string = 'open';
-  public static HIFI: string = 'hifi';
-  public static ACL: string = 'acl';
+    public static OPEN = "open";
+    public static HIFI = "hifi";
+    public static ACL = "acl";
 
-  static RestrictionCategories = [
-            Restriction.OPEN,
-             Restriction.HIFI,
-             Restriction.ACL
-            ];
+    static RestrictionCategories = [
+        Restriction.OPEN,
+        Restriction.HIFI,
+        Restriction.ACL
+    ];
 
-  static KnownRestriction(pRestriction: string): boolean {
-    return this.RestrictionCategories.includes(pRestriction);
-  };
+    static KnownRestriction(pRestriction: string): boolean {
+        return this.RestrictionCategories.includes(pRestriction);
+    }
 
-};
+}

@@ -12,10 +12,9 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
+import { setupMetaverseAPI, finishMetaverseAPI } from "@Route-Tools/middleware";
 
 // GET /api/v1/commerce/available_updates?per_page=10
 const procGetCommerceAvailableUpdates: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
@@ -26,10 +25,12 @@ const procGetCommerceAvailableUpdates: RequestHandler = async (req: Request, res
     next();
 };
 
-export const name = '/api/v1/commerce/available_updates';
+export const name = "/api/v1/commerce/available_updates";
 
 export const router = Router();
 
-router.get('/api/v1/commerce/available_updates',  [ setupMetaverseAPI,
-                                                    procGetCommerceAvailableUpdates,
-                                                    finishMetaverseAPI ] );
+router.get("/api/v1/commerce/available_updates", [
+    setupMetaverseAPI,
+    procGetCommerceAvailableUpdates,
+    finishMetaverseAPI
+]);
