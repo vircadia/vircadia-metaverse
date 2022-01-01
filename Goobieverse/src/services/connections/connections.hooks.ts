@@ -1,23 +1,19 @@
 import { HooksObject } from '@feathersjs/feathers';
-import * as local from '@feathersjs/authentication-local';
+import * as authentication from '@feathersjs/authentication';
 import  requestFail  from '../../hooks/requestFail';
 import requestSuccess from '../../hooks/requestSuccess';
-// import { Perm } from '../../utils/Perm';
-// import checkAccessToAccount from '../../hooks/checkAccessToAccount';
-import * as authentication from '@feathersjs/authentication';
 
 const { authenticate } = authentication.hooks;
-const { hashPassword, protect } = local.hooks;
 
 export default {
   before: {
-    all: [],
-    find: [authenticate('jwt')],
+    all: [authenticate('jwt')],
+    find: [],
     get: [],
-    create: [hashPassword('password')],
-    update: [hashPassword('password')],
+    create: [],
+    update: [],
     patch: [],
-    remove: [],
+    remove: []
   },
 
   after: {
@@ -27,7 +23,7 @@ export default {
     create: [],
     update: [],
     patch: [],
-    remove: [],
+    remove: []
   },
 
   error: {
@@ -37,6 +33,6 @@ export default {
     create: [],
     update: [],
     patch: [],
-    remove: [],
-  },
+    remove: []
+  }
 } as HooksObject;

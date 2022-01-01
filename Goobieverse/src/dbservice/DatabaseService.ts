@@ -1,9 +1,10 @@
 import { Service } from 'feathers-mongodb';
 import { Application } from '../declarations';
-import { HookContext, Paginated } from '@feathersjs/feathers';
+import { HookContext, Paginated, } from '@feathersjs/feathers';
 import { DatabaseServiceOptions } from './DatabaseServiceOptions';
 import { Db, Collection, Document, FindCursor, WithId,Filter } from 'mongodb';
 import { IsNotNullOrEmpty, IsNullOrEmpty } from '../utils/Misc';
+import { AccountModel } from '../interfaces/AccountModel';
  
 
 export class DatabaseService extends Service {
@@ -48,13 +49,24 @@ export class DatabaseService extends Service {
     }
   }
 
-  async findDataAsArray(tableName: string, filter?:Filter<any>): Promise<any[]> {
-    return (await this.findData(tableName,filter)).toArray();
+  async findDataToArray(tableName: string, filter?:Filter<any> ): Promise<any[]>{
+    await (this.getService(tableName));
+    const data = await this.findData(tableName,filter);
+    if(data instanceof Array){
+      return data;
+    }else{
+      return data.data;
+    }
   }
 
-  async CreateData(tableName: string, data: any): Promise<any[]> {
-    console.log(this.getService(tableName),'all');
-    return (await this.findData(tableName)).toArray();
+  async CreateData(tableName: string, data:any): Promise<any> {
+    await (this.getService(tableName));
+    return await super.create(data);
+  }
+
+  async UpdateDataById(tableName: string, data:any,id:any): Promise<any> {
+    await (this.getService(tableName));
+    return await super.update(id, data); 
   }
 
 }

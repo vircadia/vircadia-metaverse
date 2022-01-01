@@ -1,156 +1,139 @@
 import { DatabaseService } from './../../dbservice/DatabaseService';
-import { Service, MongoDBServiceOptions } from 'feathers-mongodb';
+import {  MongoDBServiceOptions } from 'feathers-mongodb';
 import { Application } from '../../declarations';
 import config from '../../appconfig';
-import { Id, Params } from '@feathersjs/feathers';
+import {  Params } from '@feathersjs/feathers';
 import { AccountModel } from '../../interfaces/AccountModel';
-import { Response } from '../../utils/response';
-import { GenUUID, IsNotNullOrEmpty } from '../../utils/Misc';
+import { GenUUID } from '../../utils/Misc';
 import { Roles } from '../../utils/sets/Roles';
-import { IsNullOrEmpty } from '../../utils/Misc';
+import { IsNullOrEmpty, isValidObject } from '../../utils/Misc';
+import { SArray } from '../../utils/vTypes';
+import { sendEmail } from '../../utils/mail';
+import path from 'path';
+import fsPromises from 'fs/promises';
+
 export class Users extends DatabaseService {
+  app: Application;
   //eslint-disable-next-line @typescript-eslint/no-unused-vars
   constructor(options: Partial<MongoDBServiceOptions>, app: Application) {
-    super(options,app);
+    super(options, app);
+    this.app = app;
   }
 
   async create(data: AccountModel, params?: Params): Promise<any> {
-    // try {
-    //   const id = GenUUID();
-    //   const username = trim(data.username);
-    //   const email = trim(data.email);
-    //   const password = trim(data.password);
-    //   const roles = [Roles.USER];
-    //   const friends : string[] = [];
-    //   const connections : string[] = [];
-    //   const whenCreated = new Date();
-    //   // const perPage = parseInt(params?.query?.per_page) || 10;
-    //   // const skip = ((parseInt(params?.query?.page) || 1) - 1) * perPage;
-
-    //   const accounts = await super.find({});
-    //   console.log(accounts, 'all accounts');
-    //   if (
-    //     id != '' &&
-    //     typeof id != 'undefined' &&
-    //     username != '' &&
-    //     typeof username != 'undefined' &&
-    //     email != '' &&
-    //     typeof email != 'undefined' &&
-    //     password != '' &&
-    //     typeof password != 'undefined' &&
-    //     typeof roles != 'undefined'
-    //   ) {
-    //     const newData = { ...data, id: id , roles:roles,friends:friends,connections:connections,whenCreated:whenCreated};
-    //     const UserData = await super
-    //       .create(newData)
-    //       .then((result: any) => {
-    //         let finalData = {};
-    //         finalData = result == null ? {} : result;
-    //         return finalData;
-    //       })
-    //       .catch((error: any) => {
-    //         return error;
-    //       });
-    //     if (isValidObject(UserData) && !UserData.type) {
-    //       return Response.success(UserData);
-    //     }
-    //   } else {
-    //     return Response.error(messages.common_messages_record_added_failed);
-    //   }
-    // } catch (error: any) {
-    //   return Response.error(messages.common_messages_error);
-    // }
-    if (data) {
+    if (data.username && data.email && data.password) {
       const username : string = data.username;
       const email : string  = data.email;
       const password : string = data.password;
       if (username) {
-        const accountsName: AccountModel[] = await this.findDataAsArray(config.dbCollections.accounts, { username: username } );
-        console.log(accountsName, 'accountsName');
+        const accountsName: AccountModel[] = await this.findDataToArray(config.dbCollections.accounts, { query: { username: username }  });
         const name = (accountsName as Array<AccountModel>)
           ?.map((item) => item.username);
-        console.log(name);
         if (!name.includes(username)) {
-          const accountsEmail: AccountModel[] = await this.findDataAsArray(config.dbCollections.accounts, { email: email } );
+         
+          const accountsEmail: AccountModel[] = await this.findDataToArray(config.dbCollections.accounts, { query:{email:  email }});
           const emailAddress = (accountsEmail as Array<AccountModel>)
             ?.map((item) => item.email);
           if (!emailAddress.includes(email)) {
-            console.log('in');
+            
             const id = GenUUID();
             const roles = [Roles.USER];
             const friends : string[] = [];
             const connections : string[] = [];
             const whenCreated = new Date();
-
-            const newUserData = {
+            const accountIsActive = true;
+            const accountWaitingVerification = false;
+            const accounts = await this.CreateData(config.dbCollections.accounts, {
               ...data,
               id: id,
               roles: roles,
               whenCreated: whenCreated,
               friends: friends,
-              connections:connections,
-            };
-
-            const accounts: AccountModel[] = await this.CreateData(config.dbCollections.accounts, { newUserData });
-            console.log(accounts, 'accounts');
-            // return Promise.resolve({ newUserData });
-            // const AccountDetails = await this.CreateData(config.dbCollections.accounts, { query: {insertOne:{newUserData} } });
-            // console.log(AccountDetails,'AccountDetails');
-          }else{
-            return Response.error('Email already exists');
+              connections: connections,
+              accountIsActive: accountIsActive,
+              accountWaitingVerification :accountWaitingVerification
+            });
+            if (isValidObject(accounts)) {
+              const emailToValidate = data.email;
+              const emailRegexp = /^[a-zA-Z0-9.!#$%&'+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)$/;
+              if (emailRegexp.test(emailToValidate)) {
+                try {
+                  const adminAccountName = config.metaverseServer['base_admin_account']; 
+                  if (accounts.username === adminAccountName) {
+                    if (IsNullOrEmpty(accounts.roles)) accounts.roles = [];
+                    SArray.add(accounts.roles, Roles.ADMIN);
+                  }
+                 
+                  const verificationURL = config.metaverse['metaverseServerUrl']
+                  + `/api/v1/account/verify/email?a=${accounts.id}&v=${accounts.id}`;
+                  const metaverseName = config.metaverse['metaverseName'];
+                  const shortMetaverseName = config.metaverse['metaverseNickName'];
+                  const verificationFile = path.join(__dirname, '../..', config.metaverseServer['email_verification_email_body']);
+                
+                  let emailBody = await fsPromises.readFile(verificationFile, 'utf-8');
+                  emailBody = emailBody.replace('VERIFICATION_URL', verificationURL)
+                    .replace('METAVERSE_NAME', metaverseName)
+                    .replace('SHORT_METAVERSE_NAME', shortMetaverseName);
+                
+                  const email = {
+                    from: 'khilan.odan@gmail.com',
+                    to: accounts.email,
+                    subject:  `${shortMetaverseName} account verification`,
+                    html: emailBody,
+                  };
+                  const sendEmailVerificationLink = await sendEmail(this.app, email).then(
+                    function (result:any) {
+                      let sendEmailVerificationStatus = {};
+                      sendEmailVerificationStatus = result == null ? {} : result;
+                      return sendEmailVerificationStatus;
+                    }
+                  );
+                  return Promise.resolve({
+                    accountId: accounts.id,
+                    username: accounts.username,
+                    accountIsActive: accounts.accountIsActive,
+                    accountWaitingVerification:accounts.accountWaitingVerification
+                  }); 
+                } catch (error: any) {
+                  throw new Error('Exception adding user: ' + error);
+                }
+              }
+              else {
+                throw new Error('Send valid Email address');
+              }
+            } else {
+              throw new Error('Could not create account');
+            }
+          } else {
+            throw new Error('Email already exists');
           }
         } else {
-          return Response.error('Account already exists');
+          throw new Error('Account already exists');
         }
       } else {
-        return Response.error('Badly formatted username');
+        throw new Error('Badly formatted username');
       }
     } else {
-      return Response.error('Badly formatted request');
+      throw new Error('Badly formatted request');
     }
   }
 
-  // async find(params?: Params): Promise<any> {
-  //   try {
-  //     const UserData = await super
-  //       .find()
-  //       .then((result: any) => {
-  //         let finalData = {};
-  //         finalData = result == null ? {} : result;
-  //         return finalData;
-  //       })
-  //       .catch((error: any) => {
-  //         return error;
-  //       });
-  //     if (isValidArray(UserData.data)) {
-  //       return Response.success(UserData.data);
-  //     } else {
-  //       return Response.error(messages.common_messages_records_not_available);
-  //     }
-  //   } catch (error: any) {
-  //     return Response.error(messages.common_messages_error);
-  //   }
-  // }
+  async find(params?: Params): Promise<any> {
+    
+    const perPage = parseInt(params?.query?.per_page) || 10;
+    const skip = ((parseInt(params?.query?.page) || 1) - 1) * perPage;
 
-  // async get(id: string, params?: Params): Promise<any> {
-  //   try {
-  //     const UserData = await super
-  //       .get(id)
-  //       .then((result: any) => {
-  //         let finalData = {};
-  //         finalData = result == null ? {} : result;
-  //         return finalData;
-  //       })
-  //       .catch((error: any) => {
-  //         return error;
-  //       });
-  //     if (isValidObject(UserData) && !UserData.type) {
-  //       return Response.success(UserData);
-  //     } else {
-  //       return Response.error(messages.common_messages_record_not_available);
-  //     }
-  //   } catch (error: any) {
-  //     return Response.error(messages.common_messages_error);
-  //   }
-  // }
+
+    const user = await this.findDataToArray(config.dbCollections.accounts, {
+      query: {
+        accountIsActive: true ,
+        $select: [ 'username', 'accountId' ],
+        $skip: skip,
+        $limit: perPage
+      }
+    });
+    
+    return Promise.resolve({ user }); 
+  }
+
 }

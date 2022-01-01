@@ -9,6 +9,7 @@ import {Availability} from '../utils/sets/Availability';
 import { SArray } from '../utils/vTypes';
 import { DatabaseService } from '../dbservice/DatabaseService';
 
+
 export default (pRequiredAccess: Perm[]) => {
   return async (context: HookContext): Promise<HookContext> => {
     const  dbService = new DatabaseService({},undefined,context);
@@ -17,18 +18,14 @@ export default (pRequiredAccess: Perm[]) => {
     console.log(accounts);
     let canAccess = false;
 
-    if (IsNotNullOrEmpty(accounts)) {
+    let pTargetEntity:AccountModel | undefined;
+    if(accounts instanceof Array){
+      pTargetEntity = (accounts as Array<AccountModel>)[0];
+    }else if(IsNotNullOrEmpty(accounts.data[0])){
+      pTargetEntity = accounts.data[0];  
+    }
 
-
-      let pTargetEntity:AccountModel;
-
-      if(accounts instanceof Array){
-        pTargetEntity = (accounts as Array<AccountModel>)[0];
-      }else{
-        pTargetEntity = accounts.data[0];  
-      }
-
-
+    if (IsNotNullOrEmpty(pTargetEntity)) {
       for (const perm of pRequiredAccess) {
         switch (perm) {
         case Perm.ALL:
@@ -37,13 +34,12 @@ export default (pRequiredAccess: Perm[]) => {
         case Perm.PUBLIC:
           // The target entity is publicly visible
           // Mostly AccountEntities that must have an 'availability' field
-          if (pTargetEntity.hasOwnProperty('availability')) {
+          if (pTargetEntity?.hasOwnProperty('availability')) {
             if ((pTargetEntity).availability.includes(Availability.ALL)) {
               canAccess = true;
             }
           }
-          break;
-        /* case Perm.DOMAIN:
+          break;/* case Perm.DOMAIN:
           // requestor is a domain and it's account is the domain's sponsoring account
           if (pAuthToken && SArray.has(pAuthToken.scope, TokenScope.DOMAIN)) {
             if (pTargetEntity.hasOwnProperty('sponsorAccountId')) {
@@ -58,6 +54,7 @@ export default (pRequiredAccess: Perm[]) => {
             }
           }
           break;
+          
         case Perm.OWNER:
           // The requestor wants to be the same account as the target entity
           if (pAuthToken && pTargetEntity.hasOwnProperty('id')) {
