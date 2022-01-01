@@ -1,10 +1,10 @@
-import { Service } from 'feathers-mongodb';
+import { Service, } from 'feathers-mongodb';
 import { Application } from '../declarations';
-import { HookContext, Paginated } from '@feathersjs/feathers';
+import { HookContext, Paginated, Id, } from '@feathersjs/feathers';
 import { DatabaseServiceOptions } from './DatabaseServiceOptions';
 import { Db, Collection, Document, FindCursor, WithId,Filter } from 'mongodb';
 import { IsNotNullOrEmpty, IsNullOrEmpty } from '../utils/Misc';
- 
+import { VKeyedCollection } from '../utils/vTypes';
 
 export class DatabaseService extends Service {
   app?: Application;
@@ -37,10 +37,15 @@ export class DatabaseService extends Service {
     return this.Model;
   }
 
+  async getData(tableName: string, id:Id ): Promise<any>{
+    await (this.getService(tableName));
+    return super.get(id);
+  }
+
+
   async findData(tableName: string, filter?:Filter<any> ): Promise<Paginated<any> | any[]>{
     await (this.getService(tableName));
     if(IsNotNullOrEmpty(filter)){
-      console.log(filter);
       return await super.find(filter!);
     } else {
       return await super.find();
@@ -55,6 +60,23 @@ export class DatabaseService extends Service {
     }else{
       return data.data;
     }
+  }
+
+
+  async patchData(tableName:string,id:Id,data:VKeyedCollection){
+    console.log(tableName + '  ' + id);
+    await (this.getService(tableName));
+    return await super.patch(id,data);
+  }
+
+  async deleteData(tableName:string,id:Id,filter?:Filter<any>){
+    await (this.getService(tableName));
+    return await super.remove(id,filter);
+  }
+
+  async deleteMultipleData(tableName:string,filter?:Filter<any>){
+    await (this.getService(tableName));
+    return await super.remove(null,filter);
   }
 
 }

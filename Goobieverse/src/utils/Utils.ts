@@ -1,6 +1,6 @@
+import { AccountModel } from './../interfaces/AccountModel';
 import { SArray } from './vTypes';
 import { Roles } from './sets/Roles';
-import { AccountModel } from '../interfaces/AccountModel';
 import config from '../appconfig';
 
 
@@ -40,4 +40,19 @@ export function isOnline(pAcct: AccountModel): boolean {
     );
   }
   return false;
+}
+ 
+export function couldBeDomainId(pId: string): boolean {
+  return pId.length === 36;
+}
+
+// Return the ISODate when an account is considered offline
+export function dateWhenNotOnline(): Date {
+  const whenOffline = new Date(Date.now() - config.metaverseServer.heartbeat_seconds_until_offline);
+  return whenOffline;
+}
+
+export function validateEmail(email:string):boolean{
+  const emailRegexp = /^[a-zA-Z0-9.!#$%&'+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)$/;
+  return emailRegexp.test(email);
 }

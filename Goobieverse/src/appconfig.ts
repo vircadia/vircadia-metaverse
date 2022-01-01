@@ -119,7 +119,8 @@ const dbCollections = {
   domains : 'domains',
   accounts : 'accounts',
   places : 'places',
-  tokens : 'tokens'
+  tokens : 'tokens',
+  requests:'requests'
 };
 
 
