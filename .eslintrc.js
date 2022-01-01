@@ -35,8 +35,6 @@ module.exports = {
 
     env: {
         "es2020": true,
-        "browser": true,
-        "worker": true,
         "node": true
     },
 
