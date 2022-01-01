@@ -72,6 +72,11 @@ export async function setupDB(): Promise<void> {
 
 }
 
+// NOTE: Use this only for testing. Directly sets the database global to another value.
+export async function setDB(pDb: Db) {
+    Datab = pDb;
+}
+
 // Low level access to database to create an object is specified collection.
 // Note: there is no check for duplicates.
 // Throws exception if anything wrong with the fetch.
