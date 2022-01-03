@@ -10,11 +10,11 @@ import connections from './connections/connections.service';
 import accounts from './accounts/accounts.service';
 
 export default function (app: Application): void {
-  app.configure(auth);
-  app.configure(users);
-  app.configure(friends);
-  app.configure(profiles);
-  app.configure(accounts);
-  app.configure(email);
-  app.configure(connections);
+    app.configure(auth);
+    app.configure(users);
+    app.configure(friends);
+    app.configure(profiles);
+    app.configure(accounts);
+    app.configure(email);
+    app.configure(connections);
 }

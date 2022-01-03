@@ -16,12 +16,12 @@
 
 // Class to manage the manipulations on roles that accounts can have
 export class Roles {
-  // at the moment, the only role is 'admin'
-  public static ADMIN = 'admin';   // someone who has metaverse-server admin
-  public static USER = 'user';     // a 'user' or 'person'
+    // at the moment, the only role is 'admin'
+    public static ADMIN = 'admin';   // someone who has metaverse-server admin
+    public static USER = 'user';     // a 'user' or 'person'
 
-  // See if the passed role code is a known role token
-  static async KnownRole(pScope: string): Promise<boolean> {
-    return [ Roles.ADMIN, Roles.USER ].includes(pScope);
-  }
+    // See if the passed role code is a known role token
+    static async KnownRole(pScope: string): Promise<boolean> {
+        return [ Roles.ADMIN, Roles.USER ].includes(pScope);
+    }
 }

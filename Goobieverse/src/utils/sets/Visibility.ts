@@ -15,22 +15,22 @@
 'use strict';
 
 export class Visibility {
-  public static OPEN = 'open';
-  public static FRIENDS = 'friends';
-  public static CONNECTIONS = 'connections';
-  public static GROUP = 'group';
-  public static PRIVATE = 'private';
+    public static OPEN = 'open';
+    public static FRIENDS = 'friends';
+    public static CONNECTIONS = 'connections';
+    public static GROUP = 'group';
+    public static PRIVATE = 'private';
 
-  static VisibilityCategories = [
-    Visibility.OPEN,
-    Visibility.FRIENDS,
-    Visibility.CONNECTIONS,
-    Visibility.GROUP,
-    Visibility.PRIVATE
-  ];
+    static VisibilityCategories = [
+        Visibility.OPEN,
+        Visibility.FRIENDS,
+        Visibility.CONNECTIONS,
+        Visibility.GROUP,
+        Visibility.PRIVATE
+    ];
 
-  static KnownVisibility(pVisibility: string): boolean {
-    return this.VisibilityCategories.includes(pVisibility);
-  }
+    static KnownVisibility(pVisibility: string): boolean {
+        return this.VisibilityCategories.includes(pVisibility);
+    }
 }
 

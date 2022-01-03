@@ -11,33 +11,33 @@ const { authenticate } = feathersAuthentication.hooks;
 
 
 export default {
-  before: {
-    all: [iff(isHasAuthToken(),authenticate('jwt'))],
-    find: [],
-    get: [checkAccessToAccount(config.dbCollections.accounts,[Perm.PUBLIC,Perm.OWNER,Perm.ADMIN])],
-    create: [disallow()],
-    update: [disallow()],
-    patch: [disallow()],
-    remove: [disallow()]
-  },
+    before: {
+        all: [iff(isHasAuthToken(),authenticate('jwt'))],
+        find: [],
+        get: [checkAccessToAccount(config.dbCollections.accounts,[Perm.PUBLIC,Perm.OWNER,Perm.ADMIN])],
+        create: [disallow()],
+        update: [disallow()],
+        patch: [disallow()],
+        remove: [disallow()]
+    },
 
-  after: {
-    all: [requestSuccess()],
-    find: [],
-    get: [],
-    create: [],
-    update: [],
-    patch: [],
-    remove: []
-  },
+    after: {
+        all: [requestSuccess()],
+        find: [],
+        get: [],
+        create: [],
+        update: [],
+        patch: [],
+        remove: []
+    },
 
-  error: {
-    all: [requestFail()],
-    find: [],
-    get: [],
-    create: [],
-    update: [],
-    patch: [],
-    remove: []
-  }
+    error: {
+        all: [requestFail()],
+        find: [],
+        get: [],
+        create: [],
+        update: [],
+        patch: [],
+        remove: []
+    }
 };
