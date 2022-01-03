@@ -28,37 +28,37 @@ export interface VKeyValue {
 // String array.
 // Several structures are an array of strings (TokenScope, AccountRoles, ...).
 export class SArray  {
-  static has(pArray: string[], pCheck: string): boolean {
-    return IsNullOrEmpty(pArray) ? false : pArray.includes(pCheck);
-  }
+    static has(pArray: string[], pCheck: string): boolean {
+        return IsNullOrEmpty(pArray) ? false : pArray.includes(pCheck);
+    }
 
-  static hasNoCase(pArray: string[], pCheck: string): boolean {
-    const pCheckLower = pCheck.toLowerCase();
-    if (IsNotNullOrEmpty(pArray)) {
-      for (const ent of pArray) {
-        if (ent.toLowerCase() === pCheckLower) {
-          return true;
+    static hasNoCase(pArray: string[], pCheck: string): boolean {
+        const pCheckLower = pCheck.toLowerCase();
+        if (IsNotNullOrEmpty(pArray)) {
+            for (const ent of pArray) {
+                if (ent.toLowerCase() === pCheckLower) {
+                    return true;
+                }
+            }
         }
-      }
+        return false;
     }
-    return false;
-  }
 
-  static add(pArray: string[], pAdd: string): boolean {
-    let added = false;
-    if (typeof(pAdd) === 'string') {
-      if (! pArray.includes(pAdd)) {
-        pArray.push(pAdd);
-        added = true;
-      }
+    static add(pArray: string[], pAdd: string): boolean {
+        let added = false;
+        if (typeof(pAdd) === 'string') {
+            if (! pArray.includes(pAdd)) {
+                pArray.push(pAdd);
+                added = true;
+            }
+        }
+        return added;
     }
-    return added;
-  }
 
-  static remove(pArray: string[], pRemove: string): void {
-    const idx = pArray.indexOf(pRemove);
-    if (idx >= 0) {
-      pArray.splice(idx, 1);
+    static remove(pArray: string[], pRemove: string): void {
+        const idx = pArray.indexOf(pRemove);
+        if (idx >= 0) {
+            pArray.splice(idx, 1);
+        }
     }
-  }
 }

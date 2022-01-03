@@ -12,16 +12,16 @@ declare module '../../declarations' {
 }
 
 export default function (app: Application): void {
-  const options = {
-    paginate: app.get('paginate'),
-    id:'id' 
-  };
+    const options = {
+        paginate: app.get('paginate'),
+        id:'id' 
+    };
 
-  // Initialize our service with any options it requires
-  app.use('/users', new Users(options, app));
+    // Initialize our service with any options it requires
+    app.use('/users', new Users(options, app));
 
-  // Get our initialized service so that we can register hooks
-  const service = app.service('users');
+    // Get our initialized service so that we can register hooks
+    const service = app.service('users');
 
-  service.hooks(hooks);
+    service.hooks(hooks);
 }

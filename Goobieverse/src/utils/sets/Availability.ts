@@ -15,14 +15,14 @@
 'use strict';
 
 export class Availability {
-  public static NONE = 'none';        // no one can see me
-  public static FRIENDS = 'friends';  // available to friends
-  public static CONNECTIONS= 'connections';     // available to connections
-  public static ALL = 'all';          // available to all
+    public static NONE = 'none';        // no one can see me
+    public static FRIENDS = 'friends';  // available to friends
+    public static CONNECTIONS= 'connections';     // available to connections
+    public static ALL = 'all';          // available to all
 
-  // See if the passed availability code is a known availability token
-  static async KnownAvailability(pAvailability: string): Promise<boolean> {
-    return [ Availability.NONE,Availability.FRIENDS,Availability.CONNECTIONS,Availability.ALL].includes(pAvailability);
-  }
+    // See if the passed availability code is a known availability token
+    static async KnownAvailability(pAvailability: string): Promise<boolean> {
+        return [ Availability.NONE,Availability.FRIENDS,Availability.CONNECTIONS,Availability.ALL].includes(pAvailability);
+    }
 }
 

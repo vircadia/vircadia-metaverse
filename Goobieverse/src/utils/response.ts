@@ -1,10 +1,10 @@
 export const Response = {
-  success : (data: any,additionalFields?:any) => {
-    return {status: 'success',data: data,...additionalFields};
-  },
-  error:(message: string,additionalFields?:any) => {
-    return { status: 'failure', message: message,...additionalFields};
-  }
+    success : (data: any,additionalFields?:any) => {
+        return {status: 'success',data: data,...additionalFields};
+    },
+    error:(message: string,additionalFields?:any) => {
+        return { status: 'failure', message: message,...additionalFields};
+    }
 };
 
 export enum HTTPStatusCode {

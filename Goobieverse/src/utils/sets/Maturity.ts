@@ -15,21 +15,21 @@
 'use strict';
 
 export class Maturity {
-  public static UNRATED = 'unrated';
-  public static EVERYONE = 'everyone';
-  public static TEEN = 'teen';
-  public static MATURE = 'mature';
-  public static ADULT = 'adult';
+    public static UNRATED = 'unrated';
+    public static EVERYONE = 'everyone';
+    public static TEEN = 'teen';
+    public static MATURE = 'mature';
+    public static ADULT = 'adult';
 
-  static MaturityCategories = [ Maturity.UNRATED,
-    Maturity.EVERYONE,
-    Maturity.TEEN,
-    Maturity.MATURE,
-    Maturity.ADULT
-  ];
+    static MaturityCategories = [ Maturity.UNRATED,
+        Maturity.EVERYONE,
+        Maturity.TEEN,
+        Maturity.MATURE,
+        Maturity.ADULT
+    ];
 
-  static KnownMaturity(pMaturity: string): boolean {
-    return this.MaturityCategories.includes(pMaturity);
-  }
+    static KnownMaturity(pMaturity: string): boolean {
+        return this.MaturityCategories.includes(pMaturity);
+    }
 }
 

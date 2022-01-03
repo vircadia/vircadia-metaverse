@@ -7,36 +7,36 @@ import requestSuccess from '../../hooks/requestSuccess';
 import * as authentication from '@feathersjs/authentication';
 
 const { authenticate } = authentication.hooks;
-const { hashPassword, protect } = local.hooks;
+const { hashPassword } = local.hooks;
 
 export default {
-  before: {
-    all: [],
-    find: [authenticate('jwt')],
-    get: [],
-    create: [hashPassword('password')],
-    update: [hashPassword('password')],
-    patch: [],
-    remove: [],
-  },
+    before: {
+        all: [],
+        find: [authenticate('jwt')],
+        get: [],
+        create: [hashPassword('password')],
+        update: [hashPassword('password')],
+        patch: [],
+        remove: [],
+    },
 
-  after: {
-    all: [requestSuccess()],
-    find: [],
-    get: [],
-    create: [],
-    update: [],
-    patch: [],
-    remove: [],
-  },
+    after: {
+        all: [requestSuccess()],
+        find: [],
+        get: [],
+        create: [],
+        update: [],
+        patch: [],
+        remove: [],
+    },
 
-  error: {
-    all: [requestFail()],
-    find: [],
-    get: [],
-    create: [],
-    update: [],
-    patch: [],
-    remove: [],
-  },
+    error: {
+        all: [requestFail()],
+        find: [],
+        get: [],
+        create: [],
+        update: [],
+        patch: [],
+        remove: [],
+    },
 } as HooksObject;

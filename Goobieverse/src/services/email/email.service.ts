@@ -16,10 +16,10 @@ declare module '../../declarations' {
 }
 
 export default function (app: Application): void {
-  const event = Mailer(smtpTransport(config.email));
-  app.use('email', event);
+    const event = Mailer(smtpTransport(config.email));
+    app.use('email', event);
 
-  const service = app.service('email');
+    const service = app.service('email');
 
-  service.hooks(hooks);
+    service.hooks(hooks);
 }
