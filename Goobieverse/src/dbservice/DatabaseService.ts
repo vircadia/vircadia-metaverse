@@ -17,6 +17,7 @@ export class DatabaseService extends Service {
     this.loadDatabase();
   }
 
+  
   async loadDatabase() {
     if(IsNotNullOrEmpty(this.app) && this.app){
       this.db = await this.app.get('mongoClient');
@@ -62,21 +63,26 @@ export class DatabaseService extends Service {
     }
   }
 
-
-  async patchData(tableName:string,id:Id,data:VKeyedCollection){
+ 
+  async patchData(tableName:string,id:Id,data:VKeyedCollection): Promise<any> {
     console.log(tableName + '  ' + id);
     await (this.getService(tableName));
     return await super.patch(id,data);
   }
 
-  async deleteData(tableName:string,id:Id,filter?:Filter<any>){
+  async deleteData(tableName:string,id:Id,filter?:Filter<any>): Promise<any> {
     await (this.getService(tableName));
     return await super.remove(id,filter);
   }
 
-  async deleteMultipleData(tableName:string,filter?:Filter<any>){
+  async deleteMultipleData(tableName:string,filter?:Filter<any>): Promise<any> {
     await (this.getService(tableName));
     return await super.remove(null,filter);
   }
 
+  async CreateData(tableName: string, data:any): Promise<any> {
+    await (this.getService(tableName));
+    return await super.create(data);
+  }
+ 
 }

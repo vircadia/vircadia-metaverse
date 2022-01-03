@@ -36,6 +36,16 @@ const server = {
   version: process.env.SERVER_VERSION ?? '',
 };
 
+const email = { 
+  host: process.env.SMTP_HOST ?? 'smtp.gmail.com',
+  port: process.env.SMTP_PORT ?? '465',
+  secure: process.env.SMTP_SECURE ?? true,
+  auth: {
+    user: process.env.SMTP_USER ?? 'khilan.odan@gmail.com',
+    pass: process.env.SMTP_PASS ?? 'blackhawk143',
+  }
+};
+
 /**
  * Metaverse Server
  */
@@ -51,10 +61,13 @@ const metaverseServer = {
   handshake_request_expiration_minutes: 1,      // minutes that a handshake friend request is active
   connection_request_expiration_minutes: 60 * 24 * 4, // 4 days
   friend_request_expiration_minutes: 60 * 24 * 4,     // 4 days
-
+  base_admin_account:process.env.ADMIN_ACCOUNT ?? 'Goobieverse',
   place_current_timeout_minutes: 5,             // minutes until current place info is stale
   place_inactive_timeout_minutes: 60,           // minutes until place is considered inactive
-  place_check_last_activity_seconds: (3*60)-5,  // seconds between checks for Place lastActivity updates
+  place_check_last_activity_seconds: (3 * 60) - 5,  // seconds between checks for Place lastActivity updates
+  email_verification_timeout_minutes: process.env.EMAIL_VERIFICATION_TIME,
+  enable_account_email_verification: process.env.ENABLE_ACCOUNT_VERIFICATION ?? 'true',
+  email_verification_email_body: '../verificationEmail.html',
 };
 
 /**
@@ -120,7 +133,8 @@ const dbCollections = {
   accounts : 'accounts',
   places : 'places',
   tokens : 'tokens',
-  requests:'requests'
+  requests:'requests',
+  email:'email'
 };
 
 
@@ -134,7 +148,8 @@ const config = {
   server,
   metaverse,
   metaverseServer,
-  dbCollections
+  dbCollections,
+  email
 };
 
 export default config;

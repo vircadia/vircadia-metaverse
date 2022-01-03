@@ -1,8 +1,13 @@
 import { HooksObject } from '@feathersjs/feathers';
+import * as authentication from '@feathersjs/authentication';
+import  requestFail  from '../../hooks/requestFail';
+import requestSuccess from '../../hooks/requestSuccess';
+
+const { authenticate } = authentication.hooks;
 
 export default {
   before: {
-    all: [],
+    all: [authenticate('jwt')],
     find: [],
     get: [],
     create: [],
@@ -12,7 +17,7 @@ export default {
   },
 
   after: {
-    all: [],
+    all: [requestSuccess()],
     find: [],
     get: [],
     create: [],
@@ -22,7 +27,7 @@ export default {
   },
 
   error: {
-    all: [],
+    all: [requestFail()],
     find: [],
     get: [],
     create: [],

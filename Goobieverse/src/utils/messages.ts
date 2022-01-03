@@ -10,4 +10,5 @@ export const messages = {
   common_messages_user_email_link_error:'email already exists for another account',
   common_messages_unauthorized:'Unauthorized',
   common_messages_email_validation_error:'Invalid email address'
+  
 };

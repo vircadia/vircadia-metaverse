@@ -1,13 +1,13 @@
-// Initializes the `friends` service on path `/friends`
+// Initializes the `connections` service on path `/connections`
 import { ServiceAddons } from '@feathersjs/feathers';
 import { Application } from '../../declarations';
-import { Friends } from './friends.class';
-import hooks from './friends.hooks';
+import { Connections } from './connections.class';
+import hooks from './connections.hooks';
 
 // Add this service to the service type index
 declare module '../../declarations' {
   interface ServiceTypes {
-    friends: Friends & ServiceAddons<any>;
+    'connections': Connections & ServiceAddons<any>;
   }
 }
 
@@ -18,10 +18,10 @@ export default function (app: Application): void {
   };
 
   // Initialize our service with any options it requires
-  app.use('/friends', new Friends(options, app));
+  app.use('/connections', new Connections(options, app));
 
   // Get our initialized service so that we can register hooks
-  const service = app.service('friends');
+  const service = app.service('connections');
 
   service.hooks(hooks);
 }
