@@ -12,17 +12,16 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
 
-import { Monitoring } from '@Monitoring/Monitoring';
+import { Monitoring } from "@Monitoring/Monitoring";
 
-import { Config } from '@Base/config';
-import { Logger } from '@Tools/Logging';
+import { Config } from "@Base/config";
+import { Logger } from "@Tools/Logging";
 
 const procAllStats: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-    Monitoring.event('apiRequests', 1);
+    Monitoring.event("apiRequests", 1);
     // TODO: maybe have specific request stats...
     next();
 };
@@ -30,4 +29,4 @@ const procAllStats: RequestHandler = async (req: Request, resp: Response, next: 
 export const name = "Request stats";
 
 export const router = Router()
-  .use(procAllStats);
+    .use(procAllStats);

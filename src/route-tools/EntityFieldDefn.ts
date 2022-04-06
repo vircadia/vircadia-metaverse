@@ -12,20 +12,19 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
 
-import { Entity } from '@Entities/Entity';
-import { AuthToken } from '@Entities/AuthToken';
+import { Entity } from "@Entities/Entity";
+import { AuthToken } from "@Entities/AuthToken";
 
 
-import { VKeyedCollection } from '@Tools/vTypes';
+import { VKeyedCollection } from "@Tools/vTypes";
 
-import { Logger } from '@Tools/Logging';
+import { Logger } from "@Tools/Logging";
 
 export interface ValidateResponse {
-  valid: boolean,
-  reason?: string
-};
+    valid: boolean,
+    reason?: string
+}
 
 // A start at having a table driven access permissions to the Entity attributes.
 // Each Entity field would have an entry that includes who can read or write
@@ -47,5 +46,5 @@ export interface FieldDefn {
     getter: getterFunction,
     setter: setterFunction,
     updater?: updaterFunction
-};
+}
 export type EntityFieldsDefn = { [ key: string]: FieldDefn };

@@ -12,14 +12,13 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
 
-import { RESTResponse } from './route-tools/RESTResponse';
-import { AccountEntity } from './Entities/AccountEntity';
-import { DomainEntity } from './Entities/DomainEntity';
-import { PlaceEntity } from './Entities/PlaceEntity';
-import { SessionEntity } from './Entities/SessionEntity';
-import { AuthToken } from '@Entities/AuthToken';
+import { RESTResponse } from "./route-tools/RESTResponse";
+import { AccountEntity } from "./Entities/AccountEntity";
+import { DomainEntity } from "./Entities/DomainEntity";
+import { PlaceEntity } from "./Entities/PlaceEntity";
+import { SessionEntity } from "./Entities/SessionEntity";
+import { AuthToken } from "@Entities/AuthToken";
 
 // This defintion adds our parameters to the Request type
 // Most of these are variables that are filled by processing on the request
@@ -45,4 +44,4 @@ declare global {
             vParam3?: string;           // Used by maint for parameters
         }
     }
-};
+}

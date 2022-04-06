@@ -12,7 +12,6 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict'
 
 import { IsNotNullOrEmpty } from "@Tools/Misc";
 
@@ -39,5 +38,4 @@ export class RequestEntity {
     // requestType == VERIFYEMAIL
     // 'requestingAccountId' is the account being verified
     public verificationCode: string;    // the code we're waiting for
-};
-
+}

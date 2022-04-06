@@ -12,25 +12,23 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict'
 
 export class Visibility {
-    public static OPEN: string = 'open';
-    public static FRIENDS: string = 'friends';
-    public static CONNECTIONS: string = 'connections';
-    public static GROUP: string = 'group';
-    public static PRIVATE: string = 'private';
+    public static OPEN = "open";
+    public static FRIENDS = "friends";
+    public static CONNECTIONS = "connections";
+    public static GROUP = "group";
+    public static PRIVATE = "private";
 
     static VisibilityCategories = [
-            Visibility.OPEN,
-            Visibility.FRIENDS,
-            Visibility.CONNECTIONS,
-            Visibility.GROUP,
-            Visibility.PRIVATE
+        Visibility.OPEN,
+        Visibility.FRIENDS,
+        Visibility.CONNECTIONS,
+        Visibility.GROUP,
+        Visibility.PRIVATE
     ];
 
     static KnownVisibility(pVisibility: string): boolean {
         return this.VisibilityCategories.includes(pVisibility);
-    };
-};
-
+    }
+}

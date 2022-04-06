@@ -12,38 +12,38 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
 
-import { Config } from '@Base/config';
+import { Config } from "@Base/config";
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI, usernameFromParams } from '@Route-Tools/middleware';
-import { HTTPStatusCode } from '@Route-Tools/RESTResponse';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
+import { setupMetaverseAPI, finishMetaverseAPI, usernameFromParams } from "@Route-Tools/middleware";
+import { HTTPStatusCode } from "@Route-Tools/RESTResponse";
 
 // When a user goes to "METAVERSE_URL/users/:username", redirect to
 //        "https://dashboard.vircadia.com?metaverse=METAVERSE_URL&page=user/profile&user=username"
 const procGetUserProfile: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-    if (req.vUsername && typeof(req.vUsername) === 'string') {
+    if (req.vUsername && typeof req.vUsername === "string") {
         const dashboardURL = Config.metaverse["dashboard-url"];
         const metaverseURL = encodeURIComponent(Config.metaverse["metaverse-server-url"]);
         const username = encodeURIComponent(req.vUsername);
         const redirectionURL = `${dashboardURL}?metaverse=${metaverseURL}&page=profile/${username}`;
         resp.statusCode = HTTPStatusCode.Found;
-        resp.setHeader('Location', redirectionURL),
-        resp.setHeader('content-type', 'text/html');
+        resp.setHeader("Location", redirectionURL),
+        resp.setHeader("content-type", "text/html");
         resp.send();
-    }
-    else {
-        req.vRestResp.respondFailure('usename not specified');
+    } else {
+        req.vRestResp.respondFailure("usename not specified");
     }
     next();
 };
 
-export const name = '/users/:username';
+export const name = "/users/:username";
 
 export const router = Router();
 
-router.get( '/users/:username', [ setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
-                                 usernameFromParams,    // req.vUsername
-                                 procGetUserProfile,
-                                 finishMetaverseAPI ] );
+router.get("/users/:username", [
+    setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
+    usernameFromParams,    // req.vUsername
+    procGetUserProfile,
+    finishMetaverseAPI
+]);

@@ -12,19 +12,18 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict'
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
-import { Requests, RequestType } from '@Entities/Requests';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
+import { setupMetaverseAPI, finishMetaverseAPI } from "@Route-Tools/middleware";
+import { Requests, RequestType } from "@Entities/Requests";
 
-import { Accounts } from '@Entities/Accounts';
+import { Accounts } from "@Entities/Accounts";
 
-import { HTTPStatusCode } from '@Route-Tools/RESTResponse';
-import { IsNotNullOrEmpty } from '@Tools/Misc';
-import { Config } from '@Base/config';
-import { logger, Logger } from '@Tools/Logging';
-import { AccountEntity } from '@Entities/AccountEntity';
+import { HTTPStatusCode } from "@Route-Tools/RESTResponse";
+import { IsNotNullOrEmpty } from "@Tools/Misc";
+import { Config } from "@Base/config";
+import { logger, Logger } from "@Tools/Logging";
+import { AccountEntity } from "@Entities/AccountEntity";
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
@@ -32,12 +31,12 @@ import { AccountEntity } from '@Entities/AccountEntity';
 //      /api/v1/account/verify?a=ACCOUNT_ID&v=VERIFICATION_CODE
 const procGetVerifyAccount: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
     logger.debug(`procGetVerifyAccount: `);
-    if (typeof(req.query.a) === 'string' && IsNotNullOrEmpty(req.query.a)
-                && typeof(req.query.v) === 'string' && IsNotNullOrEmpty(req.query.v)) {
+    if (typeof req.query.a === "string" && IsNotNullOrEmpty(req.query.a)
+                && typeof req.query.v === "string" && IsNotNullOrEmpty(req.query.v)) {
         const accountId = req.query.a;
         const verifyCode = req.query.v;
         logger.debug(`procGetVerifyAccount: acctId=${accountId}, code=${verifyCode}`);
-        const request = await Requests.getWithRequesterOrTarget(accountId, RequestType.VERIFYEMAIL)
+        const request = await Requests.getWithRequesterOrTarget(accountId, RequestType.VERIFYEMAIL);
         if (request) {
             if (request.verificationCode === verifyCode) {
                 // A matching verification request
@@ -50,37 +49,33 @@ const procGetVerifyAccount: RequestHandler = async (req: Request, resp: Response
                     await Requests.remove(request);
 
                     // If specified, send the user to a nice place
-                    if (IsNotNullOrEmpty(Config['metaverse-server']['email-verification-success-redirect'])) {
-                        const redirectURL = BuildRedirect(Config['metaverse-server']['email-verification-success-redirect'],
-                                        accountId);
+                    if (IsNotNullOrEmpty(Config["metaverse-server"]["email-verification-success-redirect"])) {
+                        const redirectURL = BuildRedirect(Config["metaverse-server"]["email-verification-success-redirect"],
+                            accountId);
                         Logger.debug(`procGetVerifyAccount: Redirect success to ${redirectURL}`);
                         resp.statusCode = HTTPStatusCode.Found;
-                        resp.setHeader('Location', redirectURL);
-                        resp.setHeader('content-type', 'text/html');
+                        resp.setHeader("Location", redirectURL);
+                        resp.setHeader("content-type", "text/html");
                         resp.send();
                     }
-                }
-                else {
+                } else {
                     // Odd that we can't find the account. The pending verification request is no more.
                     await Requests.remove(request);
                     Logger.error(`procGetVerifyAccount: account ${accountId} could not be found for verification`);
-                    RedirectFailure(resp, accountId, 'Not verified. Missing account');
-                };
-            }
-            else {
+                    RedirectFailure(resp, accountId, "Not verified. Missing account");
+                }
+            } else {
                 Logger.error(`procGetVerifyAccount: verification code did not match for  ${accountId}`);
-                RedirectFailure(resp, accountId, 'Not verified');
-            };
-        }
-        else {
+                RedirectFailure(resp, accountId, "Not verified");
+            }
+        } else {
             Logger.error(`procGetVerifyAccount: attempt to verify account ${accountId} but no pending verification request`);
-            RedirectFailure(resp, accountId, 'Not verified. No pending verification request');
-        };
-    }
-    else {
+            RedirectFailure(resp, accountId, "Not verified. No pending verification request");
+        }
+    } else {
         Logger.error(`procGetVerifyAccount: attempted verification with no parameters`);
-        RedirectFailure(resp, 'UNKNOWN', 'Verification parameters not present');
-    };
+        RedirectFailure(resp, "UNKNOWN", "Verification parameters not present");
+    }
     // NOTE: no 'next()' operation because all paths return a redirect
 };
 
@@ -91,27 +86,29 @@ function BuildRedirect(pUrl: string, pAccountId: string, pReason?: string): stri
     if (IsNotNullOrEmpty(pReason)) {
         url = url.replace("FAILURE_REASON", encodeURI(pReason));
     }
-    return url.replace("METAVERSE_SERVER_URL", Config.metaverse['metaverse-server-url'])
-        .replace("DASHBOARD_URL", Config.metaverse['dashboard-url'])
+    return url.replace("METAVERSE_SERVER_URL", Config.metaverse["metaverse-server-url"])
+        .replace("DASHBOARD_URL", Config.metaverse["dashboard-url"])
         .replace("ACCOUNT_ID", pAccountId);
-};
+}
 
 // The operation failed so send the user to a sad place
 function RedirectFailure(pResp: Response, pAccountId: string, pReason: string): void {
-    const redirectURL = BuildRedirect(Config['metaverse-server']['email-verification-failure-redirect'],
-                            pAccountId, pReason);
+    const redirectURL = BuildRedirect(Config["metaverse-server"]["email-verification-failure-redirect"],
+        pAccountId, pReason);
     Logger.debug(`procGetVerifyAccount: Redirect failure to ${redirectURL}`);
     pResp.statusCode = HTTPStatusCode.Found;
-    pResp.setHeader('Location', redirectURL);
-    pResp.setHeader('content-type', 'text/html');
+    pResp.setHeader("Location", redirectURL);
+    pResp.setHeader("content-type", "text/html");
     pResp.send();
-};
+}
 
-export const name = '/api/v1/account/verify/email';
+export const name = "/api/v1/account/verify/email";
 
 export const router = Router();
 
 // Note that this is down one level -- if "/api/v1/account/verify" the "verify" is confused with account name
-router.get(  '/api/v1/account/verify/email', [ setupMetaverseAPI,      // req.vRestResp, req.vAuthToken
-                                               procGetVerifyAccount,
-                                               finishMetaverseAPI ] );
+router.get("/api/v1/account/verify/email", [
+    setupMetaverseAPI,      // req.vRestResp, req.vAuthToken
+    procGetVerifyAccount,
+    finishMetaverseAPI
+]);

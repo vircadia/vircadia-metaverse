@@ -12,20 +12,19 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict'
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
-import { accountFromAuthToken } from '@Route-Tools/middleware';
-import { buildAccountInfo } from '@Route-Tools/Util';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
+import { setupMetaverseAPI, finishMetaverseAPI } from "@Route-Tools/middleware";
+import { accountFromAuthToken } from "@Route-Tools/middleware";
+import { buildAccountInfo } from "@Route-Tools/Util";
 
-import { Accounts } from '@Entities/Accounts';
+import { Accounts } from "@Entities/Accounts";
 
-import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
-import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
-import { AccountFilterInfo } from '@Entities/EntityFilters/AccountFilterInfo';
+import { PaginationInfo } from "@Entities/EntityFilters/PaginationInfo";
+import { AccountScopeFilter } from "@Entities/EntityFilters/AccountScopeFilter";
+import { AccountFilterInfo } from "@Entities/EntityFilters/AccountFilterInfo";
 
-import { Logger } from '@Tools/Logging';
+import { Logger } from "@Tools/Logging";
 
 // Return account information
 // The accounts returned depend on the scope (whether admin) and the search criteria (infoer)
@@ -42,7 +41,7 @@ const procGetAccounts: RequestHandler = async (req: Request, resp: Response, nex
         const accts: any[] = [];
         for await (const acct of Accounts.enumerateAsync(scoper, infoer, pager)) {
             accts.push(await buildAccountInfo(req, acct));
-        };
+        }
 
         req.vRestResp.Data = {
             accounts: accts
@@ -50,18 +49,19 @@ const procGetAccounts: RequestHandler = async (req: Request, resp: Response, nex
         pager.addResponseFields(req);
         scoper.addResponseFields(req);
         infoer.addResponseFields(req);
+    } else {
+        req.vRestResp.respondFailure(req.vAccountError ?? "Not logged in");
     }
-    else {
-        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-    };
     next();
 };
 
-export const name = '/api/v1/accounts';
+export const name = "/api/v1/accounts";
 
 export const router = Router();
 
-router.get(   '/api/v1/accounts',                 [ setupMetaverseAPI,      // req.vRestResp, req.vAuthToken
-                                                    accountFromAuthToken,   // req.vAuthAccount
-                                                    procGetAccounts,
-                                                    finishMetaverseAPI ] );
+router.get("/api/v1/accounts", [
+    setupMetaverseAPI,      // req.vRestResp, req.vAuthToken
+    accountFromAuthToken,   // req.vAuthAccount
+    procGetAccounts,
+    finishMetaverseAPI
+]);

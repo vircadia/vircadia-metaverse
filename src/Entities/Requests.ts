@@ -11,80 +11,85 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
-'use strict'
 
-import { Config } from '@Base/config';
 
-import { RequestEntity } from '@Entities/RequestEntity';
+import { Config } from "@Base/config";
 
-import { createObject, getObject, getObjects, updateObjectFields, deleteOne, deleteMany } from '@Tools/Db';
+import { RequestEntity } from "@Entities/RequestEntity";
 
-import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
-import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
+import { createObject, getObject, getObjects, updateObjectFields, deleteOne, deleteMany } from "@Tools/Db";
 
-import { GenUUID, SimpleObject, IsNotNullOrEmpty, IsNullOrEmpty } from '@Tools/Misc';
-import { VKeyedCollection } from '@Tools/vTypes';
-import { Logger } from '@Tools/Logging';
+import { CriteriaFilter } from "@Entities/EntityFilters/CriteriaFilter";
+import { GenericFilter } from "@Entities/EntityFilters/GenericFilter";
 
-export let requestCollection = 'requests';
+import { GenUUID, SimpleObject, IsNotNullOrEmpty, IsNullOrEmpty } from "@Tools/Misc";
+import { VKeyedCollection } from "@Tools/vTypes";
+import { Logger } from "@Tools/Logging";
+
+export const requestCollection = "requests";
 
 export class RequestType {
-    public static HANDSHAKE = 'handshake';      // doing handshake to make a connection
-    public static CONNECTION = 'connection';    // asking to make a connection
-    public static FRIEND = 'friend';            // asking to be a friend
-    public static FOLLOW = 'follow';            // asking to follow
-    public static VERIFYEMAIL = 'verifyEmail';  // verifying email request
-};
+    public static HANDSHAKE = "handshake";      // doing handshake to make a connection
+    public static CONNECTION = "connection";    // asking to make a connection
+    public static FRIEND = "friend";            // asking to be a friend
+    public static FOLLOW = "follow";            // asking to follow
+    public static VERIFYEMAIL = "verifyEmail";  // verifying email request
+}
 
 // Initialize request management.
 // Mostly starts a periodic function that deletes expired requests.
 export function initRequests(): void {
 
     // Expire requests that have pased their prime
-    setInterval( async () => {
+    setInterval(async () => {
         const nowtime = new Date();
         const numDeleted = await deleteMany(requestCollection,
-                                new GenericFilter({ 'expirationTime': { $lt: nowtime } }) );
+            new GenericFilter({ "expirationTime": { $lt: nowtime } }));
         if (numDeleted > 0) {
             Logger.debug(`Requests.Expiration: expired ${numDeleted} requests`);
-        };
-    }, 1000 * 60 * 2 );
-};
+        }
+    }, 1000 * 60 * 2);
+}
 
 export const Requests = {
     async getWithId(pRequestId: string): Promise<RequestEntity> {
-        return IsNullOrEmpty(pRequestId) ? null : getObject(requestCollection,
-                                                    new GenericFilter({ 'id': pRequestId }));
+        return IsNullOrEmpty(pRequestId)
+            ? null
+            : getObject(requestCollection,
+                new GenericFilter({ "id": pRequestId }));
     },
     // Return all Requests that have the passed Id as either the requester or target.
     // Normally matches the accountId fields but can change it to others (usually for connection NodeId).
     async getWithRequesterOrTarget(pRequestId: string, pType: string,
-                    pRequesterField: string = 'requestingAccountId',
-                    pTargetField: string = 'targetAccountId'): Promise<RequestEntity> {
-        return IsNullOrEmpty(pRequestId) ? null : getObject(requestCollection,
+        pRequesterField = "requestingAccountId",
+        pTargetField = "targetAccountId"): Promise<RequestEntity> {
+        return IsNullOrEmpty(pRequestId)
+            ? null
+            : getObject(requestCollection,
                 new GenericFilter(
-                    { '$or': [ SimpleObject(pRequesterField, pRequestId),
-                            SimpleObject(pTargetField, pRequestId)
-                            ],
-                    'requestType': pType
-                    }) );
+                    { "$or": [
+                        SimpleObject(pRequesterField, pRequestId),
+                        SimpleObject(pTargetField, pRequestId)
+                    ],
+                    "requestType": pType }));
     },
     // Return a Request between the two specified id's
     // Normally matches the accountId fields but can change it to others (usually for connection NodeId).
     async getWithRequestBetween(pRequestId: string, pTargetId: string, pType: string,
-                    pRequesterField: string = 'requestingAccountId',
-                    pTargetField: string = 'targetAccountId'): Promise<RequestEntity> {
+        pRequesterField = "requestingAccountId",
+        pTargetField = "targetAccountId"): Promise<RequestEntity> {
         const wayone: VKeyedCollection = {};
         wayone[pRequesterField] = pRequestId;
         wayone[pTargetField] = pTargetId;
         const waytwo: VKeyedCollection = {};
         waytwo[pRequesterField] = pTargetId;
         waytwo[pTargetField] = pRequestId;
-        return IsNullOrEmpty(pRequestId) ? null : getObject(requestCollection,
+        return IsNullOrEmpty(pRequestId)
+            ? null
+            : getObject(requestCollection,
                 new GenericFilter(
-                    { '$or': [ wayone, waytwo ],
-                    'requestType': pType
-                    }) );
+                    { "$or": [wayone, waytwo],
+                        "requestType": pType }));
     },
     create(): RequestEntity {
         const aRequest = new RequestEntity();
@@ -114,40 +119,37 @@ export const Requests = {
         newRequest.requestType = RequestType.VERIFYEMAIL;
         newRequest.requestingAccountId = pAccountId;
         newRequest.verificationCode = pVerificationCode;
-        const expirationMinutes = Config["metaverse-server"]['email-verification-timeout-minutes'];
+        const expirationMinutes = Config["metaverse-server"]["email-verification-timeout-minutes"];
         newRequest.expirationTime = new Date(Date.now() + 1000 * 60 * expirationMinutes);
         return newRequest;
     },
-    add(pRequestEntity: RequestEntity) : Promise<RequestEntity> {
+    add(pRequestEntity: RequestEntity): Promise<RequestEntity> {
         return createObject(requestCollection, pRequestEntity);
     },
     async update(pEntity: RequestEntity, pFields: VKeyedCollection): Promise<RequestEntity> {
         return updateObjectFields(requestCollection,
-                                new GenericFilter({ 'id': pEntity.id }), pFields);
+            new GenericFilter({ "id": pEntity.id }), pFields);
     },
-    async remove(pRequestEntity: RequestEntity) : Promise<boolean> {
-        return deleteOne(requestCollection, new GenericFilter({ 'id': pRequestEntity.id }) );
+    async remove(pRequestEntity: RequestEntity): Promise<boolean> {
+        return deleteOne(requestCollection, new GenericFilter({ "id": pRequestEntity.id }));
     },
     // Remove all requests for specified account of the specified type
     // If type not specified, remove them all
-    async removeAllMyRequests(pAccountId: string, pRequestType?: string): Promise<number>{
+    async removeAllMyRequests(pAccountId: string, pRequestType?: string): Promise<number> {
         const criteria: VKeyedCollection = {
-            'requestingAccount': pAccountId
+            "requestingAccount": pAccountId
         };
         if (IsNotNullOrEmpty(pRequestType)) {
             criteria.requestType = pRequestType;
-        };
+        }
         return deleteMany(requestCollection, new GenericFilter(criteria));
     },
     // TODO: add scope (admin) and filter criteria filtering
     //    It's push down to this routine so we could possibly use DB magic for the queries
     async *enumerateAsync(pPager: CriteriaFilter,
-                pInfoer?: CriteriaFilter, pScoper?: CriteriaFilter): AsyncGenerator<RequestEntity> {
+        pInfoer?: CriteriaFilter, pScoper?: CriteriaFilter): AsyncGenerator<RequestEntity> {
         for await (const acct of getObjects(requestCollection, pPager, pInfoer, pScoper)) {
             yield acct;
-        };
+        }
     }
 };
-
-
-

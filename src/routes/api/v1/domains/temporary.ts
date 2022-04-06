@@ -12,22 +12,21 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
 
-import { Config } from '@Base/config';
+import { Config } from "@Base/config";
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, accountFromAuthToken, finishMetaverseAPI } from '@Route-Tools/middleware';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
+import { setupMetaverseAPI, accountFromAuthToken, finishMetaverseAPI } from "@Route-Tools/middleware";
 
-import { Domains } from '@Entities/Domains';
-import { Places } from '@Entities/Places';
-import { buildDomainInfo, buildPlaceInfo } from '@Route-Tools/Util';
+import { Domains } from "@Entities/Domains";
+import { Places } from "@Entities/Places";
+import { buildDomainInfo, buildPlaceInfo } from "@Route-Tools/Util";
 
-import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator';
-import { Config as UniqueNamesConfig } from 'unique-names-generator';
+import { uniqueNamesGenerator, adjectives, colors, animals } from "unique-names-generator";
+import { Config as UniqueNamesConfig } from "unique-names-generator";
 
-import { GenUUID } from '@Tools/Misc';
-import { Logger } from '@Tools/Logging';
+import { GenUUID } from "@Tools/Misc";
+import { Logger } from "@Tools/Logging";
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
@@ -37,11 +36,11 @@ import { Logger } from '@Tools/Logging';
 // POST /domains/temporary
 const procPostDomainsTemporary: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
 
-    if (Config['metaverse-server']['allow-temp-domain-creation']) {
+    if (Config["metaverse-server"]["allow-temp-domain-creation"]) {
         const customConfig: UniqueNamesConfig = {
             // dictionaries: [ adjectives, colors, animals ],
-            dictionaries: [ colors, animals ],
-            separator: '-',
+            dictionaries: [colors, animals],
+            separator: "-",
             length: 2
         };
         const generatedPlacename: string = uniqueNamesGenerator(customConfig);
@@ -52,20 +51,20 @@ const procPostDomainsTemporary: RequestHandler = async (req: Request, resp: Resp
         newDomain.apiKey = generatedAPIkey;
         if (req.vSenderKey) {
             newDomain.iPAddrOfFirstContact = req.vSenderKey;
-        };
+        }
 
         // If the requestor is logged in, associate that account with the new domain/place
         if (req.vAuthToken) {
-            Logger.debug(`procPostDomainsTemporary: associating account ${req.vAuthToken.accountId} with new domain ${newDomain.id}`)
+            Logger.debug(`procPostDomainsTemporary: associating account ${req.vAuthToken.accountId} with new domain ${newDomain.id}`);
             newDomain.sponsorAccountId = req.vAuthToken.accountId;
-        };
+        }
 
         // Creating a domain also creates a Place for that domain
         const newPlacename = await Places.uniqifyPlaceName(newDomain.name);
         const newPlace = await Places.createPlace(newDomain.sponsorAccountId);
         newPlace.domainId = newDomain.id;
         newPlace.name = newPlacename;
-        newPlace.description = 'A place in ' + newDomain.name;
+        newPlace.description = "A place in " + newDomain.name;
         newPlace.maturity = newDomain.maturity;
         newPlace.iPAddrOfFirstContact = req.vSenderKey;
 
@@ -76,22 +75,23 @@ const procPostDomainsTemporary: RequestHandler = async (req: Request, resp: Resp
         Logger.info(`procPostDomainsTemporary: creating temporary domain "${newDomain.name}" and place "${newPlace.name}"`);
 
         req.vRestResp.Data = {
-            'domain': await buildDomainInfo(newDomain),
-            'place': await buildPlaceInfo(newPlace, newDomain)
+            "domain": await buildDomainInfo(newDomain),
+            "place": await buildPlaceInfo(newPlace, newDomain)
         };
         req.vRestResp.Data.domain.api_key = newDomain.apiKey;
-    }
-    else {
-        req.vRestResp.respondFailure('domain temporary names not available');
+    } else {
+        req.vRestResp.respondFailure("domain temporary names not available");
     }
     next();
 };
 
-export const name = '/api/v1/domains/temporary';
+export const name = "/api/v1/domains/temporary";
 
 export const router = Router();
 
-router.post(  '/api/v1/domains/temporary',      [ setupMetaverseAPI,        // req.vRestResp, req.vAuthToken
-                                                  accountFromAuthToken,     // req.vAuthAccount
-                                                  procPostDomainsTemporary,
-                                                  finishMetaverseAPI ] );
+router.post("/api/v1/domains/temporary", [
+    setupMetaverseAPI,        // req.vRestResp, req.vAuthToken
+    accountFromAuthToken,     // req.vAuthAccount
+    procPostDomainsTemporary,
+    finishMetaverseAPI
+]);

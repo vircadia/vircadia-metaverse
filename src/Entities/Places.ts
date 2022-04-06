@@ -11,35 +11,35 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
-'use strict'
 
-import Config from '@Base/config';
 
-import { Domains } from '@Entities/Domains';
+import Config from "@Base/config";
 
-import { AccountEntity } from '@Entities/AccountEntity';
-import { PlaceEntity } from '@Entities/PlaceEntity';
-import { placeFields } from '@Entities/PlaceFields';
-import { DomainEntity } from './DomainEntity';
+import { Domains } from "@Entities/Domains";
 
-import { AuthToken } from '@Entities/AuthToken';
-import { Tokens, TokenScope } from '@Entities/Tokens';
+import { AccountEntity } from "@Entities/AccountEntity";
+import { PlaceEntity } from "@Entities/PlaceEntity";
+import { placeFields } from "@Entities/PlaceFields";
+import { DomainEntity } from "./DomainEntity";
 
-import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
-import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
+import { AuthToken } from "@Entities/AuthToken";
+import { Tokens, TokenScope } from "@Entities/Tokens";
 
-import { ValidateResponse } from '@Route-Tools/EntityFieldDefn';
-import { getEntityField, setEntityField, getEntityUpdateForField } from '@Route-Tools/GetterSetter';
+import { CriteriaFilter } from "@Entities/EntityFilters/CriteriaFilter";
+import { GenericFilter } from "@Entities/EntityFilters/GenericFilter";
 
-import { createObject, getObject, getObjects, updateObjectFields, deleteOne, deleteMany, noCaseCollation } from '@Tools/Db';
+import { ValidateResponse } from "@Route-Tools/EntityFieldDefn";
+import { getEntityField, setEntityField, getEntityUpdateForField } from "@Route-Tools/GetterSetter";
 
-import { GenUUID, IsNullOrEmpty, IsNotNullOrEmpty, genRandomString } from '@Tools/Misc';
-import { VKeyedCollection } from '@Tools/vTypes';
-import { Logger } from '@Tools/Logging';
-import { PlaceFilterInfo } from './EntityFilters/PlaceFilterInfo';
-import { Accounts } from './Accounts';
+import { createObject, getObject, getObjects, updateObjectFields, deleteOne, deleteMany, noCaseCollation } from "@Tools/Db";
 
-export let placeCollection = 'places';
+import { GenUUID, IsNullOrEmpty, IsNotNullOrEmpty, genRandomString } from "@Tools/Misc";
+import { VKeyedCollection } from "@Tools/vTypes";
+import { Logger } from "@Tools/Logging";
+import { PlaceFilterInfo } from "./EntityFilters/PlaceFilterInfo";
+import { Accounts } from "./Accounts";
+
+export const placeCollection = "places";
 
 // Initialize place management.
 export function initPlaces(): void {
@@ -49,7 +49,7 @@ export function initPlaces(): void {
     // Update current attendance and aliveness for places
     // This saves reading the domain information on every place fetch
     // [Note: There is a lot of checking for values changing to reduce database updates]
-    setInterval( async () => {
+    setInterval(async () => {
 
         let numPlaces = 0;
         let numUnhookedPlaces = 0;
@@ -59,7 +59,7 @@ export function initPlaces(): void {
         const inactivePlaceTime = Places.dateWhenNotActive();
         // The date when a Place's "current" update information is considered stale
         const lastGoodUpdateTime = new Date(Date.now()
-                    - (Config['metaverse-server']['place-current-timeout-minutes'] * 60 * 1000));
+                    - Config["metaverse-server"]["place-current-timeout-minutes"] * 60 * 1000);
         // Logger.debug(`PlaceActivity: inactive=${inactivePlaceTime.toISOString()}, stale=${lastGoodUpdateTime.toISOString()}`);
 
         for await (const aPlace of Places.enumerateAsync(placer)) {
@@ -77,11 +77,10 @@ export function initPlaces(): void {
                     if (IsNullOrEmpty(aPlace.currentAttendance) || aPlace.currentAttendance !== domainAttendance) {
                         aPlace.currentAttendance = domainAttendance;
                         updates.currentAttendance = aPlace.currentAttendance;
-                    };
+                    }
                     aPlace.lastActivity = aDomain.timeOfLastHeartbeat ?? inactivePlaceTime;
                     updates.lastActivity = aPlace.lastActivity;
-                }
-                else {
+                } else {
                     // can't find the domain to go with the place. Set everything to zero and update DB
                     // Logger.debug(`   PlaceActivity: no domain found for place ${aPlace.name}`);
                     numUnhookedPlaces++;
@@ -89,49 +88,52 @@ export function initPlaces(): void {
                     aPlace.lastActivity = inactivePlaceTime;
                     updates.currentAttendance = aPlace.currentAttendance;
                     updates.lastActivity = aPlace.lastActivity;
-                };
-            }
-            else {
+                }
+            } else {
                 // The Place has updated current info so just set the current activity time
                 // Logger.debug(`PlaceActivity: place ${aPlace.name} has currentLastUpdateTime so updating activity`);
                 if (IsNullOrEmpty(aPlace.lastActivity) || aPlace.lastActivity !== aPlace.currentLastUpdateTime) {
                     aPlace.lastActivity = aPlace.currentLastUpdateTime;
                     updates.lastActivity = aPlace.lastActivity;
-                };
-            };
+                }
+            }
             if (aPlace.lastActivity <= inactivePlaceTime) {
                 // Logger.debug(`   PlaceActivity: place ${aPlace.name} deemed inactive`);
                 numInactivePlaces++;
-            };
+            }
             // This updateEntityFields does nothing if 'updates' is empty
             await Places.updateEntityFields(aPlace, updates);
-        };
+        }
         // Logger.debug(`PlaceActivity: numPlaces=${numPlaces}, unhookedPlaces=${numUnhookedPlaces}, inactivePlaces=${numInactivePlaces}`);
-    }, 1000 * Config['metaverse-server']['place-check-last-activity-seconds'] );
-};
+    }, 1000 * Config["metaverse-server"]["place-check-last-activity-seconds"]);
+}
 
 export const Places = {
     async getPlaceWithId(pPlaceId: string): Promise<PlaceEntity> {
-        return IsNullOrEmpty(pPlaceId) ? null : getObject(placeCollection,
-                                                new GenericFilter({ 'id': pPlaceId }));
+        return IsNullOrEmpty(pPlaceId)
+            ? null
+            : getObject(placeCollection,
+                new GenericFilter({ "id": pPlaceId }));
     },
     async getPlaceWithName(pPlacename: string): Promise<PlaceEntity> {
-        return IsNullOrEmpty(pPlacename) ? null : getObject(placeCollection,
-                                                new GenericFilter({ 'name': pPlacename }),
-                                                noCaseCollation);
+        return IsNullOrEmpty(pPlacename)
+            ? null
+            : getObject(placeCollection,
+                new GenericFilter({ "name": pPlacename }),
+                noCaseCollation);
     },
-    async addPlace(pPlaceEntity: PlaceEntity) : Promise<PlaceEntity> {
+    async addPlace(pPlaceEntity: PlaceEntity): Promise<PlaceEntity> {
         Logger.info(`Places: creating place ${pPlaceEntity.name}, id=${pPlaceEntity.id}`);
         return IsNullOrEmpty(pPlaceEntity) ? null : createObject(placeCollection, pPlaceEntity);
     },
     async createPlace(pAccountId: string): Promise<PlaceEntity> {
         const newPlace = new PlaceEntity();
         newPlace.id = GenUUID();
-        newPlace.name = 'UNKNOWN-' + genRandomString(5);
-        newPlace.path = '/0,0,0/0,0,0,1';
+        newPlace.name = "UNKNOWN-" + genRandomString(5);
+        newPlace.path = "/0,0,0/0,0,0,1";
         newPlace.whenCreated = new Date();
         newPlace.currentAttendance = 0;
-        const APItoken = await Tokens.createToken(pAccountId, [ TokenScope.PLACE ], -1);
+        const APItoken = await Tokens.createToken(pAccountId, [TokenScope.PLACE], -1);
         await Tokens.addToken(APItoken);  // put token into DB
         newPlace.currentAPIKeyTokenId = APItoken.id;
         return newPlace;
@@ -141,9 +143,9 @@ export const Places = {
         let newPlacename = pPlaceName;
         const existingPlace = await Places.getPlaceWithName(newPlacename);
         if (existingPlace) {
-            newPlacename = newPlacename + '-' + genRandomString(5);
+            newPlacename = newPlacename + "-" + genRandomString(5);
             Logger.info(`uniqifyPlaceName: non-unique place name ${pPlaceName}. Creating ${newPlacename}`);
-        };
+        }
         return newPlacename;
     },
     // Get the value of a place field with the fieldname.
@@ -151,27 +153,27 @@ export const Places = {
     // Returns the value. Could be 'undefined' whether the requestor doesn't have permissions or that's
     //     the actual field value.
     async getField(pAuthToken: AuthToken, pPlace: PlaceEntity,
-                                    pField: string, pRequestingAccount?: AccountEntity): Promise<any> {
+        pField: string, pRequestingAccount?: AccountEntity): Promise<any> {
         return getEntityField(placeFields, pAuthToken, pPlace, pField, pRequestingAccount);
     },
     // Set a place field with the fieldname and a value.
     // Checks to make sure the setter has permission to set.
     // Returns 'true' if the value was set and 'false' if the value could not be set.
     async setField(pAuthToken: AuthToken,  // authorization for making this change
-                pPlace: PlaceEntity,               // the place being changed
-                pField: string, pVal: any,          // field being changed and the new value
-                pRequestingAccount?: AccountEntity, // Account associated with pAuthToken, if known
-                pUpdates?: VKeyedCollection         // where to record updates made (optional)
-                        ): Promise<ValidateResponse> {
+        pPlace: PlaceEntity,               // the place being changed
+        pField: string, pVal: any,          // field being changed and the new value
+        pRequestingAccount?: AccountEntity, // Account associated with pAuthToken, if known
+        pUpdates?: VKeyedCollection         // where to record updates made (optional)
+    ): Promise<ValidateResponse> {
         return setEntityField(placeFields, pAuthToken, pPlace, pField, pVal, pRequestingAccount, pUpdates);
     },
     // Verify that the passed value is legal for the named field
     async validateFieldValue(pFieldName: string, pValue: any): Promise<ValidateResponse> {
         const defn = placeFields[pFieldName];
         if (defn) {
-            return await defn.validate(defn, defn.request_field_name, pValue);
-        };
-        return { 'valid': false, 'reason': 'Unknown field name' };
+            return defn.validate(defn, defn.request_field_name, pValue);
+        }
+        return { "valid": false, "reason": "Unknown field name" };
     },
     // Generate an 'update' block for the specified field or fields.
     // This is a field/value collection that can be passed to the database routines.
@@ -179,34 +181,34 @@ export const Places = {
     //     we want the actual value (whatever it is) to go into the database.
     // If an existing VKeyedCollection is passed, it is added to an returned.
     getUpdateForField(pPlace: PlaceEntity,
-                    pField: string | string[], pExisting?: VKeyedCollection): VKeyedCollection {
+        pField: string | string[], pExisting?: VKeyedCollection): VKeyedCollection {
         return getEntityUpdateForField(placeFields, pPlace, pField, pExisting);
     },
-    async removePlace(pPlaceEntity: PlaceEntity) : Promise<boolean> {
+    async removePlace(pPlaceEntity: PlaceEntity): Promise<boolean> {
         Logger.info(`Places: removing place ${pPlaceEntity.name}, id=${pPlaceEntity.id}`);
-        return deleteOne(placeCollection, new GenericFilter({ 'id': pPlaceEntity.id }) );
+        return deleteOne(placeCollection, new GenericFilter({ "id": pPlaceEntity.id }));
     },
 
-    async removeMany(pCriteria: CriteriaFilter) : Promise<number> {
+    async removeMany(pCriteria: CriteriaFilter): Promise<number> {
         return deleteMany(placeCollection, pCriteria);
     },
 
     async *enumerateAsync(pPager: CriteriaFilter,
-                pInfoer?: CriteriaFilter, pScoper?: CriteriaFilter): AsyncGenerator<PlaceEntity> {
+        pInfoer?: CriteriaFilter, pScoper?: CriteriaFilter): AsyncGenerator<PlaceEntity> {
         for await (const place of getObjects(placeCollection, pPager, pInfoer, pScoper)) {
             yield place;
-        };
+        }
         // return getObjects(placeCollection, pCriteria, pPager); // not sure why this doesn't work
     },
 
     // The contents of this entity have been updated
     async updateEntityFields(pEntity: PlaceEntity, pFields: VKeyedCollection): Promise<PlaceEntity> {
         return updateObjectFields(placeCollection,
-                                new GenericFilter({ 'id': pEntity.id }), pFields);
+            new GenericFilter({ "id": pEntity.id }), pFields);
     },
 
-    dateWhenNotActive() : Date {
-        return new Date(Date.now() - (Config['metaverse-server']['place-inactive-timeout-minutes'] * 60 * 1000));
+    dateWhenNotActive(): Date {
+        return new Date(Date.now() - Config["metaverse-server"]["place-inactive-timeout-minutes"] * 60 * 1000);
     },
 
     async getCurrentInfoAPIKey(pPlace: PlaceEntity): Promise<string> {
@@ -215,7 +217,7 @@ export const Places = {
         const keyToken = await Tokens.getTokenWithTokenId(pPlace.currentAPIKeyTokenId);
         if (IsNotNullOrEmpty(keyToken)) {
             key = keyToken.token;
-        };
+        }
         return key;
     },
 
@@ -223,10 +225,10 @@ export const Places = {
         // Compute and return the string for the Places's address.
         // The address is of the form "optional-domain/x,y,z/x,y,z,w".
         // If the domain is missing, the domain-server's network address is added
-        let addr = pPlace.path ?? '/0,0,0/0,0,0,1';
+        let addr = pPlace.path ?? "/0,0,0/0,0,0,1";
 
         // If no domain/address specified in path, build addr using reported domain IP/port
-        const pieces = addr.split('/');
+        const pieces = addr.split("/");
         if (pieces[0].length === 0) {
             const aDomain = await Domains.getDomainWithId(pPlace.domainId);
             if (IsNotNullOrEmpty(aDomain)) {
@@ -234,11 +236,11 @@ export const Places = {
                     let domainAddr = aDomain.networkAddr;
                     if (IsNotNullOrEmpty(aDomain.networkPort)) {
                         domainAddr = aDomain.networkAddr + ":" + aDomain.networkPort;
-                    };
+                    }
                     addr = domainAddr + addr;
-                };
-            };
-        };
+                }
+            }
+        }
         return addr;
     },
 
@@ -252,10 +254,10 @@ export const Places = {
             if (aDomain) {
                 const aAccount = await Accounts.getAccountWithId(aDomain.sponsorAccountId);
                 if (aAccount) {
-                    pPlace.managers = [ aAccount.username ];
-                };
-            };
-            await Places.updateEntityFields(pPlace, { 'managers': pPlace.managers })
+                    pPlace.managers = [aAccount.username];
+                }
+            }
+            await Places.updateEntityFields(pPlace, { "managers": pPlace.managers });
         }
         return pPlace.managers;
     }

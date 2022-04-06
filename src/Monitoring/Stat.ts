@@ -11,16 +11,16 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
-'use strict'
 
-import { Config } from '@Base/config';
 
-import { Histogram } from '@Monitoring/Histogram';
-import { Logger } from '@Tools/Logging';
-import { VKeyedCollection } from '@Tools/vTypes';
+import { Config } from "@Base/config";
+
+import { Histogram } from "@Monitoring/Histogram";
+import { Logger } from "@Tools/Logging";
+import { VKeyedCollection } from "@Tools/vTypes";
 
 // Function that is called for a statistic when pulling its value
-export type updateValueFunction = ( pStat: Stat ) => Promise<void>;
+export type updateValueFunction = (pStat: Stat) => Promise<void>;
 
 export abstract class Stat {
     public name: string;      // the name of the statistic
@@ -35,34 +35,34 @@ export abstract class Stat {
     public secondsBetweenPulls: number; // seconds between doing pull operation
     public pullCount: number;
 
-    _histograms: Map<string,Histogram>;
+    _histograms: Map<string, Histogram>;
 
-    constructor(pName:string, pCategory: string, pUnit: string, pPullAction?: updateValueFunction) {
+    constructor(pName: string, pCategory: string, pUnit: string, pPullAction?: updateValueFunction) {
         this.name = pName;
         this.category = pCategory;
         this.unit = pUnit;
         this.value = 0;
         this.pullAction = pPullAction;
-        this._histograms = new Map<string,Histogram>();
-    };
+        this._histograms = new Map<string, Histogram>();
+    }
 
     // Add a histogram to this value
     AddHistogram(pHistogramName: string, pHistogram: Histogram) {
         this._histograms.set(pHistogramName, pHistogram);
-    };
+    }
+
     async DoPullAction(): Promise<void> {
         if (this.pullAction) {
             if (this.secondsBetweenPulls) {
                 if (this.pullCount-- < 0) {
                     await this.pullAction(this);
                     this.pullCount = this.secondsBetweenPulls;
-                };
-            }
-            else {
+                }
+            } else {
                 await this.pullAction(this);
-            };
-        };
-    };
+            }
+        }
+    }
 
     // Record one or more events
     abstract Event(pCount: number): void;
@@ -71,21 +71,20 @@ export abstract class Stat {
     abstract Gather(): void;
     // Return an object containing the values in this stat
 
-    Report(pReturnHistogram: boolean = true): any {
+    Report(pReturnHistogram = true): any {
         const report: VKeyedCollection = {
-            'name': this.name,
-            'category': this.category,
-            'unit': this.unit,
-            'value': this.value
+            "name": this.name,
+            "category": this.category,
+            "unit": this.unit,
+            "value": this.value
         };
         if (pReturnHistogram && this._histograms.size > 0) {
             const history: any = {};
-            this._histograms.forEach( (histo, name) => {
+            this._histograms.forEach((histo, name) => {
                 history[name] = histo.GetHistogram();
             });
             report.history = history;
-        };
+        }
         return report;
-    };
-};
-
+    }
+}

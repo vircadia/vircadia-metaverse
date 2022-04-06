@@ -12,18 +12,17 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
 
-import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
-import { accountFromAuthToken } from '@Route-Tools/middleware';
-import { updateLocationInfo } from '@Route-Tools/Util';
+import { setupMetaverseAPI, finishMetaverseAPI } from "@Route-Tools/middleware";
+import { accountFromAuthToken } from "@Route-Tools/middleware";
+import { updateLocationInfo } from "@Route-Tools/Util";
 
-import { Accounts } from '@Entities/Accounts';
+import { Accounts } from "@Entities/Accounts";
 
-import { IsNotNullOrEmpty } from '@Tools/Misc';
-import { Logger } from '@Tools/Logging';
+import { IsNotNullOrEmpty } from "@Tools/Misc";
+import { Logger } from "@Tools/Logging";
 
 const procPutUserHeartbeat: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
     if (req.vAuthAccount) {
@@ -34,24 +33,23 @@ const procPutUserHeartbeat: RequestHandler = async (req: Request, resp: Response
             if (IsNotNullOrEmpty(req.vAuthAccount.locationNodeId)) {
                 req.vRestResp.Data = {
                     // 'session_id': req.vSession.id
-                    'session_id': req.vAuthAccount.locationNodeId
+                    "session_id": req.vAuthAccount.locationNodeId
                 };
-            };
-        };
+            }
+        }
+    } else {
+        req.vRestResp.respondFailure(req.vAccountError ?? "Not logged in");
     }
-    else {
-        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-    };
     next();
 };
 
-export const name = '/api/v1/user/heartbeat';
+export const name = "/api/v1/user/heartbeat";
 
 export const router = Router();
 
-router.put( '/api/v1/user/heartbeat', [ setupMetaverseAPI,
-                                        accountFromAuthToken,
-                                        procPutUserHeartbeat,
-                                        finishMetaverseAPI
-                                      ] );
-
+router.put("/api/v1/user/heartbeat", [
+    setupMetaverseAPI,
+    accountFromAuthToken,
+    procPutUserHeartbeat,
+    finishMetaverseAPI
+]);

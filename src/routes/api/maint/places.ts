@@ -12,26 +12,25 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict'
 
-import Config from '@Base/config';
+import Config from "@Base/config";
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
-import { accountFromAuthToken } from '@Route-Tools/middleware';
-import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
-import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
-import { PlaceFilterInfo } from '@Entities/EntityFilters/PlaceFilterInfo';
-import { buildPlaceInfo } from '@Route-Tools/Util';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
+import { setupMetaverseAPI, finishMetaverseAPI } from "@Route-Tools/middleware";
+import { accountFromAuthToken } from "@Route-Tools/middleware";
+import { CriteriaFilter } from "@Entities/EntityFilters/CriteriaFilter";
+import { PaginationInfo } from "@Entities/EntityFilters/PaginationInfo";
+import { PlaceFilterInfo } from "@Entities/EntityFilters/PlaceFilterInfo";
+import { buildPlaceInfo } from "@Route-Tools/Util";
 
-import { Domains } from '@Entities/Domains';
-import { Places } from '@Entities/Places';
-import { PlaceEntity } from '@Entities/PlaceEntity';
-import { Accounts } from '@Entities/Accounts';
-import { Maturity } from '@Entities/Sets/Maturity';
+import { Domains } from "@Entities/Domains";
+import { Places } from "@Entities/Places";
+import { PlaceEntity } from "@Entities/PlaceEntity";
+import { Accounts } from "@Entities/Accounts";
+import { Maturity } from "@Entities/Sets/Maturity";
 
-import { IsNullOrEmpty, IsNotNullOrEmpty } from '@Tools/Misc';
-import { Logger } from '@Tools/Logging';
+import { IsNullOrEmpty, IsNotNullOrEmpty } from "@Tools/Misc";
+import { Logger } from "@Tools/Logging";
 
 // Return places that don't have an associated domain
 const procPlacesUnhooked: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
@@ -47,21 +46,19 @@ const procPlacesUnhooked: RequestHandler = async (req: Request, resp: Response, 
             const places: any[] = [];
             for await (const aPlace of unhookedPlaces(placer, pager)) {
                 places.push(await buildPlaceInfo(aPlace));
-            };
+            }
 
             req.vRestResp.Data = {
-                'places': places,
+                places,
                 // Maturity catagories added so client knows what is defined in the metaverse-server
-                'maturity-categories': Maturity.MaturityCategories
+                "maturity-categories": Maturity.MaturityCategories
             };
+        } else {
+            req.vRestResp.respondFailure("not admin");
         }
-        else {
-            req.vRestResp.respondFailure('not admin');
-        };
+    } else {
+        req.vRestResp.respondFailure("must have account for access");
     }
-    else {
-        req.vRestResp.respondFailure('must have account for access');
-    };
 
     placer.addResponseFields(req);
     pager.addResponseFields(req);
@@ -81,15 +78,13 @@ const procPlacesDeleteUnhooked: RequestHandler = async (req: Request, resp: Resp
             for await (const aPlace of unhookedPlaces(placer, pager)) {
                 Logger.info(`DeleteUnhooked: deleting place ${aPlace.name} for having no domain`);
                 Places.removePlace(aPlace);
-            };
+            }
+        } else {
+            req.vRestResp.respondFailure("not admin");
         }
-        else {
-            req.vRestResp.respondFailure('not admin');
-        };
+    } else {
+        req.vRestResp.respondFailure("must have account for access");
     }
-    else {
-        req.vRestResp.respondFailure('must have account for access');
-    };
 
     placer.addResponseFields(req);
     pager.addResponseFields(req);
@@ -102,9 +97,9 @@ async function *unhookedPlaces(pPager: CriteriaFilter, pInfoer?: CriteriaFilter)
         const aDomain = await Domains.getDomainWithId(aPlace.domainId);
         if (IsNullOrEmpty(aDomain) || IsNullOrEmpty(aDomain.networkAddr)) {
             yield aPlace;
-        };
-    };
-};
+        }
+    }
+}
 
 // Return places that haven't pinged in a while
 const procPlacesInactive: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
@@ -119,21 +114,19 @@ const procPlacesInactive: RequestHandler = async (req: Request, resp: Response, 
             const places: any[] = [];
             for await (const aPlace of inactivePlaces(placer, pager)) {
                 places.push(await buildPlaceInfo(aPlace));
-            };
+            }
 
             req.vRestResp.Data = {
-                'places': places,
+                places,
                 // Maturity catagories added so client knows what is defined in the metaverse-server
-                'maturity-categories': Maturity.MaturityCategories
+                "maturity-categories": Maturity.MaturityCategories
             };
+        } else {
+            req.vRestResp.respondFailure("not admin");
         }
-        else {
-            req.vRestResp.respondFailure('not admin');
-        };
+    } else {
+        req.vRestResp.respondFailure("must have account for access");
     }
-    else {
-        req.vRestResp.respondFailure('must have account for access');
-    };
 
     placer.addResponseFields(req);
     pager.addResponseFields(req);
@@ -153,15 +146,13 @@ const procPlacesDeleteInactive: RequestHandler = async (req: Request, resp: Resp
             for await (const aPlace of inactivePlaces(placer, pager)) {
                 Logger.info(`DeleteInactive: deleting place ${aPlace.name} for being inactive`);
                 Places.removePlace(aPlace);
-            };
+            }
+        } else {
+            req.vRestResp.respondFailure("not admin");
         }
-        else {
-            req.vRestResp.respondFailure('not admin');
-        };
+    } else {
+        req.vRestResp.respondFailure("must have account for access");
     }
-    else {
-        req.vRestResp.respondFailure('must have account for access');
-    };
 
     placer.addResponseFields(req);
     pager.addResponseFields(req);
@@ -174,31 +165,39 @@ async function *inactivePlaces(pPager: CriteriaFilter, pInfoer?: CriteriaFilter)
     for await (const aPlace of Places.enumerateAsync(pPager, pInfoer)) {
         if (IsNotNullOrEmpty(aPlace.lastActivity) || aPlace.lastActivity < inactivePlaceTime) {
             yield aPlace;
-        };
-    };
-};
+        }
+    }
+}
 
-export const name = '/api/maint/places/';
+export const name = "/api/maint/places/";
 
 export const router = Router();
 
 // Return places that don't have an associated domain
-router.get('/api/maint/places/unhooked', [ setupMetaverseAPI,
-                                          accountFromAuthToken,
-                                          procPlacesUnhooked,
-                                          finishMetaverseAPI ] );
+router.get("/api/maint/places/unhooked", [
+    setupMetaverseAPI,
+    accountFromAuthToken,
+    procPlacesUnhooked,
+    finishMetaverseAPI
+]);
 // Delete the places that are unhooked
-router.delete('/api/maint/places/unhooked', [ setupMetaverseAPI,
-                                          accountFromAuthToken,
-                                          procPlacesDeleteUnhooked,
-                                          finishMetaverseAPI ] );
+router["delete"]("/api/maint/places/unhooked", [
+    setupMetaverseAPI,
+    accountFromAuthToken,
+    procPlacesDeleteUnhooked,
+    finishMetaverseAPI
+]);
 // Return places that haven't pinged in a while
-router.get('/api/maint/places/inactive', [ setupMetaverseAPI,
-                                          accountFromAuthToken,
-                                          procPlacesInactive,
-                                          finishMetaverseAPI ] );
+router.get("/api/maint/places/inactive", [
+    setupMetaverseAPI,
+    accountFromAuthToken,
+    procPlacesInactive,
+    finishMetaverseAPI
+]);
 // Delete the places that are inactive
-router.delete('/api/maint/places/inactive', [ setupMetaverseAPI,
-                                          accountFromAuthToken,
-                                          procPlacesDeleteInactive,
-                                          finishMetaverseAPI ] );
+router["delete"]("/api/maint/places/inactive", [
+    setupMetaverseAPI,
+    accountFromAuthToken,
+    procPlacesDeleteInactive,
+    finishMetaverseAPI
+]);

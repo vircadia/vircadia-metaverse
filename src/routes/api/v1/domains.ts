@@ -12,25 +12,24 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
-import { accountFromAuthToken } from '@Route-Tools/middleware';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
+import { setupMetaverseAPI, finishMetaverseAPI } from "@Route-Tools/middleware";
+import { accountFromAuthToken } from "@Route-Tools/middleware";
 
-import { Domains } from '@Entities/Domains';
-import { Places } from '@Entities/Places';
-import { DomainFields } from '@Entities/DomainFields';
-import { buildDomainInfoV1 } from '@Route-Tools/Util';
-import { buildDomainInfo, buildPlaceInfo } from '@Route-Tools/Util';
+import { Domains } from "@Entities/Domains";
+import { Places } from "@Entities/Places";
+import { DomainFields } from "@Entities/DomainFields";
+import { buildDomainInfoV1 } from "@Route-Tools/Util";
+import { buildDomainInfo, buildPlaceInfo } from "@Route-Tools/Util";
 
-import { PaginationInfo } from '@Entities/EntityFilters/PaginationInfo';
-import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
-import { VisibilityFilter } from '@Entities/EntityFilters/VisibilityFilter';
-import { HTTPStatusCode } from '@Route-Tools/RESTResponse';
+import { PaginationInfo } from "@Entities/EntityFilters/PaginationInfo";
+import { AccountScopeFilter } from "@Entities/EntityFilters/AccountScopeFilter";
+import { VisibilityFilter } from "@Entities/EntityFilters/VisibilityFilter";
+import { HTTPStatusCode } from "@Route-Tools/RESTResponse";
 
-import { GenUUID, IsNotNullOrEmpty } from '@Tools/Misc';
-import { Logger } from '@Tools/Logging';
+import { GenUUID, IsNotNullOrEmpty } from "@Tools/Misc";
+import { Logger } from "@Tools/Logging";
 
 // GET /api/v1/domains
 const procGetDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
@@ -48,25 +47,24 @@ const procGetDomains: RequestHandler = async (req: Request, resp: Response, next
         const domainArray: any[] = [];
         for await (const aDomain of Domains.enumerateAsync(scoper, pager)) {
             if (await visibilitier.criteriaTestAsync(req.vAuthAccount, aDomain)) {
-                domainArray.push( await buildDomainInfoV1(aDomain) );
+                domainArray.push(await buildDomainInfoV1(aDomain));
             }
-        };
+        }
         req.vRestResp.Data = {
-            'domains': domainArray
+            "domains": domainArray
         };
 
         visibilitier.addResponseFields(req);
         scoper.addResponseFields(req);
         pager.addResponseFields(req);
-    }
-    else {
-        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
+    } else {
+        req.vRestResp.respondFailure(req.vAccountError ?? "Not logged in");
         req.vRestResp.HTTPStatus = HTTPStatusCode.Unauthorized;
-    };
+    }
     next();
 };
 
-    // Create a domain entry
+// Create a domain entry
 const procPostDomains: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
     if (req.vAuthAccount) {
         if (req.body && req.body.domain && req.body.domain.label) {
@@ -81,16 +79,16 @@ const procPostDomains: RequestHandler = async (req: Request, resp: Response, nex
                     newDomain.apiKey = generatedAPIkey;
                     if (req.vSenderKey) {
                         newDomain.iPAddrOfFirstContact = req.vSenderKey;
-                    };
+                    }
 
                     if (req.body.domain.network_address) {
                         newDomain.networkAddr = req.body.domain.network_address;
-                    };
+                    }
                     if (req.body.domain.network_port) {
                         newDomain.networkPort = req.body.domain.network_port;
-                    };
+                    }
                     // Domain is associated with the account that is logged in for the creation
-                    Logger.debug(`procPostDomains: associating account ${req.vAuthToken.accountId} with new domain ${newDomain.id}`)
+                    Logger.debug(`procPostDomains: associating account ${req.vAuthToken.accountId} with new domain ${newDomain.id}`);
                     newDomain.sponsorAccountId = req.vAuthToken.accountId;
 
                     // Creating a domain also creates a Place for that domain
@@ -99,10 +97,10 @@ const procPostDomains: RequestHandler = async (req: Request, resp: Response, nex
                     const newPlace = await Places.createPlace(req.vAuthToken.accountId);
                     newPlace.domainId = newDomain.id;
                     newPlace.name = newPlacename;
-                    newPlace.description = 'A place in ' + newDomain.name;
+                    newPlace.description = "A place in " + newDomain.name;
                     newPlace.maturity = newDomain.maturity;
                     newPlace.iPAddrOfFirstContact = req.vSenderKey;
-                    newPlace.managers = [ req.vAuthAccount.username ];
+                    newPlace.managers = [req.vAuthAccount.username];
 
                     // Now that the local structures are updated, store the new entries
                     Domains.addDomain(newDomain);
@@ -112,40 +110,40 @@ const procPostDomains: RequestHandler = async (req: Request, resp: Response, nex
                     domainInfo.api_key = newDomain.apiKey;
 
                     req.vRestResp.Data = {
-                        'domain': domainInfo,
-                        'place': await buildPlaceInfo(newPlace, newDomain)
+                        "domain": domainInfo,
+                        "place": await buildPlaceInfo(newPlace, newDomain)
                     };
 
                     // some legacy requests want the domain information at the top level
-                    req.vRestResp.addAdditionalField('domain', domainInfo);
+                    req.vRestResp.addAdditionalField("domain", domainInfo);
+                } else {
+                    req.vRestResp.respondFailure(ifValid.reason ?? "invalid domain name");
                 }
-                else {
-                    req.vRestResp.respondFailure(ifValid.reason ?? 'invalid domain name');
-                };
+            } else {
+                req.vRestResp.respondFailure("label was empty");
             }
-            else {
-                req.vRestResp.respondFailure('label was empty');
-            };
+        } else {
+            req.vRestResp.respondFailure("no label supplied");
         }
-        else {
-            req.vRestResp.respondFailure('no label supplied');
-        };
+    } else {
+        req.vRestResp.respondFailure(req.vAccountError ?? "Not logged in");
     }
-    else {
-        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-    };
     next();
 };
 
-export const name = '/api/v1/domains';
+export const name = "/api/v1/domains";
 
 export const router = Router();
 
-router.get(   '/api/v1/domains',  [ setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
-                                    accountFromAuthToken, // req.vAuthAccount
-                                    procGetDomains,
-                                    finishMetaverseAPI ] );
-router.post(   '/api/v1/domains', [ setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
-                                    accountFromAuthToken, // req.vAuthAccount
-                                    procPostDomains,
-                                    finishMetaverseAPI ] );
+router.get("/api/v1/domains", [
+    setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
+    accountFromAuthToken, // req.vAuthAccount
+    procGetDomains,
+    finishMetaverseAPI
+]);
+router.post("/api/v1/domains", [
+    setupMetaverseAPI,    // req.vRestResp, req.vAuthToken
+    accountFromAuthToken, // req.vAuthAccount
+    procPostDomains,
+    finishMetaverseAPI
+]);

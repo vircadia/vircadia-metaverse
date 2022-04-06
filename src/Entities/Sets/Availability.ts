@@ -12,24 +12,23 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict'
 
-import { Logger } from '@Tools/Logging';
+import { Logger } from "@Tools/Logging";
 
 export class Availability {
-  public static NONE: string = 'none';        // no one can see me
-  public static FRIENDS: string = 'friends';  // available to friends
-  public static CONNECTIONS: string = 'connections';     // available to connections
-  public static ALL: string = 'all';          // available to all
+    public static NONE = "none";        // no one can see me
+    public static FRIENDS = "friends";  // available to friends
+    public static CONNECTIONS = "connections";     // available to connections
+    public static ALL = "all";          // available to all
 
-  // See if the passed availability code is a known availability token
-  static async KnownAvailability(pAvailability: string): Promise<boolean> {
-    return [ Availability.NONE,
+    // See if the passed availability code is a known availability token
+    static async KnownAvailability(pAvailability: string): Promise<boolean> {
+        return [
+            Availability.NONE,
             Availability.FRIENDS,
             Availability.CONNECTIONS,
             Availability.ALL
-           ].includes(pAvailability);
-  };
+        ].includes(pAvailability);
+    }
 
-};
-
+}

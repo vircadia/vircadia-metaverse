@@ -12,29 +12,28 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict'
 
-import Config from '@Base/config';
+import Config from "@Base/config";
 
-import { Logger } from '@Tools/Logging';
+import { Logger } from "@Tools/Logging";
 
 export class Maturity {
-  public static UNRATED: string = 'unrated';
-  public static EVERYONE: string = 'everyone';
-  public static TEEN: string = 'teen';
-  public static MATURE: string = 'mature';
-  public static ADULT: string = 'adult';
+    public static UNRATED = "unrated";
+    public static EVERYONE = "everyone";
+    public static TEEN = "teen";
+    public static MATURE = "mature";
+    public static ADULT = "adult";
 
-  static MaturityCategories = [ Maturity.UNRATED,
-             Maturity.EVERYONE,
-             Maturity.TEEN,
-             Maturity.MATURE,
-             Maturity.ADULT
-            ];
+    static MaturityCategories = [
+        Maturity.UNRATED,
+        Maturity.EVERYONE,
+        Maturity.TEEN,
+        Maturity.MATURE,
+        Maturity.ADULT
+    ];
 
-  static KnownMaturity(pMaturity: string): boolean {
-    return this.MaturityCategories.includes(pMaturity);
-  };
+    static KnownMaturity(pMaturity: string): boolean {
+        return this.MaturityCategories.includes(pMaturity);
+    }
 
-};
-
+}

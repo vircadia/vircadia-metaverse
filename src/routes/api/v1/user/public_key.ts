@@ -12,19 +12,18 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
 
-import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
-import { accountFromAuthToken } from '@Route-Tools/middleware';
+import { setupMetaverseAPI, finishMetaverseAPI } from "@Route-Tools/middleware";
+import { accountFromAuthToken } from "@Route-Tools/middleware";
 
-import multer from 'multer';
+import multer from "multer";
 
-import { Logger } from '@Tools/Logging';
-import { convertBinKeyToPEM } from '@Route-Tools/Util';
-import { Accounts } from '@Entities/Accounts';
-import { IsNotNullOrEmpty } from '@Tools/Misc';
+import { Logger } from "@Tools/Logging";
+import { convertBinKeyToPEM } from "@Route-Tools/Util";
+import { Accounts } from "@Entities/Accounts";
+import { IsNotNullOrEmpty } from "@Tools/Misc";
 
 // PUT /api/v1/user/public_key
 // The api_key and public_key are POSTed as entities in a multi-part-form mime type.
@@ -40,41 +39,39 @@ const procPutUserPublicKey: RequestHandler = async (req: Request, resp: Response
 
                 if (IsNotNullOrEmpty(publicKeyBin)) {
                     const fieldsToUpdate = {
-                        'sessionPublicKey': convertBinKeyToPEM(publicKeyBin)
+                        "sessionPublicKey": convertBinKeyToPEM(publicKeyBin)
                     };
                     await Accounts.updateEntityFields(req.vAuthAccount, fieldsToUpdate);
+                } else {
+                    req.vRestResp.respondFailure("badly formed public key");
                 }
-                else {
-                    req.vRestResp.respondFailure('badly formed public key');
-                };
+            } catch (e) {
+                Logger.error("procPutUserPublicKey: exception converting: " + e);
+                req.vRestResp.respondFailure("exception converting public key");
             }
-            catch (e) {
-                Logger.error('procPutUserPublicKey: exception converting: ' + e);
-                req.vRestResp.respondFailure('exception converting public key');
-            }
+        } else {
+            Logger.error("procPutUserPublicKey: no files part of body");
+            req.vRestResp.respondFailure("no public key supplied");
         }
-        else {
-            Logger.error('procPutUserPublicKey: no files part of body');
-            req.vRestResp.respondFailure('no public key supplied');
-        };
+    } else {
+        req.vRestResp.respondFailure(req.vAccountError ?? "Not logged in");
     }
-    else {
-        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-    };
     next();
 };
 
-export const name = '/api/v1/user/public_key';
+export const name = "/api/v1/user/public_key";
 
 export const router = Router();
 
 // The public key is sent in binary in a multipart-form.
 // This creates an unpacker to catch fields 'api_key' and 'public_key'
 const multiStorage = multer.memoryStorage();
-const uploader = multer( { storage: multiStorage, });
-const multiParser = uploader.fields( [ { name: 'public_key' }]);
-router.put( '/api/v1/user/public_key', [ setupMetaverseAPI,
-                                         accountFromAuthToken,  // vRESTResp.vAuthAccount
-                                         multiParser,    // body['api_key'], files['public_key'].buffer
-                                         procPutUserPublicKey,
-                                         finishMetaverseAPI ] );
+const uploader = multer({ storage: multiStorage });
+const multiParser = uploader.fields([{ name: "public_key" }]);
+router.put("/api/v1/user/public_key", [
+    setupMetaverseAPI,
+    accountFromAuthToken,  // vRESTResp.vAuthAccount
+    multiParser,    // body['api_key'], files['public_key'].buffer
+    procPutUserPublicKey,
+    finishMetaverseAPI
+]);

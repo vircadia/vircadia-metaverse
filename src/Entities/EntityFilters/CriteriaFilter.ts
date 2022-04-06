@@ -11,9 +11,9 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
-'use strict'
 
-import { Request } from 'express';
+
+import { Request } from "express";
 
 // Criteria filters are used to filter collections of entities.
 // They work by taking an enumeration stream and returning a stream
@@ -34,25 +34,25 @@ import { Request } from 'express';
 //    response.
 export abstract class CriteriaFilter {
 
-  // Take a request and extract filter parameters
-  abstract parametersFromRequest(pRequest: Request): void;
+    // Take a request and extract filter parameters
+    abstract parametersFromRequest(pRequest: Request): void;
 
-  // Adds additional fields to the response
-  abstract addResponseFields(pRequest: Request): void;
+    // Adds additional fields to the response
+    abstract addResponseFields(pRequest: Request): void;
 
-  // Test a thing and return 'true' if it should be included in the set
-  abstract criteriaTest(pThingy: any): boolean;
+    // Test a thing and return 'true' if it should be included in the set
+    abstract criteriaTest(pThingy: any): boolean;
 
-  // A async version of criteriaTest. This is used externally to the
-  //    database filtering and should go away when the aggregate pipeline
-  //    is implemented.
-  abstract criteriaTestAsync(pThingy: any): Promise<boolean>;
+    // A async version of criteriaTest. This is used externally to the
+    //    database filtering and should go away when the aggregate pipeline
+    //    is implemented.
+    abstract criteriaTestAsync(pThingy: any): Promise<boolean>;
 
-  // Return Mongodb criteria for the search query
-  // This changes what 'criteriaTest' returns since the testing is now
-  //     expected to be in the query.
-  abstract criteriaParameters(): any;
+    // Return Mongodb criteria for the search query
+    // This changes what 'criteriaTest' returns since the testing is now
+    //     expected to be in the query.
+    abstract criteriaParameters(): any;
 
-  // return Mongodb critera for sort operations
-  abstract sortCriteriaParameters(): any;
-};
+    // return Mongodb critera for sort operations
+    abstract sortCriteriaParameters(): any;
+}

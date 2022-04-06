@@ -12,18 +12,17 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict'
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
-import { accountFromAuthToken, accountFromParams } from '@Route-Tools/middleware';
-import { tokenFromParams } from '@Route-Tools/middleware';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
+import { setupMetaverseAPI, finishMetaverseAPI } from "@Route-Tools/middleware";
+import { accountFromAuthToken, accountFromParams } from "@Route-Tools/middleware";
+import { tokenFromParams } from "@Route-Tools/middleware";
 
-import { Tokens } from '@Entities/Tokens';
-import { AccountScopeFilter } from '@Entities/EntityFilters/AccountScopeFilter';
+import { Tokens } from "@Entities/Tokens";
+import { AccountScopeFilter } from "@Entities/EntityFilters/AccountScopeFilter";
 
-import { Logger } from '@Tools/Logging';
-import { Accounts } from '@Entities/Accounts';
+import { Logger } from "@Tools/Logging";
+import { Accounts } from "@Entities/Accounts";
 
 // metaverseServerApp.use(express.urlencoded({ extended: false }));
 
@@ -34,50 +33,44 @@ const procDeleteToken: RequestHandler = async (req: Request, resp: Response, nex
     if (req.vAuthAccount) {
         if (req.vAccount) {
             if (req.vTokenId) {
-                const scoper = new AccountScopeFilter(req.vAuthAccount, 'accountId');
+                const scoper = new AccountScopeFilter(req.vAuthAccount, "accountId");
                 scoper.parametersFromRequest(req);
                 const tok = await Tokens.getTokenWithTokenId(req.vTokenId);
                 if (tok) {
-                    if ( scoper.AsAdmin() && Accounts.isAdmin(req.vAuthAccount)
+                    if (scoper.AsAdmin() && Accounts.isAdmin(req.vAuthAccount)
                                 || req.vAuthAccount.id === tok.accountId) {
                         if (req.vAccount.id === tok.accountId) {
-                        await Tokens.removeToken(tok);
+                            await Tokens.removeToken(tok);
+                        } else {
+                            req.vRestResp.respondFailure("Token account does not match requested account");
                         }
-                        else {
-                            req.vRestResp.respondFailure('Token account does not match requested account');
-                        };
+                    } else {
+                        req.vRestResp.respondFailure("Unauthorized");
                     }
-                    else {
-                        req.vRestResp.respondFailure('Unauthorized');
-                    };
+                } else {
+                    req.vRestResp.respondFailure("Token not found");
                 }
-                else {
-                    req.vRestResp.respondFailure('Token not found');
-                };
+            } else {
+                req.vRestResp.respondFailure("Token no speciied");
             }
-            else {
-                req.vRestResp.respondFailure('Token no speciied');
-            };
+        } else {
+            req.vRestResp.respondFailure("Target acccount not found");
         }
-        else {
-            req.vRestResp.respondFailure('Target acccount not found');
-        };
+    } else {
+        req.vRestResp.respondFailure("Not logged in");
     }
-    else {
-        req.vRestResp.respondFailure('Not logged in');
-    };
     next();
 };
 
-export const name = '/api/v1/account/:accoundId/tokens/:tokenId';
+export const name = "/api/v1/account/:accoundId/tokens/:tokenId";
 
 export const router = Router();
 
-router.delete('/api/v1/account/:accountId/tokens/:tokenId', [ setupMetaverseAPI,  // req.vRestResp, req.vAuthToken
-                                                    accountFromAuthToken,   // req.vAuthAccount
-                                                    accountFromParams,      // req.vAccount
-                                                    tokenFromParams,        // req.vToken
-                                                    procDeleteToken,
-                                                    finishMetaverseAPI ] );
-
-
+router["delete"]("/api/v1/account/:accountId/tokens/:tokenId", [
+    setupMetaverseAPI,  // req.vRestResp, req.vAuthToken
+    accountFromAuthToken,   // req.vAuthAccount
+    accountFromParams,      // req.vAccount
+    tokenFromParams,        // req.vToken
+    procDeleteToken,
+    finishMetaverseAPI
+]);

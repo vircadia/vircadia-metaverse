@@ -12,49 +12,49 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
 
-import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
-import { accountFromAuthToken } from '@Route-Tools/middleware';
-import { IsNullOrEmpty } from '@Tools/Misc';
-import { Accounts } from '@Entities/Accounts';
+import { setupMetaverseAPI, finishMetaverseAPI } from "@Route-Tools/middleware";
+import { accountFromAuthToken } from "@Route-Tools/middleware";
+import { IsNullOrEmpty } from "@Tools/Misc";
+import { Accounts } from "@Entities/Accounts";
 
 const procGetUserLocker: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
     if (req.vAuthAccount) {
         if (IsNullOrEmpty(req.vAuthAccount.locker)) {
             req.vRestResp.Data = {};  // legacy code wants something back
-        }
-        else {
+        } else {
             req.vRestResp.Data = req.vAuthAccount.locker;
-        };
+        }
+    } else {
+        req.vRestResp.respondFailure(req.vAccountError ?? "Not logged in");
     }
-    else {
-        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-    };
 
     next();
 };
 const procPostUserLocker: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
     if (req.vAuthAccount) {
-        await Accounts.updateEntityFields(req.vAuthAccount, { 'locker': req.body } );
+        await Accounts.updateEntityFields(req.vAuthAccount, { "locker": req.body });
+    } else {
+        req.vRestResp.respondFailure(req.vAccountError ?? "Not logged in");
     }
-    else {
-        req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-    };
     next();
 };
 
-export const name = '/api/v1/user/locker';
+export const name = "/api/v1/user/locker";
 
 export const router = Router();
 
-router.get(   '/api/v1/user/locker', [ setupMetaverseAPI,
-                                      accountFromAuthToken,
-                                      procGetUserLocker,
-                                      finishMetaverseAPI ] );
-router.post(  '/api/v1/user/locker', [ setupMetaverseAPI,
-                                      accountFromAuthToken,
-                                      procPostUserLocker,
-                                      finishMetaverseAPI ] );
+router.get("/api/v1/user/locker", [
+    setupMetaverseAPI,
+    accountFromAuthToken,
+    procGetUserLocker,
+    finishMetaverseAPI
+]);
+router.post("/api/v1/user/locker", [
+    setupMetaverseAPI,
+    accountFromAuthToken,
+    procPostUserLocker,
+    finishMetaverseAPI
+]);

@@ -11,17 +11,17 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
-'use strict'
 
-import { Config } from '@Base/config';
 
-import { SessionEntity } from '@Entities/SessionEntity';
+import { Config } from "@Base/config";
 
-import { CriteriaFilter } from '@Entities/EntityFilters/CriteriaFilter';
+import { SessionEntity } from "@Entities/SessionEntity";
 
-import { VKeyedCollection } from '@Tools/vTypes';
-import { GenUUID, genRandomString, IsNullOrEmpty } from '@Tools/Misc';
-import { Logger } from '@Tools/Logging';
+import { CriteriaFilter } from "@Entities/EntityFilters/CriteriaFilter";
+
+import { VKeyedCollection } from "@Tools/vTypes";
+import { GenUUID, genRandomString, IsNullOrEmpty } from "@Tools/Misc";
+import { Logger } from "@Tools/Logging";
 
 let _currentSessions: Map<string, SessionEntity>;
 
@@ -33,22 +33,22 @@ export function initSessions(): void {
     _currentSessions = new Map<string, SessionEntity>();
 
     // Expire tokens that have pased their prime
-    setInterval( async () => {
+    setInterval(async () => {
         const timeoutTime = new Date(Date.now() - 1000 * 60 * Config["metaverse-server"]["session-timeout-minutes"]).valueOf();
         const toDelete: SessionEntity[] = [];
-        _currentSessions.forEach( sess => {
+        _currentSessions.forEach((sess) => {
             if (sess.timeOfLastReference.valueOf() < timeoutTime) {
                 toDelete.push(sess);
             }
         });
         if (toDelete.length > 0) {
             Logger.debug(`Session.Expiration: expired ${toDelete.length} sessions`);
-            toDelete.forEach( sess => {
-                _currentSessions.delete(sess.senderKey);
+            toDelete.forEach((sess) => {
+                _currentSessions["delete"](sess.senderKey);
             });
-        };
-    }, 1000 * 60 * 2 );
-};
+        }
+    }, 1000 * 60 * 2);
+}
 
 export const Sessions = {
     // Create a new AuthToken.
@@ -61,7 +61,7 @@ export const Sessions = {
         return aSession;
     },
     getSessionWithSessionId(pSessionId: string): SessionEntity {
-        _currentSessions.forEach( sess => {
+        _currentSessions.forEach((sess) => {
             if (pSessionId === sess.id) {
                 return sess;
             }
@@ -71,12 +71,12 @@ export const Sessions = {
     getSessionWithSenderKey(pSenderKey: string): SessionEntity {
         return _currentSessions.get(pSenderKey);
     },
-    addSession(pSessionEntity: SessionEntity) : SessionEntity {
+    addSession(pSessionEntity: SessionEntity): SessionEntity {
         _currentSessions.set(pSessionEntity.senderKey, pSessionEntity);
         return pSessionEntity;
     },
-    removeSession(pSessionEntity: SessionEntity) : void {
-        _currentSessions.delete(pSessionEntity.senderKey);
+    removeSession(pSessionEntity: SessionEntity): void {
+        _currentSessions["delete"](pSessionEntity.senderKey);
     },
     // touch a session to not that it has been used
     touchSession(pSession: SessionEntity): void {
@@ -92,13 +92,10 @@ export const Sessions = {
             if (pFilter) {
                 if (pFilter.criteriaTest(sess)) {
                     yield sess;
-                };
-            }
-            else {
+                }
+            } else {
                 yield sess;
-            };
-        };
-    },
+            }
+        }
+    }
 };
-
-

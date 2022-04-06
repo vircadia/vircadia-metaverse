@@ -11,9 +11,9 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
-'use strict'
 
-import { Entity } from '@Entities/Entity';
+
+import { Entity } from "@Entities/Entity";
 
 // NOTE: this class cannot have functions in them as they are just JSON to and from the database
 export class AccountEntity implements Entity {
@@ -56,4 +56,4 @@ export class AccountEntity implements Entity {
     public IPAddrOfCreator: string;   // IP address that created this account
     public whenCreated: Date;  // date of account creation
     public timeOfLastHeartbeat: Date; // when we last heard from this user
-};
+}

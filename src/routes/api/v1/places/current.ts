@@ -12,28 +12,27 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
 
-import Config from '@Base/config';
+import Config from "@Base/config";
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI, param1FromParams, placeFromParams } from '@Route-Tools/middleware';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
+import { setupMetaverseAPI, finishMetaverseAPI, param1FromParams, placeFromParams } from "@Route-Tools/middleware";
 
-import { Tokens } from '@Entities/Tokens';
+import { Tokens } from "@Entities/Tokens";
 
-import { Places } from '@Entities/Places';
+import { Places } from "@Entities/Places";
 
-import { IsNotNullOrEmpty, IsNullOrEmpty } from '@Tools/Misc';
-import { VKeyedCollection } from '@Tools/vTypes';
-import { Logger } from '@Tools/Logging';
+import { IsNotNullOrEmpty, IsNullOrEmpty } from "@Tools/Misc";
+import { VKeyedCollection } from "@Tools/vTypes";
+import { Logger } from "@Tools/Logging";
 
 interface CurrentBody {
-  placeId: string,
-  current_api_key: string,
-  current_attendance: number,
-  current_images: string[],
-  current_info: string
-};
+    placeId: string,
+    current_api_key: string,
+    current_attendance: number,
+    current_images: string[],
+    current_info: string
+}
 
 export const procPostPlaceCurrent: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
     const reqBody = req.body as CurrentBody;
@@ -51,53 +50,46 @@ export const procPostPlaceCurrent: RequestHandler = async (req: Request, resp: R
                         //      the authentication for setting the fields with the special Admin token
                         const specialAuth = Tokens.createSpecialAdminToken();
 
-                        for (const field of [ 'current_attendance', 'current_images', 'current_info']) {
+                        for (const field of ["current_attendance", "current_images", "current_info"]) {
 
                             // If the requestor is setting a value, make sure it's legal before updating
                             if (reqBody.hasOwnProperty(field)) {
                                 const validity = await Places.validateFieldValue(field, req.body[field]);
                                 if (validity.valid) {
                                     await Places.setField(specialAuth, aPlace, field, req.body[field], undefined, updates);
-                                }
-                                else {
+                                } else {
                                     req.vRestResp.respondFailure(`Value for ${field} is not valid: ${validity.reason}`);
-                                };
-                            };
-                        };
+                                }
+                            }
+                        }
                         // Update the database with the new values
                         updates.currentLastUpdateTime = new Date();
                         await Places.updateEntityFields(aPlace, updates);
+                    } else {
+                        req.vRestResp.respondFailure("current_api_key does not match Places key");
                     }
-                    else {
-                        req.vRestResp.respondFailure('current_api_key does not match Places key');
-                    };
+                } else {
+                    req.vRestResp.respondFailure("Place apikey lookup failed");
                 }
-                else {
-                    req.vRestResp.respondFailure('Place apikey lookup failed');
-                };
+            } else {
+                req.vRestResp.respondFailure("Place specified by placeId does not exist");
             }
-            else {
-                req.vRestResp.respondFailure('Place specified by placeId does not exist');
-            };
+        } else {
+            req.vRestResp.respondFailure("No current_api_key");
         }
-        else {
-            req.vRestResp.respondFailure('No current_api_key');
-        };
+    } else {
+        req.vRestResp.respondFailure("No placeId");
     }
-    else {
-        req.vRestResp.respondFailure('No placeId');
-    };
     next();
 };
 
-export const name = '/api/v1/places/current';
+export const name = "/api/v1/places/current";
 
 export const router = Router();
 
-router.post(   '/api/v1/places/current',
-                                     [ setupMetaverseAPI,   // req.vRESTResp
-                                      procPostPlaceCurrent,
-                                      finishMetaverseAPI ] );
-
-
-
+router.post("/api/v1/places/current",
+    [
+        setupMetaverseAPI,   // req.vRESTResp
+        procPostPlaceCurrent,
+        finishMetaverseAPI
+    ]);

@@ -12,46 +12,44 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
-import { accountFromAuthToken, accountFromParams } from '@Route-Tools/middleware';
-import { buildLocationInfo } from '@Route-Tools/Util';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
+import { setupMetaverseAPI, finishMetaverseAPI } from "@Route-Tools/middleware";
+import { accountFromAuthToken, accountFromParams } from "@Route-Tools/middleware";
+import { buildLocationInfo } from "@Route-Tools/Util";
 
-import { Perm } from '@Route-Tools/Perm';
-import { checkAccessToEntity } from '@Route-Tools/Permissions';
+import { Perm } from "@Route-Tools/Perm";
+import { checkAccessToEntity } from "@Route-Tools/Permissions";
 
 const procGetUserLocation: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-  if (req.vAuthAccount) {
-    if (req.vAccount) {
-      if (await checkAccessToEntity(req.vAuthToken, req.vAccount,
-                          [ Perm.OWNER, Perm.FRIEND, Perm.CONNECTION, Perm.ADMIN ], req.vAuthAccount)) {
-        req.vRestResp.Data = {
-          'location': await buildLocationInfo(req.vAccount)
-        };
-      }
-      else {
-        req.vRestResp.respondFailure('unauthorized');
-      }
+    if (req.vAuthAccount) {
+        if (req.vAccount) {
+            if (await checkAccessToEntity(req.vAuthToken, req.vAccount,
+                [Perm.OWNER, Perm.FRIEND, Perm.CONNECTION, Perm.ADMIN], req.vAuthAccount)) {
+                req.vRestResp.Data = {
+                    "location": await buildLocationInfo(req.vAccount)
+                };
+            } else {
+                req.vRestResp.respondFailure("unauthorized");
+            }
+        } else {
+            req.vRestResp.respondFailure("target account not found");
+        }
+    } else {
+        req.vRestResp.respondFailure(req.vAccountError ?? "Not logged in");
     }
-    else {
-      req.vRestResp.respondFailure('target account not found');
-    };
-  }
-  else {
-    req.vRestResp.respondFailure(req.vAccountError ?? 'Not logged in');
-  };
-  next();
+    next();
 };
 
-export const name = '/api/v1/users/:accountId/location';
+export const name = "/api/v1/users/:accountId/location";
 
 export const router = Router();
 
 // Note the user of :accountId which looks up the username
-router.get(   '/api/v1/users/:accountId/location', [ setupMetaverseAPI,   // req.vRESTReq
-                                                    accountFromAuthToken, // req.vAuthAccount
-                                                    accountFromParams,    // req.vAccount
-                                                    procGetUserLocation,
-                                                    finishMetaverseAPI ]);
+router.get("/api/v1/users/:accountId/location", [
+    setupMetaverseAPI,   // req.vRESTReq
+    accountFromAuthToken, // req.vAuthAccount
+    accountFromParams,    // req.vAccount
+    procGetUserLocation,
+    finishMetaverseAPI
+]);

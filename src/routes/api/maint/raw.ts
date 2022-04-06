@@ -12,19 +12,18 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict'
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI } from '@Route-Tools/middleware';
-import { accountFromAuthToken } from '@Route-Tools/middleware';
-import { param1FromParams, param2FromParams, param3FromParams } from '@Route-Tools/middleware';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
+import { setupMetaverseAPI, finishMetaverseAPI } from "@Route-Tools/middleware";
+import { accountFromAuthToken } from "@Route-Tools/middleware";
+import { param1FromParams, param2FromParams, param3FromParams } from "@Route-Tools/middleware";
 
-import { GenericFilter } from '@Entities/EntityFilters/GenericFilter';
-import { getObject } from '@Tools/Db';
+import { GenericFilter } from "@Entities/EntityFilters/GenericFilter";
+import { getObject } from "@Tools/Db";
 
-import { Accounts } from '@Entities/Accounts';
-import { SimpleObject } from '@Tools/Misc';
-import { Logger } from '@Tools/Logging';
+import { Accounts } from "@Entities/Accounts";
+import { SimpleObject } from "@Tools/Misc";
+import { Logger } from "@Tools/Logging";
 
 // A maint function for admin account that lets one get any object in any collection
 const procMaintRaw: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
@@ -36,30 +35,26 @@ const procMaintRaw: RequestHandler = async (req: Request, resp: Response, next: 
                 const value = req.vParam3;
                 const criteria = new GenericFilter(SimpleObject(field, value));
                 req.vRestResp.Data = await getObject(collection, criteria);
+            } else {
+                req.vRestResp.respondFailure("parameters missing");
             }
-            else {
-                req.vRestResp.respondFailure('parameters missing');
-            };
+        } else {
+            req.vRestResp.respondFailure("not admin");
         }
-        else {
-            req.vRestResp.respondFailure('not admin');
-        };
-    };
+    }
     next();
 };
 
-export const name = '/api/maint/raw/';
+export const name = "/api/maint/raw/";
 
 export const router = Router();
 
-router.get('/api/maint/raw/:param1/:param2/:param3', [ setupMetaverseAPI,
-                                          accountFromAuthToken,
-                                          param1FromParams,
-                                          param2FromParams,
-                                          param3FromParams,
-                                          procMaintRaw,
-                                          finishMetaverseAPI ] );
-
-
-
-
+router.get("/api/maint/raw/:param1/:param2/:param3", [
+    setupMetaverseAPI,
+    accountFromAuthToken,
+    param1FromParams,
+    param2FromParams,
+    param3FromParams,
+    procMaintRaw,
+    finishMetaverseAPI
+]);

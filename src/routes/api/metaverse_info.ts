@@ -12,25 +12,24 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
 
-import { Router, RequestHandler, Request, Response, NextFunction } from 'express';
-import { setupMetaverseAPI, finishMetaverseAPI, finishReturnData } from '@Route-Tools/middleware';
+import { Router, RequestHandler, Request, Response, NextFunction } from "express";
+import { setupMetaverseAPI, finishMetaverseAPI, finishReturnData } from "@Route-Tools/middleware";
 
-import { Config, readInJSON } from '@Base/config';
+import { Config, readInJSON } from "@Base/config";
 
-import { Logger } from '@Tools/Logging';
-import { IsNotNullOrEmpty } from '@Tools/Misc';
+import { Logger } from "@Tools/Logging";
+import { IsNotNullOrEmpty } from "@Tools/Misc";
 
-import deepmerge from 'deepmerge';
+import deepmerge from "deepmerge";
 
 const procMetaverseInfo: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
-    let data:any = {
-        'metaverse_name': Config.metaverse["metaverse-name"],
-        'metaverse_nick_name': Config.metaverse["metaverse-nick-name"],
-        'metaverse_url': Config.metaverse["metaverse-server-url"],
-        'ice_server_url': Config.metaverse["default-ice-server-url"],
-        'metaverse_server_version': Config.server["server-version"],
+    let data: any = {
+        "metaverse_name": Config.metaverse["metaverse-name"],
+        "metaverse_nick_name": Config.metaverse["metaverse-nick-name"],
+        "metaverse_url": Config.metaverse["metaverse-server-url"],
+        "ice_server_url": Config.metaverse["default-ice-server-url"],
+        "metaverse_server_version": Config.server["server-version"]
     };
 
     // If the additional information file exists, read and include the contents
@@ -40,12 +39,11 @@ const procMetaverseInfo: RequestHandler = async (req: Request, resp: Response, n
             const additional = await readInJSON(additionUrl);
             if (IsNotNullOrEmpty(additional)) {
                 data = deepmerge(data, additional);
-            };
-        };
-    }
-    catch (err) {
+            }
+        }
+    } catch (err) {
         Logger.error(`procMetaverseInfo: exception reading additional info file: ${err}`);
-    };
+    }
 
     req.vRestResp.Data = data;
     next();
@@ -55,9 +53,13 @@ export const name = "/api/v1/metaverse_info";
 
 export const router = Router();
 
-router.get( '/api/metaverse_info',    [ setupMetaverseAPI,
-                                        procMetaverseInfo,
-                                        finishReturnData ] );
-router.get( '/api/v1/metaverse_info', [ setupMetaverseAPI,
-                                        procMetaverseInfo,
-                                        finishReturnData ] );
+router.get("/api/metaverse_info", [
+    setupMetaverseAPI,
+    procMetaverseInfo,
+    finishReturnData
+]);
+router.get("/api/v1/metaverse_info", [
+    setupMetaverseAPI,
+    procMetaverseInfo,
+    finishReturnData
+]);
