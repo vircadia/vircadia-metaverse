@@ -22,6 +22,7 @@ import config from '../appconfig';
 import { AccountInterface } from '../common/interfaces/AccountInterface';
 import { Roles } from '../common/sets/Roles';
 import { SArray } from './vTypes';
+import { blackListedMail } from './blacklistArray';
 
 // The legacy interface returns public keys as a stripped PEM key.
 // "stripped" in that the bounding "BEGIN" and "END" lines have been removed.
@@ -105,9 +106,21 @@ export function dateWhenNotActive(): Date {
 }
 
 export function isValidateEmail(email: string): boolean {
-    const emailRegexp =
-        /^[a-zA-Z0-9.!#$%&'+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)$/;
-    return emailRegexp.test(email);
+    const regex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@/;
+    const emailBeforeAt = email.match(regex);
+
+    try {
+        const emailDomain = email.split('@')[1].toLowerCase();
+        if (!blackListedMail.includes(emailDomain) && emailBeforeAt) {
+            return true;
+        }
+    } catch (e) {}
+    return false;
+}
+
+export function isValidateUsername(username: string): boolean {
+    const usernameRegexp = /^[a-zA-Z0-9.\-_$@*!]{2,30}$/;
+    return usernameRegexp.test(username);
 }
 
 export function getUtcDate(): Date {
@@ -184,4 +197,3 @@ export const isValidArray = (arr: any[]): boolean => {
 export const isValidObject = (obj: any): boolean => {
     return obj && Object.keys(obj).length > 0;
 };
-

@@ -45,6 +45,7 @@ import {
     isValidateEmail,
     getGameUserLevel,
     getUtcDate,
+    isValidateUsername,
 } from '../../utils/Utils';
 import { messages } from '../../utils/messages';
 
@@ -87,10 +88,7 @@ export class Users extends DatabaseService {
      *
      */
     async create(data: any): Promise<any> {
-        const username: string = data.username
-            .toString()
-            .trim()
-            .replace(/ /g, '');
+        const username: string = data.username.toString().trim();
 
         const email: string = data.email;
         const password: string = data.password;
@@ -101,7 +99,7 @@ export class Users extends DatabaseService {
         const bio: string = data.bio ?? '';
 
         if (isValidateEmail(email)) {
-            if (username) {
+            if (isValidateUsername(username)) {
                 const accountsName: AccountInterface[] =
                     await this.findDataToArray(config.dbCollections.accounts, {
                         query: { username: username },
@@ -400,4 +398,3 @@ export class Users extends DatabaseService {
         }
     }
 }
-

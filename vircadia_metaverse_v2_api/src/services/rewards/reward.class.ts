@@ -251,11 +251,18 @@ export class RewardItem extends DatabaseService {
                 const { id: userId } = loginUser; // user id
 
                 // check today user has already claimed reward or not
+
+                const rewardCount = await this.findData(
+                    config.dbCollections.rewardItems,
+                    { query: { userId: userId } }
+                );
+
                 const rewardList: any[] = await this.findDataToArray(
                     config.dbCollections.rewardItems,
                     {
                         query: {
                             userId: userId,
+                            $limit: rewardCount.total,
                         },
                     }
                 );
