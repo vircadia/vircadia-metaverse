@@ -123,15 +123,6 @@ const metaverseServer = {
     inventoryItemMasterDataFile: './master_data/inventory_items.json',
     questItemMasterDataFile: './master_data/quest_items.json',
     npcMasterDataFile: './master_data/npc.json',
-    // goobieBody: './goobie/body/',
-    // goobieLeftEye: './goobie/left_eye/',
-    // goobieRightEye: './goobie/right_eye/',
-    // goobieLeftArm: './goobie/left_arm/',
-    // goobieRightArm: './goobie/right_arm/',
-    // goobieLeftPupil: './goobie/left_pupil/',
-    // goobieRightPupil: './goobie/right_pupil/',
-    // goobieMouth: './goobie/mouth/',
-    // goobieTemp: './goobie/temp/',
 };
 
 /**

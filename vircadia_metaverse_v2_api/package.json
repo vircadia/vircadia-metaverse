@@ -1,18 +1,18 @@
 {
-    "name": "goobie-verse",
-    "description": "Goobieverse",
-    "version": "0.0.1",
-    "homepage": "",
+    "name": "metaverse-server",
+    "description": "Metaverse server for Vircadia.",
+    "version": "2.0.0",
     "private": true,
     "main": "src",
     "keywords": [
-        "feathers"
+        "Vircadia",
+        "virtual world"
     ],
-    "author": {
-        "name": "",
-        "email": ""
-    },
-    "contributors": [],
+    "author": "Robert Adams <misterblue@misterblue.com>",
+    "contributors": [
+        "Robert Adams",
+        "Vircadia contributors"
+    ],
     "bugs": {},
     "directories": {
         "lib": "src",
