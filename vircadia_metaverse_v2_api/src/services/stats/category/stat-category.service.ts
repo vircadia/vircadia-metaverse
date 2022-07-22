@@ -35,6 +35,7 @@ export default (app: Application) => {
 
     // Initialize our service with any options it requires
     app.use('/stats/category', new StatCategory(options, app));
+    app.use('api/v1/stats/category', app.service('stats/category'));
 
     // Get our initialized service so that we can register hooks
     const service = app.service('stats/category');

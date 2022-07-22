@@ -14,8 +14,10 @@
 
 'use strict';
 
+import addOldToken from './hooks/addOldToken';
 // Application hooks that run for every service
 // Don't remove this comment. It's needed to format import lines nicely.
+import storeAuthTokenInRedis from './hooks/storeAuthTokenInRedis';
 
 export default {
     before: {
@@ -29,10 +31,10 @@ export default {
     },
 
     after: {
-        all: [],
+        all: [storeAuthTokenInRedis()],
         find: [],
         get: [],
-        create: [],
+        create: [addOldToken()],
         update: [],
         patch: [],
         remove: [],

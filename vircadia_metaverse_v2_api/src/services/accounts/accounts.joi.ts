@@ -25,21 +25,25 @@ const country = Joi.string().trim();
 const achievementId = Joi.string().trim();
 const ethereumAddress = Joi.string().trim();
 
-
 const images = Joi.object({
     hero,
     tiny,
     thumbnail,
 });
+const accounts = Joi.object()
+    .keys({
+        email,
+        public_key,
+        bio,
+        images,
+        country,
+        achievementId,
+        ethereumAddress,
+    })
+    .required();
 
 export const patchAccountsSchema = Joi.object().keys({
-    email,
-    public_key,
-    bio,
-    images,
-    country,
-    achievementId,
-    ethereumAddress
+    accounts,
 });
 
 const a = Joi.string().trim();
@@ -68,11 +72,12 @@ export const joiOptions = { convert: true, abortEarly: false };
 
 export const joiReadOptions = {
     getContext(context: HookContext) {
-        return context.params.query;
+        return context.params?.query ?? {};
     },
     setContext(context: HookContext, newValues: any) {
-        Object.assign(context.params.query, newValues);
+        Object.assign(context.params?.query ?? {}, newValues);
     },
     convert: true,
     abortEarly: false,
 };
+

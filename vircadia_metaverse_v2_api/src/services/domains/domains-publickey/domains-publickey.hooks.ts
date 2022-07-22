@@ -33,8 +33,8 @@ export default {
         find: [validators.form(findDomainPublickeySchema, joiReadOptions)],
         get: [disallow()],
         create: [disallow()],
-        update: [disallow()],
-        patch: [validators.form(editDomainPublickeySchema, joiOptions)],
+        update: [validators.form(editDomainPublickeySchema, joiOptions)],
+        patch: [disallow()],
         remove: [disallow()],
     },
 

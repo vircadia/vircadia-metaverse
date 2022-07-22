@@ -79,4 +79,3 @@ export class Stat extends DatabaseService {
         }
     }
 }
-

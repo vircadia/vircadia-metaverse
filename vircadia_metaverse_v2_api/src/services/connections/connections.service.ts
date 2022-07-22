@@ -35,6 +35,7 @@ export default function (app: Application): void {
 
     // Initialize our service with any options it requires
     app.use('/connections', new Connections(options, app));
+    app.use('api/v1/user/connections', app.service('connections'));
 
     // Get our initialized service so that we can register hooks
     const service = app.service('connections');

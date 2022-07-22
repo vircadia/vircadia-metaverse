@@ -17,4 +17,7 @@
 import Quest from './quest/quest.service';
 import QuestItem from './quest-item/quest-item.service';
 import Npc from './npc/npc.service';
-export default [Quest, QuestItem, Npc];
+import MiniGame from './mini_game/mini_game.service';
+import MiniGameQuest from './mini_game_quest/minigame_quest.service';
+export default [Quest, QuestItem, Npc, MiniGame, MiniGameQuest];
+

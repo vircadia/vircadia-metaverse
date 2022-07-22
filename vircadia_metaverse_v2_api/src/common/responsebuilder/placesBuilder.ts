@@ -54,6 +54,7 @@ export async function buildLocationInfo(
         }
     }
     ret.node_id = pAcct.locationNodeId;
+    ret.path = pAcct.locationPath;
     ret.online = isOnline(pAcct);
     return ret;
 }
@@ -171,4 +172,3 @@ export async function buildPlacesForDomain(
     }
     return ret;
 }
-

@@ -34,6 +34,7 @@ import channels from './channels';
 import { HookContext as FeathersHookContext } from '@feathersjs/feathers';
 import authentication from './authentication';
 import mongodb from './mongodb';
+import socketio from '@feathersjs/socketio';
 
 // Don't remove this comment. It's needed to format import lines nicely.
 
@@ -69,8 +70,11 @@ app.use('/', express.static(app.get('public')));
 
 // Set up Plugins and providers
 app.configure(express.rest());
-// app.configure(socketio());
-
+app.configure(
+    socketio(function (io) {
+        io.sockets.setMaxListeners(0);
+    })
+);
 app.configure(mongodb);
 
 // Configure other middleware (see `middleware/index.ts`)

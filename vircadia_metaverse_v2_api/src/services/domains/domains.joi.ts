@@ -33,19 +33,24 @@ const heartbeat = Joi.object({
     num_users,
     anon_users,
 });
+const domain = Joi.object()
+    .keys({
+        name,
+        version,
+        protocol,
+        network_address,
+        restricted,
+        capacity,
+        description,
+        maturity,
+        restriction,
+        managers,
+        tags,
+        heartbeat,
+    })
+    .required();
 export const editDomainSchema = Joi.object().keys({
-    name,
-    version,
-    protocol,
-    network_address,
-    restricted,
-    capacity,
-    description,
-    maturity,
-    restriction,
-    managers,
-    tags,
-    heartbeat,
+    domain,
 });
 
 const per_page = Joi.number().integer().positive();
@@ -64,11 +69,12 @@ export const joiOptions = { convert: true, abortEarly: false };
 
 export const joiReadOptions = {
     getContext(context: HookContext) {
-        return context.params.query;
+        return context.params?.query ?? {};
     },
     setContext(context: HookContext, newValues: any) {
-        Object.assign(context.params.query, newValues);
+        Object.assign(context.params?.query ?? {}, newValues);
     },
     convert: true,
     abortEarly: false,
 };
+

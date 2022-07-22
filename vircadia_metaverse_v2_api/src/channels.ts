@@ -17,6 +17,8 @@
 import '@feathersjs/transport-commons';
 import { HookContext } from '@feathersjs/feathers';
 import { Application } from './declarations';
+import { authRepository } from './redis';
+import { IsNotNullOrEmpty } from './utils/Misc';
 
 export default function (app: Application): void {
     if (typeof app.channel !== 'function') {
@@ -55,6 +57,21 @@ export default function (app: Application): void {
             // app.channel(`userIds/${user.id}`).join(connection);
         }
     });
+
+    app.on(
+        'logout',
+        async (authResult: any, { connection }: any): Promise<any> => {
+            const authToken: any = await authRepository
+                .search()
+                .where('token')
+                .equals(authResult.accessToken)
+                .returnAll();
+
+            if (IsNotNullOrEmpty(authToken)) {
+                await authRepository.remove(authToken[0].entityId);
+            }
+        }
+    );
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     app.publish((data: any, hook: HookContext) => {

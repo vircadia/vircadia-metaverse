@@ -35,11 +35,13 @@ export default function (app: Application): void {
 
     // Initialize our service with any options it requires
     app.use('/domainsField', new DomainsFeild(options, app));
-    app.use('/domains/:domainId/field/:fieldName', app.service('domainsField'));
+    app.use(
+        'api/v1/domains/:domainId/field/:fieldName',
+        app.service('domainsField')
+    );
 
     // Get our initialized service so that we can register hooks
     const service = app.service('domainsField');
 
     service.hooks(hooks);
 }
-

@@ -1,4 +1,5 @@
 //   Copyright 2020 Vircadia Contributors
+//   Copyright 2022 DigiSomni LLC.
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -113,8 +114,11 @@ export const messages = {
     common_messages_quest_not_accepted: 'Quest is not accepted.',
     common_messages_inventory_requirement_not_fulfill:
         'Inventory requirement not fulfill.',
+    common_messages_minigame_requirement_not_fulfill:
+        'Mini game requirement not fulfill.',
     common_messages_quest_id_already_exist: 'Quest item id is already exist.',
     common_messages_npc_id_already_exist: 'Npc id is already exist.',
+    common_messages_minigame_id_already_exist: 'Minigame id is already exist.',
     common_messages_master_data_init_success: 'Master data init successfully.',
     common_messages_inventory_item_id_already_exist:
         'Inventory item id is already exist.',
@@ -159,4 +163,37 @@ export const messages = {
         'The amount exceeds available game balance',
     common_messages_no_ethereum_address:
         'The user does not have Ethereum address associated',
+    common_messages_play_minigame: 'Play minigame to complete quest',
+    common_messages_minigame_not_associated:
+        'Mini game not associated with quest',
+    common_messages_minigame_not_associated_questItem:
+        'Mini game not associated with quest item',
+    commmon_messages_minigame_not_found: 'Mini game not found',
+    common_messages_bone_structure_not_found: 'Goobie bone structure not found',
+    error_joi_messages_visibility: {
+        'string.base': 'Visibility must be a string',
+        'string.empty': 'Visibility is not allowed to be empty',
+    },
+    error_joi_messages_maturity: {
+        'string.base': 'Maturity must be a string',
+        'string.empty': 'Maturity is not allowed to be empty',
+    },
+    error_joi_messages_restiction: {
+        'string.base': 'Restriction must be a string',
+        'string.empty': 'Restriction is not allowed to be empty',
+    },
+    error_joi_messages_domainId: {
+        'string.base': 'Domain Id must be a string',
+        'string.empty': 'Domain is not allowed to be empty',
+    },
+    error_joi_messages_email: {
+        'string.base': 'Email address must be a string',
+        'string.empty': 'Email is not allowed to be empty',
+        'string.email': 'Email must be a valid email',
+    },
+    error_joi_messages_number: {
+        'number.base': 'Value must be a number',
+        'number.integer': 'Value must be a number',
+        'number.positive': 'Value must be a positive number',
+    },
 };

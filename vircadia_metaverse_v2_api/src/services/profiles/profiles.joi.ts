@@ -25,10 +25,10 @@ export const findProfileSchema = Joi.object({
 
 export const joiReadOptions = {
     getContext(context: HookContext) {
-        return context.params.query;
+        return context.params?.query ?? {};
     },
     setContext(context: HookContext, newValues: any) {
-        Object.assign(context.params.query, newValues);
+        Object.assign(context.params?.query ?? {}, newValues);
     },
     convert: true,
     abortEarly: false,

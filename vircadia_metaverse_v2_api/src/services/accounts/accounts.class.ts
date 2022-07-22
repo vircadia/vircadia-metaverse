@@ -126,7 +126,7 @@ export class Accounts extends DatabaseService {
             const page = parseInt(params?.query?.page) || 1;
             const skip = (page - 1) * perPage;
 
-            let asAdmin = params?.query?.asAdmin === 'true' ? true : false;
+            let asAdmin = params?.query?.asAdmin == true ? true : false;
             const filter: string[] = (params?.query?.filter ?? '').split(',');
             const status: string = params?.query?.status ?? '';
             const targetAccount = params?.query?.account ?? '';
@@ -136,8 +136,8 @@ export class Accounts extends DatabaseService {
             if (
                 asAdmin &&
                 IsNotNullOrEmpty(loginUser) &&
-                isAdmin(loginUser as AccountInterface) &&
-                IsNullOrEmpty(targetAccount)
+                isAdmin(loginUser as AccountInterface) 
+                // && IsNullOrEmpty(targetAccount)
             ) {
                 asAdmin = true;
             } else {
@@ -203,7 +203,7 @@ export class Accounts extends DatabaseService {
             );
             return Promise.resolve(
                 buildPaginationResponse(
-                    accounts,
+                    { accounts },
                     page,
                     perPage,
                     Math.ceil(accountData.total / perPage),
@@ -236,7 +236,7 @@ export class Accounts extends DatabaseService {
         );
         if (IsNotNullOrEmpty(objAccount)) {
             const account = await buildAccountInfo(objAccount);
-            return Promise.resolve(buildSimpleResponse(account));
+            return Promise.resolve(buildSimpleResponse({ account }));
         } else {
             throw new BadRequest(
                 messages.common_messages_target_account_notfound
@@ -266,7 +266,7 @@ export class Accounts extends DatabaseService {
                     isAdmin(loginUser as AccountInterface)) ||
                 id === loginUser.id
             ) {
-                const valuesToSet = data ?? {};
+                const valuesToSet = data.accounts ?? {};
                 const updates: VKeyedCollection = {};
                 if (IsNotNullOrEmpty(valuesToSet.email)) {
                     if (!isValidateEmail(valuesToSet.email)) {
@@ -404,6 +404,10 @@ export class Accounts extends DatabaseService {
                 messages.common_messages_target_account_notfound
             );
         }
+    }
+
+    async create(data: any, params?: Params | undefined): Promise<any> {
+        return Promise.resolve(data);
     }
 }
 

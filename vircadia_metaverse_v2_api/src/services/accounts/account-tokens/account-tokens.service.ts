@@ -36,7 +36,8 @@ export default function (app: Application): void {
 
     // Initialize our service with any options it requires
     app.use('/accountTokens', new AccountTokens(options, app));
-    app.use('/account/:accountId/tokens', app.service('accountTokens'));
+
+    app.use('/api/v1/account/:accountId/tokens', app.service('accountTokens'));
 
     // Get our initialized service so that we can register hooks
     const service = app.service('accountTokens');

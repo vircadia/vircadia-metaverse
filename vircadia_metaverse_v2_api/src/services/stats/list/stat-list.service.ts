@@ -36,6 +36,7 @@ export default (app: Application) => {
     initMonitoring();
     // Initialize our service with any options it requires
     app.use('/stats/list', new StatList(options, app));
+    app.use('api/v1/stats/list', app.service('stats/list'));
 
     // Get our initialized service so that we can register hooks
     const service = app.service('stats/list');

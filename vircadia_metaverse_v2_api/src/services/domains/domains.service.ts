@@ -35,10 +35,10 @@ export default function (app: Application): void {
 
     // Initialize our service with any options it requires
     app.use('/domains', new Domains(options, app));
+    app.use('/api/v1/domains', app.service('domains'));
 
     // Get our initialized service so that we can register hooks
     const service = app.service('domains');
 
     service.hooks(hooks);
 }
-

@@ -31,6 +31,7 @@ import {
     joiOptions,
     joiReadOptions,
 } from './accounts.joi';
+import app from '../../app';
 
 export default {
     before: {
@@ -47,7 +48,18 @@ export default {
                 Perm.ADMIN,
             ]),
         ],
-        create: [disallow()],
+        create: [
+            async (context: any) => {
+                const data = context.data;
+                const accountId = context.params.route.accountId;
+                const params = context.params;
+                const response = await app
+                    .service('accounts')
+                    .patch(accountId, data, params);
+                context.data = response;
+                return Promise.resolve(context);
+            },
+        ],
         update: [disallow()],
         patch: [
             authenticate('jwt'),
@@ -63,7 +75,14 @@ export default {
         all: [requestSuccess()],
         find: [],
         get: [],
-        create: [],
+        create: [
+            async (context: any) => {
+                if (context.result.status === 'failure') {
+                    context.statusCode = 400;
+                }
+                return Promise.resolve(context);
+            },
+        ],
         update: [],
         patch: [],
         remove: [],
@@ -79,4 +98,3 @@ export default {
         remove: [],
     },
 };
-

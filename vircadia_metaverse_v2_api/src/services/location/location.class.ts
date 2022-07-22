@@ -25,6 +25,8 @@ import { BadRequest, NotAuthenticated } from '@feathersjs/errors';
 import { buildSimpleResponse } from '../../common/responsebuilder/responseBuilder';
 import { extractLoggedInUserFromParams } from '../auth/auth.utils';
 import { messages } from '../../utils/messages';
+import { Perm } from '../../utils/Perm';
+import { checkAccessToEntity } from '../../utils/Permissions';
 
 /**
  * Location.
@@ -136,13 +138,28 @@ export class Location extends DatabaseService {
 
     async find(params?: any): Promise<any> {
         const loginUser = extractLoggedInUserFromParams(params);
+        const accountId = params.route?.accountId;
+
+        const accountEntity = await this.getData(
+            config.dbCollections.accounts,
+            accountId
+        );
+
         if (loginUser) {
-            const domain = await this.getData(
-                config.dbCollections.domains,
-                loginUser.locationDomainId
-            );
-            const location = await buildLocationInfo(loginUser, domain);
-            return Promise.resolve(buildSimpleResponse({ location }));
+            if (
+                await checkAccessToEntity(
+                    [Perm.OWNER, Perm.FRIEND, Perm.CONNECTION, Perm.ADMIN],
+                    loginUser,
+                    accountEntity
+                )
+            ) {
+                const domain = await this.getData(
+                    config.dbCollections.domains,
+                    loginUser.locationDomainId
+                );
+                const location = await buildLocationInfo(loginUser, domain);
+                return Promise.resolve(buildSimpleResponse({ location }));
+            }
         } else {
             throw new NotAuthenticated(messages.common_messages_not_logged_in);
         }

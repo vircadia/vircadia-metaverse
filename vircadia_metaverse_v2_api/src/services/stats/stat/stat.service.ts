@@ -35,10 +35,10 @@ export default (app: Application) => {
 
     // Initialize our service with any options it requires
     app.use('/stats/stat', new Stat(options, app));
+    app.use('api/v1/stats/stat', app.service('stats/stat'));
 
     // Get our initialized service so that we can register hooks
     const service = app.service('stats/stat');
 
     service.hooks(hooks);
 };
-

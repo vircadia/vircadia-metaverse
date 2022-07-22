@@ -56,7 +56,12 @@ export default function (app: Application): void {
         },
         new AccountPublickey(options, app)
     );
-    app.use('user/:accountId/public_key', app.service('user/public_key'));
+    app.use('api/v1/user/public_key', app.service('user/public_key'));
+
+    app.use(
+        'api/v1/users/:accountId/public_key',
+        app.service('user/public_key')
+    );
 
     // Get our initialized service so that we can register hooks
     const service = app.service('user/public_key');

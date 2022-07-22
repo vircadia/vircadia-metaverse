@@ -56,7 +56,12 @@ export default function (app: Application): void {
     // Initialize our service with any options it requires
     app.use('/accounts', new Accounts(options, app));
 
-    app.use('/accounts/verify/email', app.service('accounts'), redirect);
+    app.use('/api/v1/accounts', app.service('accounts'));
+
+    app.use('/api/v1/account', app.service('accounts'));
+    app.use('/api/v1/account/:accountId', app.service('accounts'));
+
+    app.use('/api/v1/accounts/verify/email', app.service('accounts'), redirect);
 
     // Get our initialized service so that we can register hooks
     const service = app.service('accounts');

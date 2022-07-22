@@ -15,8 +15,8 @@
 import { HookContext } from '@feathersjs/feathers';
 import Joi from '@hapi/joi';
 
-const domainId = Joi.string().trim().required();
-const api_key = Joi.string().trim().required();
+const domainId = Joi.string().trim();
+const api_key = Joi.string().trim();
 
 export const editDomainPublickeySchema = Joi.object().keys({
     api_key,
@@ -30,10 +30,10 @@ export const joiOptions = { convert: true, abortEarly: false };
 
 export const joiReadOptions = {
     getContext(context: HookContext) {
-        return context.params.route;
+        return context.params?.query ?? {};
     },
     setContext(context: HookContext, newValues: any) {
-        Object.assign(context.params.route, newValues);
+        Object.assign(context.params?.query ?? {}, newValues);
     },
     convert: true,
     abortEarly: false,

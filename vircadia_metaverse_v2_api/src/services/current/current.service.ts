@@ -35,6 +35,7 @@ export default function (app: Application): void {
 
     // Initialize our service with any options it requires
     app.use('/current', new Current(options, app));
+    app.use('api/v1/places/current', app.service('current'));
 
     // Get our initialized service so that we can register hooks
     const service = app.service('current');

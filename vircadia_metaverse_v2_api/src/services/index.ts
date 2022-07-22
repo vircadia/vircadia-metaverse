@@ -49,12 +49,18 @@ import domainPublicKey from './domains/domains-publickey/domains-publickey.servi
 import domainTemp from './domains/domains_temp/domains-temp.service';
 import sendVerifyMail from './send_verification_mail/send_verify_mail.service';
 import verfifyUser from './verify_user/verify_user.service';
+import userPlaces from './place/user-places/user-places.service';
+import usersHeartbeat from './user_heartbeat/user_heartbeat.service';
+import tokens from './tokens/tokens.service';
+import oauthToken from './tokens/oauth_token/oauth-token.service';
 import tokenTransfer from './token-transfer/token-transfer.service';
+import ConnectionRequest from './connections_request/connections_request.service';
 
 export default function (app: Application): void {
     app.configure(auth);
     app.configure(users);
     app.configure(friends);
+    app.configure(accountTokens);
     app.configure(profiles);
     app.configure(accounts);
     app.configure(email);
@@ -90,12 +96,16 @@ export default function (app: Application): void {
     app.configure(domainsField);
     app.configure(placesField);
     app.configure(accountField);
-    app.configure(accountTokens);
     app.configure(Explore);
     app.configure(accountPublickey);
     app.configure(domainTemp);
     app.configure(sendVerifyMail);
     app.configure(verfifyUser);
     app.configure(domainPublicKey);
-    app.configure(tokenTransfer);
+    app.configure(userPlaces);
+    app.configure(usersHeartbeat);
+    app.configure(tokens);
+    app.configure(oauthToken);
+    // app.configure(tokenTransfer);
+    app.configure(ConnectionRequest);
 }

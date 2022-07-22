@@ -19,6 +19,6 @@ import { PublicRoutesController } from '../controllers/PublicRoutesController';
 
 const publicRoutes = express.Router();
 
-publicRoutes.get('/metaverse_info', PublicRoutesController().metaverseInfo);
+publicRoutes.get('/api/metaverse_info', PublicRoutesController().metaverseInfo);
 
 export { publicRoutes };

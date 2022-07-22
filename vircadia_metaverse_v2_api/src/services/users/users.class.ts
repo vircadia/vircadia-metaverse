@@ -88,6 +88,7 @@ export class Users extends DatabaseService {
      *
      */
     async create(data: any): Promise<any> {
+        data = data.user;
         const username: string = data.username.toString().trim();
 
         const email: string = data.email;
@@ -214,7 +215,7 @@ export class Users extends DatabaseService {
 
                                     const verificationURL =
                                         config.metaverse.metaverseServerUrl +
-                                        `/api/account/verify/email?a=${account.id}&v=${verifyCode}`;
+                                        `/api/v1/account/verify/email?a=${account.id}&v=${verifyCode}`;
                                     const metaverseName =
                                         config.metaverse.metaverseName;
                                     const shortMetaverseName =
@@ -315,7 +316,7 @@ export class Users extends DatabaseService {
     async find(params?: Params): Promise<any> {
         const loginUser = extractLoggedInUserFromParams(params);
         if (IsNotNullOrEmpty(loginUser)) {
-            let asAdmin = params?.query?.asAdmin === 'true' ? true : false;
+            let asAdmin = params?.query?.asAdmin == true ? true : false;
             const perPage = parseInt(params?.query?.per_page) || 10;
             const page = parseInt(params?.query?.page) || 1;
             const skip = (page - 1) * perPage;
@@ -324,7 +325,9 @@ export class Users extends DatabaseService {
             const filterQuery: any = {};
             const targetAccount = params?.query?.account ?? '';
 
-            if (asAdmin && isAdmin(loginUser) && IsNullOrEmpty(targetAccount)) {
+            if (asAdmin && isAdmin(loginUser) 
+                    // && IsNullOrEmpty(targetAccount)
+                ) {
                 asAdmin = true;
             } else {
                 asAdmin = false;
@@ -398,3 +401,4 @@ export class Users extends DatabaseService {
         }
     }
 }
+

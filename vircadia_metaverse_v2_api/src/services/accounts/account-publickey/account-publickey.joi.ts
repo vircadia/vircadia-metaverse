@@ -25,10 +25,10 @@ export const joiOptions = { convert: true, abortEarly: false };
 
 export const joiReadOptions = {
     getContext(context: HookContext) {
-        return context.params.route;
+        return context.params?.query ?? {};
     },
     setContext(context: HookContext, newValues: any) {
-        Object.assign(context.params.route, newValues);
+        Object.assign(context.params?.query ?? {}, newValues);
     },
     convert: true,
     abortEarly: false,

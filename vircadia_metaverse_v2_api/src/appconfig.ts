@@ -123,6 +123,7 @@ const metaverseServer = {
     inventoryItemMasterDataFile: './master_data/inventory_items.json',
     questItemMasterDataFile: './master_data/quest_items.json',
     npcMasterDataFile: './master_data/npc.json',
+    tokengen_url: '../mailtemplates/DomainTokenLogin.html',
 };
 
 /**
@@ -226,6 +227,7 @@ const dbCollections = {
     npc: 'npc',
     rewardItems: 'rewardItems',
     tokenBalances: 'tokenBalances',
+    minigame: 'minigame',
     blockchainTransactions: 'blockchainTransactions',
 };
 

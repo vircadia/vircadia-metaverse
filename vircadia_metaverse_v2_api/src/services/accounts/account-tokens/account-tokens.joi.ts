@@ -15,7 +15,6 @@
 import Joi from '@hapi/joi';
 import { HookContext } from '@feathersjs/feathers';
 
-const accountId = Joi.string().trim().required();
 const per_page = Joi.number().integer().positive();
 const page_num = Joi.number().integer().positive();
 const asAdmin = Joi.boolean();
@@ -30,10 +29,10 @@ export const joiOptions = { convert: true, abortEarly: false };
 
 export const joiReadOptions = {
     getContext(context: HookContext) {
-        return context.params.query;
+        return context.params?.query ?? {};
     },
     setContext(context: HookContext, newValues: any) {
-        Object.assign(context.params.query, newValues);
+        Object.assign(context.params?.query ?? {}, newValues);
     },
     convert: true,
     abortEarly: false,

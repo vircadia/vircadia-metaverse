@@ -16,16 +16,16 @@ import { TOKEN_NAME } from './../../services/token-transfer/token-transfer.class
 import { Hook, HookContext } from '@feathersjs/feathers';
 import { ethers } from 'ethers';
 import { GeneralError } from '@feathersjs/errors';
-import { TDeployedHardhatContractsJson } from './../../../blockchain/interfaces/contractTypes';
-import deployedContracts from './../../../blockchain/hardhat_contracts.json';
+import { TDeployedHardhatContractsJson } from './../../../ethereum/dlt/interfaces/contractTypes';
+import deployedContracts from './../../../ethereum/dlt/hardhat_contracts.json';
 import { IsNullOrEmpty } from '../../utils/Misc';
-import { GooERC20 } from '../../../blockchain/typechain/GooERC20';
+import { VircadiaERC20 } from '../../../ethereum/dlt/typechain/VircadiaERC20'
 import { BlockchainOptions } from './../../services/token-transfer/token-transfer.class';
 
 // Connects to the deployed ERC20 token contract and passes it to service or subsequent hooks
 export default (options: BlockchainOptions): Hook => {
     let wallet: ethers.Wallet;
-    let gooToken: GooERC20;
+    let gooToken: VircadiaERC20;
 
     if (IsNullOrEmpty(options.minterPrivateKey)) {
         throw new GeneralError('Private key cannot be empty');
@@ -43,7 +43,7 @@ export default (options: BlockchainOptions): Hook => {
             contracts[options.chainId][0].contracts[TOKEN_NAME]
                 .abi as ethers.ContractInterface,
             wallet
-        ) as GooERC20;
+        ) as VircadiaERC20;
     }
 
     return async (context: HookContext): Promise<HookContext> => {

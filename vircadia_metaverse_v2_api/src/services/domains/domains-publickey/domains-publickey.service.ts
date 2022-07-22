@@ -56,10 +56,13 @@ export default function (app: Application): void {
         },
         new DomainPublickey(options, app)
     );
+    app.use(
+        'api/v1/domains/:domainId/public_key',
+        app.service('domains/:domainId/public_key')
+    );
 
     // Get our initialized service so that we can register hooks
     const service = app.service('domains/:domainId/public_key');
 
     service.hooks(hooks);
 }
-

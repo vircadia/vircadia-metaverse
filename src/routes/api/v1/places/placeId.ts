@@ -93,7 +93,7 @@ export const procPutPlacesPlaceId: RequestHandler = async (req: Request, resp: R
     next();
 };
 // Delete a Place
-export const procDeletePlacesPlaceId: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
+export const disallow()procDeletePlacesPlaceId: RequestHandler = async (req: Request, resp: Response, next: NextFunction) => {
     if (req.vAuthAccount) {
         if (req.vPlace) {
             if (await checkAccessToEntity(req.vAuthToken, req.vPlace, [ Perm.DOMAINACCESS, Perm.ADMIN ], req.vAuthAccount)) {

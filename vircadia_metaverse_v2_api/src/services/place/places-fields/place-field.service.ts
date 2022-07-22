@@ -35,11 +35,13 @@ export default function (app: Application): void {
 
     // Initialize our service with any options it requires
     app.use('/placesField', new PlacesFeild(options, app));
-    app.use('/places/:placeId/field/:fieldName', app.service('placesField'));
+    app.use(
+        'api/v1/places/:placeId/field/:fieldName',
+        app.service('placesField')
+    );
 
     // Get our initialized service so that we can register hooks
     const service = app.service('placesField');
 
     service.hooks(hooks);
 }
-

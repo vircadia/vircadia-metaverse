@@ -35,9 +35,11 @@ export default function (app: Application): void {
 
     // Initialize our service with any options it requires
     app.use('/users', new Users(options, app));
+    app.use('/api/v1/users', app.service('users'));
 
     // Get our initialized service so that we can register hooks
     const service = app.service('users');
 
     service.hooks(hooks);
 }
+

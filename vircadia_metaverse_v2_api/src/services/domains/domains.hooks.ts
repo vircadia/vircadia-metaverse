@@ -31,14 +31,14 @@ export default {
         find: [],
         get: [],
         create: [disallow()],
-        update: [disallow()],
-        patch: [
+        update: [
             checkAccessToAccount(config.dbCollections.domains, [
                 Perm.MANAGER,
                 Perm.ADMIN,
             ]),
             validators.form(editDomainSchema, joiOptions),
         ],
+        patch: [disallow()],
         remove: [
             checkAccessToAccount(config.dbCollections.domains, [
                 Perm.SPONSOR,
@@ -67,4 +67,3 @@ export default {
         remove: [],
     },
 };
-

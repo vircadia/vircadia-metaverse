@@ -19,6 +19,7 @@ import { ServiceAddons } from '@feathersjs/feathers';
 import { Application } from '../../declarations';
 import { Profiles } from './profiles.class';
 import hooks from './profiles.hooks';
+import { extractLoggedInUserFromParams } from '../auth/auth.utils';
 
 // Add this service to the service type index
 declare module '../../declarations' {
@@ -35,7 +36,7 @@ export default function (app: Application): void {
 
     // Initialize our service with any options it requires
     app.use('/profiles', new Profiles(options, app));
-
+    app.use('/api/v1/profiles', app.service('profiles'));
     // Get our initialized service so that we can register hooks
     const service = app.service('profiles');
 

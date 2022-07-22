@@ -34,11 +34,17 @@ export default function (app: Application): void {
     };
 
     // Initialize our service with any options it requires
-    app.use('/explore.json', new Explore(options, app));
+    app.use(
+        '/explore.json',
+        new Explore(options, app),
+        async (request: any, response: any) => {
+            console.log(response.data);
+            response.send(response.data.data);
+        }
+    );
 
     // Get our initialized service so that we can register hooks
     const service = app.service('explore.json');
 
     service.hooks(hooks);
 }
-

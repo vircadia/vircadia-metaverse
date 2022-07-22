@@ -81,7 +81,7 @@ export class AccountTokens extends DatabaseService {
 
         return Promise.resolve(
             buildPaginationResponse(
-                tokens,
+                { tokens },
                 page_num,
                 perPage,
                 Math.ceil(tokensData.total / perPage),
@@ -174,4 +174,3 @@ export class AccountTokens extends DatabaseService {
         }
     }
 }
-

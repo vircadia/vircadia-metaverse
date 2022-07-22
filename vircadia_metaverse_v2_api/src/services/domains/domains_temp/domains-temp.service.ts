@@ -55,9 +55,13 @@ export default function (app: Application): void {
         new DomainTemp(options, app)
     );
 
+    app.use(
+        'api/v1/domains/temporary',
+        app.service('domains/create_temporary')
+    );
+
     // Get our initialized service so that we can register hooks
     const service = app.service('domains/create_temporary');
 
     service.hooks(hooks);
 }
-

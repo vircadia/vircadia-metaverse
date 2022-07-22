@@ -22,32 +22,35 @@ import { getUtcDate } from '../utils/Utils';
 
 export default () => {
     return async (context: HookContext): Promise<HookContext> => {
-        const dbService = new DatabaseService(
-            { id: 'id', multi: ['remove'] },
-            undefined,
-            context
-        );
-        dbService.deleteMultipleData(config.dbCollections.tokens, {
-            query: { expirationTime: { $lt: getUtcDate() } },
-        });
-        const token = await Tokens.createToken(context.result?.id, [
-            TokenScope.OWNER,
-        ]);
-        token.token_type = 'Bearer';
-        await dbService.createData(config.dbCollections.tokens, token);
+        if (context.path === 'authentication') {
+            const dbService = new DatabaseService(
+                { id: 'id', multi: ['remove'] },
+                undefined,
+                context
+            );
+            dbService.deleteMultipleData(config.dbCollections.tokens, {
+                query: { expirationTime: { $lt: getUtcDate() } },
+            });
+            const token = await Tokens.createToken(context.result.user?.id, [
+                TokenScope.OWNER,
+            ]);
+            token.token_type = 'Bearer';
+            await dbService.createData(config.dbCollections.tokens, token);
 
-        context.result = {
-            ...context.result,
-            access_token: token.token,
-            token_type: 'Bearer',
-            expires_in:
-                token.expirationTime.valueOf() / 1000 -
-                token.whenCreated.valueOf() / 1000,
-            refresh_token: token.refreshToken,
-            scope: token.scope[0],
-            created_at: token.whenCreated.valueOf() / 1000,
-        };
+            context.result.data = {
+                access_token: token.token,
+                token_type: 'Bearer',
+                expires_in:
+                    token.expirationTime.valueOf() / 1000 -
+                    token.whenCreated.valueOf() / 1000,
+                refresh_token: token.refreshToken,
+                scope: token.scope[0],
+                created_at: token.whenCreated.valueOf(),
+                account_id: context.result.user?.id,
+                account_name: context.result.user?.username,
+                account_roles: context.result.user?.roles,
+            };
+        }
         return context;
     };
 };
-

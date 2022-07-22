@@ -164,9 +164,9 @@ export class Domains extends DatabaseService {
      * @returns - {status: 'success', data:{...}} or { status: 'failure', message: 'message'}
      *
      */
-    async patch(id: NullableId, data: any): Promise<any> {
+    async update(id: NullableId, data: any): Promise<any> {
         if (IsNotNullOrEmpty(id) && id) {
-            const domainData = data;
+            const domainData = data.domain;
             const updateDomain: any = {};
             if (IsNotNullOrEmpty(domainData?.name)) {
                 updateDomain.name = domainData.name;
@@ -258,4 +258,3 @@ export class Domains extends DatabaseService {
         }
     }
 }
-

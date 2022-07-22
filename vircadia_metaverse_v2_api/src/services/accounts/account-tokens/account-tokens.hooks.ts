@@ -28,13 +28,16 @@ import { disallow } from 'feathers-hooks-common';
 
 export default {
     before: {
-        all: [authenticate('jwt')],
-        find: [validators.form(findAccountTokenSchema, joiReadOptions)],
+        all: [],
+        find: [
+            authenticate('jwt'),
+            validators.form(findAccountTokenSchema, joiReadOptions),
+        ],
         get: [disallow()],
         create: [disallow()],
         update: [disallow()],
         patch: [disallow()],
-        remove: [],
+        remove: [authenticate('jwt')],
     },
 
     after: {
@@ -57,4 +60,3 @@ export default {
         remove: [],
     },
 };
-

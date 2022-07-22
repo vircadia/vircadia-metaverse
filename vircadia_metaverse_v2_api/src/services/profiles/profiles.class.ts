@@ -99,7 +99,7 @@ export class Profiles extends DatabaseService {
         });
         return Promise.resolve(
             buildPaginationResponse(
-                profiles,
+                { profiles },
                 page,
                 perPage,
                 Math.ceil(accountData.total / perPage),
@@ -154,4 +154,3 @@ export class Profiles extends DatabaseService {
         }
     }
 }
-

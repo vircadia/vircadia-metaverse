@@ -97,7 +97,7 @@ export class DomainPublickey extends DatabaseService {
      *
      */
 
-    async patch(id: NullableId, data: any, params?: any): Promise<any> {
+    async update(id: NullableId, data: any, params?: any): Promise<any> {
         const loginUser = extractLoggedInUserFromParams(params);
         const domainId = params?.route?.domainId;
         const api_key = params?.body?.api_key;

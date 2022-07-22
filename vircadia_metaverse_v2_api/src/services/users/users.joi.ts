@@ -23,15 +23,21 @@ const facebookId = Joi.string().trim();
 const twitterId = Joi.string().trim();
 const googleId = Joi.string().trim();
 const bio = Joi.string().trim();
+const user = Joi.object()
+    .keys({
+        username,
+        email,
+        password,
+        ethereumAddress,
+        facebookId,
+        twitterId,
+        googleId,
+        bio,
+    })
+    .required();
+
 export const createUserSchema = Joi.object().keys({
-    username,
-    email,
-    password,
-    ethereumAddress,
-    facebookId,
-    twitterId,
-    googleId,
-    bio,
+    user,
 });
 
 const per_page = Joi.number().integer().positive();
@@ -53,11 +59,12 @@ export const joiOptions = { convert: true, abortEarly: false };
 
 export const joiReadOptions = {
     getContext(context: HookContext) {
-        return context.params.query;
+        return context.params?.query ?? {};
     },
     setContext(context: HookContext, newValues: any) {
-        Object.assign(context.params.query, newValues);
+        Object.assign(context.params?.query ?? {}, newValues);
     },
     convert: true,
     abortEarly: false,
 };
+

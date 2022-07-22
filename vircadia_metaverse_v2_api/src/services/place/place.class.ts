@@ -232,7 +232,7 @@ export class Place extends DatabaseService {
      *
      */
 
-    async patch(id: Id, data: any, params: Params): Promise<any> {
+    async update(id: Id, data: any, params: Params): Promise<any> {
         if (params.user) {
             if (IsNotNullOrEmpty(id) && id) {
                 if (IsNotNullOrEmpty(data)) {
@@ -243,17 +243,17 @@ export class Place extends DatabaseService {
                         id
                     );
                     // The caller specified a domain. Either the same domain or changing
-                    if (data.pointee_query !== getPlaceData.domainId) {
-                        updatePlace.domainId = trim(data.pointee_query);
+                    if (data.place.pointee_query !== getPlaceData.domainId) {
+                        updatePlace.domainId = trim(data.place.pointee_query);
                     }
-                    if (IsNotNullOrEmpty(data?.description)) {
-                        updatePlace.description = trim(data.description);
+                    if (IsNotNullOrEmpty(data?.place.description)) {
+                        updatePlace.description = trim(data.place.description);
                     }
-                    if (IsNotNullOrEmpty(data?.path)) {
-                        updatePlace.path = trim(data.path);
+                    if (IsNotNullOrEmpty(data?.place.path)) {
+                        updatePlace.path = trim(data.place.path);
                     }
-                    if (IsNotNullOrEmpty(data?.thumbnail)) {
-                        updatePlace.thumbnail = trim(data.thumbnail);
+                    if (IsNotNullOrEmpty(data?.place.thumbnail)) {
+                        updatePlace.thumbnail = trim(data.place.thumbnail);
                     }
                     await this.patchData(
                         config.dbCollections.places,
@@ -369,4 +369,3 @@ export class Place extends DatabaseService {
         );
     }
 }
-

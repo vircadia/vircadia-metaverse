@@ -19,6 +19,14 @@ const name = Joi.string().trim().required();
 const description = Joi.string().trim().required();
 const address = Joi.string().trim().required();
 const domainId = Joi.string().trim().required();
+const place = Joi.object()
+    .keys({
+        pointee_query: Joi.string().required(),
+        path: Joi.string().required(),
+        description: Joi.string().required(),
+        thumbnail: Joi.string().required(),
+    })
+    .required();
 
 export const createPlaceSchema = Joi.object().keys({
     name,
@@ -27,12 +35,7 @@ export const createPlaceSchema = Joi.object().keys({
     domainId,
 });
 
-export const updatePlaceSchema = Joi.object().keys({
-    pointee_query: Joi.string(),
-    path: Joi.string(),
-    description: Joi.string(),
-    thumbnail: Joi.string(),
-});
+export const updatePlaceSchema = Joi.object().keys({ place }).required();
 
 const per_page = Joi.number().integer().positive();
 const page = Joi.number().integer().positive();
@@ -54,11 +57,12 @@ export const joiOptions = { convert: true, abortEarly: false };
 
 export const joiReadOptions = {
     getContext(context: HookContext) {
-        return context.params.query;
+        return context.params?.query ?? {};
     },
     setContext(context: HookContext, newValues: any) {
-        Object.assign(context.params.query, newValues);
+        Object.assign(context.params?.query ?? {}, newValues);
     },
     convert: true,
     abortEarly: false,
 };
+

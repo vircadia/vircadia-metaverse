@@ -36,7 +36,7 @@ export default function (app: Application): void {
     // Initialize our service with any options it requires
     app.use('/accountField', new AccountFeild(options, app));
     app.use(
-        '/account/:accountId/field/:fieldName',
+        'api/v1/account/:accountId/field/:fieldName',
         app.service('accountField')
     );
 
@@ -45,4 +45,3 @@ export default function (app: Application): void {
 
     service.hooks(hooks);
 }
-

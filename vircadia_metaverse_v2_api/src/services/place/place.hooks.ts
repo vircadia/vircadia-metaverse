@@ -52,8 +52,7 @@ export default {
                 Perm.ADMIN,
             ]),
         ],
-        update: [disallow()],
-        patch: [
+        update: [
             authenticate('jwt'),
             validators.form(updatePlaceSchema, joiOptions),
             checkAccessToAccount(config.dbCollections.accounts, [
@@ -61,6 +60,7 @@ export default {
                 Perm.ADMIN,
             ]),
         ],
+        patch: [disallow()],
         remove: [
             authenticate('jwt'),
             checkAccessToAccount(config.dbCollections.accounts, [

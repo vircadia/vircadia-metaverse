@@ -38,7 +38,7 @@ describe('API test', () => {
             username: 'Metaverse',
             email: 'metaverse@gmail.com',
             password: '123456',
-            ethereumAddress: '0xc1251A0864B522BB0F3cf654231E8E55B937CE27',
+            ethereumAddress: '0xC4eABEc8CCb1db4db76A2CA716B03D0ae7b8d929',
         };
 
         beforeAll(async () => {
@@ -58,58 +58,154 @@ describe('API test', () => {
         });*/
 
         it('authenticates user and creates accessToken', async () => {
-            const { user, accessToken } = await app
-                .service('authentication')
-                .create(
-                    {
-                        strategy: 'local',
-                        ...userInfo,
-                    },
-                    {}
-                );
+            try {
+                const { user, accessToken } = await app
+                    .service('authentication')
+                    .create(
+                        {
+                            strategy: 'local',
+                            ...userInfo,
+                        },
+                        {}
+                    );
 
-            authToken = `Bearer ${accessToken}`;
-            selfUser.id = user.id;
-            selfUser.email = user.email;
+                authToken = `Bearer ${accessToken}`;
+                selfUser.id = user.id;
+                selfUser.email = user.email;
 
-            expect(accessToken).toBeTruthy();
-            expect(user).toBeTruthy();
+                expect(accessToken).toBeTruthy();
+                expect(user).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it('fetch users', async () => {
-            const result = await axios.get(getUrl('/users'), {
+            try {
+                const result = await axios.get(getUrl('/api/v1/users'), {
+                    headers: {
+                        Authorization: authToken,
+                    },
+                });
+                expect(result.status).toBe(200);
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
+        });
+
+        it('Create users', async () => {
+            try {
+                const result = await axios.post(
+                    getUrl('/api/v1/users'),
+                    {
+                        user: {
+                            grant_type: 'password',
+                            username: userInfo.username,
+                            password: userInfo.password,
+                        },
+                    },
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
+                expect(result.status).toBe(200);
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
+        });
+
+        it('Generate initial account token', async () => {
+            try {
+                const result = await axios.post(
+                    getUrl('/oauth/token'),
+                    {
+                        grant_type: 'password',
+                        username: userInfo.username,
+                        password: userInfo.password,
+                    },
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
+                expect(result.status).toBe(200);
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
+        });
+
+        it('html access token', async () => {
+            const result = await axios.get(getUrl('/user/tokens/new'), {
                 headers: {
                     Authorization: authToken,
                 },
             });
             expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
-            expect(result.data.data.users.length).toBeGreaterThan(0);
+        });
+
+        it('Get token', async () => {
+            try {
+                const result = await axios.post(getUrl('/api/v1/token/new'), {
+                    headers: {
+                        Authorization: authToken,
+                    },
+                });
+                expect(result.status).toBe(200);
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
     });
 
     describe('Profile', () => {
         let profileId = '';
         it('Find profile', async () => {
-            const result = await axios.get(getUrl('/profiles'), {
-                headers: {
-                    Authorization: authToken,
-                },
-            });
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
-            expect(result.data.data.length).toBeGreaterThan(0);
-            profileId = result.data.data[0].id;
+            try {
+                const result = await axios.get(getUrl('/api/v1/profiles'), {
+                    headers: {
+                        Authorization: authToken,
+                    },
+                });
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+                expect(result.data.data.length).toBeGreaterThan(0);
+                profileId = result.data.data[0].id;
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it('Get profile', async () => {
-            const result = await axios.get(getUrl(`/profiles/${profileId}`), {
-                headers: {
-                    Authorization: authToken,
-                },
-            });
+            const result = await axios.get(
+                getUrl(`/api/v1/profiles/${profileId}`),
+                {
+                    headers: {
+                        Authorization: authToken,
+                    },
+                }
+            );
             expect(result.status).toBe(200);
             expect(result.data.data).toBeTruthy();
+        });
+
+        it('Get user profile', async () => {
+            try {
+                const result = await axios.get(
+                    getUrl(`/api/v1/user/profile/${profileId}`),
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
     });
 
@@ -123,139 +219,175 @@ describe('API test', () => {
         };
 
         it('Create Achievement Item', async () => {
-            const result = await axios.post(
-                getUrl('/achievement-items'),
-                newAchivementItem,
-                {
-                    headers: {
-                        Authorization: authToken,
-                    },
-                }
-            );
+            try {
+                const result = await axios.post(
+                    getUrl('/achievement-items'),
+                    newAchivementItem,
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
 
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
-            achievementItem = result.data.data;
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+                achievementItem = result.data.data;
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it('Find Achievement Items', async () => {
-            const result = await axios.get(getUrl('/achievement-items'), {
-                headers: {
-                    Authorization: authToken,
-                },
-            });
+            try {
+                const result = await axios.get(getUrl('/achievement-items'), {
+                    headers: {
+                        Authorization: authToken,
+                    },
+                });
 
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
-            expect(result.data.data.length).toBeGreaterThan(0);
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+                expect(result.data.data.length).toBeGreaterThan(0);
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it('Get Achievement Item', async () => {
-            const result = await axios.get(
-                getUrl(`/achievement-items/${achievementItem?.id}`),
-                {
-                    headers: {
-                        Authorization: authToken,
-                    },
-                }
-            );
+            try {
+                const result = await axios.get(
+                    getUrl(`/achievement-items/${achievementItem?.id}`),
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
 
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it('Update Achievement Item', async () => {
-            newAchivementItem.name = 'Gold Star';
-            newAchivementItem.description = 'this is Gold star';
-            const result = await axios.patch(
-                getUrl(`/achievement-items/${achievementItem?.id}`),
-                newAchivementItem,
-                {
-                    headers: {
-                        Authorization: authToken,
-                    },
-                }
-            );
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
-            achievementItem = result.data.data;
+            try {
+                newAchivementItem.name = 'Gold Star';
+                newAchivementItem.description = 'this is Gold star';
+                const result = await axios.patch(
+                    getUrl(`/achievement-items/${achievementItem?.id}`),
+                    newAchivementItem,
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+                achievementItem = result.data.data;
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it('Create Achievement', async () => {
-            const result = await axios.post(
-                getUrl('/achievement'),
-                {
-                    achievementItemId: achievementItem?.id,
-                    userId: selfUser.id,
-                },
-                {
-                    headers: {
-                        Authorization: authToken,
+            try {
+                const result = await axios.post(
+                    getUrl('/achievement'),
+                    {
+                        achievementItemId: achievementItem?.id,
+                        userId: selfUser.id,
                     },
-                }
-            );
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
 
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
-            achievement = result.data.data;
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+                achievement = result.data.data;
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it('Get user achievements', async () => {
-            const result = await axios.get(
-                getUrl('/achievement', { userId: selfUser?.id }),
-                {
-                    headers: {
-                        Authorization: authToken,
-                    },
-                }
-            );
+            try {
+                const result = await axios.get(
+                    getUrl('/achievement', { userId: selfUser?.id }),
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
 
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
-            //expect(result.data.data.length).toBeGreaterThan(0);
-            if (result.data.data.length) {
-                achievement = result.data.data[0];
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+                //expect(result.data.data.length).toBeGreaterThan(0);
+                if (result.data.data.length) {
+                    achievement = result.data.data[0];
+                }
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
             }
         });
 
         it('Get achievement', async () => {
-            const result = await axios.get(
-                getUrl(`/achievement/${achievement?.id}`),
-                {
-                    headers: {
-                        Authorization: authToken,
-                    },
-                }
-            );
+            try {
+                const result = await axios.get(
+                    getUrl(`/achievement/${achievement?.id}`),
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
 
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it('Delete achievement', async () => {
-            const result = await axios.delete(
-                getUrl(`/achievement/${achievement?.id}`),
-                {
-                    headers: {
-                        Authorization: authToken,
-                    },
-                }
-            );
+            try {
+                const result = await axios.delete(
+                    getUrl(`/achievement/${achievement?.id}`),
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
 
-            expect(result.status).toBe(200);
+                expect(result.status).toBe(200);
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it('Delete Achievement Item', async () => {
-            const result = await axios.delete(
-                getUrl(`/achievement-items/${achievementItem?.id}`),
-                {
-                    headers: {
-                        Authorization: authToken,
-                    },
-                }
-            );
+            try {
+                const result = await axios.delete(
+                    getUrl(`/achievement-items/${achievementItem?.id}`),
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
 
-            expect(result.status).toBe(200);
+                expect(result.status).toBe(200);
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
     });
 
@@ -265,7 +397,7 @@ describe('API test', () => {
             username: `testUser${date}`,
             email: `testuser${date}@gmail.com`,
             password: '123456',
-            ethereumAddress: `0xc1251A0864B522BB0F3cf654231E8E55B937CE27${date}`,
+            ethereumAddress: `0xC4eABEc8CCb1db4db76A2CA716B03D0ae7b8d929${date}`,
         };
 
         let registerUser: any = {};
@@ -280,100 +412,194 @@ describe('API test', () => {
         });
 
         it(' Create Connections', async () => {
-            const result = await axios.post(
-                getUrl('/connections'),
-                {
-                    username: registerUser?.username,
-                },
-                {
-                    headers: {
-                        Authorization: authToken,
+            try {
+                const result = await axios.post(
+                    getUrl('/api/v1/user/connections'),
+                    {
+                        username: registerUser?.username,
                     },
-                }
-            );
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
 
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it(' Get Connections', async () => {
-            const result = await axios.get(getUrl('/connections'), {
-                headers: {
-                    Authorization: authToken,
-                },
-            });
+            try {
+                const result = await axios.get(
+                    getUrl('/api/v1/user/connections'),
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
 
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it(' Create friends', async () => {
-            const result = await axios.post(
-                getUrl('/friends'),
-                {
-                    username: registerUser?.username,
-                },
-                {
-                    headers: {
-                        Authorization: authToken,
+            try {
+                const result = await axios.post(
+                    getUrl('/api/v1/user/friends'),
+                    {
+                        username: registerUser?.username,
                     },
-                }
-            );
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
 
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it(' Get friends', async () => {
-            const result = await axios.get(getUrl('/friends'), {
-                headers: {
-                    Authorization: authToken,
-                },
-            });
+            try {
+                const result = await axios.get(getUrl('/api/v1/user/friends'), {
+                    headers: {
+                        Authorization: authToken,
+                    },
+                });
 
-            expect(result.status).toBe(200);
-            expect(result.data.data.friends).toBeTruthy();
+                expect(result.status).toBe(200);
+                expect(result.data.data.friends).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it(' Remove friend', async () => {
-            const result = await axios.delete(
-                getUrl(`/friends/${registerUser?.username}`),
-                {
-                    headers: {
-                        Authorization: authToken,
-                    },
-                }
-            );
+            try {
+                const result = await axios.delete(
+                    getUrl(`/api/v1/user/friends/${registerUser?.username}`),
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
 
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it(' Remove Connection', async () => {
-            const result = await axios.delete(
-                getUrl(`/connections/${registerUser?.username}`),
-                {
-                    headers: {
-                        Authorization: authToken,
-                    },
-                }
-            );
+            try {
+                const result = await axios.delete(
+                    getUrl(
+                        `/api/v1/user/connections/${registerUser?.username}`
+                    ),
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
 
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it('Delete Account', async () => {
-            const result = await axios.delete(
-                getUrl(`/accounts/${registerUser?.accountId}`),
-                {
-                    headers: {
-                        Authorization: authToken,
+            try {
+                const result = await axios.delete(
+                    getUrl(
+                        `/api/v1/user/connections/${registerUser?.accountId}`
+                    ),
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
+                expect(result.status).toBe(200);
+                expect(result.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
+        });
+
+        it(' Create connection request', async () => {
+            try {
+                const result = await axios.post(
+                    getUrl('/api/v1/user/connection_request'),
+                    {
+                        user_connection_request: {
+                            node_id: selfUser.id,
+                            proposed_node_id: selfUser.id,
+                        },
                     },
-                }
-            );
-            expect(result.status).toBe(200);
-            expect(result.data).toBeTruthy();
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
+
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
+        });
+
+        it(' Remove connection request', async () => {
+            try {
+                const result = await axios.delete(
+                    getUrl('/api/v1/user/connection_request'),
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
+        });
+
+        it(' User heartbeat', async () => {
+            try {
+                const result = await axios.put(
+                    getUrl('/api/v1/user/heartbeat'),
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
+
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
     });
 
@@ -405,126 +631,158 @@ describe('API test', () => {
         const userInventory: any = {};
 
         it('Create Inventory items', async () => {
-            const result = await axios.post(
-                getUrl('/inventory-item'),
-                inventoryItem,
-                {
-                    headers: {
-                        Authorization: authToken,
-                    },
-                }
-            );
+            try {
+                const result = await axios.post(
+                    getUrl('/inventory-item'),
+                    inventoryItem,
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
 
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it('Find inventory item', async () => {
-            const result = await axios.get(getUrl('/inventory-item'), {
-                headers: {
-                    Authorization: authToken,
-                },
-            });
-            expect(result.status).toBe(200);
-            expect(result.data.data.length).toBeGreaterThan(0);
+            try {
+                const result = await axios.get(getUrl('/inventory-item'), {
+                    headers: {
+                        Authorization: authToken,
+                    },
+                });
+                expect(result.status).toBe(200);
+                expect(result.data.data.length).toBeGreaterThan(0);
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it('Get inventory item', async () => {
-            const result = await axios.get(
-                getUrl(`/inventory-item/${inventoryItem?.id}`),
-                {
-                    headers: {
-                        Authorization: authToken,
-                    },
-                }
-            );
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
+            try {
+                const result = await axios.get(
+                    getUrl(`/inventory-item/${inventoryItem?.id}`),
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it('Update Inventory items', async () => {
-            const result = await axios.patch(
-                getUrl(`/inventory-item/${inventoryItem?.id}`),
-                {
-                    name: 'Stick-bright',
-                },
-                {
-                    headers: {
-                        Authorization: authToken,
+            try {
+                const result = await axios.patch(
+                    getUrl(`/inventory-item/${inventoryItem?.id}`),
+                    {
+                        name: 'Stick-bright',
                     },
-                }
-            );
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
 
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it('Create user inventory item', async () => {
-            const newUserInventoryItem = {
-                itemId: inventoryItem.id,
-                toUserId: selfUser?.id,
-                qty: 10,
-                itemSource: 'rewarded_for_quest',
-            };
+            try {
+                const newUserInventoryItem = {
+                    itemId: inventoryItem.id,
+                    toUserId: selfUser?.id,
+                    qty: 10,
+                    itemSource: 'rewarded_for_quest',
+                };
 
-            const result = await axios.post(
-                getUrl('/user-inventory'),
-                newUserInventoryItem,
-                {
-                    headers: {
-                        Authorization: authToken,
-                    },
+                const result = await axios.post(
+                    getUrl('/user-inventory'),
+                    newUserInventoryItem,
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
+
+                if (result.status === 200) {
+                    userInventory.id = result.data.data.id;
                 }
-            );
 
-            if (result.status === 200) {
-                userInventory.id = result.data.data.id;
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
             }
-
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
         });
 
         it('Find user inventory', async () => {
-            const result = await axios.get(getUrl('/user-inventory'), {
-                headers: {
-                    Authorization: authToken,
-                },
-            });
+            try {
+                const result = await axios.get(getUrl('/user-inventory'), {
+                    headers: {
+                        Authorization: authToken,
+                    },
+                });
 
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it('Get user inventory', async () => {
-            const result = await axios.get(
-                getUrl(`/user-inventory/${userInventory.id}`),
-                {
-                    headers: {
-                        Authorization: authToken,
-                    },
-                }
-            );
+            try {
+                const result = await axios.get(
+                    getUrl(`/user-inventory/${userInventory.id}`),
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
 
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it('Patch user inventory', async () => {
-            const result = await axios.patch(
-                getUrl(`/user-inventory/${userInventory.id}`),
-                {
-                    qty: 20,
-                },
-                {
-                    headers: {
-                        Authorization: authToken,
+            try {
+                const result = await axios.patch(
+                    getUrl(`/user-inventory/${userInventory.id}`),
+                    {
+                        qty: 20,
                     },
-                }
-            );
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
 
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it('Reorder user inventory', async () => {
@@ -548,17 +806,21 @@ describe('API test', () => {
         });
 
         it('Remove user inventory', async () => {
-            const result = await axios.delete(
-                getUrl(`/user-inventory/${userInventory.id}`),
-                {
-                    headers: {
-                        Authorization: authToken,
-                    },
-                }
-            );
+            try {
+                const result = await axios.delete(
+                    getUrl(`/user-inventory/${userInventory.id}`),
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
 
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it('Create Inventory Transfer', async () => {
@@ -594,163 +856,201 @@ describe('API test', () => {
         let itemHandlerData: any = {};
 
         it('Create item handler', async () => {
-            const itemHandler: any = {
-                itemId: 'regular-stick',
-                ownerId: selfUser?.id,
-                addedDate: addedDate,
-                expiresOn: expiresOn,
-                area: 'ground',
-                qty: 10,
-            };
+            try {
+                const itemHandler: any = {
+                    itemId: 'regular-stick',
+                    ownerId: selfUser?.id,
+                    addedDate: addedDate,
+                    expiresOn: expiresOn,
+                    area: 'ground',
+                    qty: 10,
+                };
 
-            const result = await axios.post(
-                getUrl('/item-handler'),
-                itemHandler,
-                {
-                    headers: {
-                        Authorization: authToken,
-                    },
+                const result = await axios.post(
+                    getUrl('/item-handler'),
+                    itemHandler,
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
+
+                if (result.status === 200) {
+                    itemHandlerData = result.data.data;
                 }
-            );
 
-            if (result.status === 200) {
-                itemHandlerData = result.data.data;
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
             }
-
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
         });
 
         it('Edit item handler', async () => {
-            const result = await axios.patch(
-                getUrl(`/item-handler/${itemHandlerData.id}`),
-                {
-                    expiresOn: itemHandlerData.expiresOn,
-                    qty: 12,
-                },
-                {
-                    headers: {
-                        Authorization: authToken,
+            try {
+                const result = await axios.patch(
+                    getUrl(`/item-handler/${itemHandlerData.id}`),
+                    {
+                        expiresOn: itemHandlerData.expiresOn,
+                        qty: 12,
                     },
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
+
+                if (result.status === 200) {
+                    itemHandlerData = result.data.data;
                 }
-            );
 
-            if (result.status === 200) {
-                itemHandlerData = result.data.data;
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
             }
-
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
         });
 
         it('Find item handler', async () => {
-            const result = await axios.get(getUrl('/item-handler'), {
-                headers: {
-                    Authorization: authToken,
-                },
-            });
+            try {
+                const result = await axios.get(getUrl('/item-handler'), {
+                    headers: {
+                        Authorization: authToken,
+                    },
+                });
 
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it('Get item handler', async () => {
-            const result = await axios.get(
-                getUrl(`/item-handler/${itemHandlerData.id}`),
-                {
-                    headers: {
-                        Authorization: authToken,
-                    },
-                }
-            );
+            try {
+                const result = await axios.get(
+                    getUrl(`/item-handler/${itemHandlerData.id}`),
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
 
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it('Pickup item handler', async () => {
-            const result = await axios.post(
-                getUrl('/pickup-item'),
-                {
-                    id: itemHandlerData.id,
-                },
-                {
-                    headers: {
-                        Authorization: authToken,
+            try {
+                const result = await axios.post(
+                    getUrl('/pickup-item'),
+                    {
+                        id: itemHandlerData.id,
                     },
-                }
-            );
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it('Remove item handler', async () => {
-            const result = await axios.delete(
-                getUrl(`/item-handler/${itemHandlerData.id}`),
-                {
-                    headers: {
-                        Authorization: authToken,
-                    },
-                }
-            );
+            try {
+                const result = await axios.delete(
+                    getUrl(`/item-handler/${itemHandlerData.id}`),
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
 
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
     });
 
     describe('Accounts', () => {
         it('Find Accounts', async () => {
-            const result = await axios.get(getUrl('/accounts'), {
-                headers: {
-                    Authorization: authToken,
-                },
-            });
+            try {
+                const result = await axios.get(getUrl('/api/v1/accounts'), {
+                    headers: {
+                        Authorization: authToken,
+                    },
+                });
 
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
-            expect(result.data.data.length).toBeGreaterThan(0);
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+                expect(result.data.data.length).toBeGreaterThan(0);
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it('Get Account', async () => {
-            const result = await axios.get(
-                getUrl(`/accounts/${selfUser?.id}`),
-                {
-                    headers: {
-                        Authorization: authToken,
-                    },
-                }
-            );
-            expect(result.status).toBe(200);
-            expect(result.data.data).toBeTruthy();
+            try {
+                const result = await axios.get(
+                    getUrl(`/api/v1/account/${selfUser?.id}`),
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it('Update Account', async () => {
-            const result = await axios.patch(
-                getUrl(`/accounts/${selfUser?.id}`),
-                {
-                    email: selfUser.email,
-                    images: {
-                        hero: 'https://staging-2.digisomni.com/img/logo-1.c0f688c0.png',
-                        tiny: 'https://staging-2.digisomni.com/img/logo-1.c0f688c0.png',
-                        thumbnail:
-                            'https://staging-2.digisomni.com/img/logo-1.c0f688c0.png',
+            try {
+                const result = await axios.post(
+                    getUrl(`/api/v1/account/${selfUser?.id}`),
+                    {
+                        accounts: {
+                            email: selfUser.email,
+                            images: {
+                                hero: 'https://staging-2.digisomni.com/img/logo-1.c0f688c0.png',
+                                tiny: 'https://staging-2.digisomni.com/img/logo-1.c0f688c0.png',
+                                thumbnail:
+                                    'https://staging-2.digisomni.com/img/logo-1.c0f688c0.png',
+                            },
+                        },
                     },
-                },
-                {
-                    headers: {
-                        Authorization: authToken,
-                    },
-                }
-            );
-            expect(result.status).toBe(200);
-            expect(result.data).toBeTruthy();
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
+                expect(result.status).toBe(200);
+                expect(result.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
         });
 
         it('Delete Account', async () => {
             try {
                 const result = await axios.delete(
-                    getUrl(`/accounts/${selfUser?.id}`),
+                    getUrl(`/api/v1/account/${selfUser?.id}`),
                     {
                         headers: {
                             Authorization: authToken,
@@ -761,14 +1061,14 @@ describe('API test', () => {
                 expect(result.status).toBe(200);
                 expect(result.data).toBeTruthy();
             } catch (error: any) {
-                expect(error.status).toBe(200);
+                expect(typeof error).toBe('object');
             }
         });
 
         it('Get Account field', async () => {
             try {
                 const result = await axios.get(
-                    getUrl(`/account/${selfUser?.id}/field/email`),
+                    getUrl(`/api/v1/account/${selfUser?.id}/field/email`),
                     {
                         headers: {
                             Authorization: authToken,
@@ -788,7 +1088,7 @@ describe('API test', () => {
                     set: 'metaverse@gmail.com',
                 };
                 const result = await axios.post(
-                    getUrl(`/account/${selfUser?.id}/field/email`),
+                    getUrl(`/api/v1/account/${selfUser?.id}/field/email`),
                     set,
                     {
                         headers: {
@@ -806,7 +1106,7 @@ describe('API test', () => {
         it('Get public key of account', async () => {
             try {
                 const result = await axios.get(
-                    getUrl(`/user/${selfUser?.id}/public_key`),
+                    getUrl(`/api/v1/users/${selfUser?.id}/public_key`),
                     {
                         headers: {
                             Authorization: authToken,
@@ -816,6 +1116,62 @@ describe('API test', () => {
                 expect(result.status).toBe(200);
                 expect(result.data.data).toBeTruthy();
                 expect(result.data.data.length).toBeGreaterThan(0);
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
+        });
+
+        it('Update public key of account', async () => {
+            try {
+                const result = await axios.get(
+                    getUrl('/api/v1/user/public_key'),
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+                expect(result.data.data.length).toBeGreaterThan(0);
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
+        });
+
+        let acccountTokens = {};
+        it('Get acccount tokens', async () => {
+            try {
+                const result = await axios.get(
+                    getUrl(`/api/v1/account/${selfUser?.id}/tokens`),
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
+                acccountTokens = result.data;
+                expect(result.status).toBe(200);
+                expect(result.data.data).toBeTruthy();
+                expect(result.data.data.length).toBeGreaterThan(0);
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
+        });
+
+        it('Get specific acccount token', async () => {
+            try {
+                const result = await axios.delete(
+                    getUrl(
+                        `/api/v1/account/${selfUser?.id}/tokens/${acccountTokens[0]?.id}`
+                    ),
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
+                expect(result.status).toBe(200);
             } catch (error: any) {
                 expect(typeof error).toBe('object');
             }
@@ -1328,7 +1684,7 @@ describe('API test', () => {
 
         it('Get all Domains', async () => {
             try {
-                const result = await axios.get(getUrl('/domains'), {
+                const result = await axios.get(getUrl('/api/v1/domains'), {
                     headers: {
                         Authorization: authToken,
                     },
@@ -1344,7 +1700,7 @@ describe('API test', () => {
         it('Get Domain', async () => {
             try {
                 const result = await axios.get(
-                    getUrl(`/domains/${newDomain?.id}`),
+                    getUrl(`/api/v1/domains/${newDomain?.id}`),
                     {
                         headers: {
                             Authorization: authToken,
@@ -1362,7 +1718,7 @@ describe('API test', () => {
         it('Create temp Domain', async () => {
             try {
                 const result = await axios.post(
-                    getUrl('/domains/create_temporary'),
+                    getUrl('/api/v1/domains/temporary'),
                     {
                         headers: {
                             Authorization: authToken,
@@ -1380,11 +1736,13 @@ describe('API test', () => {
 
         it('Update Domain', async () => {
             try {
-                const result = await axios.patch(
-                    getUrl(`/domains/${newDomain?.id}`),
+                const result = await axios.put(
+                    getUrl(`/api/v1/domains/${newDomain?.id}`),
                     {
-                        name: 'test A regular stick',
-                        version: '21.21.21',
+                        domain: {
+                            name: 'test A regular stick',
+                            version: '21.21.21',
+                        },
                     },
                     {
                         headers: {
@@ -1402,7 +1760,7 @@ describe('API test', () => {
         it('Delete Domain', async () => {
             try {
                 const result = await axios.delete(
-                    getUrl(`/domains/${newDomain?.id}`),
+                    getUrl(`/api/v1/domains/${newDomain?.id}`),
                     {
                         headers: {
                             Authorization: authToken,
@@ -1420,7 +1778,7 @@ describe('API test', () => {
         it('Get public key of domain', async () => {
             try {
                 const result = await axios.get(
-                    getUrl(`/domains/${newDomain?.id}/public_key`),
+                    getUrl(`/api/v1/domains/${newDomain?.id}/public_key`),
                     {
                         headers: {
                             Authorization: authToken,
@@ -1434,6 +1792,63 @@ describe('API test', () => {
                 expect(typeof error).toBe('object');
             }
         });
+
+        it('Update public key of domain', async () => {
+            try {
+                const result = await axios.put(
+                    getUrl(`/api/v1/domains/${newDomain?.id}/public_key`),
+                    {
+                        name: 'test A regular stick',
+                        version: '21.21.21',
+                    },
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
+                expect(result.status).toBe(200);
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
+        });
+
+        it('Get domain field', async () => {
+            try {
+                const result = await axios.get(
+                    getUrl(`/api/v1/domains/${newDomain?.id}/field/managers`),
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
+                expect(result.status).toBe(200);
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
+        });
+
+        it('Set domain field', async () => {
+            try {
+                const result = await axios.patch(
+                    getUrl(`/api/v1/domains/${newDomain?.id}/field/managers`),
+                    {
+                        set: {
+                            set: [selfUser.username],
+                        },
+                    },
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
+                expect(result.status).toBe(200);
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
+        });
     });
 
     describe('Monitoring', () => {
@@ -1441,7 +1856,7 @@ describe('API test', () => {
 
         it('Get all stats', async () => {
             try {
-                const result = await axios.get(getUrl('/stats/list'), {
+                const result = await axios.get(getUrl('/api/v1/stats/list'), {
                     headers: {
                         Authorization: authToken,
                     },
@@ -1456,11 +1871,14 @@ describe('API test', () => {
 
         it('Get stat by name', async () => {
             try {
-                const result = await axios.get(getUrl('/stats/stat/cpuBusy'), {
-                    headers: {
-                        Authorization: authToken,
-                    },
-                });
+                const result = await axios.get(
+                    getUrl('/api/v1/stats/stat/cpuBusy'),
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
                 expect(result.status).toBe(200);
                 expect(result.data.data).toBeTruthy();
             } catch (error: any) {
@@ -1470,11 +1888,14 @@ describe('API test', () => {
 
         it('Get stat by category', async () => {
             try {
-                const result = await axios.get(getUrl('/stats/category/os'), {
-                    headers: {
-                        Authorization: authToken,
-                    },
-                });
+                const result = await axios.get(
+                    getUrl('/api/v1/stats/category/os'),
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
                 expect(result.status).toBe(200);
                 expect(result.data.data).toBeTruthy();
             } catch (error: any) {
@@ -1486,7 +1907,7 @@ describe('API test', () => {
     describe('Overview', () => {
         it('metaverse_info', async () => {
             try {
-                const result = await axios.get(getUrl('/metaverse_info'), {
+                const result = await axios.get(getUrl('/api/metaverse_info'), {
                     headers: {
                         Authorization: authToken,
                     },
@@ -1528,7 +1949,7 @@ describe('API test', () => {
                 address: {},
             };
             try {
-                const result = await axios.post(getUrl('/place'), {
+                const result = await axios.post(getUrl('/api/v1/places'), {
                     placeInfo,
                     headers: {
                         Authorization: authToken,
@@ -1545,7 +1966,7 @@ describe('API test', () => {
 
         it('Get all place', async () => {
             try {
-                const result = await axios.get(getUrl('/place'), {
+                const result = await axios.get(getUrl('/api/v1/places'), {
                     headers: {
                         Authorization: authToken,
                     },
@@ -1561,7 +1982,7 @@ describe('API test', () => {
         it('Get place', async () => {
             try {
                 const result = await axios.get(
-                    getUrl(`/place/${newPlace?.id}`),
+                    getUrl(`/api/v1/places/${newPlace?.id}`),
                     {
                         headers: {
                             Authorization: authToken,
@@ -1579,7 +2000,7 @@ describe('API test', () => {
         it('Update place', async () => {
             try {
                 const result = await axios.patch(
-                    getUrl(`/place/${newPlace?.id}`),
+                    getUrl(`/api/v1/places/${newPlace?.id}`),
                     {
                         name: 'test A regular stick',
                     },
@@ -1599,7 +2020,7 @@ describe('API test', () => {
         it('Delete place', async () => {
             try {
                 const result = await axios.delete(
-                    getUrl(`/place/${newPlace?.id}`),
+                    getUrl(`/api/v1/places/${newPlace?.id}`),
                     {
                         headers: {
                             Authorization: authToken,
@@ -1617,7 +2038,7 @@ describe('API test', () => {
         it('Get place field', async () => {
             try {
                 const result = await axios.get(
-                    getUrl(`/places/${newPlace?.id}/field/description`),
+                    getUrl(`/api/v1/places/${newPlace?.id}/field/description`),
                     {
                         headers: {
                             Authorization: authToken,
@@ -1637,8 +2058,60 @@ describe('API test', () => {
                     set: 'test set place description',
                 };
                 const result = await axios.post(
-                    getUrl(`/places/${newPlace?.id}/field/description`),
+                    getUrl(`/api/v1/places/${newPlace?.id}/field/description`),
                     set,
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
+                expect(result.status).toBe(200);
+                expect(result.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
+        });
+
+        it('Get user place', async () => {
+            try {
+                const result = await axios.get(getUrl('/api/v1/user/places'), {
+                    headers: {
+                        Authorization: authToken,
+                    },
+                });
+                expect(result.status).toBe(200);
+                expect(result.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
+        });
+
+        it('Set user place', async () => {
+            try {
+                const set = {
+                    place: { name: 'test set place description' },
+                };
+                const result = await axios.post(
+                    getUrl('/api/v1/user/places'),
+                    set,
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
+                expect(result.status).toBe(200);
+                expect(result.data).toBeTruthy();
+            } catch (error: any) {
+                expect(typeof error).toBe('object');
+            }
+        });
+
+        it('Get place', async () => {
+            try {
+                const result = await axios.get(
+                    getUrl(`/api/v1/user/places/${newPlace?.id}`),
                     {
                         headers: {
                             Authorization: authToken,
@@ -1658,11 +2131,14 @@ describe('API test', () => {
 
         it('Get all location', async () => {
             try {
-                const result = await axios.get(getUrl('/location'), {
-                    headers: {
-                        Authorization: authToken,
-                    },
-                });
+                const result = await axios.get(
+                    getUrl(`/api/v1/users/${selfUser.id}/location`),
+                    {
+                        headers: {
+                            Authorization: authToken,
+                        },
+                    }
+                );
 
                 newlocation = result.data;
                 expect(result.status).toBe(200);
@@ -1676,7 +2152,7 @@ describe('API test', () => {
         it('Update location', async () => {
             try {
                 const result = await axios.patch(
-                    getUrl('/location'),
+                    getUrl('/api/v1/user/location'),
                     {
                         networkAddress: 'network address',
                     },
@@ -1695,10 +2171,10 @@ describe('API test', () => {
     });
 
     describe('current', () => {
-        it('Update current', async () => {
+        it('Update current place', async () => {
             try {
                 const result = await axios.post(
-                    getUrl('/current'),
+                    getUrl('/api/v1/places/current'),
                     {
                         currentAPIKeyTokenId: 'test',
                     },
@@ -1720,7 +2196,7 @@ describe('API test', () => {
         it('Get token', async () => {
             try {
                 const result = await axios.get(
-                    getUrl(`/account/${selfUser?.id}/tokens`),
+                    getUrl(`/api/v1/account/${selfUser?.id}/tokens`),
                     {
                         headers: {
                             Authorization: authToken,
@@ -1737,4 +2213,3 @@ describe('API test', () => {
         });
     });
 });
-

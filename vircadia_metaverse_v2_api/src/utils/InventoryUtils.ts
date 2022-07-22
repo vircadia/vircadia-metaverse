@@ -19,6 +19,7 @@ export enum ItemSource {
     LOOTING = 'looting',
     PURCHASE_FROM_MERCHANT = 'purchase_from_merchant',
     REWARDED_FOR_QUEST = 'rewarded_for_quest',
+    REWARDED_FOR_MINIGAME = 'rewarded_for_minigame',
     DAILY_REWARD = 'daily_reward',
     GROUND_SPAWN = 'ground_spawn',
     WINNING_AUCTION = 'winning_auction',
