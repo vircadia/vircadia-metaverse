@@ -6,36 +6,43 @@ services:
     container_name: mongodb_container
     image: mongo:latest
     restart: always
-    # ports:
-      # - 27018:27017
+    #ports:
+     # - 27018:27017
     volumes:
       - mongo_db:/data/db
-
+  redis:
+        container_name: redis_container
+        restart: always
+        image: redis/redis-stack:latest
+        # command: redis-server --save 20 1 --loglevel warning
+        volumes:
+            - redis_server:/data/redis
   # Node API service      
   api:
-    #container_name: vircadia-metaverse-v2
+    #container_name: vircadia-metaverse
     build: .
     # ports:
       # - 3030:3030
     volumes:
       - .:/usr/src/api
     environment:
-     PORT: 3030
-     MONGODB_URL: mongodb://mongodb_container:27017
+     PORT: 3040
+     MONGODB_URL: mongodb://mongodb_container:27018
+     REDIS_URL: redis://redis_container:6378
      NAME: Vircadia
     depends_on:
-      - mongo_db   
+      - mongo_db  
+      - redis 
   nginx:
     image: nginx:latest
     volumes:
       - ./conf.d:/etc/nginx/conf.d 
       - /etc/letsencrypt:/etc/letsencrypt
-      - /opt/goobieverse-website/dist/spa:/opt/goobieverse-website/dist/spa 
     depends_on:
-      - api 
+      - api
     ports:
-      - 3030:3030
-      - 443:443
-      - 80:80    
+      - 3040:3040
+      - 443:443 
 volumes:
   mongo_db: {}
+  redis_server: {}

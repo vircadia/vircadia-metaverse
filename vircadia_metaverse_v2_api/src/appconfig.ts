@@ -41,7 +41,7 @@ dotenv.config({
 const server = {
     local: process.env.LOCAL === 'true',
     hostName: process.env.SERVER_HOST,
-    port: process.env.PORT ?? 3030,
+    port: process.env.PORT ?? 3040,
     paginate: {
         default: 10,
         max: 100,
