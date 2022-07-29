@@ -60,7 +60,7 @@ const server = {
 
 const database = {
     databaseUrl: process.env.DATABASE_URL,
-    dbName: process.env.DB_NAME ?? 'tester',
+    dbName: process.env.DB_NAME ?? 'admin',
     dbUserName: process.env.DB_USER ?? 'metaverse',
     dbPassword: process.env.DB_PASSWORD ?? 'nooneknowsit',
     host: process.env.DB_HOST ?? 'localhost',
