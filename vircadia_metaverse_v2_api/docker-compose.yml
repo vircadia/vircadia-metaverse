@@ -42,7 +42,7 @@ services:
       - api
     ports:
       - 3040:3040
-      - 443:443 
+      - 445:445 
 volumes:
   mongo_db: {}
   redis_server: {}
