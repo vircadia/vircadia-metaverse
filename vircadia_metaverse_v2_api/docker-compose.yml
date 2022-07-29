@@ -27,7 +27,7 @@ services:
       - .:/usr/src/api
     environment:
      PORT: 3040
-     MONGODB_URL: mongodb://mongodb_container_v1:27018
+     MONGODB_URL: mongodb://mongodb_container_v1:27017
      REDIS_URL: redis://redis_container_v1:6379
      NAME: Vircadia
     depends_on:
