@@ -215,7 +215,7 @@ export class Users extends DatabaseService {
 
                                     const verificationURL =
                                         config.metaverse.metaverseServerUrl +
-                                        `/account/verify/email?a=${account.id}&v=${verifyCode}`;
+                                        `/api/v1/account/verify/email?a=${account.id}&v=${verifyCode}`;
                                     const metaverseName =
                                         config.metaverse.metaverseName;
                                     const shortMetaverseName =
@@ -226,6 +226,9 @@ export class Users extends DatabaseService {
                                         config.metaverseServer
                                             .email_verification_email_body
                                     );
+                                    
+                                    console.log(verificationURL,"verificationURL")
+                                    console.log(verificationFile,"verificationFile")
 
                                     let emailBody = await fsPromises.readFile(
                                         verificationFile,
