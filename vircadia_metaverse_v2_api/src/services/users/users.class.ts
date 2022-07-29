@@ -215,7 +215,7 @@ export class Users extends DatabaseService {
 
                                     const verificationURL =
                                         config.metaverse.metaverseServerUrl +
-                                        `/api/v1/account/verify/email?a=${account.id}&v=${verifyCode}`;
+                                        `/api/v1/accounts/verify/email?a=${account.id}&v=${verifyCode}`;
                                     const metaverseName =
                                         config.metaverse.metaverseName;
                                     const shortMetaverseName =
