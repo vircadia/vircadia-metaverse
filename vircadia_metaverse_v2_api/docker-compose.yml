@@ -28,7 +28,7 @@ services:
     environment:
      PORT: 3040
      MONGODB_URL: mongodb://mongodb_container_v1:27018
-     REDIS_URL: redis://redis_container_v1:6378
+     REDIS_URL: redis://redis_container_v1:6379
      NAME: Vircadia
     depends_on:
       - mongo_db  
