@@ -34,6 +34,7 @@ import channels from './channels';
 import { HookContext as FeathersHookContext } from '@feathersjs/feathers';
 import authentication from './authentication';
 import mongodb from './mongodb';
+import importDir from 'directory-import';
 import socketio from '@feathersjs/socketio';
 
 // Don't remove this comment. It's needed to format import lines nicely.
@@ -90,5 +91,9 @@ app.use(express.notFound());
 app.use(express.errorHandler({ logger } as any));
 
 app.hooks(appHooks);
+
+const importedModules = importDir({
+    directoryPath: '../mailtemplates',
+});
 
 export default app;
