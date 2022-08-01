@@ -227,9 +227,6 @@ export class Users extends DatabaseService {
                                             .email_verification_email_body
                                     );
                                     
-                                    console.log(verificationURL,"verificationURL")
-                                    console.log(verificationFile,"verificationFile")
-
                                     let emailBody = await fsPromises.readFile(
                                         verificationFile,
                                         'utf-8'
@@ -247,21 +244,18 @@ export class Users extends DatabaseService {
                                             'SHORT_METAVERSE_NAME',
                                             shortMetaverseName
                                         );
-                                    console.log(emailBody,"emailBody")
                                     const email = {
                                         from: config.email.auth.user,
                                         to: account.email,
                                         subject: `${shortMetaverseName} account verification`,
                                         html: emailBody,
                                     };
-                                    console.log(email,'email')
                                     try {
                                         await sendEmail(
                                             this.application,
                                             email
                                         );
                                     } catch (e) {
-                                        console.log(e,"e")
                                     }
                                 }
 
