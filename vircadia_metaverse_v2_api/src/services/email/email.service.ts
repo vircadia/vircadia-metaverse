@@ -32,6 +32,8 @@ declare module '../../declarations' {
 
 export default function (app: Application): void {
     const event = Mailer(smtpTransport(config.email));
+    console.log(config.email,"config.email")
+    console.log(event,"event")
     app.use('email', event);
 
     const service = app.service('email');
