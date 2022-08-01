@@ -3,7 +3,7 @@ version: '3.9'
 services:
   # MongoDB service
   mongo_db:
-    container_name: vircadia_mongodb_container_v1
+    container_name: mongodb_container_v1
     image: mongo:latest
     restart: always
     #ports:
@@ -11,7 +11,7 @@ services:
     volumes:
       - mongo_db:/data/db
   redis:
-        container_name: vircadia_redis_container_v1
+        container_name: redis_container_v1
         restart: always
         image: redis/redis-stack:latest
         # command: redis-server --save 20 1 --loglevel warning
@@ -27,8 +27,8 @@ services:
       - .:/usr/src/api
     environment:
      PORT: 3040
-     MONGODB_URL: mongodb://vircadia_mongodb_container_v1:27017
-     REDIS_URL: redis://vircadia_redis_container_v1:6379
+     MONGODB_URL: mongodb://mongodb_container_v1:27017
+     REDIS_URL: redis://redis_container_v1:6379
      NAME: Vircadia
     depends_on:
       - mongo_db  
