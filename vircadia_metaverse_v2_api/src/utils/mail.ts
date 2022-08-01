@@ -29,8 +29,8 @@ export async function sendEmail(app: Application, email: any): Promise<void> {
         console.log(result,"result")
         return result;
     } catch (error: any) {
-        return Promise.reject(new BadRequest(error));
         console.log(error,"error")
+        return Promise.reject(new BadRequest(error));
     }
 }
 
