@@ -1,8 +1,8 @@
 # Iamus
 
-Metaverse server for [Vircadia Project] implemented in [NodeJS]/[ExpressJS]/[TypeScript].
+Metaverse server for [Overte] implemented in [NodeJS]/[ExpressJS]/[TypeScript].
 This supports the basic inter-domain operations for a
-[Vircadia Project] grid: accounts, etc.
+[Overte] grid: accounts, etc.
 
 For building, refer to [Building](docs/Building.md).
 
@@ -20,7 +20,7 @@ The original metaverse-server project is named "Project Apollo".
 "Iamus" is one of the Greek god Apollo's many sons.
 See https://en.wikipedia.org/wiki/Iamus .
 
-[Vircadia Project]: https://vircadia.com/
+[Overte]: https://overte.org/
 [NodeJS]: https://nodejs.org/
 [ExpressJS]: https://expressjs.com/
 [TypeScript]: https://www.typescriptlang.org/
