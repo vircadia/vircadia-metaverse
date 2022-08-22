@@ -42,7 +42,7 @@ export default {
         get: [disallow()],
         create: [
             validate.form(createUserSchema, joiOptions),
-            hashPassword('password'),
+            hashPassword('user.password'),
         ],
         update: [disallow()],
         patch: [disallow()],

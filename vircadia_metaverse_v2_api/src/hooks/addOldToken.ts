@@ -28,21 +28,17 @@ export default () => {
                 undefined,
                 context
             );
-            console.log('AddoldToken hook called')
 
             dbService.deleteMultipleData(config.dbCollections.tokens, {
                 query: { expirationTime: { $lt: getUtcDate() } },
             });
-            console.log('AddoldToken hook called mutliple delete data')
 
             const token = await Tokens.createToken(context.result.user?.id, [
                 TokenScope.OWNER,
             ]);
-            console.log('AddoldToken hook called token created successfully',token)
 
             token.token_type = 'Bearer';
             await dbService.createData(config.dbCollections.tokens, token);
-            console.log('AddoldToken hook called token inserted to db',token)
 
             context.result.data = {
                 access_token: token.token,
@@ -58,7 +54,6 @@ export default () => {
                 account_roles: context.result.user?.roles,
             };
         }
-        console.log('AddoldToken hook called context returned')
 
         return context;
     };

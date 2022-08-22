@@ -14,7 +14,6 @@ export default () => {
                 const authResult = context.result;
 
                 const currentTime = Math.floor(Date.now() / 1000);
-                console.log('REdis storeAuthTokenInREdis hook:------>>');
 
                 // get expired tokens
                 const expiredAuths: any = await authRepository
@@ -22,7 +21,6 @@ export default () => {
                     .where('expires')
                     .lte(currentTime)
                     .returnAll();
-                console.log('Expired Auths:', expiredAuths);
 
                 // delete expired tokens
                 const deleteAuths =
@@ -30,7 +28,6 @@ export default () => {
                     expiredAuths.forEach((expiredAuth: any) => {
                         authRepository.remove(expiredAuth.entityId);
                     });
-                console.log('Redis deleted expired auth tokens:', deleteAuths);
 
                 // create new token
                 await authRepository.createAndSave({
