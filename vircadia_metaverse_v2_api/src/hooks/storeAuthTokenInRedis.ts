@@ -1,6 +1,6 @@
 import { NotAuthenticated } from '@feathersjs/errors';
 import { HookContext } from '@feathersjs/feathers';
-import { authRepository, redisClient } from '../redis';
+import { authRepository } from '../redis';
 import { IsNotNullOrEmpty, IsNullOrEmpty } from '../utils/Misc';
 
 export default () => {
@@ -14,30 +14,23 @@ export default () => {
                 const authResult = context.result;
 
                 const currentTime = Math.floor(Date.now() / 1000);
+                console.log('REdis storeAuthTokenInREdis hook:------>>');
 
-                const allAuthTokens = await authRepository
+                // get expired tokens
+                const expiredAuths: any = await authRepository
                     .search()
-                    .return.all();
+                    .where('expires')
+                    .lte(currentTime)
+                    .returnAll();
+                console.log('Expired Auths:', expiredAuths);
 
-                if (IsNotNullOrEmpty(allAuthTokens)) {
-                    // get expired tokens
-                    const expiredAuths: any = await authRepository
-                        .search()
-                        .where('expires')
-                        .lte(currentTime)
-                        .returnAll();
-
-                    // delete expired tokens
-                    const deleteAuths =
-                        IsNotNullOrEmpty(expiredAuths) &&
-                        expiredAuths.map((expiredAuth: any) => {
-                            return (
-                                expiredAuth.prefix + ':' + expiredAuth.entityId
-                            );
-                        });
-
-                    await redisClient.del(deleteAuths);
-                }
+                // delete expired tokens
+                const deleteAuths =
+                    IsNotNullOrEmpty(expiredAuths) &&
+                    expiredAuths.forEach((expiredAuth: any) => {
+                        authRepository.remove(expiredAuth.entityId);
+                    });
+                console.log('Redis deleted expired auth tokens:', deleteAuths);
 
                 // create new token
                 await authRepository.createAndSave({
@@ -54,4 +47,3 @@ export default () => {
         return context;
     };
 };
-

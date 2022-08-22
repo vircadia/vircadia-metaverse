@@ -24,6 +24,7 @@ import * as local from '@feathersjs/authentication-local';
 const { authenticate } = feathersAuthentication.hooks;
 const { protect } = local.hooks;
 import { iff, isProvider } from 'feathers-hooks-common';
+import authTokenValidate from '../../hooks/authTokenValidate';
 
 export default {
     before: {
@@ -39,7 +40,11 @@ export default {
     after: {
         all: [protect(...['password', 'passwordSalt', 'passwordHash'])],
         find: [],
-        get: [iff(isProvider('external'), addOldToken(), updateLastOnline())],
+        get: [
+            iff(isProvider('external'), addOldToken(), updateLastOnline()).else(
+                authTokenValidate()
+            ),
+        ],
         create: [],
         update: [],
         patch: [],
@@ -56,4 +61,3 @@ export default {
         remove: [],
     },
 } as HooksObject;
-

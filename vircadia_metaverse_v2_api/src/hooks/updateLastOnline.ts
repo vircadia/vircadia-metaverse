@@ -25,6 +25,8 @@ export default () => {
     return async (context: HookContext): Promise<HookContext> => {
         const dbService = new DatabaseService({ id: 'id' }, undefined, context);
         const loginUser = extractLoggedInUserFromParams(context.params);
+        console.log('Update last online user:', loginUser.id);
+
         if (IsNotNullOrEmpty(loginUser)) {
             const result = await dbService.patchData(
                 config.dbCollections.accounts,
@@ -34,9 +36,9 @@ export default () => {
                 }
             );
             context.result.lastOnline = result.lastOnline;
+            console.log('Update last context.result.lastOnline:', result.lastOnline);
         }
 
         return context;
     };
 };
-

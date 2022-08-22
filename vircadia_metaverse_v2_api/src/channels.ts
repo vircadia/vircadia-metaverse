@@ -34,15 +34,18 @@ export default function (app: Application): void {
     app.on('login', (authResult: any, { connection }: any): void => {
         // connection can be undefined if there is no
         // real-time connection, e.g. when logging in via REST
+        console.log('Login authentication api called');
+
         if (connection) {
             // Obtain the logged in user from the connection
             // const user = connection.user;
-
             // The connection is no longer anonymous, remove it
             app.channel('anonymous').leave(connection);
+            console.log('Login authentication connection');
 
             // Add it to the authenticated user channel
             app.channel('authenticated').join(connection);
+            console.log('Login authentication api in socket');
 
             // Channels can be named anything and joined on any condition
 
@@ -66,6 +69,7 @@ export default function (app: Application): void {
                 .where('token')
                 .equals(authResult.accessToken)
                 .returnAll();
+            console.log('Logout remove authentication api called');
 
             if (IsNotNullOrEmpty(authToken)) {
                 await authRepository.remove(authToken[0].entityId);
