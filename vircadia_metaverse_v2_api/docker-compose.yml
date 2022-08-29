@@ -7,7 +7,7 @@ services:
     image: mongo:latest
     restart: always
     #ports:
-     # - 27018:27017
+    # - 27017:27017
     volumes:
       - mongo_db:/data/db
   redis:
@@ -22,7 +22,7 @@ services:
     #container_name: vircadia-metaverse
     build: .
     # ports:
-      # - 3030:3030
+    #   - 3040
     volumes:
       - .:/usr/src/api
     environment:
@@ -37,12 +37,14 @@ services:
     image: nginx:latest
     volumes:
       - ./conf.d:/etc/nginx/conf.d 
-      - /etc/letsencrypt:/etc/letsencrypt
     depends_on:
       - api
+      - mongodb_container_v1
     ports:
       - 3040:3040
-      - 445:445 
+      - 445:445
+      - 80:80 
+      - 27017:27017  
 volumes:
   mongo_db: {}
   redis_server: {}

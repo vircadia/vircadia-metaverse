@@ -19,7 +19,7 @@ import { GeneralError } from '@feathersjs/errors';
 import { TDeployedHardhatContractsJson } from './../../../ethereum/dlt/interfaces/contractTypes';
 import deployedContracts from './../../../ethereum/dlt/hardhat_contracts.json';
 import { IsNullOrEmpty } from '../../utils/Misc';
-import { VircadiaERC20 } from '../../../ethereum/dlt/typechain/VircadiaERC20'
+import { VircadiaERC20 } from './../../../ethereum/dlt/typechain/VircadiaERC20'
 import { BlockchainOptions } from './../../services/token-transfer/token-transfer.class';
 
 // Connects to the deployed ERC20 token contract and passes it to service or subsequent hooks

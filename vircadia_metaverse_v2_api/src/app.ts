@@ -92,8 +92,10 @@ app.use(express.errorHandler({ logger } as any));
 
 app.hooks(appHooks);
 
+/*
 const importedModules = importDir({
     directoryPath: '../mailtemplates',
 });
+*/
 
 export default app;
