@@ -14,13 +14,15 @@
 
 'use strict';
 
-import { ServiceAddons } from '@feathersjs/feathers';
 import { AuthenticationService, JWTStrategy } from '@feathersjs/authentication';
 import { LocalStrategy } from '@feathersjs/authentication-local';
 import { expressOauth } from '@feathersjs/authentication-oauth';
+import { NotAuthenticated } from '@feathersjs/errors';
+import { ServiceAddons } from '@feathersjs/feathers';
 import { Application } from './declarations';
-import { GoogleStrategy } from './services/strategies/google';
 import { FacebookStrategy } from './services/strategies/facebook';
+import { GoogleStrategy } from './services/strategies/google';
+import { validatePassword } from './utils/Utils';
 
 declare module './declarations' {
     interface ServiceTypes {
@@ -30,9 +32,19 @@ declare module './declarations' {
 
 export default function (app: Application): void {
     const authentication = new AuthenticationService(app);
+    class MyLocalStrategy extends LocalStrategy {
+        async comparePassword(entity: any, password: string): Promise<any> {
+            const { errorMessage } = this.configuration;
+            if (await validatePassword(entity, password)) {
+                return entity;
+            } else {
+                throw new NotAuthenticated(errorMessage);
+            }
+        }
+    }
 
     authentication.register('jwt', new JWTStrategy());
-    authentication.register('local', new LocalStrategy());
+    authentication.register('local', new MyLocalStrategy());
     authentication.register('google', new GoogleStrategy(app));
     authentication.register('facebook', new FacebookStrategy(app));
 

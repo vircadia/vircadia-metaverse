@@ -23,6 +23,7 @@ import { AccountInterface } from '../common/interfaces/AccountInterface';
 import { Roles } from '../common/sets/Roles';
 import { SArray } from './vTypes';
 import { blackListedMail } from './blacklistArray';
+import { hashPasswordSalt } from './Misc';
 
 // The legacy interface returns public keys as a stripped PEM key.
 // "stripped" in that the bounding "BEGIN" and "END" lines have been removed.
@@ -70,8 +71,9 @@ export async function validatePassword(
     pAcct: AccountInterface,
     pPassword: string
 ): Promise<boolean> {
-    const result = await bcrypt.compare(pPassword, pAcct.password);
-    return result;
+    return (
+        hashPasswordSalt(pPassword, pAcct.passwordSalt) === pAcct.passwordHash
+    );
 }
 
 export function isOnline(pAcct: AccountInterface): boolean {

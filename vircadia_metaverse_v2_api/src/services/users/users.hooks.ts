@@ -29,6 +29,7 @@ import {
     joiOptions,
     joiReadOptions,
 } from './users.joi';
+import passwordSaltAdd from '../../hooks/passwordSaltAdd';
 const { authenticate } = authentication.hooks;
 const { hashPassword } = local.hooks;
 
@@ -42,6 +43,7 @@ export default {
         get: [disallow()],
         create: [
             validate.form(createUserSchema, joiOptions),
+            passwordSaltAdd(),
             hashPassword('user.password'),
         ],
         update: [disallow()],

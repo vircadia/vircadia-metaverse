@@ -176,3 +176,9 @@ export function genRandomNumber(maxNumber: number): number {
     return Math.floor(Math.random() * maxNumber);
 }
 
+export function hashPasswordSalt(pPassword: string, pSalt: string): string {
+    const hash = crypto.createHmac('sha512', pSalt);
+    hash.update(pPassword);
+    const val = hash.digest('hex');
+    return val;
+}

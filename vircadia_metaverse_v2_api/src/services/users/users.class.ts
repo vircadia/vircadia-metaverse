@@ -93,6 +93,8 @@ export class Users extends DatabaseService {
 
         const email: string = data.email;
         const password: string = data.password;
+        const passwordHash: string = data.passwordHash;
+        const passwordSalt: string = data.passwordSalt;
         const ethereumAddress: string = data.ethereumAddress ?? '';
         const googleId: string = data.googleId;
         const facebookId: string = data.facebookId;
@@ -165,6 +167,8 @@ export class Users extends DatabaseService {
                                 ethereumAddress: ethereumAddress,
                                 email: email,
                                 password: password,
+                                passwordSalt: passwordSalt,
+                                passwordHash: passwordHash,
                                 roles: roles,
                                 whenCreated: whenCreated,
                                 friends: friends,
