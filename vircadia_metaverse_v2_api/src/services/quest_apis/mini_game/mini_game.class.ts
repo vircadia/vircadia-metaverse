@@ -146,7 +146,6 @@ export class MiniGame extends DatabaseService {
      *                     }
      *                 ],
      *                 "xp":100,
-     *                 "goo":100
      *              }
      *           }
      * @returns - {
@@ -177,7 +176,6 @@ export class MiniGame extends DatabaseService {
      *                     }
      *                 ],
      *                 "xp":100,
-     *                 "goo":100
      *              }
      *           } or  { status: 'failure', message: 'message'}
      *
@@ -240,7 +238,6 @@ export class MiniGame extends DatabaseService {
      *                     }
      *                 ],
      *                 "xp":100,
-     *                 "goo":100
      *              }
      *           } or  { status: 'failure', message: 'message'}
      */

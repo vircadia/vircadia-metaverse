@@ -63,7 +63,6 @@ export interface AccountInterface {
     level: number;
     bio: string;
     country: string;
-    // goo: number;
     xp: number;
 
     achievementId: string;
