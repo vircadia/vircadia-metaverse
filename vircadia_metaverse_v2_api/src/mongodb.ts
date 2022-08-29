@@ -21,6 +21,7 @@ import config from './appconfig';
 
 export default function (app: Application): void {
     let connection = '';
+     console.log("==>>>>>Connecting");
     if (IsNotNullOrEmpty(config.database.databaseUrl)) {
         connection = config.database.databaseUrl || '';
     } else {
@@ -35,7 +36,7 @@ export default function (app: Application): void {
         connection = `mongodb://${hostSpec}/${optionsSpec}`; //Without auth
     }
     const database = config.database.dbName;
-    console.log(connection);
+    console.log("==>>>>>",connection);
     const mongoClient = MongoClient.connect(connection).then((client) =>
         client.db(database)
     );
