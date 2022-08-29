@@ -55,7 +55,7 @@ const itemSchema = {
 const rewardSchema = {
     items: Joi.array().items(itemSchema).label('Items'),
     xp: Joi.number().integer().min(0).label('XP'),
-    goo: Joi.number().integer().min(0).label('Goo'),
+    //goo: Joi.number().integer().min(0).label('Goo'),
 };
 
 const id = Joi.string().trim().label('ID');
