@@ -80,10 +80,10 @@ const email = {
     port: parseInt(process.env.SMTP_PORT ?? '465'),
     secure: process.env.SMTP_SECURE === 'false' ? false : true,
     auth: {
-        user: process.env.SMTP_USER ?? 'khilan.odan@gmail.com',
-        pass: process.env.SMTP_PASS ?? 'blackhawk143',
+        user: process.env.SMTP_USER ?? '',
+        pass: process.env.SMTP_PASS ?? '',
     },
-    email_from: process.env.SMTP_EMAIL_FROM ?? 'khilan.odan@gmail.com',
+    email_from: process.env.SMTP_EMAIL_FROM ?? '',
 };
 
 /**
@@ -160,7 +160,7 @@ const authentication = {
     secret: process.env.AUTH_SECRET ?? 'testing',
     authStrategies: ['jwt', 'local'],
     jwtOptions: {
-        expiresIn: '60 days',
+        expiresIn: '336 days',
     },
     local: {
         usernameField: 'username',

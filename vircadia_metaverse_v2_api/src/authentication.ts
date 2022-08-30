@@ -47,7 +47,8 @@ export default function (app: Application): void {
     authentication.register('local', new MyLocalStrategy());
     authentication.register('google', new GoogleStrategy(app));
     authentication.register('facebook', new FacebookStrategy(app));
-
-    app.use('/authentication', authentication);
+    
+    app.use('/oauth/token',authentication);
+   // app.use('/authentication', authentication);
     app.configure(expressOauth());
 }
