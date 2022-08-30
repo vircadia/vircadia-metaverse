@@ -6,14 +6,16 @@ import { IsNullOrEmpty } from '../utils/Misc';
 export default () => {
     return async (context: HookContext): Promise<HookContext> => {
         const contextAuth = context.params.authentication?.accessToken;
-        const authToken = contextAuth
+        let authToken = contextAuth
             ? contextAuth
             : context.params.headers?.authorization;
+
+        let newAuthJwt = authToken.split(' ');
 
         const existAuth: any = await authRepository
             .search()
             .where('token')
-            .equals(authToken)
+            .equals(newAuthJwt[newAuthJwt.length - 1])
             .returnAll();
 
         if (IsNullOrEmpty(existAuth)) {
