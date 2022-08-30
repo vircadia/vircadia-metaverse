@@ -39,7 +39,6 @@ export default () => {
 
             token.token_type = 'Bearer';
             await dbService.createData(config.dbCollections.tokens, token);
-            console.log(context);
 
             context.result = {
                 ...context.result,
