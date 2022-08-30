@@ -16,9 +16,9 @@
 
 import { AccountInterface } from '../common/interfaces/AccountInterface';
 import { HookContext } from '@feathersjs/feathers';
-import { IsNotNullOrEmpty } from '../utils/Misc';
+import { IsNotNullOrEmpty, isValidUUID } from '../utils/Misc';
 import { Perm } from '../utils/Perm';
-import { isAdmin } from '../utils/Utils';
+import { isAdmin, isValidArray } from '../utils/Utils';
 import config from '../appconfig';
 import { HTTPStatusCode } from '../utils/response';
 import { Availability } from '../common/sets/Availability';
@@ -34,8 +34,15 @@ export default (collection: string, pRequiredAccess: Perm[]) => {
 
         const loginUser = extractLoggedInUserFromParams(context.params);
 
+        let condition  : any = {};
+        if(isValidUUID(context.id)){
+            condition.id = context.id;
+        }else{
+            condition.username = context.id;
+        }
+    
         const entryDataArray = await dbService.findDataToArray(collection, {
-            query: { id: context.id },
+            query: condition,
         });
         let canAccess = false;
 
