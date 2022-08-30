@@ -54,7 +54,7 @@ const filter = Joi.string().trim();
 const status = Joi.string().trim();
 const search = Joi.string().trim();
 const acct = Joi.string().trim();
-const asAdmin = Joi.boolean();
+const asAdmin = Joi.boolean().allow('').default(false);
 
 export const findAccountsSchema = Joi.object().keys({
     a,

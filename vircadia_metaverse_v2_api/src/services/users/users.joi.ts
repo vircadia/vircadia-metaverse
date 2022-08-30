@@ -44,7 +44,7 @@ const per_page = Joi.number().integer().positive();
 const page = Joi.number().integer().positive();
 const filter = Joi.string().trim();
 const status = Joi.string().trim();
-const asAdmin = Joi.boolean();
+const asAdmin = Joi.boolean().allow('').default(false);
 const account = Joi.string().trim();
 export const findUserSchema = Joi.object().keys({
     per_page,

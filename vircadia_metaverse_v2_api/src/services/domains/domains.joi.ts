@@ -56,7 +56,7 @@ export const editDomainSchema = Joi.object().keys({
 const per_page = Joi.number().integer().positive();
 const page = Joi.number().integer().positive();
 const account = Joi.string().trim();
-const asAdmin = Joi.boolean();
+const asAdmin = Joi.boolean().allow('').default(false);
 
 export const findDomainSchema = Joi.object().keys({
     per_page,

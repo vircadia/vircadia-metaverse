@@ -17,7 +17,7 @@ import { HookContext } from '@feathersjs/feathers';
 
 const per_page = Joi.number().integer().positive();
 const page_num = Joi.number().integer().positive();
-const asAdmin = Joi.boolean();
+const asAdmin = Joi.boolean().allow('').default(false);
 
 export const findAccountTokenSchema = Joi.object().keys({
     per_page,
