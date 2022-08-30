@@ -32,13 +32,15 @@ import {
     buildPaginationResponse,
     buildSimpleResponse,
 } from '../../common/responsebuilder/responseBuilder';
-import { getUtcDate } from '../../utils/Utils';
+import { getUtcDate, isAdmin } from '../../utils/Utils';
 import {
     NotAcceptable,
     BadRequest,
     NotFound,
     NotAuthenticated,
 } from '@feathersjs/errors';
+import { extractLoggedInUserFromParams } from '../auth/auth.utils';
+import { AccountInterface } from '../../common/interfaces/AccountInterface';
 
 /**
  * Place.
@@ -294,6 +296,7 @@ export class Place extends DatabaseService {
      */
 
     async find(params: Params): Promise<any> {
+        const loginUser = extractLoggedInUserFromParams(params);
         const perPage = parseInt(params?.query?.per_page) || 10;
         const page = parseInt(params?.query?.page) || 1;
         const skip = (page - 1) * perPage;
@@ -301,7 +304,21 @@ export class Place extends DatabaseService {
         const order = params?.query?.order || '';
         const search = params?.query?.search || '';
         const tag = params?.query?.tag?.split(',');
+        const targetAccount = params?.query?.account ?? '';
         const filterQuery: any = {};
+        const domainquery: any = {};
+        let asAdmin = params?.query?.asAdmin === 'true' ? true : false;
+
+        if (
+            asAdmin &&
+            IsNotNullOrEmpty(loginUser) &&
+            isAdmin(loginUser as AccountInterface)
+        ) {
+            asAdmin = true;
+        } else {
+            asAdmin = false;
+        }
+
         if (IsNotNullOrEmpty(maturity)) {
             filterQuery.maturity = maturity;
         }
@@ -311,6 +328,12 @@ export class Place extends DatabaseService {
         if (IsNotNullOrEmpty(tag)) {
             filterQuery.tag = { $in: tag };
         }
+        if (asAdmin) {
+            domainquery.sponsorAccountId = targetAccount;
+        } else if (!asAdmin) {
+            domainquery.sponsorAccountId = loginUser.id;
+        }
+
         if (IsNotNullOrEmpty(order)) {
             filterQuery.$sort = {
                 whenCreated: order == 'descending' ? -1 : 1,
@@ -338,21 +361,33 @@ export class Place extends DatabaseService {
 
         const domains = await this.findDataToArray(
             config.dbCollections.domains,
-            { query: { id: { $in: domainIds } } }
+            { query: { ...domainquery, id: { $in: domainIds } } }
         );
 
         const places: any[] = [];
 
-        (placesData as Array<PlaceInterface>)?.forEach(async (element) => {
-            let DomainInterface: DomainInterface | undefined;
-            for (const domain of domains) {
-                if (domain && domain.id === element.domainId) {
-                    DomainInterface = domain;
-                    break;
+        await Promise.all(
+            (placesData as Array<PlaceInterface>)?.map(async (element) => {
+                let DomainInterface: DomainInterface | undefined;
+                for await (const domain of domains) {
+                    if (domain && domain.id === element.domainId) {
+                        DomainInterface = domain;
+                        if (
+                            DomainInterface?.sponsorAccountId === loginUser.id
+                        ) {
+                            places.push(
+                                await buildPlaceInfo(
+                                    this,
+                                    element,
+                                    DomainInterface
+                                )
+                            );
+                        }
+                        break;
+                    }
                 }
-            }
-            places.push(await buildPlaceInfo(this, element, DomainInterface));
-        });
+            })
+        );
 
         const data = {
             places: places,

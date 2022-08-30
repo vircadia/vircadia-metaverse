@@ -35,7 +35,10 @@ import validators from '@feathers-plus/validate-joi';
 export default {
     before: {
         all: [],
-        find: [validators.form(findPlaceSchema, joiReadOptions)],
+        find: [
+            authenticate('jwt'),
+            validators.form(findPlaceSchema, joiReadOptions),
+        ],
         get: [
             authenticate('jwt'),
             checkAccessToAccount(config.dbCollections.accounts, [

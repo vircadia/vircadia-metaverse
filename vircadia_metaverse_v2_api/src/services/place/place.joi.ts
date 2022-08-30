@@ -43,6 +43,8 @@ const order = Joi.string().trim();
 const maturity = Joi.string().trim();
 const tag = Joi.string().trim();
 const search = Joi.string().trim();
+const asAdmin = Joi.boolean().allow('').default(false);
+const account = Joi.string().trim();
 
 export const findPlaceSchema = Joi.object({
     per_page,
@@ -51,6 +53,8 @@ export const findPlaceSchema = Joi.object({
     maturity,
     tag,
     search,
+    account,
+    asAdmin
 });
 
 export const joiOptions = { convert: true, abortEarly: false };
