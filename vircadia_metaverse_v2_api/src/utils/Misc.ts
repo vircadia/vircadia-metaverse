@@ -20,7 +20,7 @@ import https from 'https';
 import os from 'os';
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
-import { validate as isValidUUID } from 'uuid';
+import { validate as isValiduuid } from 'uuid';
 
 
 
@@ -39,7 +39,7 @@ export function GenUUID(): string {
 }
 
 export function isValidUUID(uuid:any):boolean{
-   return isValidUUID(uuid);
+   return isValiduuid(uuid);
 }
 
 
