@@ -217,7 +217,9 @@ export class Users extends DatabaseService {
                                         request
                                     );
 
-                                    const verificationURL =
+                                  
+                                    try {
+                                        const verificationURL =
                                         config.metaverse.metaverseServerUrl +
                                         `/api/v1/accounts/verify/email?a=${account.id}&v=${verifyCode}`;
                                     const metaverseName =
@@ -254,7 +256,6 @@ export class Users extends DatabaseService {
                                         subject: `${shortMetaverseName} account verification`,
                                         html: emailBody,
                                     };
-                                    try {
                                         await sendEmail(
                                             this.application,
                                             email
