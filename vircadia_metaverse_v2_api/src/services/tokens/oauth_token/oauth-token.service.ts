@@ -19,6 +19,7 @@ import { ServiceAddons } from '@feathersjs/feathers';
 import { Application } from '../../../declarations';
 import { AccountFeild } from './oauth-token.class';
 import hooks from './oauth-token.hooks';
+import multer from 'multer';
 
 // Add this service to the service type index
 declare module '../../../declarations' {
@@ -32,13 +33,17 @@ export default function (app: Application): void {
         paginate: app.get('paginate'),
         id: 'id',
     };
+    const multipartMiddleware = multer({ limits: { fieldSize: Infinity } });
 
     // Initialize our service with any options it requires
-    app.use('/oauth/token', new AccountFeild(options, app));
+    app.use(
+        '/oauth/token',
+        multipartMiddleware.any(),
+        new AccountFeild(options, app)
+    );
 
     // Get our initialized service so that we can register hooks
     const service = app.service('oauth/token');
 
     service.hooks(hooks);
 }
-

@@ -18,7 +18,7 @@ import { AuthenticationService, JWTStrategy } from '@feathersjs/authentication';
 import { LocalStrategy } from '@feathersjs/authentication-local';
 import { expressOauth } from '@feathersjs/authentication-oauth';
 import { NotAuthenticated } from '@feathersjs/errors';
-import { ServiceAddons } from '@feathersjs/feathers';
+import {  ServiceAddons } from '@feathersjs/feathers';
 import { Application } from './declarations';
 import { FacebookStrategy } from './services/strategies/facebook';
 import { GoogleStrategy } from './services/strategies/google';

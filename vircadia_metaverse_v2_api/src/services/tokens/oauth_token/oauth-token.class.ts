@@ -69,6 +69,8 @@ export class AccountFeild extends DatabaseService {
                 const userName = data.username;
                 const userPassword = data.password;
                 const userScope: string = data.scope ?? TokenScope.OWNER;
+
+                params.headers['content-type'] = 'application/json';
                 if (TokenScope.KnownScope(userScope)) {
                     const tokenData = await this.app
                         ?.service('authentication')
@@ -179,10 +181,9 @@ export class AccountFeild extends DatabaseService {
         };
         if (pAcct) {
             (body.account_id = pAcct.id),
-            (body.account_name = pAcct.username),
-            (body.account_roles = pAcct.roles);
+                (body.account_name = pAcct.username),
+                (body.account_roles = pAcct.roles);
         }
         return body;
     }
 }
-

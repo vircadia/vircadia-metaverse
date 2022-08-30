@@ -22,7 +22,7 @@ import { disallow } from 'feathers-hooks-common';
 
 export default {
     before: {
-        all: [authenticate('jwt')],
+        all: [],
         find: [disallow()],
         get: [disallow()],
         create: [],
