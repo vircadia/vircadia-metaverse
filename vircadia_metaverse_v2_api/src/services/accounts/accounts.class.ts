@@ -23,7 +23,7 @@ import config from '../../appconfig';
 import { AccountInterface } from '../../common/interfaces/AccountInterface';
 import { RequestInterface } from '../../common/interfaces/RequestInterface';
 import { buildAccountInfo } from '../../common/responsebuilder/accountsBuilder';
-import { IsNotNullOrEmpty, IsNullOrEmpty } from '../../utils/Misc';
+import { IsNotNullOrEmpty, IsNullOrEmpty, isValidUUID } from '../../utils/Misc';
 import { NotAuthenticated, NotFound, BadRequest } from '@feathersjs/errors';
 
 import {
@@ -230,11 +230,25 @@ export class Accounts extends DatabaseService {
      */
 
     async get(id: Id): Promise<any> {
-        const objAccount = await this.getData(
-            config.dbCollections.accounts,
-            id
-        );
-        if (IsNotNullOrEmpty(objAccount)) {
+        let objAccount = null;
+        if(isValidUUID(id)){
+            objAccount = await this.getData(
+                config.dbCollections.accounts,
+                id
+            );
+        }else{
+            
+            const accounts = await this.findDataToArray(
+                config.dbCollections.accounts,
+                {query:{ username:id }}
+            );
+
+            if(IsNotNullOrEmpty(accounts)){
+                objAccount = accounts[0];
+            }
+
+        }
+        if (IsNotNullOrEmpty(objAccount) && objAccount) {
             const account = await buildAccountInfo(objAccount);
             return Promise.resolve(buildSimpleResponse({ account }));
         } else {

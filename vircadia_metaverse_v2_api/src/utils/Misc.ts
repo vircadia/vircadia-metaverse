@@ -20,6 +20,9 @@ import https from 'https';
 import os from 'os';
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
+import { validate as isValidUUID } from 'uuid';
+
+
 
 // Return 'true' if the passed value is null or empty
 export function IsNullOrEmpty(pVal: any): boolean {
@@ -34,6 +37,11 @@ export function IsNullOrEmpty(pVal: any): boolean {
 export function GenUUID(): string {
     return uuidv4();
 }
+
+export function isValidUUID(uuid:any):boolean{
+   return isValidUUID(uuid);
+}
+
 
 // Return 'true' if the passed value is not null or empty
 export function IsNotNullOrEmpty(pVal: any): boolean {
