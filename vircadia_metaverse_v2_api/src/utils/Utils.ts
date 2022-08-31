@@ -93,16 +93,16 @@ export function couldBeDomainId(pId: string): boolean {
 // Return the ISODate when an account is considered offline
 export function dateWhenNotOnline(): Date {
     const whenOffline = new Date(
-        getUtcDate().valueOf() -
-            config.metaverseServer.heartbeat_seconds_until_offline
+        Date.now() -
+            (config.metaverseServer.heartbeat_seconds_until_offline * 1000)
     );
     return whenOffline;
 }
 
 export function dateWhenNotActive(): Date {
     const whenNotActive = new Date(
-        getUtcDate().valueOf() -
-            config.metaverseServer.place_inactive_timeout_minutes
+        Date.now() -
+            (config.metaverseServer.domain_seconds_until_offline * 1000)
     );
     return whenNotActive;
 }

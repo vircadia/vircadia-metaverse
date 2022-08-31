@@ -74,8 +74,8 @@ export class StatsMetaverse extends Stat {
                     {
                         query: {
                             $or: [
-                                { numUsers: { $gt: { $gt: 0 } } },
-                                { anonUsers: { $gt: { $gt: 0 } } },
+                                { numUsers: { $gt: 0 } },
+                                { anonUsers: { $gt: 0 } },
                             ],
                         },
                     }
@@ -132,7 +132,7 @@ export class StatsMetaverse extends Stat {
                     config.dbCollections.domains,
                     {
                         query: {
-                            timeOfLastHeartbeat: { $gte: dateWhenNotOnline() },
+                            timeOfLastHeartbeat: { $gte: dateWhenNotActive() },
                         },
                     }
                 );
@@ -174,4 +174,3 @@ export class StatsMetaverse extends Stat {
         };
     }
 }
-

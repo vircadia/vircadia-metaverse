@@ -36,6 +36,7 @@ import authentication from './authentication';
 import mongodb from './mongodb';
 import importDir from 'directory-import';
 import socketio from '@feathersjs/socketio';
+import { initMonitoring } from './common/Monitoring/Monitoring';
 
 // Don't remove this comment. It's needed to format import lines nicely.
 
@@ -81,6 +82,7 @@ app.configure(mongodb);
 // Configure other middleware (see `middleware/index.ts`)
 app.configure(middleware);
 app.configure(authentication);
+app.configure(initMonitoring);
 // Set up our services (see `services/index.ts`)
 app.configure(services);
 // Set up event channels (see channels.ts)

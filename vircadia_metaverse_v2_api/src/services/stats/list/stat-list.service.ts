@@ -33,7 +33,6 @@ export default (app: Application) => {
         paginate: app.get('paginate'),
         id: 'id',
     };
-    initMonitoring();
     // Initialize our service with any options it requires
     app.use('/stats/list', new StatList(options, app));
     app.use('api/v1/stats/list', app.service('stats/list'));

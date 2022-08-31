@@ -41,7 +41,7 @@ import {
 } from '@feathersjs/errors';
 import { extractLoggedInUserFromParams } from '../auth/auth.utils';
 import { AccountInterface } from '../../common/interfaces/AccountInterface';
-
+import _ from 'lodash';
 /**
  * Place.
  * @noInheritDoc
@@ -306,9 +306,7 @@ export class Place extends DatabaseService {
         const tag = params?.query?.tag?.split(',');
         const targetAccount = params?.query?.account ?? '';
         const filterQuery: any = {};
-        const domainquery: any = {};
-        let asAdmin = params?.query?.asAdmin === 'true' ? true : false;
-
+        let asAdmin = params?.query?.asAdmin;
         if (
             asAdmin &&
             IsNotNullOrEmpty(loginUser) &&
@@ -327,11 +325,6 @@ export class Place extends DatabaseService {
         }
         if (IsNotNullOrEmpty(tag)) {
             filterQuery.tag = { $in: tag };
-        }
-        if (asAdmin) {
-            domainquery.sponsorAccountId = targetAccount;
-        } else if (!asAdmin) {
-            domainquery.sponsorAccountId = loginUser.id;
         }
 
         if (IsNotNullOrEmpty(order)) {
@@ -359,10 +352,15 @@ export class Place extends DatabaseService {
                     self.indexOf(value) === index && value !== undefined
             );
 
-        const domains = await this.findDataToArray(
-            config.dbCollections.domains,
-            { query: { ...domainquery, id: { $in: domainIds } } }
-        );
+        var domains = await this.findDataToArray(config.dbCollections.domains, {
+            query: { id: { $in: domainIds } },
+        });
+
+        if (asAdmin) {
+            domains = _.filter(domains, { sponsorAccountId: targetAccount });
+        } else if (!asAdmin) {
+            domains = _.filter(domains, { sponsorAccountId: loginUser.id });
+        }
 
         const places: any[] = [];
 
@@ -372,17 +370,9 @@ export class Place extends DatabaseService {
                 for await (const domain of domains) {
                     if (domain && domain.id === element.domainId) {
                         DomainInterface = domain;
-                        if (
-                            DomainInterface?.sponsorAccountId === loginUser.id
-                        ) {
-                            places.push(
-                                await buildPlaceInfo(
-                                    this,
-                                    element,
-                                    DomainInterface
-                                )
-                            );
-                        }
+                        places.push(
+                            await buildPlaceInfo(this, element, DomainInterface)
+                        );
                         break;
                     }
                 }

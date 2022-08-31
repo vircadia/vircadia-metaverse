@@ -15,18 +15,11 @@
 'use strict';
 
 import { HookContext } from '@feathersjs/feathers';
-import { Response } from '../utils/response';
-import { IsNotNullOrEmpty } from '../utils/Misc';
 import { Monitoring } from '../common/Monitoring/Monitoring';
 
 export default () => {
     return async (context: HookContext): Promise<HookContext> => {
-        context.statusCode = context.error.code;
-        const errors = IsNotNullOrEmpty(context?.error?.errors)
-            ? { errors: context?.error?.errors }
-            : {};
-        context.result = Response.error(context?.error?.message, errors);
-        Monitoring.event('apiErrors', 1);
+        Monitoring.event('apiRequests', 1);
         return context;
     };
 };

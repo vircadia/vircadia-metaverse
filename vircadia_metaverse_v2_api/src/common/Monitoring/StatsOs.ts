@@ -46,7 +46,7 @@ export class StatsOs extends Stat {
             }
         );
         if (config.monitoring.history) {
-            cpuBusy.AddHistogram('in5mins', new ValueHistogram(60, 5 * 1000)); // 60 five second buckets
+            cpuBusy.AddHistogram('5mins', new ValueHistogram(60, 5 * 1000)); // 60 five second buckets
             cpuBusy.AddHistogram('perHour', new ValueHistogram(60, 60 * 1000)); // 60 one minute buckets
             cpuBusy.AddHistogram(
                 'perDay',
