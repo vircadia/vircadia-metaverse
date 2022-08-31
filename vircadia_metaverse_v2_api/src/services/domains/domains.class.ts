@@ -220,7 +220,7 @@ export class Domains extends DatabaseService {
                     updateDomain.anonUsers = domainData.heartbeat.anon_users;
                 }
             }
-
+            updateDomain.timeOfLastHeartbeat = new Date();
             await this.patchData(
                 config.dbCollections.domains,
                 id,
