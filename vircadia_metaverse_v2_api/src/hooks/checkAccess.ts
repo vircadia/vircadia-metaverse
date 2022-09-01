@@ -16,7 +16,7 @@
 
 import { AccountInterface } from '../common/interfaces/AccountInterface';
 import { HookContext } from '@feathersjs/feathers';
-import { IsNotNullOrEmpty, isValidUUID } from '../utils/Misc';
+import { IsNotNullOrEmpty, IsNullOrEmpty, isValidUUID } from '../utils/Misc';
 import { Perm } from '../utils/Perm';
 import { isAdmin, isValidArray } from '../utils/Utils';
 import config from '../appconfig';
@@ -34,16 +34,21 @@ export default (collection: string, pRequiredAccess: Perm[]) => {
 
         const loginUser = extractLoggedInUserFromParams(context.params);
 
-        let condition  : any = {};
-        if(isValidUUID(context.id)){
-            condition.id = context.id;
-        }else{
-            condition.username = context.id;
+        let condition: any = {};
+        if (IsNotNullOrEmpty(context.id)) {
+            if (isValidUUID(context.id)) {
+                condition.id = context.id;
+            } else {
+                condition.username = context.id;
+            }
+        } else {
+            condition.id = loginUser.id;
         }
-    
+
         const entryDataArray = await dbService.findDataToArray(collection, {
             query: condition,
         });
+        console.log(condition);
         let canAccess = false;
 
         let pTargetEntity: any;
@@ -213,4 +218,3 @@ export default (collection: string, pRequiredAccess: Perm[]) => {
         return context;
     };
 };
-

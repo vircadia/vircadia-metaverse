@@ -42,6 +42,7 @@ import {
 import { extractLoggedInUserFromParams } from '../auth/auth.utils';
 import { AccountInterface } from '../../common/interfaces/AccountInterface';
 import _ from 'lodash';
+import { Visibility } from '../../common/sets/Visibility';
 /**
  * Place.
  * @noInheritDoc
@@ -304,7 +305,6 @@ export class Place extends DatabaseService {
         const order = params?.query?.order || '';
         const search = params?.query?.search || '';
         const tag = params?.query?.tag?.split(',');
-        const targetAccount = params?.query?.account ?? '';
         const filterQuery: any = {};
         let asAdmin = params?.query?.asAdmin;
         if (
@@ -355,29 +355,35 @@ export class Place extends DatabaseService {
         var domains = await this.findDataToArray(config.dbCollections.domains, {
             query: { id: { $in: domainIds } },
         });
-
-        if (asAdmin) {
-            domains = _.filter(domains, { sponsorAccountId: targetAccount });
-        } else if (!asAdmin) {
-            domains = _.filter(domains, { sponsorAccountId: loginUser.id });
-        }
-
         const places: any[] = [];
 
-        await Promise.all(
-            (placesData as Array<PlaceInterface>)?.map(async (element) => {
-                let DomainInterface: DomainInterface | undefined;
-                for await (const domain of domains) {
-                    if (domain && domain.id === element.domainId) {
-                        DomainInterface = domain;
-                        places.push(
-                            await buildPlaceInfo(this, element, DomainInterface)
-                        );
-                        break;
+        for await (const place of placesData) {
+            let DomainInterface: DomainInterface | undefined;
+            for await (const domain of domains) {
+                if (domain && domain.id === place.domainId) {
+                    DomainInterface = domain;
+                    if (domain.networkAddr) {
+                        if (
+                            await this.criteriaTestAsync(
+                                place,
+                                domain,
+                                asAdmin,
+                                loginUser
+                            )
+                        ) {
+                            places.push(
+                                await buildPlaceInfo(
+                                    this,
+                                    place,
+                                    DomainInterface
+                                )
+                            );
+                            break;
+                        }
                     }
                 }
-            })
-        );
+            }
+        }
 
         const data = {
             places: places,
@@ -392,5 +398,42 @@ export class Place extends DatabaseService {
                 allPlaces.total
             )
         );
+    }
+
+    async criteriaTestAsync(
+        place: any,
+        domain: any,
+        asAdmin: boolean,
+        loginUser: any
+    ): Promise<any> {
+        if (asAdmin) {
+            if (place.hasOwnProperty('visibility')) {
+                switch (place.visibility) {
+                    case Visibility.OPEN:
+                        return true;
+                    case Visibility.PRIVATE:
+                        if (loginUser && place.hasOwnProperty('domainId')) {
+                            const aDomain =
+                                domain ??
+                                (await this.getData(
+                                    config.dbCollections.domains,
+                                    place.domainId
+                                ));
+                            if (aDomain) {
+                                return (
+                                    aDomain.sponsorAccountId === loginUser.id
+                                );
+                            }
+                        }
+                        break;
+                    default:
+                        return false;
+                }
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+        }
     }
 }

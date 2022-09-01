@@ -16,9 +16,10 @@ import Joi from '@hapi/joi';
 import { HookContext } from '@feathersjs/feathers';
 
 const scope = Joi.string();
-
+const asAdmin = Joi.boolean().allow('').default(false);
 export const findTokenSchema = Joi.object().keys({
     scope,
+    asAdmin
 });
 
 export const joiOptions = { convert: true, abortEarly: false };
@@ -33,4 +34,3 @@ export const joiReadOptions = {
     convert: true,
     abortEarly: false,
 };
-
