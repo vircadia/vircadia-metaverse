@@ -362,25 +362,20 @@ export class Place extends DatabaseService {
             for await (const domain of domains) {
                 if (domain && domain.id === place.domainId) {
                     DomainInterface = domain;
-                    if (domain.networkAddr) {
-                        if (
-                            await this.criteriaTestAsync(
-                                place,
-                                domain,
-                                asAdmin,
-                                loginUser
-                            )
-                        ) {
-                            places.push(
-                                await buildPlaceInfo(
-                                    this,
-                                    place,
-                                    DomainInterface
-                                )
-                            );
-                            break;
-                        }
+                    if (
+                        await this.criteriaTestAsync(
+                            place,
+                            domain,
+                            asAdmin,
+                            loginUser
+                        )
+                    ) {
+                        places.push(
+                            await buildPlaceInfo(this, place, DomainInterface)
+                        );
+                        break;
                     }
+                    // }
                 }
             }
         }
@@ -406,34 +401,42 @@ export class Place extends DatabaseService {
         asAdmin: boolean,
         loginUser: any
     ): Promise<any> {
-        if (asAdmin) {
-            if (place.hasOwnProperty('visibility')) {
-                switch (place.visibility) {
-                    case Visibility.OPEN:
-                        return true;
-                    case Visibility.PRIVATE:
-                        if (loginUser && place.hasOwnProperty('domainId')) {
-                            const aDomain =
-                                domain ??
-                                (await this.getData(
-                                    config.dbCollections.domains,
-                                    place.domainId
-                                ));
-                            if (aDomain) {
-                                return (
-                                    aDomain.sponsorAccountId === loginUser.id
-                                );
+        let ret = asAdmin;
+        if (!ret) {
+            if (domain.networkAddr) {
+                if (place.hasOwnProperty('visibility')) {
+                    switch (place.visibility) {
+                        case Visibility.OPEN:
+                            ret = true;
+                            break;
+                        case Visibility.PRIVATE:
+                            if (loginUser && place.hasOwnProperty('domainId')) {
+                                const aDomain =
+                                    domain ??
+                                    (await this.getData(
+                                        config.dbCollections.domains,
+                                        place.domainId
+                                    ));
+                                if (aDomain) {
+                                    ret =
+                                        aDomain.sponsorAccountId ===
+                                        loginUser.id;
+                                }
                             }
-                        }
-                        break;
-                    default:
-                        return false;
+                            break;
+                        default:
+                            ret = false;
+                            return;
+                    }
+                } else {
+                    // if 'visibility' is not specified, it's assumed "OPEN"
+                    ret = true;
                 }
             } else {
-                return true;
+                ret = false;
             }
         } else {
-            return true;
+            return ret;
         }
     }
 }

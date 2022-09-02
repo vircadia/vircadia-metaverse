@@ -30,25 +30,25 @@ import { NotAuthenticated, BadRequest } from '@feathersjs/errors';
 
 export default (collection: string, pRequiredAccess: Perm[]) => {
     return async (context: HookContext): Promise<HookContext> => {
-        const dbService = new DatabaseService({}, undefined, context);
+        const dbService = new DatabaseService({ id: 'id' }, undefined, context);
 
         const loginUser = extractLoggedInUserFromParams(context.params);
 
         let condition: any = {};
-        if (IsNotNullOrEmpty(context.id)) {
-            if (isValidUUID(context.id)) {
-                condition.id = context.id;
-            } else {
-                condition.username = context.id;
+        if (context.method != 'remove') {
+            if (IsNotNullOrEmpty(context.id)) {
+                if (isValidUUID(context.id)) {
+                    condition.id = context.id;
+                } else {
+                    condition.username = context.id;
+                }
             }
         } else {
             condition.id = loginUser.id;
         }
-
         const entryDataArray = await dbService.findDataToArray(collection, {
             query: condition,
         });
-        console.log(condition);
         let canAccess = false;
 
         let pTargetEntity: any;

@@ -33,6 +33,8 @@ import {
     isSArraySet,
     simpleGetter,
 } from '../utils/Validators';
+import { VKeyedCollection } from '../utils/vTypes';
+import { dateWhenNotActive } from '../utils/Utils';
 // Naming and access for the fields in a DomainEntity.
 // Indexed by request_field_name.
 export const DomainFields: { [key: string]: any } = {
@@ -397,3 +399,40 @@ export const DomainFields: { [key: string]: any } = {
         getter: simpleGetter,
     },
 };
+
+export function initDomains(): void {
+    setInterval(async () => {
+        const dbService = new DatabaseService({}, app);
+
+        // Find domains that are not heartbeating and reset activity if not talking
+        const domains = await dbService.findDataToArray(
+            config.dbCollections.domains,
+            {
+                query: {
+                    timeOfLastHeartbeat: { $lt: dateWhenNotActive() },
+                    $or: [
+                        { numUsers: { $gt: 0 } },
+                        { anonUsers: { $gt: 0 } },
+                        { active: true },
+                    ],
+                },
+            }
+        );
+
+        for await (const aDomain of domains) {
+            aDomain.numUsers = 0;
+            aDomain.anonUsers = 0;
+            aDomain.active = false;
+            const updates: any = {
+                numUsers: 0,
+                anonUsers: 0,   
+                active: false,
+            };
+            await dbService.patchData(
+                config.dbCollections.domains,
+                aDomain._id,
+                updates
+            );
+        }
+    }, 1000 * config.metaverseServer.domain_seconds_check_if_online);
+}

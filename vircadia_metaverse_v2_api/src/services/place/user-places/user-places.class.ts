@@ -235,6 +235,12 @@ export class PlacesFeild extends DatabaseService {
                 );
 
                 if (IsNotNullOrEmpty(aDomain)) {
+                    if (IsNullOrEmpty(aDomain.networkAddr)) {
+                        
+                        throw new BadRequest(
+                            'Domain does not have a network address'
+                        );
+                    }
                     if (
                         await checkAccessToEntity(
                             [Perm.DOMAINACCESS, Perm.ADMIN],
@@ -292,7 +298,7 @@ export class PlacesFeild extends DatabaseService {
         }
     }
 
-     /**
+    /**
      * Delete user place
      *
      * @remarks
@@ -319,4 +325,3 @@ export class PlacesFeild extends DatabaseService {
         }
     }
 }
-
