@@ -24,7 +24,19 @@ services:
         # ports:
         # - 3040:3040
         volumes:
-            - .:/usr/src/api
+            - ./conf.d:/usr/src/api/conf.d
+            - ./docs:/usr/src/api/docs
+            - ./ethereum:/usr/src/api/ethereum
+            - ./mailtemplates:/usr/src/api/mailtemplates
+            - ./master_data:/usr/src/api/master_data
+            - ./public:/usr/src/api/public
+            - ./src:/usr/src/api/src
+            - ./package.json:/usr/src/api/package.json
+            - ./tsconfig.json:/usr/src/api/tsconfig.json
+            - ./.env:/usr/src/api/.env
+            - ./types.d.ts:/usr/src/api/types.d.ts
+            - ./.eslintrc.json:/usr/src/api/.eslintrc.json
+            - ./.eslintignore:/usr/src/api/.eslintignore
         environment:
             PORT: 3040
             MONGODB_URL: mongodb://mongodb_container:27017
