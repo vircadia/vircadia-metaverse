@@ -185,6 +185,8 @@ export class AccountFeild extends DatabaseService {
                             );
                             // if update password then dont show password in response
                             if (fieldName === 'password') {
+                                delete updates['passwordSalt'];
+                                delete updates['passwordHash'];
                                 updates.password =
                                     'Password changed successfully';
                             }
@@ -217,4 +219,3 @@ export class AccountFeild extends DatabaseService {
         }
     }
 }
-
