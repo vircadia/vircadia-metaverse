@@ -163,7 +163,7 @@ const authentication = {
         expiresIn: '336 days',
     },
     local: {
-        usernameField: 'username',
+        usernameField: 'email',
         passwordField: 'password',
     },
     bearerToken: {

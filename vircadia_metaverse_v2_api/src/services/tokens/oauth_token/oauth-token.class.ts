@@ -76,7 +76,7 @@ export class AccountFeild extends DatabaseService {
                         ?.service('authentication')
                         .create(
                             {
-                                username: userName,
+                                email: userName,
                                 password: userPassword,
                                 strategy: 'local',
                             },
