@@ -23,7 +23,7 @@ import { DatabaseServiceOptions } from '../../../common/dbservice/DatabaseServic
 import { buildSimpleResponse } from '../../../common/responsebuilder/responseBuilder';
 import { Application } from '../../../declarations';
 import { messages } from '../../../utils/messages';
-import { IsNotNullOrEmpty } from '../../../utils/Misc';
+import { IsNotNullOrEmpty, isValidUUID } from '../../../utils/Misc';
 import {
     convertBinKeyToPEM,
     createSimplifiedPublicKey,
@@ -48,7 +48,7 @@ export class AccountPublickey extends DatabaseService {
      *
      * @requires -authentication
      *
-     * @param accountId - account id
+     * @param accountId - account id or username
      * @returns -  {"status": "success", "data": {"": [{...},{...},...]} or  { status: 'failure', message: 'message'}
      *
      */
@@ -56,16 +56,36 @@ export class AccountPublickey extends DatabaseService {
     async find(params?: Params): Promise<any> {
         const loginUser = extractLoggedInUserFromParams(params);
         const accountId = params?.route?.accountId;
-        const accountInfo = await this.getData(
-            config.dbCollections.accounts,
-            accountId as any
-        );
+
+        let accountInfo = null;
+
+        if(isValidUUID(accountId)) {
+            accountInfo = await this.getData(
+                config.dbCollections.accounts,
+                accountId as any
+            );
+        } else {
+
+            const accounts = await this.findDataToArray(
+                config.dbCollections.accounts,
+                {query:{ username:accountId }}
+            );
+
+            if(IsNotNullOrEmpty(accounts)){
+                accountInfo = accounts[0];
+            }
+
+        }
 
         if (IsNotNullOrEmpty(accountInfo)) {
+            const publicKey = createSimplifiedPublicKey(
+                accountInfo.sessionPublicKey
+            );
             return Promise.resolve({
-                public_key: createSimplifiedPublicKey(
-                    accountInfo.sessionPublicKey
-                ),
+                public_key: publicKey,
+                data: { // TODO only if api v1
+                    public_key: publicKey,
+                },
                 username: accountInfo.username,
                 account_id: accountInfo.id,
             });
@@ -76,21 +96,7 @@ export class AccountPublickey extends DatabaseService {
         }
     }
 
-    /**
-     * POST account public key
-     *
-     * @remarks
-     * This method is to update logged in account public key
-     * - Request Type - POST
-     * - End Point - API_URL/user/public_key
-     *
-     * @requires -authentication
-     * @param files = File upload bin file
-     * @returns - {status: 'success', data:{...}} or { status: 'failure', message: 'message'}
-     *
-     */
-
-    async patch(id: NullableId, data: any, params?: any): Promise<any> {
+	async handlePublicKeyUpdate(id: NullableId, data: any, params?: any) : Promise<any>  {
         const loginUser = extractLoggedInUserFromParams(params);
         if (IsNotNullOrEmpty(loginUser)) {
             if (IsNotNullOrEmpty(params?.files)) {
@@ -100,7 +106,6 @@ export class AccountPublickey extends DatabaseService {
 
                 if (IsNotNullOrEmpty(publicKeyBin)) {
                     const sessionPublicKey = convertBinKeyToPEM(publicKeyBin);
-
                     const result = await this.patchData(
                         config.dbCollections.accounts,
                         loginUser.id,
@@ -121,6 +126,43 @@ export class AccountPublickey extends DatabaseService {
         } else {
             throw new NotAuthenticated(messages.common_messages_unauthorized);
         }
+	}
+
+    /**
+     * PATCH account public key
+     *
+     * @remarks
+     * This method is to update logged in account public key
+     * - Request Type - PATCH
+     * - End Point - API_URL/user/public_key
+     *
+     * @requires -authentication
+     * @param files = File upload bin file
+     * @returns - {status: 'success', data:{...}} or { status: 'failure', message: 'message'}
+     *
+     */
+
+    async patch(id: NullableId, data: any, params?: any): Promise<any> {
+		return this.handlePublicKeyUpdate(id, data, params);
     }
+
+    /**
+     * PUT account public key
+     *
+     * @remarks
+     * This method is to update logged in account public key
+     * - Request Type - PUT
+     * - End Point - API_URL/user/public_key
+     *
+     * @requires - authentication
+     * @param files = File upload bin file
+     * @returns - {status: 'success', data:{...}} or { status: 'failure', message: 'message'}
+     *
+     */
+
+    async update(id: NullableId, data: any, params?: any): Promise<any> {
+		return this.handlePublicKeyUpdate(id, data, params);
+    }
+
 }
 

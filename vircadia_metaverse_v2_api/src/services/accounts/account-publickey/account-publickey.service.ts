@@ -33,14 +33,10 @@ declare module '../../../declarations' {
 export default function (app: Application): void {
     const options = {
         paginate: app.get('paginate'),
-        id: 'id',
+        id: 'id'
     };
 
-    // Initialize our service with any options it requires
-    app.use(
-        '/user/public_key',
-        multipartMiddleware.any(),
-        (
+	const multerAdapter = (
             req: express.Request,
             res: express.Response,
             next: express.NextFunction
@@ -53,19 +49,27 @@ export default function (app: Application): void {
                 req.feathers.args = (req as any).args;
             }
             next();
-        },
+        };
+
+    app.use(
+        '/user/public_key',
+        multipartMiddleware.any(),
+		multerAdapter,
         new AccountPublickey(options, app)
     );
-    app.use('api/v1/user/public_key', app.service('user/public_key'));
+
+    app.use(
+        'api/v1/user/public_key',
+        multipartMiddleware.any(),
+        multerAdapter,
+        app.service('user/public_key')
+    );
 
     app.use(
         'api/v1/users/:accountId/public_key',
         app.service('user/public_key')
     );
 
-    // Get our initialized service so that we can register hooks
-    const service = app.service('user/public_key');
-
-    service.hooks(hooks);
+    app.service('user/public_key').hooks(hooks);
 }
 
