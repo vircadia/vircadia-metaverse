@@ -19,6 +19,7 @@ import config from '../appconfig';
 import { Availability } from './sets/Availability';
 import { Roles } from './sets/Roles';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import { IsNullOrEmpty, genRandomString } from '../utils/Misc';
 import { DatabaseService } from '../common/dbservice/DatabaseService';
 import app from '../app';
@@ -301,10 +302,12 @@ export const AccountFields: { [key: string]: any } = {
             pVal: any,
             updates: any
         ): Promise<any> => {
-            const salt = await bcrypt.genSalt(10);
-            const pass = pVal;
-            const hashed = await bcrypt.hash(pass, salt);
-            updates[pField] = hashed;
+            const passwordSalt = genRandomString(16);
+            const hash = crypto.createHmac('sha512', passwordSalt);
+            hash.update(pVal);
+            const val = hash.digest('hex');
+            updates['passwordSalt'] = passwordSalt;
+            updates['passwordHash'] = val;
         },
     },
     public_key: {
@@ -405,4 +408,3 @@ export const AccountFields: { [key: string]: any } = {
         },
     },
 };
-
