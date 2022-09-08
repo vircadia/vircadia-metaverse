@@ -27,6 +27,7 @@ const { authenticate } = feathersAuthentication.hooks;
 
 export default {
     before: {
+        all: [],
         find: [validators.form(findAccountPublickeySchema, joiReadOptions)],
         get: [disallow()],
         create: [disallow()],
