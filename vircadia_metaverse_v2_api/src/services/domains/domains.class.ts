@@ -20,10 +20,10 @@ import { DatabaseService } from '../../common/dbservice/DatabaseService';
 import { DatabaseServiceOptions } from '../../common/dbservice/DatabaseServiceOptions';
 import { Application } from '../../declarations';
 import config from '../../appconfig';
-import { buildDomainInfoV1 } from '../../common/responsebuilder/domainsBuilder';
+import { buildDomainInfo, buildDomainInfoV1 } from '../../common/responsebuilder/domainsBuilder';
 import { isAdmin } from '../../utils/Utils';
 import { AccountInterface } from '../../common/interfaces/AccountInterface';
-import { IsNotNullOrEmpty, IsNullOrEmpty } from '../../utils/Misc';
+import { GenUUID, IsNotNullOrEmpty, IsNullOrEmpty } from '../../utils/Misc';
 import { messages } from '../../utils/messages';
 import {
     buildPaginationResponse,
@@ -31,6 +31,11 @@ import {
 } from '../../common/responsebuilder/responseBuilder';
 import { extractLoggedInUserFromParams } from '../auth/auth.utils';
 import { BadRequest, NotFound } from '@feathersjs/errors';
+import { Maturity } from '../../common/sets/Maturity';
+import { Tokens, TokenScope } from '../../utils/Tokens';
+import { buildPlaceInfo } from '../../common/responsebuilder/placesBuilder';
+import { PlaceInterface } from '../../common/interfaces/PlaceInterface';
+import { DomainFields } from '../../common/DomainFields';
 
 /**
  * Domains.
@@ -255,6 +260,109 @@ export class Domains extends DatabaseService {
             throw new BadRequest(
                 messages.common_messages_target_domain_notfound
             );
+        }
+    }
+
+     /**
+     * POST domain create
+     *
+     * @remarks
+     * This method is to domain temporary entry
+     * - Request Type - POST
+     * - End Point - API_URL/api/v1/domains
+     *
+     * @requires -authentication
+     * @body - {}
+     * @returns - {status: 'success', data:{...}} or { status: 'failure', message: 'message'}
+     *
+     */
+
+      async create(data: any, params?: any): Promise<any> {
+        const loginUser = extractLoggedInUserFromParams(params);
+        const vSenderKey = params?.address;
+        if (data.domain && data.domain.label) {
+            const newDomainName = data.domain.label;
+
+            if (IsNotNullOrEmpty(newDomainName)) {
+                const ifValid = await DomainFields.name.validate(newDomainName);
+                if (ifValid) {
+                    const generatedAPIkey: string = GenUUID();
+                    const newDomain = {} as DomainInterface;
+                    newDomain.id = GenUUID();
+                    newDomain.name = newDomainName;
+                    newDomain.apiKey = generatedAPIkey;
+                    let key: any;
+                    if (IsNotNullOrEmpty(vSenderKey)) {
+                        key = `${vSenderKey.address}:${vSenderKey.port}`;
+                    }
+                    if (params.vSenderKey) {
+                        newDomain.iPAddrOfFirstContact = key;
+                    }
+                    if (data.domain.network_address) {
+                        newDomain.networkAddr = data.domain.network_address;
+                    }
+                    if (data.domain.network_port) {
+                        newDomain.networkPort = data.domain.network_port;
+                    }
+                    newDomain.sponsorAccountId = loginUser.id;
+                    // Creating a domain also creates a Place for that domain
+                    // Note that place names are unique so we modify the place name if there is already one.
+                    const placeDomain = await this.findDataToArray(
+                        config.dbCollections.places,
+                        { query: { name: newDomain.name } }
+                    );
+
+                    const newPlacename = IsNotNullOrEmpty(placeDomain[0])
+                        ? placeDomain[0].name
+                        : newDomain.name;
+
+                    const placeInfo = {} as PlaceInterface;
+
+                    placeInfo.id = GenUUID();
+                    placeInfo.name = newPlacename;
+                    placeInfo.whenCreated = new Date();
+                    placeInfo.path = '/0,0,0/0,0,0,1';
+                    placeInfo.currentAttendance = 0;
+                    placeInfo.iPAddrOfFirstContact = key;
+                    placeInfo.domainId = newDomain.id;
+                    placeInfo.description = 'A place in ' + newDomain.name;
+                    placeInfo.maturity = Maturity.UNRATED;
+                    placeInfo.managers = [loginUser.username];
+                    const APItoken = await Tokens.createToken(
+                        loginUser.id,
+                        [TokenScope.PLACE],
+                        -1
+                    );
+                    placeInfo.currentAPIKeyTokenId = APItoken.id;
+
+                    const placeResult = await this.createData(
+                        config.dbCollections.places,
+                        placeInfo
+                    );
+
+                    const domainResult = await this.createData(
+                        config.dbCollections.domains,
+                        newDomain
+                    );
+
+                    const domainInfo = await buildDomainInfo(domainResult);
+                    domainInfo.api_key = newDomain.apiKey;
+                    return Promise.resolve({
+                        domain: domainInfo,
+                        place: await buildPlaceInfo(
+                            this,
+                            placeResult,
+                            domainResult
+                        ),
+                    });
+                } else {
+                    throw new BadRequest('Invalid domain name');
+                }
+            } else {
+                throw new BadRequest('Label was empty');
+            }
+        } else {
+            throw new BadRequest('Label not supplied');
         }
     }
 }

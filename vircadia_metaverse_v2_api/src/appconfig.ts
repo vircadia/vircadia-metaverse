@@ -44,7 +44,7 @@ const server = {
     port: process.env.PORT ?? 3040,
     paginate: {
         default: 10,
-        max: 100,
+        max: 1000,
     },
     isDevelopmentMode: (process.env.APP_ENV ?? 'development') === 'development',
     publicPath: process.env.PUBLIC_PATH ?? './public',

@@ -41,7 +41,7 @@ export default {
         ],
         get: [
             authenticate('jwt'),
-            checkAccessToAccount(config.dbCollections.accounts, [
+            checkAccessToAccount(config.dbCollections.places, [
                 Perm.DOMAINACCESS,
                 Perm.ADMIN,
             ]),
@@ -58,7 +58,7 @@ export default {
         update: [
             authenticate('jwt'),
             validators.form(updatePlaceSchema, joiOptions),
-            checkAccessToAccount(config.dbCollections.accounts, [
+            checkAccessToAccount(config.dbCollections.places, [
                 Perm.DOMAINACCESS,
                 Perm.ADMIN,
             ]),
@@ -66,7 +66,7 @@ export default {
         patch: [disallow()],
         remove: [
             authenticate('jwt'),
-            checkAccessToAccount(config.dbCollections.accounts, [
+            checkAccessToAccount(config.dbCollections.places, [
                 Perm.DOMAINACCESS,
                 Perm.ADMIN,
             ]),

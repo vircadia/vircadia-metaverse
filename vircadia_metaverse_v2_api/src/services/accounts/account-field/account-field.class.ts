@@ -76,7 +76,13 @@ export class AccountFeild extends DatabaseService {
         if (IsNotNullOrEmpty(loginUser)) {
             if (accountId && fieldName) {
                 if (fieldAccess) {
-                    if (loginUser.id === accountId) {
+                    if (
+                        await checkAccessToEntity(
+                            AccountFields[fieldName].set_permissions,
+                            loginUser,
+                            entryDataArray
+                        )
+                    ) {
                         const objAccount = await this.getData(
                             config.dbCollections.accounts,
                             accountId
@@ -165,7 +171,13 @@ export class AccountFeild extends DatabaseService {
                     AccountFields[fieldName] &&
                     typeof AccountFields[fieldName].setter === 'function'
                 ) {
-                    if (loginUser.id === accountId) {
+                    if (
+                        await checkAccessToEntity(
+                            AccountFields[fieldName].set_permissions,
+                            loginUser,
+                            entryDataArray
+                        )
+                    ) {
                         const validity = await AccountFields[
                             fieldName
                         ].validate(data.set, loginUser, entryDataArray);

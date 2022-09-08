@@ -435,6 +435,7 @@ export class Place extends DatabaseService {
             } else {
                 ret = false;
             }
+            return ret;
         } else {
             return ret;
         }
