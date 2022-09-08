@@ -26,7 +26,11 @@ import {
 } from '../../../common/responsebuilder/domainsBuilder';
 import { isAdmin } from '../../../utils/Utils';
 import { AccountInterface } from '../../../common/interfaces/AccountInterface';
-import { IsNotNullOrEmpty, IsNullOrEmpty } from '../../../utils/Misc';
+import {
+    IsNotNullOrEmpty,
+    IsNullOrEmpty,
+    isValidUUID,
+} from '../../../utils/Misc';
 import { messages } from '../../../utils/messages';
 import {
     buildPaginationResponse,
@@ -65,11 +69,24 @@ export class AccountFeild extends DatabaseService {
     async find(params?: Params): Promise<any> {
         const loginUser = extractLoggedInUserFromParams(params);
         const fieldName = params?.route?.fieldName;
-        const accountId = params?.route?.accountId;
-        const entryDataArray = await this.getData(
-            config.dbCollections.accounts,
-            accountId as any
-        );
+        const accountId:any = params?.route?.accountId;
+
+        let entryDataArray = null;
+        if (isValidUUID(accountId)) {
+            entryDataArray = await this.getData(
+                config.dbCollections.accounts,
+                accountId
+            );
+        } else {
+            entryDataArray = await this.findDataToArray(
+                config.dbCollections.accounts,
+                { query: { username: accountId } }
+            );
+
+            if (IsNotNullOrEmpty(entryDataArray)) {
+                entryDataArray = entryDataArray[0];
+            }
+        }
 
         const fieldAccess = AccountFields[fieldName as any];
 
@@ -78,15 +95,28 @@ export class AccountFeild extends DatabaseService {
                 if (fieldAccess) {
                     if (
                         await checkAccessToEntity(
-                            AccountFields[fieldName].set_permissions,
+                            AccountFields[fieldName].get_permissions,
                             loginUser,
                             entryDataArray
                         )
                     ) {
-                        const objAccount = await this.getData(
-                            config.dbCollections.accounts,
-                            accountId
-                        );
+                        let objAccount = null;
+                        if (isValidUUID(accountId)) {
+                            objAccount = await this.getData(
+                                config.dbCollections.accounts,
+                                accountId
+                            );
+                        } else {
+                            objAccount = await this.findDataToArray(
+                                config.dbCollections.accounts,
+                                { query: { username: accountId } }
+                            );
+
+                            if (IsNotNullOrEmpty(objAccount)) {
+                                objAccount = objAccount[0];
+                            }
+                        }
+
                         if (IsNotNullOrEmpty(objAccount)) {
                             if (AccountFields[fieldName].getter) {
                                 const data = await AccountFields[
@@ -162,10 +192,23 @@ export class AccountFeild extends DatabaseService {
 
         if (IsNotNullOrEmpty(loginUser)) {
             if (accountId) {
-                const entryDataArray = await this.getData(
-                    config.dbCollections.accounts,
-                    accountId
-                );
+                let entryDataArray = null;
+                if (isValidUUID(accountId)) {
+                    entryDataArray = await this.getData(
+                        config.dbCollections.accounts,
+                        accountId
+                    );
+                } else {
+                    entryDataArray = await this.findDataToArray(
+                        config.dbCollections.accounts,
+                        { query: { username: accountId } }
+                    );
+
+                    if (IsNotNullOrEmpty(entryDataArray)) {
+                        entryDataArray = entryDataArray[0];
+                    }
+                }
+
                 if (
                     fieldName &&
                     AccountFields[fieldName] &&
@@ -192,7 +235,7 @@ export class AccountFeild extends DatabaseService {
 
                             const result = await this.patchData(
                                 config.dbCollections.accounts,
-                                accountId,
+                                entryDataArray.id,
                                 updates
                             );
                             // if update password then dont show password in response
