@@ -27,12 +27,11 @@ const { authenticate } = feathersAuthentication.hooks;
 
 export default {
     before: {
-        all: [authenticate('jwt')],
         find: [validators.form(findAccountPublickeySchema, joiReadOptions)],
         get: [disallow()],
         create: [disallow()],
-        update: [disallow()],
-        patch: [],
+        update: [authenticate('jwt')],
+        patch: [authenticate('jwt')],
         remove: [disallow()],
     },
 
