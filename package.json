@@ -1,9 +1,8 @@
 {
-    "name": "iamus-metaverse-server",
-    "version": "2.4.10",
+    "name": "vircadia-metaverse-server",
+    "version": "3.0.0",
     "private": true,
-    "description": "metaverse-server for Vircadia",
-    "author": "Robert Adams <misterblue@misterblue.com>",
+    "description": "Metaverse server for Vircadia. (Project Iamus)",
     "repository": {
         "type": "git",
         "url": "https://github.com/vircadia/Iamus"
@@ -14,7 +13,8 @@
     "homepage": "https://github.com/vircadia/Iamus",
     "keywords": [
         "Vircadia",
-        "virtual world"
+        "virtual world",
+        "open source metaverse"
     ],
     "license": "Apache-2.0",
     "main": "dist/index.js",
