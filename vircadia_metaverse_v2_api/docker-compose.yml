@@ -37,6 +37,7 @@ services:
             - ./types.d.ts:/usr/src/api/types.d.ts
             - ./.eslintrc.json:/usr/src/api/.eslintrc.json
             - ./.eslintignore:/usr/src/api/.eslintignore
+            - ./mailtemplates:/usr/src/api/lib/mailtemplates
         environment:
             PORT: 3040
             MONGODB_URL: mongodb://mongodb_container:27017
