@@ -52,6 +52,15 @@ const server = {
     localStorageProvider: process.env.LOCAL_STORAGE_PROVIDER || '',
     localStorageProviderPort: process.env.LOCAL_STORAGE_PROVIDER_PORT || '',
     storageProvider: process.env.STORAGE_PROVIDER || 'local',
+    'key-file': '', // if supplied, do https
+    'cert-file': '',
+    'max-body-size': 300000, // maximum body size for input JSON bodies
+    'static-base': '/static', // base of static data URL
+    'user-config-file': './iamus.json', // startup config over-ride
+    'server-version': {
+        // overlaid with VERSION.json
+        'version-tag': process.env.SERVER_VERSION ?? '',
+    },
 };
 
 /*
@@ -147,8 +156,22 @@ const metaverse = {
     metaverseName: process.env.METAVERSE_NAME ?? '',
     metaverseNickName: process.env.METAVERSE_NICK_NAME ?? '',
     metaverseServerUrl: process.env.METAVERSE_SERVER_URL ?? '', // if empty, set to self
-    defaultIceServerUrl: process.env.DEFAULT_ICE_SERVER_URL ?? '', // if empty, set to self
+    defaultIceServerUrl: process.env.DEFAULT_ICE_SERVER_URL ?? 'ice.vircadia.com:7337', // if empty, set to self
     dashboardUrl: process.env.DASHBOARD_URL,
+};
+
+/**
+ * Debug
+ */
+
+const debug = {
+    loglevel: 'debug',
+    'log-directory': '/home/cadia/config/Logs',
+    devel: true,
+    'request-detail': false,
+    'request-body': false,
+    'metaverseapi-response-detail': false,
+    'db-query-detail': false,
 };
 
 /**
@@ -272,6 +295,7 @@ const config = {
     database,
     client,
     monitoring,
+    debug,
 };
 
 export default config;
