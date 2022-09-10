@@ -18,6 +18,7 @@
 import { ServiceAddons } from '@feathersjs/feathers';
 import { Application } from '../../declarations';
 import { Domains } from './domains.class';
+import { domainAccessTokenMiddleware } from '../strategies/domain-access-token';
 import hooks from './domains.hooks';
 
 // Add this service to the service type index
@@ -35,7 +36,8 @@ export default function (app: Application): void {
 
     // Initialize our service with any options it requires
     app.use('/domains', new Domains(options, app));
-    app.use('/api/v1/domains', app.service('domains'));
+    app.use('/api/v1/domains', domainAccessTokenMiddleware, app.service('domains'));
+    app.use('/api/v1/domains/:id/ice_server_address', domainAccessTokenMiddleware, app.service('domains'));
 
     // Get our initialized service so that we can register hooks
     const service = app.service('domains');

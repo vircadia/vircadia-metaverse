@@ -22,6 +22,7 @@ import { Application } from '../../../declarations';
 import { DomainPublickey } from './domains-publickey.class';
 import hooks from './domains-publickey.hooks';
 const multipartMiddleware = multer({ limits: { fieldSize: Infinity } });
+import { domainAccessTokenMiddleware } from '../../strategies/domain-access-token';
 
 // Add this service to the service type index
 declare module '../../../declarations' {
@@ -36,28 +37,33 @@ export default function (app: Application): void {
         id: 'id',
     };
 
+    const multerAdapter = (
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction
+    ) => {
+        if (req?.feathers) {
+            req.feathers.files = (req as any).files?.media
+                ? (req as any).files?.media
+                : (req as any).files;
+                req.feathers.body = req.body;
+                req.feathers.args = (req as any).args;
+        }
+        next();
+    };
+
     // Initialize our service with any options it requires
     app.use(
         '/domains/:domainId/public_key',
         multipartMiddleware.any(),
-        (
-            req: express.Request,
-            res: express.Response,
-            next: express.NextFunction
-        ) => {
-            if (req?.feathers) {
-                req.feathers.files = (req as any).files?.media
-                    ? (req as any).files?.media
-                    : (req as any).files;
-                req.feathers.body = req.body;
-                req.feathers.args = (req as any).args;
-            }
-            next();
-        },
+        multerAdapter,
         new DomainPublickey(options, app)
     );
     app.use(
         'api/v1/domains/:domainId/public_key',
+        multipartMiddleware.any(),
+        multerAdapter,
+        domainAccessTokenMiddleware,
         app.service('domains/:domainId/public_key')
     );
 

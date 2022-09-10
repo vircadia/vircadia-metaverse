@@ -18,10 +18,11 @@ import { AuthenticationService, JWTStrategy } from '@feathersjs/authentication';
 import { LocalStrategy } from '@feathersjs/authentication-local';
 import { expressOauth } from '@feathersjs/authentication-oauth';
 import { NotAuthenticated } from '@feathersjs/errors';
-import {  ServiceAddons } from '@feathersjs/feathers';
+import { ServiceAddons } from '@feathersjs/feathers';
 import { Application } from './declarations';
 import { FacebookStrategy } from './services/strategies/facebook';
 import { GoogleStrategy } from './services/strategies/google';
+import { DomainAccessToken } from './services/strategies/domain-access-token';
 import { validatePassword } from './utils/Utils';
 
 declare module './declarations' {
@@ -45,9 +46,10 @@ export default function (app: Application): void {
 
     authentication.register('jwt', new JWTStrategy());
     authentication.register('local', new MyLocalStrategy());
+    authentication.register('domain-access-token', new DomainAccessToken(app));
     authentication.register('google', new GoogleStrategy(app));
     authentication.register('facebook', new FacebookStrategy(app));
-    
+
   //  app.use('/oauth/token',authentication);
     app.use('/authentication', authentication);
     app.configure(expressOauth());

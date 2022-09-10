@@ -1,4 +1,5 @@
-//   Copyright 2020 Vircadia Contributors
+//   Copyright 2022 Vircadia Contributors
+//   Copyright 2022 DigiSomni LLC.
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -12,21 +13,21 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-'use strict';
+import { HookContext } from '@feathersjs/feathers';
 
-import { Params } from '@feathersjs/feathers';
-import config from '../../appconfig';
-/**
- * This method will extract the loggedIn User from params
- *
- * @param params
- * @returns extracted user
- */
+export default function (options = {}) {
+    return async (context: HookContext): Promise<HookContext> => {
+        const { params } = context;
 
-export const extractLoggedInUserFromParams = (params?: Params): any => {
-    if (params) {
-        return params[config.authentication.entity] || params.domainAccessAccount;
-    } else {
-        return null;
-    }
+        if(params.provider && params.domainAccessToken) {
+            context.params = {
+                ...params,
+                authentication: {
+                    strategy: 'domain-access-token'
+                }
+            }
+        }
+
+        return context;
+    };
 };

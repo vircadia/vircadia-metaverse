@@ -17,6 +17,7 @@
 // Initializes the `domains` service on path `/domains`
 import { ServiceAddons } from '@feathersjs/feathers';
 import { Application } from '../../../declarations';
+import { domainAccessTokenMiddleware } from '../../strategies/domain-access-token';
 import { DomainsFeild } from './domains-field.class';
 import hooks from './domains-field.hooks';
 
@@ -37,6 +38,7 @@ export default function (app: Application): void {
     app.use('/domainsField', new DomainsFeild(options, app));
     app.use(
         'api/v1/domains/:domainId/field/:fieldName',
+        domainAccessTokenMiddleware,
         app.service('domainsField')
     );
 
