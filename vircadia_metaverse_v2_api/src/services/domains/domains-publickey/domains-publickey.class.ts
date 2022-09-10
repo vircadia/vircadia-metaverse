@@ -82,11 +82,11 @@ export class DomainPublickey extends DatabaseService {
     }
 
     /**
-     * POST domain public key
+     * PUT domain public key
      *
      * @remarks
      * This method is to update domain public key
-     * - Request Type - POST
+     * - Request Type - PUT
      * - End Point - API_URL/domains/{domainId}/public_key
      *
      * @requires -authentication
@@ -115,37 +115,35 @@ export class DomainPublickey extends DatabaseService {
         } else {
             const tokenInfo = await this.findDataToArray(
                 config.dbCollections.tokens,
-                { query: { accountId: loginUser.id, token_type: 'Bearer' } }
+                { query: { accountId: loginUser.id, scope: [ TokenScope.DOMAIN ] } }
             );
 
             if (IsNotNullOrEmpty(tokenInfo) && tokenInfo[0].accountId) {
-                if (SArray.has(tokenInfo[0].scope, TokenScope.DOMAIN)) {
-                    if (IsNullOrEmpty(domainInfo.sponsorAccountId)) {
-                        const aAccount: AccountInterface = await this.getData(
-                            config.dbCollections.accounts,
-                            tokenInfo[0].accountId
-                        );
-
-                        if (aAccount) {
-                            domainInfo.sponsorAccountId = aAccount.id;
-                            await this.patchData(
-                                config.dbCollections.domains,
-                                domainId,
-                                domainInfo
-                            );
-                        }
-                    }
-
-                    if (
-                        domainInfo.sponsorAccountId === tokenInfo[0].accountId
-                    ) {
-                        verified = true;
-                    }
-                } else {
-                    throw new BadRequest(
-                        messages.common_messages_no_domain_token
+                if (IsNullOrEmpty(domainInfo.sponsorAccountId)) {
+                    const aAccount: AccountInterface = await this.getData(
+                        config.dbCollections.accounts,
+                        tokenInfo[0].accountId
                     );
+
+                    if (aAccount) {
+                        domainInfo.sponsorAccountId = aAccount.id;
+                        await this.patchData(
+                            config.dbCollections.domains,
+                            domainId,
+                            domainInfo
+                        );
+                    }
                 }
+
+                if (
+                    domainInfo.sponsorAccountId === tokenInfo[0].accountId
+                ) {
+                    verified = true;
+                }
+            } else {
+                throw new BadRequest(
+                    messages.common_messages_no_domain_token
+                );
             }
         }
 
