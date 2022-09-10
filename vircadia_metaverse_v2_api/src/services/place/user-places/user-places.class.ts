@@ -236,16 +236,16 @@ export class PlacesFeild extends DatabaseService {
 
                 if (IsNotNullOrEmpty(aDomain)) {
                     if (IsNullOrEmpty(aDomain.networkAddr)) {
-                        
+
                         throw new BadRequest(
                             'Domain does not have a network address'
                         );
                     }
                     if (
                         await checkAccessToEntity(
-                            [Perm.DOMAINACCESS, Perm.ADMIN],
+                            [Perm.SPONSOR, Perm.MANAGER, Perm.ADMIN],
                             loginUser,
-                            loginUser
+                            aDomain
                         )
                     ) {
                         const ifValid = await PlaceFields.name.validate(
@@ -289,10 +289,18 @@ export class PlacesFeild extends DatabaseService {
                                 aDomain
                             );
                             return Promise.resolve(buildSimpleResponse(place));
-                        }
-                    }
-                }
-            }
+                        } else {
+							throw new BadRequest("Invalid place name");
+						}
+                    } else {
+						throw new NotAuthenticated(messages.common_messages_unauthorized);
+					}
+                } else {
+					throw new BadRequest(messages.common_domainId_notFound);
+				}
+            } else {
+				throw new BadRequest(messages.common_messages_parameter_missing);
+			}
         } else {
             throw new NotAuthenticated(messages.common_messages_unauthorized);
         }

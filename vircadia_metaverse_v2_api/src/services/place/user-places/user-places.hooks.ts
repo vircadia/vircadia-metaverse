@@ -32,14 +32,15 @@ export default {
         create: [
             validators.form(createUserPlaceSchema, joiOptions),
             checkAccessToAccount(config.dbCollections.accounts, [
-                Perm.DOMAINACCESS,
+                Perm.PUBLIC,
+                Perm.OWNER,
                 Perm.ADMIN,
             ]),
         ],
         update: [disallow()],
         patch: [disallow()],
         remove: [
-            checkAccessToAccount(config.dbCollections.accounts, [
+            checkAccessToAccount(config.dbCollections.places, [
                 Perm.DOMAINACCESS,
                 Perm.ADMIN,
             ]),
