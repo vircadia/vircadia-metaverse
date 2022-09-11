@@ -19,6 +19,7 @@ const { authenticate } = feathersAuthentication.hooks;
 import requestSuccess from '../../hooks/requestSuccess';
 import requestFail from '../../hooks/requestFail';
 import checkAccessToAccount from '../../hooks/checkAccess';
+import allowDomainAccessTokenAuth from '../../hooks/allowDomainAccessTokenAuth';
 import config from '../../appconfig';
 import { Perm } from '../../utils/Perm';
 import validators from '@feathers-plus/validate-joi';
@@ -27,16 +28,19 @@ import { disallow } from 'feathers-hooks-common';
 
 export default {
     before: {
-        all: [authenticate('jwt')],
+        all: [
+			allowDomainAccessTokenAuth(),
+			authenticate('jwt', 'domain-access-token')],
         find: [],
-        get: [],
-        create: [disallow()],
+		get: [],
+        create: [],
         update: [
             checkAccessToAccount(config.dbCollections.domains, [
+                Perm.SPONSOR,
                 Perm.MANAGER,
                 Perm.ADMIN,
             ]),
-            validators.form(editDomainSchema, joiOptions),
+            /* FIXME: validators.form(editDomainSchema, joiOptions), fails domain server heartbeat request */
         ],
         patch: [disallow()],
         remove: [

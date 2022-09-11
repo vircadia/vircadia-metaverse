@@ -18,6 +18,7 @@ import * as feathersAuthentication from '@feathersjs/authentication';
 const { authenticate } = feathersAuthentication.hooks;
 import requestSuccess from '../../../hooks/requestSuccess';
 import requestFail from '../../../hooks/requestFail';
+import allowDomainAccessTokenAuth from '../../../hooks/allowDomainAccessTokenAuth';
 import validators from '@feathers-plus/validate-joi';
 import {
     editDomainSchema,
@@ -29,7 +30,10 @@ import { disallow } from 'feathers-hooks-common';
 
 export default {
     before: {
-        all: [authenticate('jwt')],
+        all: [
+            allowDomainAccessTokenAuth(),
+            authenticate('jwt', 'domain-access-token')
+        ],
         find: [validators.form(findDomainSchema, joiReadOptions)],
         get: [disallow()],
         create: [validators.form(findDomainSchema, joiReadOptions)],

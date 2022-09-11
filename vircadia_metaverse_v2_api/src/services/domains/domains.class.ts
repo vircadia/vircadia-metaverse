@@ -54,7 +54,7 @@ export class Domains extends DatabaseService {
      * - Request Type - GET
      * - End Point - API_URL/domains
      *
-     * @requires -authentication
+     * @requires - authentication
      *
      * @optional @param per_page - page size
      * @optional @param page - page number
@@ -147,7 +147,7 @@ export class Domains extends DatabaseService {
      *
      * @remarks
      * This method is part of the edit domain
-     * - Request Type - PATCH
+     * - Request Type - PUT
      * - End Point - API_URL/domains/{domainId}
      *
      * @requires -authentication
@@ -157,6 +157,7 @@ export class Domains extends DatabaseService {
      *                version:"",
      *                protocol:"",
      *                network_address:"",
+     *                network_port:"",
      *                restricted:"",
      *                capacity:10,
      *                description:"",
@@ -169,7 +170,8 @@ export class Domains extends DatabaseService {
      * @returns - {status: 'success', data:{...}} or { status: 'failure', message: 'message'}
      *
      */
-    async update(id: NullableId, data: any): Promise<any> {
+    async update(id: NullableId, data: any, params: any): Promise<any> {
+		id = id || params?.route?.id;
         if (IsNotNullOrEmpty(id) && id) {
             const domainData = data.domain;
             const updateDomain: any = {};
@@ -188,6 +190,12 @@ export class Domains extends DatabaseService {
             if (IsNotNullOrEmpty(domainData.network_address)) {
                 updateDomain.networkAddr = domainData.network_address;
             }
+
+            if (IsNotNullOrEmpty(domainData.network_port)) {
+                updateDomain.networkPort = domainData.network_port;
+            }
+
+			// TODO: domain server also wants to set automatic_networking and api_key
 
             if (IsNotNullOrEmpty(domainData.restricted)) {
                 updateDomain.restricted = domainData.restricted;
@@ -214,6 +222,10 @@ export class Domains extends DatabaseService {
 
             if (IsNotNullOrEmpty(domainData.tags)) {
                 updateDomain.tags = domainData.tags;
+            }
+
+            if (IsNotNullOrEmpty(domainData.tags)) {
+                updateDomain.iceServerAddr = domainData.ice_server_address;
             }
 
             if (IsNotNullOrEmpty(domainData.heartbeat)) {
@@ -267,11 +279,12 @@ export class Domains extends DatabaseService {
      * POST domain create
      *
      * @remarks
-     * This method is to domain temporary entry
+     * Create a new domain entry.
      * - Request Type - POST
      * - End Point - API_URL/api/v1/domains
      *
-     * @requires -authentication
+     * @requires - authentication.
+     * @param label = A label that identifies the Domain Server.
      * @body - {}
      * @returns - {status: 'success', data:{...}} or { status: 'failure', message: 'message'}
      *
