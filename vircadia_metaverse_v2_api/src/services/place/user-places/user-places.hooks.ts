@@ -31,11 +31,6 @@ export default {
         get: [],
         create: [
             validators.form(createUserPlaceSchema, joiOptions),
-            checkAccessToAccount(config.dbCollections.accounts, [
-                Perm.PUBLIC,
-                Perm.OWNER,
-                Perm.ADMIN,
-            ]),
         ],
         update: [disallow()],
         patch: [disallow()],
