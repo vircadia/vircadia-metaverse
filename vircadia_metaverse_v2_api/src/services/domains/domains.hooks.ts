@@ -25,16 +25,24 @@ import { Perm } from '../../utils/Perm';
 import validators from '@feathers-plus/validate-joi';
 import { editDomainSchema, joiOptions } from './domains.joi';
 import { disallow } from 'feathers-hooks-common';
+import { HookContext } from '@feathersjs/feathers';
+import { IsNullOrEmpty } from '../../utils/Misc';
 
 export default {
     before: {
         all: [
-			allowDomainAccessTokenAuth(),
-			authenticate('jwt', 'domain-access-token')],
+            allowDomainAccessTokenAuth(),
+            authenticate('jwt', 'domain-access-token')],
         find: [],
-		get: [],
+        get: [],
         create: [],
         update: [
+            (context: HookContext) => {
+                if(context && IsNullOrEmpty(context.id)) {
+                    context.id = context.params?.id || context.params?.route?.id;
+                }
+                return context;
+            },
             checkAccessToAccount(config.dbCollections.domains, [
                 Perm.SPONSOR,
                 Perm.MANAGER,
