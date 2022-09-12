@@ -1,18 +1,66 @@
 # vircadia-metaverse-v2
 
-## Docker MAC
 
--   docker compose build
--   docker compose up  
-     OR
--   docker compose up --scale api=10
+## Getting Started
 
-## Docker Ubuntu
+Getting up and running is as easy
 
--   docker-compose build
--   docker-compose up -d //()
-    OR
--   docker-compose up --scale api=10
+1. Make sure you have [NodeJS](https://nodejs.org/) and [npm](https://www.npmjs.com/) installed.
+
+2. Install docker (https://docs.docker.com/engine/install)
+
+4. Go to the project root path
+    ```
+        cd path/to/vircadia-metaverse-v2
+    ```
+
+5. Install your dependencies
+
+    ```
+    npm install
+    cd path/to/vircadia-metaverse-v2/ethereum/dlt/
+    npm install
+    npm run chain
+    ```
+6. Copy env file
+    ```
+     cp env.default .env 
+    ```
+7. Open .env file 
+   - Change following env params  SERVER_HOST,
+    METAVERSE_SERVER_URL,
+    DEFAULT_ICE_SERVER_URL,
+    DASHBOARD_URL,
+    APP_LOGO,
+    APP_URL,
+    SMTP_USER,
+    SMTP_PASS,
+    SMTP_EMAIL_FROM  etc...
+
+    - Blockchain params 
+        MINTER_PRIVATE_KEY,
+        ETH_RPC_URL
+    
+
+
+8. Run Following docker commands for deploy into docker (Same commands for redeploy)
+     ```
+     docker-compose build
+     docker-compose up -d
+     ```
+
+9. Run Following command for stop docker  (Optional)
+     
+     ```
+     docker-compose down
+     ```
+
+10. Remove docker cached images (Optional)
+
+    ```
+    docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
+    ```
+
 
 ## Load Init master data
 
@@ -22,36 +70,6 @@
 https://{apiUrl}/init-master-data
 
 ```
-
--Remove cached images
-
-```
-docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
-```
-
-## About
-
-This project uses [Feathers](http://feathersjs.com). An open source web framework for building modern real-time applications.
-
-## Getting Started
-
-Getting up and running is as easy as 1, 2, 3.
-
-1. Make sure you have [NodeJS](https://nodejs.org/) and [npm](https://www.npmjs.com/) installed.
-2. Install your dependencies
-
-    ```
-    cd path/to/vircadia-metaverse-v2
-    npm install
-    cd path/to/vircadia-metaverse-v2/blockchain
-    npm install
-    ```
-
-3. Start your app
-
-    ```
-    npm start
-    ```
 
 ## Testing
 
@@ -72,10 +90,6 @@ $ feathers generate service               # Generate a new Service
 $ feathers generate hook                  # Generate a new Hook
 $ feathers help                           # Show all commands
 ```
-
-## Help
-
-For more information on all the things you can do with Feathers visit [docs.feathersjs.com](http://docs.feathersjs.com).
 
 ## Generate Doc
 

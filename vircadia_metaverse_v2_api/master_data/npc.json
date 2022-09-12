@@ -19,31 +19,20 @@
         "name": "Duck",
         "type": "interactive",
         "description": "It's a duck.",
-        "idleText": ["Quack.", "Quack. Quack.", "Quaaaaack."],
-        "idleAnimations": ["standard-duck-walk", "standard-duck-stand"],
-        "interactiveText": ["Munch munch."],
-        "interactiveAnimations": ["standard-duck-eat"],
-        "tags": {
-            "interactiveItem": "loaf-of-bread"
-        }
-    },
-    {
-        "id": "gy-gyc-goose-park-pond-1",
-        "name": "Goose",
-        "type": "interactive-mob",
-        "description": "It's a goose. Might be evil.",
         "idleText": [
-            "Honk.",
-            "I'm going to kill y-, I mean honk.",
-            "Hooooooonk."
+            "Quack.",
+            "Quack. Quack.",
+            "Quaaaaack."
         ],
-        "idleAnimations": ["standard-goose-walk", "standard-goose-stand"],
-        "interactiveText": ["Munch munch."],
-        "interactiveAnimations": ["standard-goose-eat"],
-        "combatText": ["HONK!", "Ahhhh!"],
-        "combatAnimations": [
-            "standard-goose-attack-1",
-            "standard-goose-attack-2"
+        "idleAnimations": [
+            "standard-duck-walk",
+            "standard-duck-stand"
+        ],
+        "interactiveText": [
+            "Munch munch."
+        ],
+        "interactiveAnimations": [
+            "standard-duck-eat"
         ],
         "tags": {
             "interactiveItem": "loaf-of-bread"

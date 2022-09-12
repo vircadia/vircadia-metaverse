@@ -24,8 +24,8 @@ if (globalThis.process?.env.APP_ENV === 'development') {
         !fs.existsSync(appRootPath.path + '/.env') &&
         !fs.existsSync(appRootPath.path + '/.env.local')
     ) {
-        const fromEnvPath = appRootPath.path + '/.env.local.default';
-        const toEnvPath = appRootPath.path + '/.env.local';
+        const fromEnvPath = appRootPath.path + '/env.default';
+        const toEnvPath = appRootPath.path + '/.env';
         fs.copyFileSync(fromEnvPath, toEnvPath, fs.constants.COPYFILE_EXCL);
     }
 }
