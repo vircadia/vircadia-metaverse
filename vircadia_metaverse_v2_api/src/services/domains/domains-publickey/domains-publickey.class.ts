@@ -124,15 +124,6 @@ export class DomainPublickey extends DatabaseService {
                         config.dbCollections.accounts,
                         tokenInfo[0].accountId
                     );
-
-                    if (aAccount) {
-                        domainInfo.sponsorAccountId = aAccount.id;
-                        await this.patchData(
-                            config.dbCollections.domains,
-                            domainId,
-                            domainInfo
-                        );
-                    }
                 }
 
                 if (
