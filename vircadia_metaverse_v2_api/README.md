@@ -22,11 +22,13 @@ Getting up and running is as easy
     npm install
     npm run chain
     ```
-6. Copy env file
+6. open vircadia_metaverse_v2_api/conf.d/vircadia_conf.conf  file and change server_name
+
+7. Copy env file
     ```
      cp env.default .env 
     ```
-7. Open .env file 
+8. Open .env file 
    - Change following env params  SERVER_HOST,
     METAVERSE_SERVER_URL,
     DEFAULT_ICE_SERVER_URL,
@@ -43,19 +45,19 @@ Getting up and running is as easy
     
 
 
-8. Run Following docker commands for deploy into docker (Same commands for redeploy)
+9. Run Following docker commands for deploy into docker (Same commands for redeploy)
      ```
      docker-compose build
      docker-compose up -d
      ```
 
-9. Run Following command for stop docker  (Optional)
+10. Run Following command for stop docker  (Optional)
      
      ```
      docker-compose down
      ```
 
-10. Remove docker cached images (Optional)
+11. Remove docker cached images (Optional)
 
     ```
     docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
