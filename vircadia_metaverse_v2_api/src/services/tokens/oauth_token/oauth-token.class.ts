@@ -25,7 +25,7 @@ import { extractLoggedInUserFromParams } from '../../auth/auth.utils';
 import { BadRequest, NotAuthenticated, NotFound } from '@feathersjs/errors';
 import { VKeyedCollection } from '../../../utils/vTypes';
 import { Tokens, TokenScope } from '../../../utils/Tokens';
-import { isEnabled, validatePassword } from '../../../utils/Utils';
+import { isValidateEmail } from '../../../utils/Utils';
 import { AuthToken } from '../../../common/interfaces/AuthToken';
 /**
  * oauth token.
@@ -66,17 +66,27 @@ export class AccountFeild extends DatabaseService {
         const accessGrantType = data.grant_type;
         switch (accessGrantType) {
             case 'password': {
-                const userName = data.username;
+                let userLogin = data.username;
                 const userPassword = data.password;
                 const userScope: string = data.scope ?? TokenScope.OWNER;
 
                 params.headers['content-type'] = 'application/json';
                 if (TokenScope.KnownScope(userScope)) {
+                    if (!isValidateEmail(userLogin))
+                    {
+                        const accountsByUsername = await this.findDataToArray(
+                            config.dbCollections.accounts,
+                            { query: { username: userLogin } }
+                        );
+                        if (accountsByUsername.length == 1) {
+                            userLogin = accountsByUsername[0].email;
+                        }
+                    }
                     const tokenData = await this.app
                         ?.service('authentication')
                         .create(
                             {
-                                email: userName,
+                                email: userLogin,
                                 password: userPassword,
                                 strategy: 'local',
                             },
