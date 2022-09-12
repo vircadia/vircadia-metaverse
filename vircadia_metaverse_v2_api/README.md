@@ -19,10 +19,10 @@ Getting up and running is as easy
     ```
     npm install
     cd path/to/vircadia-metaverse-v2/ethereum/dlt/
-    npm install
+    npm installcd ..
     npm run chain
     ```
-6. open vircadia_metaverse_v2_api/conf.d/vircadia_conf.conf  file and change server_name
+6. open vircadia_metaverse_v2_api/conf.d/vircadia_conf.conf file and change server_name
 
 7. Copy env file
     ```
@@ -63,15 +63,6 @@ Getting up and running is as easy
     docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
     ```
 
-
-## Load Init master data
-
--   Using this API, load master data into the database (Quest item, Inventory Items, Npc etc...)
-
-```
-https://{apiUrl}/init-master-data
-
-```
 
 ## Testing
 
