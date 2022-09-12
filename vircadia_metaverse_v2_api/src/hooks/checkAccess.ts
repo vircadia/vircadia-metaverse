@@ -35,26 +35,16 @@ export default (collection: string, pRequiredAccess: Perm[]) => {
         const loginUser = extractLoggedInUserFromParams(context.params);
 
         let condition: any = {};
-        if (context.method != 'remove') {
-            if (IsNotNullOrEmpty(context.id)) {
-                if (isValidUUID(context.id)) {
-                    condition.id = context.id;
-                } else {
-                    condition.username = context.id;
-                }
-            }
-        } else if (context.method == 'remove') {
-            if (IsNotNullOrEmpty(context.id)) {
-                if (isValidUUID(context.id)) {
-                    condition.id = context.id;
-                } else {
-                    condition.username = context.id;
-                }
-            }
-        } else {
-            condition.id = loginUser.id;
-        }
-        
+		if (IsNotNullOrEmpty(context.id)) {
+			if (isValidUUID(context.id)) {
+				condition.id = context.id;
+			} else {
+				condition.username = context.id;
+			}
+		} else {
+			throw new BadRequest("Missing entity ID for permission checks.");
+		}
+
         const entryDataArray = await dbService.findDataToArray(collection, {
             query: condition,
         });
