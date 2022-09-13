@@ -14,7 +14,8 @@ services:
         container_name: redis_container
         restart: always
         image: redis/redis-stack:latest
-        # command: redis-server --save 20 1 --loglevel warning
+        environment:
+            REDIS_ARGS: --save 20 1
         volumes:
             - redis_server:/data/redis
     # Node API service
