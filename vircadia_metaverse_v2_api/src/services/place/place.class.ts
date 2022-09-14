@@ -320,9 +320,11 @@ export class Place extends DatabaseService {
         if (IsNotNullOrEmpty(maturity)) {
             filterQuery.maturity = maturity;
         }
+
         if (IsNotNullOrEmpty(search)) {
             filterQuery.name = search;
         }
+
         if (IsNotNullOrEmpty(tag)) {
             filterQuery.tag = { $in: tag };
         }
@@ -333,7 +335,31 @@ export class Place extends DatabaseService {
             };
         }
 
-        // const places: any[] = [];
+        const allDomains = await this.findDataToArray(config.dbCollections.domains, {
+			query: {
+				networkAddr: { $exists: true },
+				$limit: 1000
+			}
+		});
+
+        const myDomains = await this.findDataToArray(config.dbCollections.domains, {
+			query: {
+				networkAddr: { $exists: true },
+				sponsorAccountId: loginUser.id
+				$limit: 1000
+			}
+		});
+		const myDomainIds = myDomains.filter(domain => domain.networkAddr).map(domain => domain.id);
+
+		if (!asAdmin)
+		{
+			filterQuery.$or = [
+				{ visibility: { $exists: false } }, // if 'visibility' is not specified, assume "OPEN"
+				{ visibility: Visibility.OPEN },
+				{ visibility: Visibility.PRIVATE, domainId: { $in: myDomainIds } }
+			];
+		}
+
         const allPlaces = await this.findData(config.dbCollections.places, {
             query: {
                 ...filterQuery,
@@ -345,40 +371,9 @@ export class Place extends DatabaseService {
         const placesData: PlaceInterface[] =
             allPlaces.data as Array<PlaceInterface>;
 
-        const domainIds = (placesData as Array<PlaceInterface>)
-            ?.map((item) => item.domainId)
-            .filter(
-                (value, index, self) =>
-                    self.indexOf(value) === index && value !== undefined
-            );
-
-        var domains = await this.findDataToArray(config.dbCollections.domains, {
-            query: { id: { $in: domainIds } },
-        });
-        const places: any[] = [];
-
-        for await (const place of placesData) {
-            let DomainInterface: DomainInterface | undefined;
-            for await (const domain of domains) {
-                if (domain && domain.id === place.domainId) {
-                    DomainInterface = domain;
-                    if (
-                        await this.criteriaTestAsync(
-                            place,
-                            domain,
-                            asAdmin,
-                            loginUser
-                        )
-                    ) {
-                        places.push(
-                            await buildPlaceInfo(this, place, DomainInterface)
-                        );
-                        break;
-                    }
-                    // }
-                }
-            }
-        }
+        const places = await Promise.all(placesData.map(data =>
+            buildPlaceInfo(this, data, allDomains.find(domain => domain.id === data.domainId))
+        ));
 
         const data = {
             places: places,
@@ -393,51 +388,5 @@ export class Place extends DatabaseService {
                 allPlaces.total
             )
         );
-    }
-
-    async criteriaTestAsync(
-        place: any,
-        domain: any,
-        asAdmin: boolean,
-        loginUser: any
-    ): Promise<any> {
-        let ret = asAdmin;
-        if (!ret) {
-            if (domain.networkAddr) {
-                if (place.hasOwnProperty('visibility')) {
-                    switch (place.visibility) {
-                        case Visibility.OPEN:
-                            ret = true;
-                            break;
-                        case Visibility.PRIVATE:
-                            if (loginUser && place.hasOwnProperty('domainId')) {
-                                const aDomain =
-                                    domain ??
-                                    (await this.getData(
-                                        config.dbCollections.domains,
-                                        place.domainId
-                                    ));
-                                if (aDomain) {
-                                    ret =
-                                        aDomain.sponsorAccountId ===
-                                        loginUser.id;
-                                }
-                            }
-                            break;
-                        default:
-                            ret = false;
-                            return;
-                    }
-                } else {
-                    // if 'visibility' is not specified, it's assumed "OPEN"
-                    ret = true;
-                }
-            } else {
-                ret = false;
-            }
-            return ret;
-        } else {
-            return ret;
-        }
     }
 }

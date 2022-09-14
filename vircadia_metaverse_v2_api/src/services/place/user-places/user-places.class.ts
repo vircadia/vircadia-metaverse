@@ -70,62 +70,44 @@ export class PlacesFeild extends DatabaseService {
         const page = parseInt(params?.query?.page) || 1;
         const skip = (page - 1) * perPage;
 
-        // const places: any[] = [];
-        const allPlaces = await this.findData(config.dbCollections.places, {
+        const myDomains = await this.findDataToArray(config.dbCollections.domains, {
             query: {
+                sponsorAccountId: loginUser.id,
+                $limit: 1000
+            },
+        });
+
+        const myDomainIds = myDomains.map(domain => domain.id);
+
+        // const places: any[] = [];
+        const myPlaces = await this.findData(config.dbCollections.places, {
+            query: {
+                domainId: { $in: myDomainIds },
                 $skip: skip,
                 $limit: perPage,
             },
         });
 
+
         const placesData: PlaceInterface[] =
-            allPlaces.data as Array<PlaceInterface>;
+            myPlaces.data as Array<PlaceInterface>;
 
-        const domainIds = (placesData as Array<PlaceInterface>)
-            ?.map((item) => item.domainId)
-            .filter(
-                (value, index, self) =>
-                    self.indexOf(value) === index && value !== undefined
-            );
-
-        const domains = await this.findDataToArray(
-            config.dbCollections.domains,
-            {
-                query: {
-                    id: { $in: domainIds },
-                    sponsorAccountId: loginUser.id,
-                },
-            }
-        );
-
-        const places: any[] = [];
-
-        (placesData as Array<PlaceInterface>)?.forEach(async (element) => {
-            let DomainInterface: DomainInterface | undefined;
-            for (const domain of domains) {
-                if (domain && domain.id === element.domainId) {
-                    DomainInterface = domain;
-                    break;
-                }
-            }
-            if (DomainInterface) {
-                places.push(
-                    await buildPlaceInfo(this, element, DomainInterface)
-                );
-            }
-        });
+        const places = await Promise.all(placesData.map(data =>
+            buildPlaceInfo(this, data, myDomains.find(domain => domain.id === data.domainId))
+        ));
 
         const data = {
             places: places,
             'maturity-categories': Maturity.MaturityCategories,
         };
+
         return Promise.resolve(
             buildPaginationResponse(
                 data,
                 page,
                 perPage,
-                Math.ceil(allPlaces.total / perPage),
-                allPlaces.total
+                Math.ceil(myPlaces.total / perPage),
+                myPlaces.total
             )
         );
     }
@@ -290,17 +272,17 @@ export class PlacesFeild extends DatabaseService {
                             );
                             return Promise.resolve(buildSimpleResponse(place));
                         } else {
-							throw new BadRequest("Invalid place name");
-						}
+                            throw new BadRequest("Invalid place name");
+                        }
                     } else {
-						throw new NotAuthenticated(messages.common_messages_unauthorized);
-					}
+                        throw new NotAuthenticated(messages.common_messages_unauthorized);
+                    }
                 } else {
-					throw new BadRequest(messages.common_domainId_notFound);
-				}
+                    throw new BadRequest(messages.common_domainId_notFound);
+                }
             } else {
-				throw new BadRequest(messages.common_messages_parameter_missing);
-			}
+                throw new BadRequest(messages.common_messages_parameter_missing);
+            }
         } else {
             throw new NotAuthenticated(messages.common_messages_unauthorized);
         }
