@@ -224,7 +224,7 @@ export class Domains extends DatabaseService {
                 updateDomain.tags = domainData.tags;
             }
 
-            if (IsNotNullOrEmpty(domainData.tags)) {
+            if (IsNotNullOrEmpty(domainData.ice_server_address)) {
                 updateDomain.iceServerAddr = domainData.ice_server_address;
             }
 

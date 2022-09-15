@@ -31,6 +31,7 @@ export default function (app: Application): void {
     const options = {
         paginate: app.get('paginate'),
         id: 'id',
+		whitelist: ['$exists']
     };
 
     // Initialize our service with any options it requires
