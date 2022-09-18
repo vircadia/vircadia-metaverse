@@ -30,14 +30,14 @@ const { authenticate } = feathersAuthentication.hooks;
 
 export default {
     before: {
-        all: [
-            allowDomainAccessTokenAuth(),
-            authenticate('jwt', 'domain-access-token')
-        ],
+        all: [],
         find: [validators.form(findDomainPublickeySchema, joiReadOptions)],
         get: [disallow()],
         create: [disallow()],
-        update: [],
+        update: [
+            allowDomainAccessTokenAuth(),
+            authenticate('jwt', 'domain-access-token')
+        ],
         patch: [disallow()],
         remove: [disallow()],
     },
