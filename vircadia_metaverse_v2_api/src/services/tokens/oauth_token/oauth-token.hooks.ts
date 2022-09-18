@@ -15,6 +15,7 @@
 'use strict';
 
 import * as feathersAuthentication from '@feathersjs/authentication';
+import { HookContext } from '@feathersjs/feathers';
 const { authenticate } = feathersAuthentication.hooks;
 import requestSuccess from '../../../hooks/requestSuccess';
 import requestFail from '../../../hooks/requestFail';
@@ -42,7 +43,14 @@ export default {
     },
 
     error: {
-        all: [requestFail()],
+        all: [requestFail(), (context: HookContext) => {
+            if(context.result)
+            {
+                context.result.error = "invalid";
+                context.result.error_description = context.result.error.message;
+            }
+            return context;
+        }],
         find: [],
         get: [],
         create: [],
