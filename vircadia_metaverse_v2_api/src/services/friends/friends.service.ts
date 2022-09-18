@@ -19,6 +19,7 @@ import { ServiceAddons } from '@feathersjs/feathers';
 import { Application } from '../../declarations';
 import { Friends } from './friends.class';
 import hooks from './friends.hooks';
+import { domainAccessTokenMiddleware } from '../strategies/domain-access-token';
 
 // Add this service to the service type index
 declare module '../../declarations' {
@@ -34,8 +35,8 @@ export default function (app: Application): void {
     };
 
     // Initialize our service with any options it requires
-    app.use('/friends', new Friends(options, app));
-    app.use('api/v1/user/friends', app.service('friends'));
+    app.use('/friends', domainAccessTokenMiddleware, new Friends(options, app));
+    app.use('api/v1/user/friends', domainAccessTokenMiddleware, app.service('friends'));
 
     // Get our initialized service so that we can register hooks
     const service = app.service('friends');

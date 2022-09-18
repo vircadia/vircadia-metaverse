@@ -22,10 +22,14 @@ import { disallow } from 'feathers-hooks-common';
 const { authenticate } = authentication.hooks;
 import validators from '@feathers-plus/validate-joi';
 import { createFriendSchema, joiOptions } from './friends.joi';
+import allowDomainAccessTokenAuth from '../../hooks/allowDomainAccessTokenAuth';
 
 export default {
     before: {
-        all: [authenticate('jwt')],
+        all: [
+            allowDomainAccessTokenAuth(),
+            authenticate('jwt', 'domain-access-token')
+        ],
         find: [],
         get: [disallow()],
         create: [validators.form(createFriendSchema, joiOptions)],
