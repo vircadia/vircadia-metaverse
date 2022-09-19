@@ -141,7 +141,7 @@ async function getManagers(
 ): Promise<string[]> {
     if (IsNullOrEmpty(pPlace.managers)) {
         pPlace.managers = [];
-        if (aDomain) {
+        if (aDomain && aDomain.sponsorAccountId) {
             const aAccount = await db.getData(
                 config.dbCollections.accounts,
                 aDomain.sponsorAccountId
