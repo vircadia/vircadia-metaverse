@@ -70,7 +70,10 @@ export class DomainPublickey extends DatabaseService {
                     domainInfo.publicKey
                 );
 
-                return Promise.resolve({ public_key });
+                return Promise.resolve({
+                    data: { public_key },
+                    public_key
+                });
             } else {
                 throw new BadRequest(
                     messages.common_messages_target_domain_notfound
