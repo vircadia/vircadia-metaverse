@@ -15,10 +15,12 @@
 'use strict';
 
 // Initializes the `users` service on path `/users`
+import express from 'express';
 import { ServiceAddons } from '@feathersjs/feathers';
 import { Application } from '../../declarations';
 import { Token } from './tokens.class';
 import hooks from './tokens.hooks';
+import config from '../../appconfig';
 
 // Add this service to the service type index
 declare module '../../declarations' {
@@ -38,6 +40,17 @@ export default function (app: Application): void {
     app.use('/api/v1/token/new', app.service('token/new'));
     app.use(
         '/user/tokens/new',
+        (
+            req: express.Request,
+            res: express.Response,
+            next: express.NextFunction
+        ) => {
+            if (req?.feathers?.headers?.authorization) {
+                next();
+            } else {
+                res.redirect(config.metaverseServer.tokengen_url);
+            }
+        },
         app.service('token/new'),
         async (request: any, response: any) => {
             response.set('Content-Type', 'text/html');

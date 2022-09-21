@@ -96,6 +96,18 @@ const email = {
 };
 
 /**
+ * Metaverse
+ */
+
+const metaverse = {
+    metaverseName: process.env.METAVERSE_NAME ?? '',
+    metaverseNickName: process.env.METAVERSE_NICK_NAME ?? '',
+    metaverseServerUrl: process.env.METAVERSE_SERVER_URL ?? '', // if empty, set to self
+    defaultIceServerUrl: process.env.DEFAULT_ICE_SERVER_URL ?? 'ice.vircadia.com:7337', // if empty, set to self
+    dashboardUrl: process.env.DASHBOARD_URL,
+};
+
+/**
  * Metaverse Server
  */
 
@@ -132,7 +144,8 @@ const metaverseServer = {
     inventoryItemMasterDataFile: './master_data/inventory_items.json',
     questItemMasterDataFile: './master_data/quest_items.json',
     npcMasterDataFile: './master_data/npc.json',
-    tokengen_url: '../mailtemplates/DomainTokenLogin.html',
+    tokengen_url: metaverse.dashboardUrl + "/domain",
+    placelist_url: metaverse.dashboardUrl + "/places"
 };
 
 /**
@@ -146,18 +159,6 @@ const client = {
         (server.local
             ? 'http://' + process.env.APP_HOST + ':' + process.env.APP_PORT
             : 'https://' + process.env.APP_HOST + ':' + process.env.APP_PORT),
-};
-
-/**
- * Metaverse
- */
-
-const metaverse = {
-    metaverseName: process.env.METAVERSE_NAME ?? '',
-    metaverseNickName: process.env.METAVERSE_NICK_NAME ?? '',
-    metaverseServerUrl: process.env.METAVERSE_SERVER_URL ?? '', // if empty, set to self
-    defaultIceServerUrl: process.env.DEFAULT_ICE_SERVER_URL ?? 'ice.vircadia.com:7337', // if empty, set to self
-    dashboardUrl: process.env.DASHBOARD_URL,
 };
 
 /**

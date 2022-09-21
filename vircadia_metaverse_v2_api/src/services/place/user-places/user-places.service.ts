@@ -15,10 +15,12 @@
 'use strict';
 
 // Initializes the `domains` service on path `/domains`
+import express from 'express';
 import { ServiceAddons } from '@feathersjs/feathers';
 import { Application } from '../../../declarations';
 import { PlacesFeild } from './user-places.class';
 import hooks from './user-places.hooks';
+import config from '../../../appconfig';
 
 // Add this service to the service type index
 declare module '../../../declarations' {
@@ -36,6 +38,15 @@ export default function (app: Application): void {
     // Initialize our service with any options it requires
     app.use('/user_places', new PlacesFeild(options, app));
     app.use('/api/v1/user/places', app.service('user_places'));
+    app.use('/user/places',
+        (
+            req: express.Request,
+            res: express.Response,
+            next: express.NextFunction
+        ) => {
+            res.redirect(config.metaverseServer.placelist_url);
+        },
+    );
 
     // Get our initialized service so that we can register hooks
     const service = app.service('user_places');
