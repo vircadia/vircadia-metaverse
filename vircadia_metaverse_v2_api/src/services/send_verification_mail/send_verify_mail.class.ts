@@ -18,7 +18,7 @@ import { BadRequest } from '@feathersjs/errors';
 import fsPromises from 'fs/promises';
 import path from 'path';
 import config from '../../appconfig';
-import { DatabaseService } from '../../common/dbservice/DatabaseService';
+import { DatabaseService, noCaseCollation } from '../../common/dbservice/DatabaseService';
 import { DatabaseServiceOptions } from '../../common/dbservice/DatabaseServiceOptions';
 import { RequestInterface } from '../../common/interfaces/RequestInterface';
 import { RequestType } from '../../common/sets/RequestType';
@@ -61,9 +61,8 @@ export class SendVerifyMail extends DatabaseService {
             const userInfo = await this.findDataToArray(
                 config.dbCollections.accounts,
                 {
-                    query: {
-                        email: email,
-                    },
+                    query: { email: email, },
+                    collation: noCaseCollation
                 }
             );
 

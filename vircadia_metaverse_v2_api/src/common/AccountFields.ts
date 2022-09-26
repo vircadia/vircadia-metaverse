@@ -21,7 +21,7 @@ import { Roles } from './sets/Roles';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { IsNullOrEmpty, genRandomString } from '../utils/Misc';
-import { DatabaseService } from '../common/dbservice/DatabaseService';
+import { DatabaseService, noCaseCollation } from '../common/dbservice/DatabaseService';
 import app from '../app';
 import { isValidObject } from '../utils/Utils';
 import {
@@ -71,7 +71,10 @@ export const AccountFields: { [key: string]: any } = {
             if (!error) {
                 const otherAccount = await dbService.findDataToArray(
                     config.dbCollections.accounts,
-                    { query: { username: value } }
+                    {
+                        query: { username: value },
+                        collation: noCaseCollation
+                    }
                 );
 
                 if (
@@ -110,7 +113,10 @@ export const AccountFields: { [key: string]: any } = {
             if (!error) {
                 const otherAccount = await dbService.findDataToArray(
                     config.dbCollections.accounts,
-                    { query: { email: value } }
+                    {
+                        query: { email: value },
+                        collation: noCaseCollation
+                    }
                 );
                 if (
                     IsNullOrEmpty(otherAccount) ||

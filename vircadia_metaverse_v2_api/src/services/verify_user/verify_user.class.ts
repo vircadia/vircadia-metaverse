@@ -17,7 +17,7 @@
 import { BadRequest } from '@feathersjs/errors';
 import { NullableId } from '@feathersjs/feathers';
 import config from '../../appconfig';
-import { DatabaseService } from '../../common/dbservice/DatabaseService';
+import { DatabaseService, noCaseCollation } from '../../common/dbservice/DatabaseService';
 import { DatabaseServiceOptions } from '../../common/dbservice/DatabaseServiceOptions';
 import { Application } from '../../declarations';
 import { messages } from '../../utils/messages';
@@ -60,9 +60,8 @@ export class VerifyUser extends DatabaseService {
             const userInfo = await this.findDataToArray(
                 config.dbCollections.accounts,
                 {
-                    query: {
-                        email: email,
-                    },
+                    query: { email: email, },
+                    collation: noCaseCollation
                 }
             );
 

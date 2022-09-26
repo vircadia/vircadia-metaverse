@@ -18,12 +18,13 @@ import { AuthenticationService, JWTStrategy } from '@feathersjs/authentication';
 import { LocalStrategy } from '@feathersjs/authentication-local';
 import { expressOauth } from '@feathersjs/authentication-oauth';
 import { NotAuthenticated } from '@feathersjs/errors';
-import { ServiceAddons } from '@feathersjs/feathers';
+import { ServiceAddons, Params } from '@feathersjs/feathers';
 import { Application } from './declarations';
 import { FacebookStrategy } from './services/strategies/facebook';
 import { GoogleStrategy } from './services/strategies/google';
 import { DomainAccessToken } from './services/strategies/domain-access-token';
 import { validatePassword } from './utils/Utils';
+import { noCaseCollation } from './common/dbservice/DatabaseService';
 
 declare module './declarations' {
     interface ServiceTypes {
@@ -34,6 +35,12 @@ declare module './declarations' {
 export default function (app: Application): void {
     const authentication = new AuthenticationService(app);
     class MyLocalStrategy extends LocalStrategy {
+
+        async findEntity(username: string, params: Params) {
+            return super.findEntity(username,
+                Object.assign({}, params, {collation: noCaseCollation}));
+        }
+
         async comparePassword(entity: any, password: string): Promise<any> {
             const { errorMessage } = this.configuration;
             if (await validatePassword(entity, password)) {
@@ -42,6 +49,7 @@ export default function (app: Application): void {
                 throw new NotAuthenticated(errorMessage);
             }
         }
+
     }
 
     authentication.register('jwt', new JWTStrategy());

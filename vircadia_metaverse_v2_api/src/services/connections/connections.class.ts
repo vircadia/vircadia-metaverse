@@ -15,7 +15,7 @@ import { NullableId } from '@feathersjs/feathers';
 
 ('use strict');
 
-import { DatabaseService } from '../../common/dbservice/DatabaseService';
+import { DatabaseService, noCaseCollation } from '../../common/dbservice/DatabaseService';
 import { DatabaseServiceOptions } from '../../common/dbservice/DatabaseServiceOptions';
 import { Application } from '../../declarations';
 import config from '../../appconfig';
@@ -28,6 +28,7 @@ import {
 } from '../../common/responsebuilder/responseBuilder';
 import { extractLoggedInUserFromParams } from '../auth/auth.utils';
 import { messages } from '../../utils/messages';
+import { SArray } from '../../utils/vTypes';
 import { IsNotNullOrEmpty } from '../../utils/Misc';
 
 /**
@@ -56,15 +57,15 @@ export class Connections extends DatabaseService {
 
     async create(data: any, params?: any): Promise<any> {
         if (data && IsNotNullOrEmpty(data.username)) {
-            const useName = data.username.toString().trim();
+            const userName = data.username.toString().trim();
             const loginUser = extractLoggedInUserFromParams(params);
-            if (loginUser.connections.includes(useName)) {
+            if (SArray.hasNoCase(loginUser.connections, userName)) {
                 throw new NotAcceptable(
                     messages.common_messages_already_in_connection
                 );
             } else if (
                 loginUser.username.toString().toLowerCase() ===
-                useName.toLowerCase()
+                userName.toLowerCase()
             ) {
                 throw new NotAcceptable(
                     messages.common_messages_not_allow_self_connect
@@ -74,7 +75,7 @@ export class Connections extends DatabaseService {
                 config.dbCollections.accounts,
                 loginUser.id
             );
-            userData.connections.push(useName);
+            userData.connections.push(userName);
             const result = await this.patchData(
                 config.dbCollections.accounts,
                 loginUser.id,
@@ -110,7 +111,7 @@ export class Connections extends DatabaseService {
             );
             const connections = ParticularUserData.data[0].connections.filter(
                 function (value: string) {
-                    return value !== userName;
+                    return value.toLowerCase() !== userName?.toString().toLowerCase();
                 }
             );
             ParticularUserData.data[0].connections = connections;
@@ -156,6 +157,7 @@ export class Connections extends DatabaseService {
                 $limit: perPage,
                 connections: { $in: loginUser.connections },
             },
+            collation: noCaseCollation
         });
 
         const userList: AccountInterface[] = usersData.data;

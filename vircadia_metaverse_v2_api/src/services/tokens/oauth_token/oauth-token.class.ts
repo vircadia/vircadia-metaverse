@@ -14,7 +14,7 @@
 
 'use strict';
 
-import { DatabaseService } from '../../../common/dbservice/DatabaseService';
+import { DatabaseService, noCaseCollation } from '../../../common/dbservice/DatabaseService';
 import { DatabaseServiceOptions } from '../../../common/dbservice/DatabaseServiceOptions';
 import { Application } from '../../../declarations';
 import config from '../../../appconfig';
@@ -76,7 +76,10 @@ export class AccountFeild extends DatabaseService {
                     {
                         const accountsByUsername = await this.findDataToArray(
                             config.dbCollections.accounts,
-                            { query: { username: userLogin } }
+                            {
+                                query: { username: userLogin },
+                                collation: noCaseCollation
+                            }
                         );
                         if (accountsByUsername.length == 1) {
                             userLogin = accountsByUsername[0].email;

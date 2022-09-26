@@ -18,7 +18,7 @@ import { BadRequest, NotAuthenticated } from '@feathersjs/errors';
 import { NullableId, Params } from '@feathersjs/feathers';
 import _ from 'lodash';
 import config from '../../../appconfig';
-import { DatabaseService } from '../../../common/dbservice/DatabaseService';
+import { DatabaseService, noCaseCollation } from '../../../common/dbservice/DatabaseService';
 import { DatabaseServiceOptions } from '../../../common/dbservice/DatabaseServiceOptions';
 import { buildSimpleResponse } from '../../../common/responsebuilder/responseBuilder';
 import { Application } from '../../../declarations';
@@ -68,7 +68,10 @@ export class AccountPublickey extends DatabaseService {
 
             const accounts = await this.findDataToArray(
                 config.dbCollections.accounts,
-                {query:{ username:accountId }}
+                {
+                    query: { username: accountId },
+                    collation: noCaseCollation
+                }
             );
 
             if(IsNotNullOrEmpty(accounts)){

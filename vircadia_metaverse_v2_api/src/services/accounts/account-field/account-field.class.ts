@@ -16,7 +16,7 @@
 
 import { DomainInterface } from '../../../common/interfaces/DomainInterface';
 import { Params, NullableId } from '@feathersjs/feathers';
-import { DatabaseService } from '../../../common/dbservice/DatabaseService';
+import { DatabaseService, noCaseCollation } from '../../../common/dbservice/DatabaseService';
 import { DatabaseServiceOptions } from '../../../common/dbservice/DatabaseServiceOptions';
 import { Application } from '../../../declarations';
 import config from '../../../appconfig';
@@ -80,7 +80,10 @@ export class AccountFeild extends DatabaseService {
         } else {
             entryDataArray = await this.findDataToArray(
                 config.dbCollections.accounts,
-                { query: { username: accountId } }
+                {
+                    query: { username: accountId },
+                    collation: noCaseCollation
+                }
             );
 
             if (IsNotNullOrEmpty(entryDataArray)) {
@@ -109,7 +112,10 @@ export class AccountFeild extends DatabaseService {
                         } else {
                             objAccount = await this.findDataToArray(
                                 config.dbCollections.accounts,
-                                { query: { username: accountId } }
+                                {
+                                    query: { username: accountId },
+                                    collation: noCaseCollation
+                                }
                             );
 
                             if (IsNotNullOrEmpty(objAccount)) {
@@ -201,7 +207,10 @@ export class AccountFeild extends DatabaseService {
                 } else {
                     entryDataArray = await this.findDataToArray(
                         config.dbCollections.accounts,
-                        { query: { username: accountId } }
+                        {
+                            query: { username: accountId },
+                            collation: noCaseCollation
+                        }
                     );
 
                     if (IsNotNullOrEmpty(entryDataArray)) {

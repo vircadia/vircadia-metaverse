@@ -18,7 +18,7 @@ import config from '../appconfig';
 import { Visibility } from './sets/Visibility';
 import { Maturity } from './sets/Maturity';
 import { IsNotNullOrEmpty, IsNullOrEmpty } from '../utils/Misc';
-import { DatabaseService } from '../common/dbservice/DatabaseService';
+import { DatabaseService, noCaseCollation } from '../common/dbservice/DatabaseService';
 import { checkAccessToEntity } from '../utils/Permissions';
 import app from '../app';
 import { isValidObject } from '../utils/Utils';
@@ -289,7 +289,10 @@ export const PlaceFields: { [key: string]: any } = {
                     return IsNotNullOrEmpty(
                         await dbService.findDataToArray(
                             config.dbCollections.accounts,
-                            { query: { username: name } }
+                            {
+                                query: { username: name },
+                                collation: noCaseCollation
+                            }
                         )
                     );
                 })
