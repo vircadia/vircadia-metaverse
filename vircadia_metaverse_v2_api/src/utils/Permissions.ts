@@ -153,9 +153,7 @@ export async function checkAccessToEntity(
                                 .managers;
                             if (
                                 managers &&
-                                managers.includes(
-                                    loginUser.username.toLowerCase()
-                                )
+                                SArray.hasNoCase(managers, loginUser.username)
                             ) {
                                 canAccess = true;
                             }

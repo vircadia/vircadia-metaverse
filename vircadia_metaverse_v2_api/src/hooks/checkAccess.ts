@@ -23,7 +23,7 @@ import config from '../appconfig';
 import { HTTPStatusCode } from '../utils/response';
 import { Availability } from '../common/sets/Availability';
 import { SArray } from '../utils/vTypes';
-import { DatabaseService } from '../common/dbservice/DatabaseService';
+import { DatabaseService, noCaseCollation } from '../common/dbservice/DatabaseService';
 import { messages } from '../utils/messages';
 import { extractLoggedInUserFromParams } from '../services/auth/auth.utils';
 import { NotAuthenticated, BadRequest } from '@feathersjs/errors';
@@ -34,20 +34,21 @@ export default (collection: string, pRequiredAccess: Perm[]) => {
 
         const loginUser = extractLoggedInUserFromParams(context.params);
 
-        let condition: any = {};
+        let queryParams: any = {};
 		if (IsNotNullOrEmpty(context.id)) {
 			if (isValidUUID(context.id)) {
-				condition.id = context.id;
+				queryParams = { query: { id: context.id } };
 			} else {
-				condition.username = context.id;
+				queryParams = {
+                    query: { username: context.id },
+                    collation: noCaseCollation
+                };
 			}
 		} else {
 			throw new BadRequest("Missing entity ID for permission checks.");
 		}
 
-        const entryDataArray = await dbService.findDataToArray(collection, {
-            query: condition,
-        });
+        const entryDataArray = await dbService.findDataToArray(collection, queryParams);
         let canAccess = false;
 
         let pTargetEntity: any;
@@ -171,9 +172,7 @@ export default (collection: string, pRequiredAccess: Perm[]) => {
                                 ).managers;
                                 if (
                                     managers &&
-                                    managers.includes(
-                                        loginUser.username.toLowerCase()
-                                    )
+                                    SArray.hasNoCase(managers, loginUser.username)
                                 ) {
                                     canAccess = true;
                                 }

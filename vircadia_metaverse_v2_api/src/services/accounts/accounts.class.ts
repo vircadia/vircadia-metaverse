@@ -18,7 +18,7 @@ import { RequestType } from '../../common/sets/RequestType';
 import { DatabaseServiceOptions } from '../../common/dbservice/DatabaseServiceOptions';
 import { Params, Id, NullableId } from '@feathersjs/feathers';
 import { Application } from '../../declarations';
-import { DatabaseService } from '../../common/dbservice/DatabaseService';
+import { DatabaseService, noCaseCollation } from '../../common/dbservice/DatabaseService';
 import config from '../../appconfig';
 import { AccountInterface } from '../../common/interfaces/AccountInterface';
 import { RequestInterface } from '../../common/interfaces/RequestInterface';
@@ -136,7 +136,7 @@ export class Accounts extends DatabaseService {
             if (
                 asAdmin &&
                 IsNotNullOrEmpty(loginUser) &&
-                isAdmin(loginUser as AccountInterface) 
+                isAdmin(loginUser as AccountInterface)
                 // && IsNullOrEmpty(targetAccount)
             ) {
                 asAdmin = true;
@@ -187,6 +187,7 @@ export class Accounts extends DatabaseService {
                         $skip: skip,
                         $limit: perPage,
                     },
+                    collation: noCaseCollation
                 }
             );
 
@@ -231,16 +232,19 @@ export class Accounts extends DatabaseService {
 
     async get(id: Id): Promise<any> {
         let objAccount = null;
-        if(isValidUUID(id)){
+        if (isValidUUID(id)){
             objAccount = await this.getData(
                 config.dbCollections.accounts,
                 id
             );
-        }else{
-            
+        } else {
+
             const accounts = await this.findDataToArray(
                 config.dbCollections.accounts,
-                {query:{ username:id }}
+                {
+                    query: { username: id },
+                    collation: noCaseCollation
+                }
             );
 
             if(IsNotNullOrEmpty(accounts)){
@@ -290,7 +294,10 @@ export class Accounts extends DatabaseService {
                     }
                     const accountData = await this.findDataToArray(
                         config.dbCollections.accounts,
-                        { query: { email: valuesToSet.email } }
+                        {
+                            query: { email: valuesToSet.email },
+                            collation: noCaseCollation
+                        }
                     );
                     if (accountData.length > 0 && accountData[0].id !== id) {
                         throw new BadRequest(
@@ -384,12 +391,13 @@ export class Accounts extends DatabaseService {
                                 { friends: { $in: [account.username] } },
                             ],
                         },
+                        collation: noCaseCollation
                     }
                 );
 
                 for (const element of accounts) {
-                    SArray.remove(element.connections, account.username);
-                    SArray.remove(element.friends, account.username);
+                    SArray.removeNoCase(element.connections, account.username);
+                    SArray.removeNoCase(element.friends, account.username);
                     await super.patchData(
                         config.dbCollections.accounts,
                         element.id,

@@ -19,7 +19,7 @@ import { Visibility } from './sets/Visibility';
 import { Restriction } from './sets/Restriction';
 import { Maturity } from './sets/Maturity';
 import { IsNotNullOrEmpty } from '../utils/Misc';
-import { DatabaseService } from '../common/dbservice/DatabaseService';
+import { DatabaseService, noCaseCollation } from '../common/dbservice/DatabaseService';
 import app from '../app';
 import {
     isStringValidator,
@@ -319,7 +319,10 @@ export const DomainFields: { [key: string]: any } = {
                     return IsNotNullOrEmpty(
                         await dbService.findData(
                             config.dbCollections.accounts,
-                            { query: { username: name } }
+                            {
+                                query: { username: name },
+                                collation: noCaseCollation
+                            }
                         )
                     );
                 })
@@ -425,7 +428,7 @@ export function initDomains(): void {
             aDomain.active = false;
             const updates: any = {
                 numUsers: 0,
-                anonUsers: 0,   
+                anonUsers: 0,
                 active: false,
             };
             await dbService.patchData(

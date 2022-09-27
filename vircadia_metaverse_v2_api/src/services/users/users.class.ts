@@ -15,7 +15,7 @@
 'use strict';
 
 import { RequestType } from '../../common/sets/RequestType';
-import { DatabaseService } from '../../common/dbservice/DatabaseService';
+import { DatabaseService, noCaseCollation } from '../../common/dbservice/DatabaseService';
 import { DatabaseServiceOptions } from '../../common/dbservice/DatabaseServiceOptions';
 import { Application } from '../../declarations';
 import config from '../../appconfig';
@@ -106,20 +106,24 @@ export class Users extends DatabaseService {
                 const accountsName: AccountInterface[] =
                     await this.findDataToArray(config.dbCollections.accounts, {
                         query: { username: username },
+                        collation: noCaseCollation
                     });
                 const name = (accountsName as Array<AccountInterface>)?.map(
                     (item) => item.username
                 );
-                if (!name.includes(username)) {
+                if (!SArray.hasNoCase(name, username)) {
                     const accountsEmail: AccountInterface[] =
                         await this.findDataToArray(
                             config.dbCollections.accounts,
-                            { query: { email: email } }
+                            {
+                                query: { email: email },
+                                collation: noCaseCollation
+                            }
                         );
                     const emailAddress = (
                         accountsEmail as Array<AccountInterface>
                     )?.map((item) => item.email);
-                    if (!emailAddress.includes(email)) {
+                    if (!SArray.hasNoCase(emailAddress,email)) {
                         let isEthereumAddressExist = false;
 
                         if (IsNotNullOrEmpty(ethereumAddress)) {
@@ -217,7 +221,7 @@ export class Users extends DatabaseService {
                                         request
                                     );
 
-                                  
+
                                     try {
                                         const verificationURL =
                                         config.metaverse.metaverseServerUrl +
@@ -232,7 +236,7 @@ export class Users extends DatabaseService {
                                         config.metaverseServer
                                             .email_verification_email_body
                                     );
-                                    
+
                                     let emailBody = await fsPromises.readFile(
                                         verificationFile,
                                         'utf-8'
@@ -330,7 +334,7 @@ export class Users extends DatabaseService {
             const filterQuery: any = {};
             const targetAccount = params?.query?.account ?? '';
 
-            if (asAdmin && isAdmin(loginUser) 
+            if (asAdmin && isAdmin(loginUser)
                     // && IsNullOrEmpty(targetAccount)
                 ) {
                 asAdmin = true;
@@ -382,6 +386,7 @@ export class Users extends DatabaseService {
                         $skip: skip,
                         $limit: perPage,
                     },
+                    collation: noCaseCollation
                 }
             );
 

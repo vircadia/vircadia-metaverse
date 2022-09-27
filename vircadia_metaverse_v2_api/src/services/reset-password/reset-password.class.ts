@@ -15,7 +15,7 @@
 import { messages } from '../../utils/messages';
 import { NullableId } from '@feathersjs/feathers';
 import config from '../../appconfig';
-import { DatabaseService } from '../../common/dbservice/DatabaseService';
+import { DatabaseService, noCaseCollation } from '../../common/dbservice/DatabaseService';
 import { DatabaseServiceOptions } from '../../common/dbservice/DatabaseServiceOptions';
 import { Application } from '../../declarations';
 import { generateRandomNumber, getUtcDate } from '../../utils/Utils';
@@ -55,7 +55,10 @@ export class ResetPassword extends DatabaseService {
     async create(data: any): Promise<any> {
         const userList = await this.findDataToArray(
             config.dbCollections.accounts,
-            { query: { email: data.email } }
+            {
+                query: { email: data.email },
+                collation: noCaseCollation
+            }
         );
         if (userList.length > 0) {
             const userDetail = userList[0] as AccountInterface;
@@ -137,32 +140,34 @@ export class ResetPassword extends DatabaseService {
         const resetPasswordList = await this.findDataToArray(
             config.dbCollections.resetPassword,
             {
-                query: {
-                    email: data.email,
-                    secretKey: data.secretKey,
-                    otp: data.otp,
-                },
+                query: { email: data.email },
+                collation: noCaseCollation
             }
         );
         if (resetPasswordList.length > 0) {
             const resetPassword =
                 resetPasswordList[0] as ResetPasswordInterface;
-            if (resetPassword.expirationTime >= getUtcDate()) {
-                await this.patchData(
-                    config.dbCollections.accounts,
-                    resetPassword.userId,
-                    { password: data.password }
-                );
-                await this.deleteData(
-                    config.dbCollections.resetPassword,
-                    resetPassword.id
-                );
-                return Promise.resolve({
-                    message:
-                        messages.common_messages_password_changed_successfully,
-                });
+            if (resetPassword.secretKey === data.secretKey && resetPassword.otp === data.otp)
+            {
+                if (resetPassword.expirationTime >= getUtcDate()) {
+                    await this.patchData(
+                        config.dbCollections.accounts,
+                        resetPassword.userId,
+                        { password: data.password }
+                    );
+                    await this.deleteData(
+                        config.dbCollections.resetPassword,
+                        resetPassword.id
+                    );
+                    return Promise.resolve({
+                        message:
+                            messages.common_messages_password_changed_successfully,
+                    });
+                } else {
+                    throw new Timeout(messages.common_messages_otp_expired);
+                }
             } else {
-                throw new Timeout(messages.common_messages_otp_expired);
+                throw new NotFound(messages.common_messages_invalid_otp_secret);
             }
         } else {
             throw new NotFound(messages.common_messages_invalid_otp_secret);

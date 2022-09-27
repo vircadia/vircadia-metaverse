@@ -155,3 +155,7 @@ export class DatabaseService extends Service {
     }
 }
 
+export let noCaseCollation: any = {
+    locale: 'en_US',
+    strength: 2
+};

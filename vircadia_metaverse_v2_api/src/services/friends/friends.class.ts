@@ -24,6 +24,7 @@ import { messages } from '../../utils/messages';
 import { BadRequest, NotAcceptable } from '@feathersjs/errors';
 import { buildAccountInfo } from '../../common/responsebuilder/accountsBuilder';
 import { NullableId } from '@feathersjs/feathers';
+import { SArray } from '../../utils/vTypes';
 
 /**
  * Friends.
@@ -57,7 +58,7 @@ export class Friends extends DatabaseService {
             config.dbCollections.accounts,
             { query: { id: loginUser.id } }
         );
-        if (ParticularUserData.data[0].connections.includes(userName)) {
+        if (SArray.hasNoCase(ParticularUserData.data[0].connections,userName)) {
             const newParticularUserData = ParticularUserData.data[0];
             newParticularUserData.friends.push(userName);
             const result = await this.patchData(
@@ -121,7 +122,7 @@ export class Friends extends DatabaseService {
             const friends = ParticularUserData.data[0].friends.filter(function (
                 value: string
             ) {
-                return value !== userName;
+                return value.toLowerCase() !== userName?.toString().toLowerCase();
             });
             ParticularUserData.data[0].friends = friends;
             const newParticularUserData = ParticularUserData.data[0];

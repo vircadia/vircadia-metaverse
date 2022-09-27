@@ -61,4 +61,11 @@ export class SArray {
             pArray.splice(idx, 1);
         }
     }
+
+    static removeNoCase(pArray: string[], pRemove: string): void {
+        const idx = pArray.findIndex(x => x.toLowerCase() === pRemove.toLowerCase());
+        if (idx >= 0) {
+            pArray.splice(idx, 1);
+        }
+    }
 }
