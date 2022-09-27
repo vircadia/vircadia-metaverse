@@ -9587,7 +9587,6 @@ export let blackListedMail = [
     'propscore.com',
     'protempmail.com',
     'proto2mail.com',
-    'protonmail.com',
     'providier.com',
     'provmail.net',
     'proxymail.eu',
