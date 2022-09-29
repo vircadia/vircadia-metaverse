@@ -24,7 +24,7 @@ export const PublicRoutesController = () => {
             metaverse_name: config.metaverse.metaverseName,
             metaverse_nick_name: config.metaverse.metaverseNickName,
             ice_server_url: config.metaverse.defaultIceServerUrl,
-            jitsi_server_url: config.metaverse.jitsiServerUrl,
+            jitsi_server_domain: config.metaverse.jitsiServerUrl,
             metaverse_url: config.metaverse.metaverseServerUrl,
             metaverse_server_version: {
                 version_tag: config.server.version,
