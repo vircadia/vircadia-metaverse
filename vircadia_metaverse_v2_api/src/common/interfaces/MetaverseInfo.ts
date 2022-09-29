@@ -19,5 +19,6 @@ export interface MetaverseInfoInterface {
     metaverse_nick_name: string;
     metaverse_url: string;
     ice_server_url: string;
+    jitsi_server_url: string;
     metaverse_server_version: any;
 }
