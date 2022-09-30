@@ -62,7 +62,6 @@ export class AccountFeild extends DatabaseService {
      */
 
     async create(data: any, params?: any): Promise<any> {
-        const loginUser = extractLoggedInUserFromParams(params);
         const accessGrantType = data.grant_type;
         switch (accessGrantType) {
             case 'password': {
@@ -122,8 +121,7 @@ export class AccountFeild extends DatabaseService {
                         {
                             query: {
                                 refreshToken: refreshingToken,
-                                accountId: loginUser.id,
-                            },
+                            }
                         }
                     );
 
@@ -139,7 +137,7 @@ export class AccountFeild extends DatabaseService {
                         ) {
                             // refresh token has not expired and requestor is owner of the token so make new
                             const newToken = await Tokens.createToken(
-                                loginUser.id,
+                                requestingAccount[0].id,
                                 refreshToken[0].scope
                             );
 
