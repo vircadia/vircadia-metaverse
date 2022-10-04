@@ -20,9 +20,10 @@ const { authenticate } = feathersAuthentication.hooks;
 import requestFail from '../../hooks/requestFail';
 import requestSuccess from '../../hooks/requestSuccess';
 import checkAccessToAccount from '../../hooks/checkAccess';
+import isHasAuthToken from '../../hooks/isHasAuthToken';
 import config from '../../appconfig';
 import { Perm } from '../../utils/Perm';
-import { disallow } from 'feathers-hooks-common';
+import { disallow, iff } from 'feathers-hooks-common';
 import {
     createPlaceSchema,
     updatePlaceSchema,
@@ -36,7 +37,7 @@ export default {
     before: {
         all: [],
         find: [
-            authenticate('jwt'),
+            iff(isHasAuthToken(), authenticate('jwt')),
             validators.form(findPlaceSchema, joiReadOptions),
         ],
         get: [

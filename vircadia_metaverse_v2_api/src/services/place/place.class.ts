@@ -345,7 +345,7 @@ export class Place extends DatabaseService {
         const myDomains = await this.findDataToArray(config.dbCollections.domains, {
 			query: {
 				networkAddr: { $exists: true },
-				sponsorAccountId: loginUser.id,
+				sponsorAccountId: loginUser?.id,
 				$limit: 1000
 			}
 		});
