@@ -104,6 +104,7 @@ const metaverse = {
     metaverseNickName: process.env.METAVERSE_NICK_NAME ?? '',
     metaverseServerUrl: process.env.METAVERSE_SERVER_URL ?? '', // if empty, set to self
     defaultIceServerUrl: process.env.DEFAULT_ICE_SERVER_URL ?? 'ice.vircadia.com:7337', // if empty, set to self
+    jitsiServerUrl: process.env.JITSI_SERVER_URL ?? 'meet.jit.si',
     dashboardUrl: process.env.DASHBOARD_URL,
 };
 
