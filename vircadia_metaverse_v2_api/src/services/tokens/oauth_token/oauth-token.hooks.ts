@@ -47,7 +47,7 @@ export default {
             if(context.result)
             {
                 context.result.error = "invalid";
-                context.result.error_description = context.result.error.message;
+                context.result.error_description = context.result.message;
             }
             return context;
         }],
