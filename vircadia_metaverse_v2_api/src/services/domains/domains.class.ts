@@ -238,6 +238,7 @@ export class Domains extends DatabaseService {
                 }
             }
             updateDomain.timeOfLastHeartbeat = new Date();
+            updateDomain.active = true;
             await this.patchData(
                 config.dbCollections.domains,
                 id,
