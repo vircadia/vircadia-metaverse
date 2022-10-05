@@ -3,7 +3,7 @@
 
 ## Getting Started
 
-Getting up and running is as easy
+Getting up and running is easy.
 
 1. Make sure you have [NodeJS](https://nodejs.org/) and [npm](https://www.npmjs.com/) installed.
 
@@ -66,11 +66,13 @@ Getting up and running is as easy
 
 ## Testing
 
-Spin up a test blockchain:
+Run `npm test` and all your tests in the `test/` directory will be run.
+
+*Note: DLT is not a required component for the metaverse.*
+
+Spin up a test chain:
 
 `npm run localchain`
-
-Then run `npm test` and all your tests in the `test/` directory will be run.
 
 ## Scaffolding
 
