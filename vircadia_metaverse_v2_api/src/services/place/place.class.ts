@@ -292,6 +292,8 @@ export class Place extends DatabaseService {
      * @params search - placeName
      * @param per_page - page size
      * @param page_num - page number
+     * @param active - filter by activity
+     * @param active_threshold - filter by minutes past since last heartbeat
      * @returns - {"status": "success","data": {"places": [{"placeId": string,"name": string,"displayName": string,"visibility": string,"path": string,"address": string,"description": string,"maturity": string,"tags": string[],"managers": string[],"domain": {"id": domainId,"name": domainName,"sponsorAccountId": string,"network_address": string,"ice_server_address": string,'version': string,'protocol_version': string,'active': boolean,"time_of_last_heartbeat": ISOStringDate,"time_of_last_heartbeat_s": integerUnixTimeSeconds,"num_users": integer},"thumbnail": URL,"images": [ URL, URL, ... ],"current_attendance": number,"current_images": string[],"current_info": string,"current_last_update_time": ISOStringDate,"current_last_update_time_s": integerUnixTimeSeconds},...],"maturity-categories": string[]}} or  { status: 'failure', message: 'message'}
      *
      */
@@ -304,8 +306,11 @@ export class Place extends DatabaseService {
         const maturity = params?.query?.maturity || '';
         const order = params?.query?.order || '';
         const search = params?.query?.search || '';
+        const active = params?.query?.active;
+        const activeThreshold = params?.query?.active_threshold;
         const tag = params?.query?.tag?.split(',');
         const filterQuery: any = {};
+        const domainFilterQuery: any = {};
         let asAdmin = params?.query?.asAdmin;
         if (
             asAdmin &&
@@ -315,6 +320,18 @@ export class Place extends DatabaseService {
             asAdmin = true;
         } else {
             asAdmin = false;
+        }
+
+        if (undefined !== active) {
+            domainFilterQuery.active = active;
+        }
+
+        if (undefined !== activeThreshold) {
+            var activeThresholdTime = new Date();
+            activeThresholdTime.setMinutes(activeThresholdTime.getMinutes() - activeThreshold);
+            domainFilterQuery.timeOfLastHeartbeat = {
+                $gt: activeThresholdTime
+            };
         }
 
         if (IsNotNullOrEmpty(maturity)) {
@@ -337,10 +354,12 @@ export class Place extends DatabaseService {
 
         const allDomains = await this.findDataToArray(config.dbCollections.domains, {
 			query: {
+                ...domainFilterQuery,
 				networkAddr: { $exists: true },
 				$limit: 1000
 			}
 		});
+		const allDomainIds = allDomains.map(domain => domain.id);
 
         const myDomains = await this.findDataToArray(config.dbCollections.domains, {
 			query: {
@@ -349,7 +368,7 @@ export class Place extends DatabaseService {
 				$limit: 1000
 			}
 		});
-		const myDomainIds = myDomains.filter(domain => domain.networkAddr).map(domain => domain.id);
+		const myDomainIds = myDomains.map(domain => domain.id);
 
 		if (!asAdmin)
 		{
@@ -363,6 +382,7 @@ export class Place extends DatabaseService {
         const allPlaces = await this.findData(config.dbCollections.places, {
             query: {
                 ...filterQuery,
+                domainId: { $in: allDomainIds },
                 $skip: skip,
                 $limit: perPage,
             },
