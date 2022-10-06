@@ -43,7 +43,7 @@ const order = Joi.string().trim();
 const maturity = Joi.string().trim();
 const tag = Joi.string().trim();
 const search = Joi.string().trim();
-const active = Joi.boolean();
+const status = Joi.string().trim().valid("online", "active");
 const active_threshold = Joi.number().integer().positive();
 const asAdmin = Joi.boolean().allow('').default(false);
 const account = Joi.string().trim();
@@ -55,7 +55,7 @@ export const findPlaceSchema = Joi.object({
     maturity,
     tag,
     search,
-    active,
+    status,
     active_threshold,
     account,
     asAdmin
