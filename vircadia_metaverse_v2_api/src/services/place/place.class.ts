@@ -292,7 +292,7 @@ export class Place extends DatabaseService {
      * @params search - placeName
      * @param per_page - page size
      * @param page_num - page number
-     * @param active - filter by activity
+     * @param status - "online" - filter domains that have heartbeat, "active" - filter domains with connected users/avatars
      * @param active_threshold - filter by minutes past since last heartbeat
      * @returns - {"status": "success","data": {"places": [{"placeId": string,"name": string,"displayName": string,"visibility": string,"path": string,"address": string,"description": string,"maturity": string,"tags": string[],"managers": string[],"domain": {"id": domainId,"name": domainName,"sponsorAccountId": string,"network_address": string,"ice_server_address": string,'version': string,'protocol_version': string,'active': boolean,"time_of_last_heartbeat": ISOStringDate,"time_of_last_heartbeat_s": integerUnixTimeSeconds,"num_users": integer},"thumbnail": URL,"images": [ URL, URL, ... ],"current_attendance": number,"current_images": string[],"current_info": string,"current_last_update_time": ISOStringDate,"current_last_update_time_s": integerUnixTimeSeconds},...],"maturity-categories": string[]}} or  { status: 'failure', message: 'message'}
      *
@@ -306,7 +306,7 @@ export class Place extends DatabaseService {
         const maturity = params?.query?.maturity || '';
         const order = params?.query?.order || '';
         const search = params?.query?.search || '';
-        const active = params?.query?.active;
+        const status = params?.query?.status;
         const activeThreshold = params?.query?.active_threshold;
         const tag = params?.query?.tag?.split(',');
         const filterQuery: any = {};
@@ -322,8 +322,10 @@ export class Place extends DatabaseService {
             asAdmin = false;
         }
 
-        if (undefined !== active) {
-            domainFilterQuery.active = active;
+        if (status === "online") {
+            domainFilterQuery.active = true;
+        } else if (status === "active") {
+            filterQuery.currentAttendance = { $gt: 0 };
         }
 
         if (undefined !== activeThreshold) {
