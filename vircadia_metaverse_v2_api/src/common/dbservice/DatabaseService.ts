@@ -124,14 +124,14 @@ export class DatabaseService extends Service {
 
         $facet.page = [];
 
-        if (undefined !== limit)
-        {
-            $facet.page.push(limit);
-        }
-
         if (undefined !== skip)
         {
             $facet.page.push(skip);
+        }
+
+        if (undefined !== limit)
+        {
+            $facet.page.push(limit);
         }
 
         paginationPipeline?.push({ $facet });
