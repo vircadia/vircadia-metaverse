@@ -18,7 +18,7 @@ import { Service } from 'feathers-mongodb';
 import { Application } from '../../declarations';
 import { HookContext, Paginated, Id, NullableId } from '@feathersjs/feathers';
 import { DatabaseServiceOptions } from './DatabaseServiceOptions';
-import { Db, Collection, Document, Filter } from 'mongodb';
+import { Db, Collection, Document, Filter, AggregateOptions } from 'mongodb';
 import { IsNotNullOrEmpty, IsNullOrEmpty } from '../../utils/Misc';
 import { VKeyedCollection } from '../../utils/vTypes';
 import { messages } from '../../utils/messages';
@@ -89,10 +89,61 @@ export class DatabaseService extends Service {
     ): Promise<Paginated<any>> {
         await this.getService(tableName);
         if (filter) {
-            return (await super.find(filter)) as Paginated<any>;
+            return ((await super.find(filter)) as Paginated<any>);
         } else {
             return (await super.find()) as Paginated<any>;
         }
+    }
+
+    async aggregate(
+        tableName: string,
+        pipeline?: Document[] | undefined,
+        options?: AggregateOptions | undefined,
+    ): Promise<Paginated<any>> {
+        await this.getService(tableName);
+
+        const paginationPipeline = pipeline?.slice();
+
+        const limitIndex = paginationPipeline?.findIndex(x => x.hasOwnProperty('$limit'));
+        const limit = (paginationPipeline || [])[limitIndex ?? -1];
+        if(undefined !== limitIndex && limitIndex != -1) {
+            paginationPipeline?.splice(limitIndex, 1);
+        }
+
+        const skipIndex = paginationPipeline?.findIndex(x => x.hasOwnProperty('$skip'));
+        const skip = (paginationPipeline || [])[skipIndex ?? -1];
+        if(undefined !== skipIndex && skipIndex != -1) {
+            paginationPipeline?.splice(skipIndex, 1);
+        }
+
+        const $facet: Document = {
+            info: [{
+                $count: "total"
+            }]
+        };
+
+        $facet.page = [];
+
+        if (undefined !== limit)
+        {
+            $facet.page.push(limit);
+        }
+
+        if (undefined !== skip)
+        {
+            $facet.page.push(skip);
+        }
+
+        paginationPipeline?.push({ $facet });
+
+        const result = (await super.Model.aggregate(paginationPipeline, options).toArray())[0];
+
+        return {
+            total: result.info.length !== 0 ? result.info[0].total : 0,
+            limit: limit?.$limit,
+            skip: skip?.$skip,
+            data: result.page
+        };
     }
 
     async findDataToArray(
