@@ -43,6 +43,8 @@ import { extractLoggedInUserFromParams } from '../auth/auth.utils';
 import { AccountInterface } from '../../common/interfaces/AccountInterface';
 import _ from 'lodash';
 import { Visibility } from '../../common/sets/Visibility';
+import { Document } from 'mongodb';
+
 /**
  * Place.
  * @noInheritDoc
@@ -309,8 +311,6 @@ export class Place extends DatabaseService {
         const status = params?.query?.status;
         const activeThreshold = params?.query?.active_threshold;
         const tag = params?.query?.tag?.split(',');
-        const filterQuery: any = {};
-        const domainFilterQuery: any = {};
         let asAdmin = params?.query?.asAdmin;
         if (
             asAdmin &&
@@ -322,79 +322,70 @@ export class Place extends DatabaseService {
             asAdmin = false;
         }
 
+        const pipeline: Document[] = [];
+        const $match: Document = {
+            domain: { $exists: true },
+            'domain.0.networkAddr': { $exists: true }
+        };
+
+        pipeline.push({
+            $lookup: {
+                from: config.dbCollections.domains,
+                localField: 'domainId',
+                foreignField: 'id',
+                as: 'domain'
+            }
+        });
+        pipeline.push({ $match });
+
         if (status === "online") {
-            domainFilterQuery.active = true;
+            $match['domain.0.active'] = true;
         } else if (status === "active") {
-            filterQuery.currentAttendance = { $gt: 0 };
+            $match.currentAttendance = { $gt: 0 };
         }
 
         if (undefined !== activeThreshold) {
             var activeThresholdTime = new Date();
             activeThresholdTime.setMinutes(activeThresholdTime.getMinutes() - activeThreshold);
-            domainFilterQuery.timeOfLastHeartbeat = {
+            $match['domain.0.timeOfLastHeartbeat'] = {
                 $gt: activeThresholdTime
             };
         }
 
         if (IsNotNullOrEmpty(maturity)) {
-            filterQuery.maturity = maturity;
+            $match.maturity = maturity;
         }
 
         if (IsNotNullOrEmpty(search)) {
-            filterQuery.name = search;
+            $match.name = { $regex: search };
         }
 
         if (IsNotNullOrEmpty(tag)) {
-            filterQuery.tag = { $in: tag };
+            $match.tag = { $in: tag };
         }
 
         if (IsNotNullOrEmpty(order)) {
-            filterQuery.$sort = {
-                whenCreated: order == 'descending' ? -1 : 1,
-            };
+            pipeline.push({ $sort: {
+                whenCreated: order == 'descending' ? -1 : 1
+            } });
         }
-
-        const allDomains = await this.findDataToArray(config.dbCollections.domains, {
-			query: {
-                ...domainFilterQuery,
-				networkAddr: { $exists: true },
-				$limit: 1000
-			}
-		});
-		const allDomainIds = allDomains.map(domain => domain.id);
-
-        const myDomains = await this.findDataToArray(config.dbCollections.domains, {
-			query: {
-				networkAddr: { $exists: true },
-				sponsorAccountId: loginUser?.id,
-				$limit: 1000
-			}
-		});
-		const myDomainIds = myDomains.map(domain => domain.id);
 
 		if (!asAdmin)
 		{
-			filterQuery.$or = [
+			$match.$or = [
 				{ visibility: { $exists: false } }, // if 'visibility' is not specified, assume "OPEN"
 				{ visibility: Visibility.OPEN },
-				{ visibility: Visibility.PRIVATE, domainId: { $in: myDomainIds } }
+				{ visibility: Visibility.PRIVATE, 'domain.0.sponsorAccountId': loginUser?.id }
 			];
 		}
 
-        const allPlaces = await this.findData(config.dbCollections.places, {
-            query: {
-                ...filterQuery,
-                domainId: { $in: allDomainIds },
-                $skip: skip,
-                $limit: perPage,
-            },
-        });
+        pipeline.push({ $skip: skip });
+        pipeline.push({ $limit: perPage });
 
-        const placesData: PlaceInterface[] =
-            allPlaces.data as Array<PlaceInterface>;
+        const dbPlaces = await this.aggregate(config.dbCollections.places, pipeline);
 
-        const places = await Promise.all(placesData.map(data =>
-            buildPlaceInfo(this, data, allDomains.find(domain => domain.id === data.domainId))
+        const places = await Promise.all(dbPlaces.data.map(place =>
+            buildPlaceInfo(this, place, place.domain[0])
         ));
 
         const data = {
@@ -406,8 +397,8 @@ export class Place extends DatabaseService {
                 data,
                 page,
                 perPage,
-                Math.ceil(allPlaces.total / perPage),
-                allPlaces.total
+                Math.ceil(dbPlaces.total / perPage),
+                dbPlaces.total
             )
         );
     }
