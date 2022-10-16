@@ -302,7 +302,7 @@ export class Place extends DatabaseService {
 
     async find(params: Params): Promise<any> {
         const loginUser = extractLoggedInUserFromParams(params);
-        const perPage = parseInt(params?.query?.per_page) || 10;
+        const perPage = parseInt(params?.query?.per_page) || config.server.paginate.default;
         const page = parseInt(params?.query?.page) || 1;
         const skip = (page - 1) * perPage;
         const maturity = params?.query?.maturity || '';

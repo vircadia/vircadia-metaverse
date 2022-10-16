@@ -14,6 +14,7 @@
 
 import Joi from '@hapi/joi';
 import { HookContext } from '@feathersjs/feathers';
+import config from '../../appconfig';
 
 const name = Joi.string().trim().required();
 const description = Joi.string().trim().required();
@@ -37,7 +38,7 @@ export const createPlaceSchema = Joi.object().keys({
 
 export const updatePlaceSchema = Joi.object().keys({ place }).required();
 
-const per_page = Joi.number().integer().positive();
+const per_page = Joi.number().integer().positive().min(1).max(config.server.paginate.max);
 const page = Joi.number().integer().positive();
 const order = Joi.string().trim();
 const maturity = Joi.string().trim();
