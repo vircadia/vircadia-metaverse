@@ -5,14 +5,14 @@ services:
     mongo_db:
         container_name: mongodb_container
         image: mongo:latest
-        restart: always
+        restart: unless-stopped
         # ports:
         # - 27018:27017
         volumes:
             - mongo_db:/data/db
     redis:
         container_name: redis_container
-        restart: always
+        restart: unless-stopped
         image: redis/redis-stack:latest
         environment:
             REDIS_ARGS: --save 20 1
@@ -24,6 +24,7 @@ services:
         build: .
         # ports:
         # - 3040:3040
+        restart: unless-stopped
         volumes:
             - ./conf.d:/usr/src/api/conf.d
             - ./docs:/usr/src/api/docs
@@ -49,6 +50,7 @@ services:
             - redis
     nginx:
         image: nginx:latest
+        restart: unless-stopped
         volumes:
             - ./conf.d:/etc/nginx/conf.d
         depends_on:
