@@ -305,7 +305,6 @@ export class Place extends DatabaseService {
      */
 
     async find(params: Params): Promise<any> {
-        console.log(params);
         const loginUser = extractLoggedInUserFromParams(params);
         const defaultPageSize = this._apiVersion === 'v1' ? config.server.paginate.max : config.server.paginate.default;
         const perPage = parseInt(params?.query?.per_page) || defaultPageSize;
