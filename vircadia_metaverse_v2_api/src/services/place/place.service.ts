@@ -24,23 +24,23 @@ import hooks from './place.hooks';
 declare module '../../declarations' {
     interface ServiceTypes {
         place: Place & ServiceAddons<any>;
+        '/api/v1/places': Place & ServiceAddons<any>;
     }
 }
 
 export default function (app: Application): void {
     const options = {
         paginate: app.get('paginate'),
-        id: 'id',
-		whitelist: ['$exists']
+        id: 'id'
     };
 
     // Initialize our service with any options it requires
-    app.use('/place', new Place(options, app));
-    app.use('/api/v1/places', app.service('place'));
+    app.use('/place', new Place(options, app, 'v2'));
+    app.use('/api/v1/places', new Place(options, app, 'v1'));
 
     // Get our initialized service so that we can register hooks
-    const service = app.service('place');
+    app.service('place').hooks(hooks);
+    app.service('/api/v1/places').hooks(hooks);
 
-    service.hooks(hooks);
 }
 

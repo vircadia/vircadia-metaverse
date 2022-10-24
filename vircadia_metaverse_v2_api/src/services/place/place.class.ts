@@ -50,9 +50,13 @@ import { Document } from 'mongodb';
  * @noInheritDoc
  */
 export class Place extends DatabaseService {
+
+    _apiVersion: string;
+
     //eslint-disable-next-line @typescript-eslint/no-unused-vars
-    constructor(options: Partial<DatabaseServiceOptions>, app: Application) {
+    constructor(options: Partial<DatabaseServiceOptions>, app: Application, apiVersion: string) {
         super(options, app);
+        this._apiVersion = apiVersion;
     }
 
     /**
@@ -301,8 +305,10 @@ export class Place extends DatabaseService {
      */
 
     async find(params: Params): Promise<any> {
+        console.log(params);
         const loginUser = extractLoggedInUserFromParams(params);
-        const perPage = parseInt(params?.query?.per_page) || config.server.paginate.default;
+        const defaultPageSize = this._apiVersion === 'v1' ? config.server.paginate.max : config.server.paginate.default;
+        const perPage = parseInt(params?.query?.per_page) || defaultPageSize;
         const page = parseInt(params?.query?.page) || 1;
         const skip = (page - 1) * perPage;
         const maturity = params?.query?.maturity || '';
