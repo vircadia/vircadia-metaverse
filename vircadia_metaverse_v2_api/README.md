@@ -19,6 +19,7 @@ Getting up and running is easy.
     ```
     cd ethereum/dlt/
     npm install
+    npm run chain
     cd ..
     ```
 5. open `conf.d/vircadia_conf.conf` file and change `server_name`
