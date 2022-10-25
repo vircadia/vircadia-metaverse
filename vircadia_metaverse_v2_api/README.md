@@ -17,11 +17,11 @@ Getting up and running is easy.
 4. Install etherium dlt dependencies
 
     ```
-    cd path/to/vircadia-metaverse-v2/ethereum/dlt/
+    cd ethereum/dlt/
     npm install
     cd ..
     ```
-5. open vircadia_metaverse_v2_api/conf.d/vircadia_conf.conf file and change server_name
+5. open `conf.d/vircadia_conf.conf` file and change `server_name`
 
 6. Copy env file
     ```
