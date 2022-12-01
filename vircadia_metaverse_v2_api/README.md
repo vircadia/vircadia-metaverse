@@ -9,26 +9,25 @@ Getting up and running is easy.
 
 2. Install docker (https://docs.docker.com/engine/install)
 
-4. Go to the project root path
+3. Go to the project root path
     ```
         cd path/to/vircadia-metaverse-v2
     ```
 
-5. Install your dependencies
+4. Install etherium dlt dependencies
 
     ```
+    cd ethereum/dlt/
     npm install
-    cd path/to/vircadia-metaverse-v2/ethereum/dlt/
-    npm installcd ..
-    npm run chain
+    cd ..
     ```
-6. open vircadia_metaverse_v2_api/conf.d/vircadia_conf.conf file and change server_name
+5. open `conf.d/vircadia_conf.conf` file and change `server_name`
 
-7. Copy env file
+6. Copy env file
     ```
      cp env.default .env 
     ```
-8. Open .env file 
+7. Open .env file 
    - Change following env params  SERVER_HOST,
     METAVERSE_SERVER_URL,
     DEFAULT_ICE_SERVER_URL,
@@ -45,19 +44,19 @@ Getting up and running is easy.
     
 
 
-9. Run Following docker commands for deploy into docker (Same commands for redeploy)
+8. Run Following docker commands for deploy into docker (Same commands for redeploy)
      ```
-     docker-compose build
-     docker-compose up -d
+     docker compose build
+     docker compose up -d
      ```
 
-10. Run Following command for stop docker  (Optional)
+9. Run Following command for stop docker  (Optional)
      
      ```
-     docker-compose down
+     docker compose down
      ```
 
-11. Remove docker cached images (Optional)
+10. Remove docker cached images (Optional)
 
     ```
     docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
