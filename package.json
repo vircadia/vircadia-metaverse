@@ -45,7 +45,7 @@
         "cors": "^2.8.5",
         "debug": "~2.6.9",
         "deepmerge": "^4.2.2",
-        "express": "~4.16.1",
+        "express": "~4.17.3",
         "fs-extra": "^9.1.0",
         "glob": "^7.1.7",
         "http-errors": "~1.6.3",
