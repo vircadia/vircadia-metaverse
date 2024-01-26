@@ -1,0 +1,180 @@
+[
+    {
+        "id": "gy-gyc-bob-shop-regular-stick",
+        "name": "A regular stick",
+        "giver": "gy-gyc-bob-shop",
+        "description": "A regular stick.",
+        "dialogue": {
+            "0": [
+                [
+                    "player",
+                    "Hello!"
+                ],
+                [
+                    "npc",
+                    "Oh no... This isn't good."
+                ],
+                [
+                    "player",
+                    "What's the matter?"
+                ],
+                [
+                    "npc",
+                    "I can't find my bundle of sticks that I was going to use to make an elixir."
+                ],
+                [
+                    "player",
+                    "Oh, I'm sorry to hear that."
+                ],
+                [
+                    "npc",
+                    "Can you perhaps help me?"
+                ],
+                [
+                    "prompt",
+                    "Sure.",
+                    "1",
+                    "I'd rather not.",
+                    "2"
+                ]
+            ],
+            "1": [
+                [
+                    "quest",
+                    "accept"
+                ],
+                [
+                    "npc",
+                    "Awesome, fetch me 2 branches and I will reward you handsomely."
+                ],
+                [
+                    "player",
+                    "Okay."
+                ]
+            ],
+            "2": [
+                [
+                    "quest",
+                    "deny"
+                ],
+                [
+                    "npc",
+                    "Oh well... *sigh*"
+                ]
+            ]
+        },
+        "itemRequirements": {
+            "items": [
+                {
+                    "itemId": "regular-stick",
+                    "qty": 2
+                }
+            ]
+        },
+        "npcRequirements": {},
+        "miniGameRequirements": {},
+        "rewards": [
+            {
+                "xp": 500
+            }
+        ],
+        "prerequisites": {
+            "minLevel": 0,
+            "maxLevel": 1,
+            "maxActive": 1,
+            "expireAfter": 5000000,
+            "maxSimultaneous": 5
+        }
+    },
+    {
+        "id": "gy-gyc-bob-shop-fetch-sticks",
+        "name": "A sticky situation.",
+        "giver": "gy-gyc-bob-shop",
+        "description": "A sticky situation.",
+        "dialogue": {
+            "0": [
+                [
+                    "player",
+                    "Hello!"
+                ],
+                [
+                    "npc",
+                    "Oh no... This isn't good."
+                ],
+                [
+                    "player",
+                    "What's the matter?"
+                ],
+                [
+                    "npc",
+                    "I can't find my bundle of sticks that I was going to use to make an elixir."
+                ],
+                [
+                    "player",
+                    "Oh, I'm sorry to hear that."
+                ],
+                [
+                    "npc",
+                    "Can you perhaps help me?"
+                ],
+                [
+                    "prompt",
+                    "Sure.",
+                    "1",
+                    "I'd rather not.",
+                    "2"
+                ]
+            ],
+            "1": [
+                [
+                    "quest",
+                    "accept"
+                ],
+                [
+                    "npc",
+                    "Awesome, fetch me 5 branches and I will reward you handsomely."
+                ],
+                [
+                    "player",
+                    "Okay."
+                ]
+            ],
+            "2": [
+                [
+                    "quest",
+                    "deny"
+                ],
+                [
+                    "npc",
+                    "Oh well... *sigh*"
+                ]
+            ]
+        },
+        "itemRequirements": {
+            "items": [
+                {
+                    "itemId": "regular-stick",
+                    "qty": 5
+                }
+            ]
+        },
+        "npcRequirements": {},
+        "miniGameRequirements": {},
+        "rewards": [
+            {
+                "itemId": "basic-elixir-of-health",
+                "qty": 1
+            },
+            {
+                "xp": 500
+            }
+        ],
+        "prerequisites": {
+            "minLevel": 2,
+            "maxLevel": 10,
+            "maxActive": 1,
+            "expireAfter": 5000000,
+            "maxSimultaneous": 5
+        }
+    }
+]

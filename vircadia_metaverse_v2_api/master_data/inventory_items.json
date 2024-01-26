@@ -1,0 +1,48 @@
+[
+    {
+        "id": "regular-stick",
+        "name": "Stick",
+        "description": "It's a simple stick.",
+        "metaData": {},
+        "thumbnail": "/game/quests/Stick_Temp.png",
+        "url": "/game/quests/Stick_Temp.glb",
+        "isNFT": false,
+        "isTransferable": false,
+        "itemType": "craftingItem",
+        "itemQuality": "common",
+        "itemStatus": {},
+        "prerequisites": {
+            "minLevel": 1,
+            "maxLevel": 50,
+            "maxAvailable": 10,
+            "expireAfter": 5000000
+        },
+        "itemTags": {
+            "isQuestItem": false,
+            "questId": ""
+        }
+    },
+    {
+        "id": "basic-elixir-of-health",
+        "name": "Elixir of health",
+        "description": "Basic elixir of health.",
+        "metaData": {},
+        "thumbnail": "/game/quests/elixir-of-health.png",
+        "url": "/game/quests/Stick_Temp.glb",
+        "isNFT": false,
+        "isTransferable": false,
+        "itemType": "craftingItem",
+        "itemQuality": "common",
+        "itemStatus": {},
+        "prerequisites": {
+            "minLevel": 1,
+            "maxLevel": 50,
+            "maxAvailable": 10,
+            "expireAfter": 5000000
+        },
+        "itemTags": {
+            "isQuestItem": false,
+            "questId": ""
+        }
+    }
+]

@@ -1,0 +1,82 @@
+version: '3.9'
+
+services:
+    # MongoDB service
+    mongo_db:
+        container_name: mongodb_container
+        image: mongo:latest
+        restart: unless-stopped
+        # ports:
+        # - 27018:27017
+        volumes:
+            - mongo_db:/data/db
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "100m"
+
+    redis:
+        container_name: redis_container
+        restart: unless-stopped
+        image: redis/redis-stack:latest
+        environment:
+            REDIS_ARGS: --save 20 1
+        volumes:
+            - redis_server:/data/redis
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "100m"
+    # Node API service
+    api:
+        #container_name: vircadia-metaverse-v2
+        build: .
+        # ports:
+        # - 3040:3040
+        restart: unless-stopped
+        volumes:
+            - ./conf.d:/usr/src/api/conf.d
+            - ./docs:/usr/src/api/docs
+            - ./ethereum:/usr/src/api/ethereum
+            - ./mailtemplates:/usr/src/api/mailtemplates
+            - ./master_data:/usr/src/api/master_data
+            - ./public:/usr/src/api/public
+            - ./src:/usr/src/api/src
+            - ./package.json:/usr/src/api/package.json
+            - ./tsconfig.json:/usr/src/api/tsconfig.json
+            - ./.env:/usr/src/api/.env
+            - ./types.d.ts:/usr/src/api/types.d.ts
+            - ./.eslintrc.json:/usr/src/api/.eslintrc.json
+            - ./.eslintignore:/usr/src/api/.eslintignore
+            - ./mailtemplates:/usr/src/api/lib/mailtemplates
+        environment:
+            PORT: 3040
+            MONGODB_URL: mongodb://mongodb_container:27017
+            REDIS_URL: redis://redis_container:6379
+            NAME: Vircadia
+        depends_on:
+            - mongo_db
+            - redis
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "2000m"
+    nginx:
+        image: nginx:latest
+        restart: unless-stopped
+        volumes:
+            - ./conf.d:/etc/nginx/conf.d
+        depends_on:
+            - api
+        ports:
+            - 3040:3040
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "100m"
+
+volumes:
+    mongo_db: {}
+    redis_server: {}
+
+

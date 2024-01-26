@@ -1,0 +1,41 @@
+[
+    {
+        "id": "gy-gyc-bob-shop",
+        "name": "Bob",
+        "type": "shopkeeper",
+        "description": "I give quests and sell wares.",
+        "idleText": [
+            "Hmph, where did I put that fork?",
+            "I really wish it would rain.",
+            "I do love butterflies."
+        ],
+        "interactiveText": [],
+        "tags": {
+            "questId": "gy-gyc-bob-shop-fetch-sticks"
+        }
+    },
+    {
+        "id": "gy-gyc-duck-park-pond-1",
+        "name": "Duck",
+        "type": "interactive",
+        "description": "It's a duck.",
+        "idleText": [
+            "Quack.",
+            "Quack. Quack.",
+            "Quaaaaack."
+        ],
+        "idleAnimations": [
+            "standard-duck-walk",
+            "standard-duck-stand"
+        ],
+        "interactiveText": [
+            "Munch munch."
+        ],
+        "interactiveAnimations": [
+            "standard-duck-eat"
+        ],
+        "tags": {
+            "interactiveItem": "loaf-of-bread"
+        }
+    }
+]
