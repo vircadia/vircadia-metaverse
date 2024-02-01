@@ -1,27 +1,18 @@
 {
     "compilerOptions": {
+        "target": "es2018",
         "module": "commonjs",
-        "allowJs": true,
+        "outDir": "./lib",
+        "rootDirs": ["src", "blockchain"],
+        "strict": true,
         "esModuleInterop": true,
-        "target": "es6",
-        "noImplicitAny": true,
-        "moduleResolution": "node",
-        "sourceMap": true,
-        "outDir": "dist",
-        "baseUrl": ".",
-        "paths": {
-            "@Entities/*": ["./src/Entities/*"],
-            "@Monitoring/*": ["./src/Monitoring/*"],
-            "@Route-Tools/*": ["./src/route-tools/*"],
-            "@Tools/*": ["./src/Tools/*"],
-            "@Base/*": ["./src/*"],
-            "*": [ "node_modules/*" ]
-        }
+        "resolveJsonModule": true,
+	 "types": ["node"]
     },
-    "include": [
-        "src/**/*"
-    ],
-    "exclude": [
-        "src/static/**/*"
-    ]
+    "exclude": ["test", "blockchain"],
+    "typedocOptions": {
+        "entryPoints": ["src/app.ts"],
+        "out": "docs"
+    }
 }
+

@@ -1,19 +1,9 @@
-/*
-    createVersion.js
-
-    Created by Kalila L. on Dec 20 2020.
-    Copyright 2020 Vircadia contributors.
-
-    Distributed under the Apache License, Version 2.0.
-    See the accompanying file LICENSE or http://www.apache.org/licenses/LICENSE-2.0.html
-*/
 
 const fse = require('fs-extra');
-
 var gitVer = require('child_process').execSync('git rev-parse --short HEAD').toString().trim();
 var gitVerFull = require('child_process').execSync('git rev-parse HEAD').toString().trim();
 var packageVersion = process.env.npm_package_version;
-const filePath = './dist/VERSION.json';
+const filePath = './lib/metaverse_info.json';
 
 console.log('Found package version', packageVersion);
 console.log('Found Git commit short hash', gitVer);
@@ -31,10 +21,10 @@ function yyyymmdd() {
 }
 
 var jsonToWrite = {
-    "npm-package-version": packageVersion,
-    "git-commit": gitVerFull,
-    "version-tag": packageVersion + "-" + yyyymmdd() + "-" + gitVer
-}
+    npm_package_version: packageVersion,
+    git_commit: gitVerFull,
+    version_tag: (packageVersion + '-' + yyyymmdd() + '-' + gitVer)
+};
 
 jsonToWrite = JSON.stringify(jsonToWrite);
 
