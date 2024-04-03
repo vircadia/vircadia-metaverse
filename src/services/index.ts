@@ -36,7 +36,6 @@ import pickupItem from './pickup-item/pickup-item.service';
 import questServices from './quest_apis/services';
 import initMasterData from './init-master-data/init-master-data.service';
 import resetUser from './reset-user/reset-user.service';
-// import generateGoobie from './generate-goobie/generate-goobie.service';
 import rewardItem from './rewards/reward.service';
 import Explore from './explore/explore.service';
 import domainsField from './domains/domains-fields/domains-field.service';
@@ -53,7 +52,7 @@ import userPlaces from './place/user-places/user-places.service';
 import usersHeartbeat from './user_heartbeat/user_heartbeat.service';
 import tokens from './tokens/tokens.service';
 import oauthToken from './tokens/oauth_token/oauth-token.service';
-import tokenTransfer from './token-transfer/token-transfer.service';
+// import tokenTransfer from './token-transfer/token-transfer.service';
 import ConnectionRequest from './connections_request/connections_request.service';
 import tokenConfig from './tokens/token_config/token_config.service';
 export default function (app: Application): void {

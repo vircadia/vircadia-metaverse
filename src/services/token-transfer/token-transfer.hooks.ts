@@ -19,7 +19,7 @@ import requestSuccess from '../../hooks/requestSuccess';
 import requestFail from '../../hooks/requestFail';
 const { authenticate } = authentication.hooks;
 import validateSignature from '../../hooks/validateSignature';
-import connectToGooTokenContract from '../../hooks/blockchain/connectToGooTokenContract';
+import connectToTokenContract from '../../hooks/blockchain/connectToTokenContract';
 import validators from '@feathers-plus/validate-joi';
 import { tokenTransferSchema, joiOptions } from './token-transfer.joi';
 import { BlockchainOptions } from './token-transfer.class';
@@ -33,7 +33,7 @@ export default (blockchainOptions: BlockchainOptions): Partial<HooksObject> => {
             create: [
                 authenticate('jwt'),
                 validators.form(tokenTransferSchema, joiOptions),
-                connectToGooTokenContract(blockchainOptions),
+                connectToTokenContract(blockchainOptions),
                 validateSignature(),
             ],
             update: [disallow()],

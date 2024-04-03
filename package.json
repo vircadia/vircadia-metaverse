@@ -27,9 +27,11 @@
         "lint": "eslint src/. test/. --config .eslintrc.json --ext .ts --fix",
         "dev": "ts-eager src/index.ts cross-env APP_ENV=development && npm run serve-local-files",
         "start": "cross-env APP_ENV=production npm run compile && node lib/src",
+        "start-dlt": "cross-env APP_ENV=production npm run compile-dlt && node lib/src",
         "localchain": "cd blockchain && npm run chain",
         "jest": "jest --forceExit",
-        "compile": "shx rm -rf lib/src && tsc",
+        "compile": "shx rm -rf lib/src && tsc -p tsconfig.nodlt.json",
+        "compile-dlt": "shx rm -rf lib/src && tsc",
         "create-version": "node build_scripts/createVersion.js",
         "serve-local-files": "http-server ./upload --ssl --port 8642 --cors=*"
     },

@@ -3,13 +3,13 @@
         "target": "es2018",
         "module": "commonjs",
         "outDir": "./lib",
-        "rootDirs": ["src", "blockchain"],
+        "rootDirs": ["src"],
         "strict": true,
         "esModuleInterop": true,
         "resolveJsonModule": true,
 	 "types": ["node"]
     },
-    "exclude": ["test", "blockchain"],
+    "exclude": ["test"],
     "typedocOptions": {
         "entryPoints": ["src/app.ts"],
         "out": "docs"
