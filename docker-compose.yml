@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
     # MongoDB service
     mongo_db:

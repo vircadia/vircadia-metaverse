@@ -44,7 +44,15 @@ export default (): Hook => {
                     }.${fileExtenstion}`;
                 }
             } else {
-                context.data.id = uploadPath && id? path.join(uploadPath, id): uploadPath? path.join(uploadPath,context.params.file.originalname): context.params.file.originalname;
+                context.data.id =
+                    uploadPath && typeof uploadPath === 'string' && id
+                        ? path.join(uploadPath, id)
+                        : uploadPath && typeof uploadPath === 'string'
+                            ? path.join(
+                                uploadPath,
+                                context.params.file.originalname || ''
+                            )
+                            : context.params.file.originalname || '';
             }
         }
         return context;
