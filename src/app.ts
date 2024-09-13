@@ -34,7 +34,6 @@ import channels from './channels';
 import { HookContext as FeathersHookContext } from '@feathersjs/feathers';
 import authentication from './authentication';
 import mongodb from './mongodb';
-import importDir from 'directory-import';
 import socketio from '@feathersjs/socketio';
 import { initMonitoring } from './common/Monitoring/Monitoring';
 import { initDomains } from './common/DomainFields';
@@ -95,9 +94,5 @@ app.use(express.notFound());
 app.use(express.errorHandler({ logger } as any));
 
 app.hooks(appHooks);
-
-const importedModules = importDir({
-    directoryPath: '../mailtemplates',
-});
 
 export default app;

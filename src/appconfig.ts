@@ -131,8 +131,8 @@ const metaverseServer = {
     email_verification_timeout_minutes: 1440,
     enable_account_email_verification:
         process.env.ENABLE_ACCOUNT_VERIFICATION ?? 'true',
-    email_verification_email_body: '../mailtemplates/verificationEmail.html',
-    email_reset_password_otp_body: '../mailtemplates/resetPasswordOtp.html',
+    email_verification_email_body: './verificationEmail.html',
+    email_reset_password_otp_body: './resetPasswordOtp.html',
     email_verification_success_redirect:
         'METAVERSE_SERVER_URL/verificationEmailSuccess.html',
     email_verification_failure_redirect:
