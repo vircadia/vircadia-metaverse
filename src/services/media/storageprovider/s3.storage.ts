@@ -27,9 +27,10 @@ import {
     StorageProviderInterface,
 } from '../../../common/interfaces/storageProvider';
 import { Conflict } from '@feathersjs/errors';
+import { GeneralError } from '@feathersjs/errors';
 
 export class S3Provider implements StorageProviderInterface {
-    bucket = config.aws.s3.staticResourceBucket;
+    bucket = config.aws.s3.staticResourceBucket || 'default-bucket-name';
     cacheDomain = config.aws.s3.awsStorageProvider;
     provider: AWS.S3 = new AWS.S3({
         accessKeyId: config.aws.keys.accessKeyId,
@@ -39,17 +40,19 @@ export class S3Provider implements StorageProviderInterface {
         endpoint: `https://${this.bucket}.${config.aws.s3.region}.linodeobjects.com`,
     });
 
-    blob: typeof S3BlobStore = new S3BlobStore({
-        client: this.provider,
-        bucket: config.aws.s3.staticResourceBucket,
-        ACL: 'public-read',
-    });
+    blob: typeof S3BlobStore | null = null;
 
-    cloudfront: AWS.CloudFront = new AWS.CloudFront({
-        region: config.aws.s3.region,
-        accessKeyId: config.aws.keys.accessKeyId,
-        secretAccessKey: config.aws.keys.secretAccessKey,
-    });
+    constructor() {
+        if (this.bucket && this.bucket !== 'default-bucket-name') {
+            this.blob = new S3BlobStore({
+                client: this.provider,
+                bucket: this.bucket,
+                ACL: 'public-read',
+            });
+        } else {
+            console.warn('S3 bucket name not provided. Some features may not work.');
+        }
+    }
 
     getProvider = (): StorageProviderInterface => {
         return this;
@@ -203,7 +206,12 @@ export class S3Provider implements StorageProviderInterface {
         });*/
     };
 
-    getStorage = (): typeof S3BlobStore => this.blob;
+    getStorage = (): typeof S3BlobStore => {
+        if (!this.blob) {
+            throw new GeneralError('S3BlobStore is not initialized. Check your S3 configuration.');
+        }
+        return this.blob;
+    };
 
     getSignedUrl = async (
         key: string,
