@@ -185,7 +185,7 @@ const authentication = {
     secret: process.env.AUTH_SECRET ?? 'testing',
     authStrategies: ['jwt', 'local'],
     jwtOptions: {
-        expiresIn: '336 days',
+        expiresIn: '1d',
     },
     local: {
         usernameField: 'email',
