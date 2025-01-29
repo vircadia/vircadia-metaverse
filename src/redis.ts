@@ -2,7 +2,8 @@ import { Client, Entity, Schema } from 'redis-om';
 
 const client = new Client();
 
-client.open(`${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`);
+client.open(process.env.REDIS_URL);
+
 class AuthJwt extends Entity {}
 
 const authToken = new Schema(AuthJwt, {
