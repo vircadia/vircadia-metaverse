@@ -23,6 +23,7 @@ import { Application } from './declarations';
 import { FacebookStrategy } from './services/strategies/facebook';
 import { GoogleStrategy } from './services/strategies/google';
 import { DomainAccessToken } from './services/strategies/domain-access-token';
+import { AzureStrategy } from './services/strategies/azure';
 import { validatePassword } from './utils/Utils';
 import { noCaseCollation } from './common/dbservice/DatabaseService';
 
@@ -57,6 +58,7 @@ export default function (app: Application): void {
     authentication.register('domain-access-token', new DomainAccessToken(app));
     authentication.register('google', new GoogleStrategy(app));
     authentication.register('facebook', new FacebookStrategy(app));
+    authentication.register('azure', new AzureStrategy(app));
 
   //  app.use('/oauth/token',authentication);
     app.use('/authentication', authentication);

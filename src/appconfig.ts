@@ -216,6 +216,16 @@ const authentication = {
             secret: process.env.FACEBOOK_CLIENT_SECRET,
             scope: ['email, public_profile'],
         },
+        azure: {
+            // Using OAuth2/OpenID Connect endpoints in Feathers
+            // Redirect URI must match Azure App Registration config
+            redirect_uri: `${metaverse.metaverseServerUrl}/oauth/azure/callback`,
+            key: process.env.AZURE_AD_CLIENT_ID,
+            secret: process.env.AZURE_AD_CLIENT_SECRET,
+            // Tenant is used to build the authorization and token URLs
+            tenant: process.env.AZURE_AD_TENANT_ID,
+            scope: ['openid', 'email', 'profile']
+        },
     },
 };
 
