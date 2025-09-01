@@ -60,6 +60,7 @@ services:
             MONGODB_URL: mongodb://mongodb_container:27017
             REDIS_URL: redis://redis_container:6379
             NAME: Vircadia
+            STORAGE_PROVIDER: local
         depends_on:
             - mongo_db
             - redis
@@ -68,15 +69,18 @@ services:
             options:
                 max-size: "2000m"
 
-    nginx:
-        image: nginx:latest
+    caddy:
+        image: caddy:latest
         restart: unless-stopped
+        environment:
+            - SERVER_HOST=${SERVER_HOST}
         volumes:
-            - ./conf.d:/etc/nginx/conf.d
+            - ./Caddyfile:/etc/caddy/Caddyfile
         depends_on:
             - api
         ports:
-            - 3040:3040
+            - 80:80
+            - 443:443
         logging:
             driver: "json-file"
             options:

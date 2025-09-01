@@ -1,0 +1,7 @@
+{$SERVER_HOST} {
+	encode gzip
+
+	handle_path /live/* {
+		reverse_proxy http://api:3040
+	}
+}

@@ -112,5 +112,7 @@ lib/
 data/
 
 .env.local
+.env
+!.env.example
 package-lock.json
 goobie/temp/
