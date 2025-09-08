@@ -42,9 +42,9 @@ export default (app: Application): void => {
         '/media',
         multipartMiddleware.fields([{ name: 'media' }, { name: 'thumbnail' }]),
         (
-            req: express.Request,
-            res: express.Response,
-            next: express.NextFunction
+            req: any,
+            res: any,
+            next: any
         ) => {
             if (req?.feathers && req.method !== 'GET') {
                 req.feathers.file = (req as any).files.media
@@ -66,9 +66,9 @@ export default (app: Application): void => {
         },
         blobService({ Model: provider.getStorage() }),
         async (
-            req: express.Request,
-            res: express.Response,
-            next: express.NextFunction
+            req: any,
+            res: any,
+            next: any
         ) => {
             // Only returns jpeg format image i.e. the ones uploaded to server.
             if (

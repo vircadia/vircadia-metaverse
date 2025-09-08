@@ -22,6 +22,7 @@ import requestSuccess from '../../hooks/requestSuccess';
 // import checkAccessToAccount from '../../hooks/checkAccessToAccount';
 import * as authentication from '@feathersjs/authentication';
 import { disallow } from 'feathers-hooks-common';
+import config from '../../appconfig';
 import validate from '@feathers-plus/validate-joi';
 import {
     createUserSchema,
@@ -42,6 +43,8 @@ export default {
         ],
         get: [disallow()],
         create: [
+            // Optionally disable external self-registration based on config
+            ...(config.authentication.allowSelfRegistration ? [] : [disallow('external')]),
             validate.form(createUserSchema, joiOptions),
             passwordSaltAdd(),
             hashPassword('user.password'),

@@ -142,9 +142,9 @@ export default (app: Application): void => {
         multipartMiddleware.any(),
         //multipartMiddleware.fields([{ name: 'media' }]),
         (   
-            req: express.Request,
-            res: express.Response,
-            next: express.NextFunction
+            req: any,
+            res: any,
+            next: any
         ) => {
             if (req?.feathers && req.method !== 'GET') {
                 req.feathers.files = (req as any).files.media

@@ -20,6 +20,7 @@ import { expressOauth } from '@feathersjs/authentication-oauth';
 import { NotAuthenticated } from '@feathersjs/errors';
 import { ServiceAddons, Params } from '@feathersjs/feathers';
 import { Application } from './declarations';
+import config from './appconfig';
 import { FacebookStrategy } from './services/strategies/facebook';
 import { GoogleStrategy } from './services/strategies/google';
 import { DomainAccessToken } from './services/strategies/domain-access-token';
@@ -54,11 +55,20 @@ export default function (app: Application): void {
     }
 
     authentication.register('jwt', new JWTStrategy());
-    authentication.register('local', new MyLocalStrategy());
+    // Always register domain-access-token for domain auth flows
     authentication.register('domain-access-token', new DomainAccessToken(app));
-    authentication.register('google', new GoogleStrategy(app));
-    authentication.register('facebook', new FacebookStrategy(app));
-    authentication.register('azure', new AzureStrategy(app));
+    if (config.authentication.enableLocal) {
+        authentication.register('local', new MyLocalStrategy());
+    }
+    if (config.authentication.enableGoogle) {
+        authentication.register('google', new GoogleStrategy(app));
+    }
+    if (config.authentication.enableFacebook) {
+        authentication.register('facebook', new FacebookStrategy(app));
+    }
+    if (config.authentication.enableAzure) {
+        authentication.register('azure', new AzureStrategy(app));
+    }
 
   //  app.use('/oauth/token',authentication);
     app.use('/authentication', authentication);

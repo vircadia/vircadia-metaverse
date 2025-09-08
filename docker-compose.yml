@@ -33,7 +33,7 @@ services:
             options:
                 max-size: "100m"
 
-    # Node API service
+    # API service
     api:
         #container_name: vircadia-metaverse-v2
         build: .

@@ -2,6 +2,7 @@
     "name": "metaverse-server",
     "description": "Metaverse server for Vircadia.",
     "version": "2.0.0",
+    "packageManager": "bun@1.1.20",
     "private": false,
     "main": "src",
     "keywords": [
@@ -20,20 +21,20 @@
     },
     "engines": {
         "node": "^16.0.0",
-        "npm": ">= 3.0.0"
+        "bun": ">=1.0.0"
     },
     "scripts": {
-        "test": "npm run lint && npm run compile && npm run jest",
-        "lint": "eslint src/. test/. --config .eslintrc.json --ext .ts --fix",
-        "dev": "ts-eager src/index.ts cross-env APP_ENV=development && npm run serve-local-files",
-        "start": "cross-env APP_ENV=production npm run compile && node lib/src",
-        "start-dlt": "cross-env APP_ENV=production npm run compile-dlt && node lib/src",
-        "localchain": "cd blockchain && npm run chain",
-        "jest": "jest --forceExit",
-        "compile": "shx rm -rf lib/src && tsc -p tsconfig.nodlt.json",
-        "compile-dlt": "shx rm -rf lib/src && tsc",
-        "create-version": "node build_scripts/createVersion.js",
-        "serve-local-files": "http-server ./upload --ssl --port 8642 --cors=*"
+        "test": "bun run lint && bun run compile && bun run jest",
+        "lint": "bunx eslint src/. test/. --config .eslintrc.json --ext .ts --fix",
+        "dev": "cross-env APP_ENV=development bunx ts-eager src/index.ts && bun run serve-local-files",
+        "start": "cross-env APP_ENV=production bun src/index.ts",
+        "start-dlt": "cross-env APP_ENV=production bun run compile-dlt && bun lib/src",
+        "localchain": "cd blockchain && bun run chain",
+        "jest": "bunx jest --forceExit",
+        "compile": "shx rm -rf lib/src && bunx tsc -p tsconfig.nodlt.json",
+        "compile-dlt": "shx rm -rf lib/src && bunx tsc",
+        "create-version": "bun build_scripts/createVersion.js",
+        "serve-local-files": "bunx http-server ./upload --ssl --port 8642 --cors=*"
     },
     "standard": {
         "env": [

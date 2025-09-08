@@ -183,6 +183,12 @@ const authentication = {
     entity: 'user',
     service: 'auth',
     secret: process.env.AUTH_SECRET ?? 'testing',
+    // Expose which strategies are enabled via env flags; actual registration happens in authentication.ts
+    allowSelfRegistration: (process.env.ALLOW_SELF_REGISTRATION ?? 'true') === 'true',
+    enableLocal: (process.env.AUTH_ENABLE_LOCAL ?? 'true') === 'true',
+    enableGoogle: (process.env.AUTH_ENABLE_GOOGLE ?? 'false') === 'true',
+    enableFacebook: (process.env.AUTH_ENABLE_FACEBOOK ?? 'false') === 'true',
+    enableAzure: (process.env.AUTH_ENABLE_AZURE ?? 'false') === 'true',
     authStrategies: ['jwt', 'local'],
     jwtOptions: {
         expiresIn: '1d',

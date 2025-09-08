@@ -41,9 +41,9 @@ export default function (app: Application): void {
     app.use(
         '/user/tokens/new',
         (
-            req: express.Request,
-            res: express.Response,
-            next: express.NextFunction
+            req: any,
+            res: any,
+            next: any
         ) => {
             if (req?.feathers?.headers?.authorization) {
                 next();

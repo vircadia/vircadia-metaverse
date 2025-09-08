@@ -38,9 +38,9 @@ export default function (app: Application): void {
     };
 
     const multerAdapter = (
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction
+        req: any,
+        res: any,
+        next: any
     ) => {
         if (req?.feathers) {
             req.feathers.files = (req as any).files?.media

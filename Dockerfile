@@ -1,14 +1,13 @@
-FROM ubuntu:latest
+FROM oven/bun:1.1.21-debian
 ENV DEBIAN_FRONTEND noninteractive
 WORKDIR /usr/src/api
 RUN apt-get update -yq \
-    && apt-get install curl gnupg -yq \
-    && curl -sL https://deb.nodesource.com/setup_22.x | bash \
-    && apt-get install nodejs -yq
+    && apt-get install -y --no-install-recommends build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
 
 COPY ./ ./
-RUN npm install
 
-CMD ["npm","run","start"]
+CMD ["bun","run","start"]

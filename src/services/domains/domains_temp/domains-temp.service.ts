@@ -41,9 +41,9 @@ export default function (app: Application): void {
         '/domains/create_temporary',
         multipartMiddleware.any(),
         (
-            req: express.Request,
-            res: express.Response,
-            next: express.NextFunction
+            req: any,
+            res: any,
+            next: any
         ) => {
             if (req?.feathers) {
                 req.feathers.address = (req as any).socket.address();
