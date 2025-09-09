@@ -92,44 +92,51 @@ export class AzureIdTokenExchange extends DatabaseService {
 
 		// Find existing account by azureId or email
 		let account: any = null;
-		const byAzure: any[] = await this.findDataToArray(
-			config.dbCollections.accounts,
-			{ query: { azureId: azureId } },
-		);
-		if (byAzure && byAzure.length > 0) {
-			account = byAzure[0];
-		} else {
-			const byEmail: any[] = await this.findDataToArray(
+		try {
+			const byAzure: any[] = await this.findDataToArray(
 				config.dbCollections.accounts,
-				{ query: { email: email }, collation: noCaseCollation },
+				{ query: { azureId: azureId } },
 			);
-			if (byEmail && byEmail.length > 0) {
-				account = byEmail[0];
-				// Link azureId to existing account
+			if (byAzure && byAzure.length > 0) {
+				account = byAzure[0];
+			} else {
+				const byEmail: any[] = await this.findDataToArray(
+					config.dbCollections.accounts,
+					{ query: { email: email }, collation: noCaseCollation },
+				);
+				if (byEmail && byEmail.length > 0) {
+					account = byEmail[0];
+					// Link azureId to existing account
+					await this.patchData(config.dbCollections.accounts, account.id, {
+						azureId: azureId,
+					});
+					account.azureId = azureId;
+				}
+			}
+		} catch (err) {
+			throw new BadRequest("Failed to lookup existing account");
+		}
+
+		if (!account) {
+			try {
+				// Create a new user via users service to reuse hooks/logic
+				const createUserData: any = {
+					username: email,
+					email: email,
+					password: GenUUID(),
+				};
+				const created = await this.application
+					.service("users")
+					.create({ user: createUserData });
+				account = created.data;
+				// Link azureId to the newly created account record in accounts collection
 				await this.patchData(config.dbCollections.accounts, account.id, {
 					azureId: azureId,
 				});
 				account.azureId = azureId;
+			} catch (err) {
+				throw new BadRequest("Failed to create or link user account");
 			}
-		}
-
-		if (!account) {
-			// Create a new user via users service to reuse hooks/logic
-			// NOTE: users service Joi schema only allows the whitelisted fields
-			const createUserData: any = {
-				username: email,
-				email: email,
-				password: GenUUID(),
-			};
-			const created = await this.application
-				.service("users")
-				.create({ user: createUserData });
-			account = created.data;
-			// Link azureId to the newly created account record in accounts collection
-			await this.patchData(config.dbCollections.accounts, account.id, {
-				azureId: azureId,
-			});
-			account.azureId = azureId;
 		}
 
 		// Issue tokens and return standard OAuth response body
