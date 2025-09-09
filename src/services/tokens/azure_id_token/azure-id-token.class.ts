@@ -115,14 +115,21 @@ export class AzureIdTokenExchange extends DatabaseService {
 
 		if (!account) {
 			// Create a new user via users service to reuse hooks/logic
+			// NOTE: users service Joi schema only allows the whitelisted fields
 			const createUserData: any = {
-				azureId: azureId,
 				username: email,
 				email: email,
 				password: GenUUID(),
 			};
-			account = (await this.application.service("users").create(createUserData))
-				.data;
+			const created = await this.application
+				.service("users")
+				.create({ user: createUserData });
+			account = created.data;
+			// Link azureId to the newly created account record in accounts collection
+			await this.patchData(config.dbCollections.accounts, account.id, {
+				azureId: azureId,
+			});
+			account.azureId = azureId;
 		}
 
 		// Issue tokens and return standard OAuth response body
