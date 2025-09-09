@@ -27,8 +27,9 @@ import { GenUUID } from "../../../utils/Misc";
 import { Roles } from "../../../common/sets/Roles";
 import { getGameUserLevel, getUtcDate } from "../../../utils/Utils";
 import { AuthToken } from "../../../common/interfaces/AuthToken";
-import { createRemoteJWKSet, jwtVerify, JWTPayload } from "jose";
+import { createRemoteJWKSet, jwtVerify, JWTPayload, decodeJwt } from "jose";
 import logger from "../../../logger";
+import { authRepository } from "../../../redis";
 
 function extractEmailFromClaims(claims: JWTPayload): string | undefined {
 	const email =
@@ -200,6 +201,25 @@ export class AzureIdTokenExchange extends DatabaseService {
 		} catch (err: any) {
 			logger.error("[azure-id-token] Failed to issue JWT: %s", err?.message);
 			throw new BadRequest("Failed to issue access token");
+		}
+
+		// Persist the JWT in Redis so downstream user lookups succeed
+		try {
+			if (accessTokenStr) {
+				const jwtPayload = decodeJwt(accessTokenStr);
+				await authRepository.createAndSave({
+					token: accessTokenStr,
+					tokenId: (jwtPayload.jti as string) || "",
+					userId: account.id,
+					expires: (jwtPayload.exp as number) || 0,
+				});
+			}
+		} catch (err: any) {
+			logger.error(
+				"[azure-id-token] Failed to persist JWT in Redis: %s",
+				err?.message,
+			);
+			// Do not fail the request solely due to Redis persistence issues
 		}
 
 		// Compose OAuth-like response, using Feathers JWT as access_token
