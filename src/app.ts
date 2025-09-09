@@ -91,7 +91,7 @@ app.configure(channels);
 
 // Configure a middleware for 404s and the error handler
 app.use(express.notFound());
-
+ 
 // Use a concise error logger to reduce noisy stack traces in logs
 const conciseErrorLogger = {
     info: (error: any): void => {

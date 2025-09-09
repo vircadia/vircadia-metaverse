@@ -1,3 +1,7 @@
+{
+	email {$ACME_EMAIL}
+}
+
 {$SERVER_HOST} {
 	encode gzip
 

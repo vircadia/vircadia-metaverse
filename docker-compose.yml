@@ -74,8 +74,11 @@ services:
         restart: unless-stopped
         environment:
             - SERVER_HOST=${SERVER_HOST}
+            - ACME_EMAIL=${ACME_EMAIL}
         volumes:
             - ./Caddyfile:/etc/caddy/Caddyfile
+            - caddy_data:/data
+            - caddy_config:/config
         depends_on:
             - api
         ports:
@@ -89,5 +92,7 @@ services:
 volumes:
     mongo_db: {}
     redis_server: {}
+    caddy_data: {}
+    caddy_config: {}
 
 
