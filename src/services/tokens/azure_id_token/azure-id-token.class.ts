@@ -113,7 +113,7 @@ export class AzureIdTokenExchange extends DatabaseService {
 					account.azureId = azureId;
 				}
 			}
-		} catch (err) {
+		} catch {
 			throw new BadRequest("Failed to lookup existing account");
 		}
 
@@ -128,13 +128,26 @@ export class AzureIdTokenExchange extends DatabaseService {
 				const created = await this.application
 					.service("users")
 					.create({ user: createUserData });
-				account = created.data;
+				const createdData = created?.data ?? created;
+				const newAccountId = createdData?.id ?? createdData?.accountId;
+				if (!newAccountId) {
+					throw new BadRequest("User creation did not return account id");
+				}
+				// Fetch the full account document to ensure correct shape
+				const fetched: any[] = await this.findDataToArray(
+					config.dbCollections.accounts,
+					{ query: { id: newAccountId } },
+				);
+				if (!fetched || fetched.length === 0) {
+					throw new BadRequest("Newly created account not found");
+				}
+				account = fetched[0];
 				// Link azureId to the newly created account record in accounts collection
 				await this.patchData(config.dbCollections.accounts, account.id, {
 					azureId: azureId,
 				});
 				account.azureId = azureId;
-			} catch (err) {
+			} catch {
 				throw new BadRequest("Failed to create or link user account");
 			}
 		}
