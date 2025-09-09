@@ -91,7 +91,38 @@ app.configure(channels);
 
 // Configure a middleware for 404s and the error handler
 app.use(express.notFound());
-app.use(express.errorHandler({ logger } as any));
+
+// Use a concise error logger to reduce noisy stack traces in logs
+const conciseErrorLogger = {
+    info: (error: any): void => {
+        const code = error?.code ?? 200;
+        const name = error?.name ?? 'Info';
+        const message = error?.message ?? '';
+        const url = error?.data?.url;
+
+        // Compact one-liner for non-5xx (Feathers uses info for 4xx like 404)
+        logger.info(`HTTP ${code} ${name}: ${message}${url ? ` - ${url}` : ''}`);
+    },
+    error: (error: any): void => {
+        const code = error?.code ?? 500;
+        const name = error?.name ?? 'Error';
+        const message = error?.message ?? '';
+        const url = error?.data?.url;
+
+        // Skip verbose stack logging for common 404s
+        if (code === 404 || name === 'NotFound') {
+            logger.info(`HTTP ${code} ${name}${url ? ` - ${url}` : ''}`);
+            return;
+        }
+
+        // Log a single-line, high-signal error without stack
+        logger.error(
+            `HTTP ${code} ${name}: ${message}${url ? ` - ${url}` : ''}`
+        );
+    },
+};
+
+app.use(express.errorHandler({ logger: conciseErrorLogger } as any));
 
 app.hooks(appHooks);
 
