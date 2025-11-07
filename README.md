@@ -1,4 +1,4 @@
-# Vircaida Metaverse
+# Vircadia Metaverse
 
 ## Getting Started
 
@@ -97,3 +97,4 @@ npx typedoc expand ./src/services/\*_/_.class.ts
 
 ```
 ````
+
