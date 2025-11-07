@@ -22,7 +22,13 @@
     ```sh
      cp env.default .env
     ```
-7. Open the `.env` file and change following:
+7. Note about ADMIN_ACCOUNT
+
+    ```
+    The ADMIN_ACCOUNT variable from env.default is copied into .env when you run the command above. Use that value as the username when creating an account in the vircadia/vircadia-web app — an account created with that username will receive automatic elevated (admin) privileges. After creating the admin account in vircadia-web, follow the instructions in that repository to create your Domain connection.
+    ```
+
+8. Open the `.env` file and change following:
 
     ```
     SERVER_HOST,
