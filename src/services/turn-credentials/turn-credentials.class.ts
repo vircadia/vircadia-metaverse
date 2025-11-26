@@ -24,47 +24,53 @@ export class TurnCredentials implements Partial<ServiceMethods<any>> {
     }
 
     async create(data: TurnCredentialsData, params?: Params): Promise<TurnCredentialsResponse> {
-        if (!config.metaverse.turn?.enabled) {
-            throw new Unavailable('TURN service is not enabled');
-        }
+        const DEFAULT_ICE_SERVERS = [
+            { urls: ['stun:stun.l.google.com:19302'], username: '', credential: '' },
+            { urls: ['stun:stun1.l.google.com:19302'], username: '', credential: '' },
+            { urls: ['stun:stun2.l.google.com:19302'], username: '', credential: '' },
+            { urls: ['stun:stun3.l.google.com:19302'], username: '', credential: '' },
+            { urls: ['stun:stun4.l.google.com:19302'], username: '', credential: '' },
+        ];
 
-        const tokenId = config.metaverse.turn.token_id;
-        const apiToken = config.metaverse.turn.api_token;
+        const response: TurnCredentialsResponse = {
+            iceServers: [...DEFAULT_ICE_SERVERS]
+        };
 
-        if (!tokenId || !apiToken) {
-            throw new Unavailable('TURN service is not configured: Missing Cloudflare credentials');
-        }
+        if (config.metaverse.turn?.enabled) {
+            const tokenId = config.metaverse.turn.token_id;
+            const apiToken = config.metaverse.turn.api_token;
 
-        const ttl = data.ttl || 86400; // Default to 24 hours if not specified
+            if (tokenId && apiToken) {
+                const ttl = data.ttl || 86400; // Default to 24 hours if not specified
 
-        try {
-            const response = await axios.post(
-                `https://rtc.live.cloudflare.com/v1/turn/keys/${tokenId}/credentials/generate`,
-                { ttl },
-                {
-                    headers: {
-                        'Authorization': `Bearer ${apiToken}`,
-                        'Content-Type': 'application/json'
+                try {
+                    const cfResponse = await axios.post(
+                        `https://rtc.live.cloudflare.com/v1/turn/keys/${tokenId}/credentials/generate`,
+                        { ttl },
+                        {
+                            headers: {
+                                'Authorization': `Bearer ${apiToken}`,
+                                'Content-Type': 'application/json'
+                            }
+                        }
+                    );
+
+                    if (cfResponse.data && cfResponse.data.iceServers) {
+                        response.iceServers.push(...cfResponse.data.iceServers);
+                    } else {
+                        console.warn('Upstream TURN provider returned invalid response: Missing iceServers');
                     }
+                } catch (error: any) {
+                    const cfError = error.response?.data?.errors?.[0]?.message;
+                    const errorMsg = cfError || error.message;
+                    console.error('Error generating TURN credentials:', error.response?.data || error.message);
+                    // We don't throw here, just log the error so we still return the default ICE servers
                 }
-            );
-
-            if (!response.data || !response.data.iceServers) {
-                throw new GeneralError('Upstream TURN provider returned invalid response: Missing iceServers');
+            } else {
+                console.warn('TURN service is enabled but not configured: Missing Cloudflare credentials');
             }
-
-            return response.data;
-        } catch (error: any) {
-            const cfError = error.response?.data?.errors?.[0]?.message;
-            const errorMsg = cfError || error.message;
-            
-            console.error('Error generating TURN credentials:', error.response?.data || error.message);
-
-            if (error.response?.status === 401 || error.response?.status === 403) {
-                 throw new GeneralError('Invalid Cloudflare TURN credentials configured on server');
-            }
-
-            throw new GeneralError(`Failed to generate TURN credentials: ${errorMsg}`);
         }
+
+        return response;
     }
 }
