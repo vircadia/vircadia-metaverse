@@ -49,6 +49,10 @@ export class TurnCredentials implements Partial<ServiceMethods<any>> {
                 }
             );
 
+            if (!response.data || !response.data.iceServers) {
+                throw new GeneralError('Upstream TURN provider returned invalid response: Missing iceServers');
+            }
+
             return response.data;
         } catch (error: any) {
             const cfError = error.response?.data?.errors?.[0]?.message;
