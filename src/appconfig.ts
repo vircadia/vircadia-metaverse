@@ -107,6 +107,12 @@ const metaverse = {
 		process.env.DEFAULT_ICE_SERVER_URL ?? "ice.vircadia.com:7337", // if empty, set to self
 	jitsiServerUrl: process.env.JITSI_SERVER_URL ?? "meet.jit.si",
 	dashboardUrl: process.env.DASHBOARD_URL,
+	turn: {
+		enabled: process.env.TURN_ENABLED === "true",
+		token_id: process.env.TURN_TOKEN_ID || "",
+		api_token: process.env.TURN_API_TOKEN || "",
+		allow_anonymous: process.env.TURN_ALLOW_ANONYMOUS === "true",
+	},
 };
 
 /**

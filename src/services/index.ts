@@ -56,6 +56,8 @@ import azureIdToken from "./tokens/azure_id_token/azure-id-token.service";
 // import tokenTransfer from './token-transfer/token-transfer.service';
 import ConnectionRequest from "./connections_request/connections_request.service";
 import tokenConfig from "./tokens/token_config/token_config.service";
+import turnCredentials from "./turn-credentials/turn-credentials.service";
+
 export default function (app: Application): void {
 	app.configure(auth);
 	app.configure(users);
@@ -110,4 +112,5 @@ export default function (app: Application): void {
 	// app.configure(tokenTransfer);
 	app.configure(ConnectionRequest);
 	app.configure(tokenConfig);
+	app.configure(turnCredentials);
 }
