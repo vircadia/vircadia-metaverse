@@ -59,8 +59,8 @@ export class TurnCredentials implements Partial<ServiceMethods<any>> {
                         // Cloudflare returns a generic iceServers object. We need to construct our specific list
                         // using the credentials provided by Cloudflare but with our specific endpoints.
                         const cfIceServers = cfResponse.data.iceServers;
-                        const username = cfIceServers[0]?.username;
-                        const credential = cfIceServers[0]?.credential;
+                        const username = cfIceServers.username;
+                        const credential = cfIceServers.credential;
 
                         if (username && credential) {
                             response.iceServers = [
