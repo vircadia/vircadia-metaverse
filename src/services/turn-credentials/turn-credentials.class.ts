@@ -32,7 +32,7 @@ export class TurnCredentials implements Partial<ServiceMethods<any>> {
         const apiToken = config.metaverse.turn.api_token;
 
         if (!tokenId || !apiToken) {
-            throw new Unavailable('TURN service is not configured correctly');
+            throw new Unavailable('TURN service is not configured: Missing Cloudflare credentials');
         }
 
         const ttl = data.ttl || 86400; // Default to 24 hours if not specified
@@ -51,8 +51,16 @@ export class TurnCredentials implements Partial<ServiceMethods<any>> {
 
             return response.data;
         } catch (error: any) {
+            const cfError = error.response?.data?.errors?.[0]?.message;
+            const errorMsg = cfError || error.message;
+            
             console.error('Error generating TURN credentials:', error.response?.data || error.message);
-            throw new GeneralError('Failed to generate TURN credentials');
+
+            if (error.response?.status === 401 || error.response?.status === 403) {
+                 throw new GeneralError('Invalid Cloudflare TURN credentials configured on server');
+            }
+
+            throw new GeneralError(`Failed to generate TURN credentials: ${errorMsg}`);
         }
     }
 }
