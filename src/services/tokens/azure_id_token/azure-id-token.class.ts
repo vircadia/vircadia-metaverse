@@ -39,53 +39,58 @@ function extractEmailFromClaims(claims: JWTPayload): string | undefined {
 	return email;
 }
 
-function sanitizeUsernameFromEmail(
-	email: string,
-	fallbackSeed: string,
-): string {
-	const source = email.toString();
-	let sanitized = "";
-	// Allow characters valid in username including @ and . and - and _
-	const allowed = /[a-zA-Z0-9.\-_$@*!]/;
-	for (const ch of source) {
-		if (allowed.test(ch)) sanitized += ch;
-		else sanitized += "_";
-	}
+/**
+ * Generate Azure username from email: uses local part + .AZURE suffix.
+ * This format avoids @ symbol conflicts with domain servers.
+ */
+function generateAzureUsername(email: string, fallbackSeed: string): string {
+	const localPart = email.split("@")[0] || "";
+	// Sanitize local part - allow alphanumeric and .-_
+	let sanitized = localPart.replace(/[^a-zA-Z0-9.\-_]/g, "_");
 	if (sanitized.length < 2) {
-		sanitized =
-			"user_" + (fallbackSeed.replace(/[^a-zA-Z0-9]/g, "").slice(0, 6) || "aa");
+		sanitized = "user_" + (fallbackSeed.replace(/[^a-zA-Z0-9]/g, "").slice(0, 6) || "aa");
 	}
-	if (sanitized.length > 30) sanitized = sanitized.slice(0, 30);
-	return sanitized;
+	// Truncate to leave room for .AZURE suffix (max username 30 chars)
+	if (sanitized.length > 24) sanitized = sanitized.slice(0, 24);
+	return sanitized + ".AZURE";
 }
 
 /**
- * Check if an account's username needs migration from the old format (local part only)
- * to the new format (full email address).
- * 
- * Old format: "john.doe" (just the part before @)
- * New format: "john.doe@example.com" (full email, sanitized)
+ * Check if an account's username needs migration to .AZURE format.
+ * Old formats:
+ *   - Full email: "user@domain.com"
+ *   - Local part only: "user" (without .AZURE suffix)
  * 
  * @param account The account to check
  * @param email The full email address from Azure claims
- * @returns true if the username appears to be in old format and should be migrated
+ * @returns true if the username needs migration to .AZURE format
  */
 function needsUsernameMigration(account: any, email: string): boolean {
 	if (!account?.username || !email) return false;
 	
 	const currentUsername = account.username.toString();
+	
+	// Already in correct format
+	if (currentUsername.endsWith(".AZURE")) {
+		return false;
+	}
+	
 	const emailLower = email.toLowerCase();
 	const localPart = emailLower.split("@")[0] || "";
 	
-	// If current username doesn't contain @ but matches the local part of the email,
-	// it's likely using the old format and needs migration
-	if (!currentUsername.includes("@") && currentUsername.toLowerCase() === localPart) {
+	// Username contains @ (full email format) - needs migration
+	if (currentUsername.includes("@")) {
 		return true;
 	}
 	
-	// Also check if it's a sanitized version of just the local part
-	const sanitizedLocalPart = localPart.replace(/[^a-zA-Z0-9.\-_$@*!]/g, "_");
-	if (!currentUsername.includes("@") && currentUsername.toLowerCase() === sanitizedLocalPart.toLowerCase()) {
+	// Username matches local part without .AZURE suffix - needs migration
+	if (currentUsername.toLowerCase() === localPart) {
+		return true;
+	}
+	
+	// Sanitized version of local part without .AZURE suffix - needs migration
+	const sanitizedLocalPart = localPart.replace(/[^a-zA-Z0-9.\-_]/g, "_");
+	if (currentUsername.toLowerCase() === sanitizedLocalPart.toLowerCase()) {
 		return true;
 	}
 	
@@ -178,9 +183,9 @@ export class AzureIdTokenExchange extends DatabaseService {
 			throw new BadRequest(msg);
 		}
 
-		// Migrate username if account exists with old format (local part only)
+		// Migrate username if account exists with old format
 		if (account && needsUsernameMigration(account, email)) {
-			const newUsername = sanitizeUsernameFromEmail(email, sub);
+			const newUsername = generateAzureUsername(email, sub);
 			const oldUsername = account.username;
 			try {
 				await this.patchData(config.dbCollections.accounts, account.id, {
@@ -188,7 +193,7 @@ export class AzureIdTokenExchange extends DatabaseService {
 				});
 				account.username = newUsername;
 				logger.info(
-					`[azure-id-token] Migrated username from old format "${oldUsername}" to new format "${newUsername}" for account ${account.id}`
+					`[azure-id-token] Migrated username from "${oldUsername}" to "${newUsername}" for account ${account.id}`
 				);
 			} catch (migrationErr: any) {
 				// Log but don't fail - username migration is best-effort
@@ -200,7 +205,7 @@ export class AzureIdTokenExchange extends DatabaseService {
 
 		if (!account) {
 			try {
-				const proposedUsername = sanitizeUsernameFromEmail(email, sub);
+				const proposedUsername = generateAzureUsername(email, sub);
 				// Directly create account in accounts collection, bypassing users service
 				const id = GenUUID();
 				const roles = [Roles.USER];

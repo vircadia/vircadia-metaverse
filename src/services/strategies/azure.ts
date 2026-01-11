@@ -40,25 +40,51 @@ function extractEmailFromProfile(profile: any): string | undefined {
 }
 
 /**
- * Check if an account's username needs migration from the old format (local part only)
- * to the new format (full email address).
+ * Generate Azure username from email: uses local part + .AZURE suffix
+ * This format avoids @ symbol conflicts with domain servers.
+ */
+function generateAzureUsername(email: string): string {
+    const localPart = email.split('@')[0] || '';
+    // Sanitize local part - allow alphanumeric and .-_
+    let sanitized = localPart.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+    if (sanitized.length < 2) sanitized = 'user_' + sanitized;
+    // Truncate to leave room for .AZURE suffix (max username 30 chars)
+    if (sanitized.length > 24) sanitized = sanitized.slice(0, 24);
+    return sanitized + '.AZURE';
+}
+
+/**
+ * Check if an account's username needs migration to .AZURE format.
+ * Old formats:
+ *   - Full email: "user@domain.com"
+ *   - Local part only: "user" (without .AZURE suffix)
  */
 function needsUsernameMigration(account: any, email: string): boolean {
     if (!account?.username || !email) return false;
     
     const currentUsername = account.username.toString();
+    
+    // Already in correct format
+    if (currentUsername.endsWith('.AZURE')) {
+        return false;
+    }
+    
     const emailLower = email.toLowerCase();
     const localPart = emailLower.split('@')[0] || '';
     
-    // If current username doesn't contain @ but matches the local part of the email,
-    // it's likely using the old format and needs migration
-    if (!currentUsername.includes('@') && currentUsername.toLowerCase() === localPart) {
+    // Username contains @ (full email format) - needs migration
+    if (currentUsername.includes('@')) {
         return true;
     }
     
-    // Also check if it's a sanitized version of just the local part
-    const sanitizedLocalPart = localPart.replace(/[^a-zA-Z0-9.\-_$@*!]/g, '_');
-    if (!currentUsername.includes('@') && currentUsername.toLowerCase() === sanitizedLocalPart.toLowerCase()) {
+    // Username matches local part without .AZURE suffix - needs migration
+    if (currentUsername.toLowerCase() === localPart) {
+        return true;
+    }
+    
+    // Sanitized version of local part without .AZURE suffix - needs migration
+    const sanitizedLocalPart = localPart.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+    if (currentUsername.toLowerCase() === sanitizedLocalPart.toLowerCase()) {
         return true;
     }
     
@@ -91,7 +117,8 @@ export class AzureStrategy extends CustomOAuthStrategy {
             throw new Error(messages.common_messages_social_error);
         }
 
-        // Check if existing entity needs username migration
+        // Check if existing entity needs username migration to .AZURE format
+        const newUsername = generateAzureUsername(email);
         if (entity && needsUsernameMigration(entity, email)) {
             const oldUsername = entity.username;
             try {
@@ -100,10 +127,10 @@ export class AzureStrategy extends CustomOAuthStrategy {
                 if (db) {
                     await db.collection(config.dbCollections.accounts).updateOne(
                         { id: entity.id },
-                        { $set: { username: email } }
+                        { $set: { username: newUsername } }
                     );
                     logger.info(
-                        `[azure-oauth] Migrated username from old format "${oldUsername}" to new format "${email}" for account ${entity.id}`
+                        `[azure-oauth] Migrated username from "${oldUsername}" to "${newUsername}" for account ${entity.id}`
                     );
                 }
             } catch (migrationErr: any) {
@@ -117,7 +144,7 @@ export class AzureStrategy extends CustomOAuthStrategy {
         return {
             ...baseData,
             email,
-            username: email,
+            username: newUsername,
             // Use a deterministic provider-specific id to handle accounts without email changes
             azureId: profile.sub
                 ? `${this.name}:::${profile.sub as string}`
@@ -135,7 +162,7 @@ export class AzureStrategy extends CustomOAuthStrategy {
             azureId: profile.sub
                 ? `${this.name}:::${profile.sub as string}`
                 : `${this.name}:::${(profile.id as string) ?? (profile.oid as string)}`,
-            username: email,
+            username: generateAzureUsername(email),
             email,
             password: generateRandomNumber(10).toString()
         };
