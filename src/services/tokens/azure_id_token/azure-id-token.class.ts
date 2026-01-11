@@ -43,10 +43,11 @@ function sanitizeUsernameFromEmail(
 	email: string,
 	fallbackSeed: string,
 ): string {
-	const allowed = /[a-zA-Z0-9.\-_$@*!]/;
-	const localPart = (email.split("@")[0] || "").toString();
+	const source = email.toString();
 	let sanitized = "";
-	for (const ch of localPart) {
+	// Allow characters valid in username including @ and . and - and _
+	const allowed = /[a-zA-Z0-9.\-_$@*!]/;
+	for (const ch of source) {
 		if (allowed.test(ch)) sanitized += ch;
 		else sanitized += "_";
 	}
@@ -56,6 +57,39 @@ function sanitizeUsernameFromEmail(
 	}
 	if (sanitized.length > 30) sanitized = sanitized.slice(0, 30);
 	return sanitized;
+}
+
+/**
+ * Check if an account's username needs migration from the old format (local part only)
+ * to the new format (full email address).
+ * 
+ * Old format: "john.doe" (just the part before @)
+ * New format: "john.doe@example.com" (full email, sanitized)
+ * 
+ * @param account The account to check
+ * @param email The full email address from Azure claims
+ * @returns true if the username appears to be in old format and should be migrated
+ */
+function needsUsernameMigration(account: any, email: string): boolean {
+	if (!account?.username || !email) return false;
+	
+	const currentUsername = account.username.toString();
+	const emailLower = email.toLowerCase();
+	const localPart = emailLower.split("@")[0] || "";
+	
+	// If current username doesn't contain @ but matches the local part of the email,
+	// it's likely using the old format and needs migration
+	if (!currentUsername.includes("@") && currentUsername.toLowerCase() === localPart) {
+		return true;
+	}
+	
+	// Also check if it's a sanitized version of just the local part
+	const sanitizedLocalPart = localPart.replace(/[^a-zA-Z0-9.\-_$@*!]/g, "_");
+	if (!currentUsername.includes("@") && currentUsername.toLowerCase() === sanitizedLocalPart.toLowerCase()) {
+		return true;
+	}
+	
+	return false;
 }
 
 export class AzureIdTokenExchange extends DatabaseService {
@@ -142,6 +176,26 @@ export class AzureIdTokenExchange extends DatabaseService {
 				: "Failed to lookup existing account";
 			logger.error(`[azure-id-token] ${msg}`);
 			throw new BadRequest(msg);
+		}
+
+		// Migrate username if account exists with old format (local part only)
+		if (account && needsUsernameMigration(account, email)) {
+			const newUsername = sanitizeUsernameFromEmail(email, sub);
+			const oldUsername = account.username;
+			try {
+				await this.patchData(config.dbCollections.accounts, account.id, {
+					username: newUsername,
+				});
+				account.username = newUsername;
+				logger.info(
+					`[azure-id-token] Migrated username from old format "${oldUsername}" to new format "${newUsername}" for account ${account.id}`
+				);
+			} catch (migrationErr: any) {
+				// Log but don't fail - username migration is best-effort
+				logger.warn(
+					`[azure-id-token] Failed to migrate username for account ${account.id}: ${migrationErr?.message}`
+				);
+			}
 		}
 
 		if (!account) {

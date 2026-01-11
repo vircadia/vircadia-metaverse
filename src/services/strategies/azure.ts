@@ -22,6 +22,8 @@ import { GenUUID } from '../../utils/Misc';
 import { generateRandomNumber } from '../../utils/Utils';
 import { messages } from '../../utils/messages';
 import axios from 'axios';
+import config from '../../appconfig';
+import logger from '../../logger';
 
 function extractEmailFromProfile(profile: any): string | undefined {
     if (!profile) return undefined;
@@ -35,6 +37,32 @@ function extractEmailFromProfile(profile: any): string | undefined {
     if (profile.preferred_username) return profile.preferred_username as string;
     if (profile.upn) return profile.upn as string;
     return undefined;
+}
+
+/**
+ * Check if an account's username needs migration from the old format (local part only)
+ * to the new format (full email address).
+ */
+function needsUsernameMigration(account: any, email: string): boolean {
+    if (!account?.username || !email) return false;
+    
+    const currentUsername = account.username.toString();
+    const emailLower = email.toLowerCase();
+    const localPart = emailLower.split('@')[0] || '';
+    
+    // If current username doesn't contain @ but matches the local part of the email,
+    // it's likely using the old format and needs migration
+    if (!currentUsername.includes('@') && currentUsername.toLowerCase() === localPart) {
+        return true;
+    }
+    
+    // Also check if it's a sanitized version of just the local part
+    const sanitizedLocalPart = localPart.replace(/[^a-zA-Z0-9.\-_$@*!]/g, '_');
+    if (!currentUsername.includes('@') && currentUsername.toLowerCase() === sanitizedLocalPart.toLowerCase()) {
+        return true;
+    }
+    
+    return false;
 }
 
 export class AzureStrategy extends CustomOAuthStrategy {
@@ -62,9 +90,34 @@ export class AzureStrategy extends CustomOAuthStrategy {
         if (!email) {
             throw new Error(messages.common_messages_social_error);
         }
+
+        // Check if existing entity needs username migration
+        if (entity && needsUsernameMigration(entity, email)) {
+            const oldUsername = entity.username;
+            try {
+                // Perform the migration by updating the account directly
+                const db = this.app.get('mongoClient');
+                if (db) {
+                    await db.collection(config.dbCollections.accounts).updateOne(
+                        { id: entity.id },
+                        { $set: { username: email } }
+                    );
+                    logger.info(
+                        `[azure-oauth] Migrated username from old format "${oldUsername}" to new format "${email}" for account ${entity.id}`
+                    );
+                }
+            } catch (migrationErr: any) {
+                // Log but don't fail - username migration is best-effort
+                logger.warn(
+                    `[azure-oauth] Failed to migrate username for account ${entity.id}: ${migrationErr?.message}`
+                );
+            }
+        }
+
         return {
             ...baseData,
             email,
+            username: email,
             // Use a deterministic provider-specific id to handle accounts without email changes
             azureId: profile.sub
                 ? `${this.name}:::${profile.sub as string}`

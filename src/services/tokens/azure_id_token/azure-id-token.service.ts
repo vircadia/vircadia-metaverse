@@ -11,6 +11,6 @@ declare module "../../../declarations" {
 }
 
 export default function (app: Application): void {
-	const options = { paginate: app.get("paginate") } as Partial<any>;
+	const options = { id: 'id', paginate: app.get("paginate") } as Partial<any>;
 	app.use("/oauth/azure/id-token", new AzureIdTokenExchange(options, app));
 }
