@@ -2,7 +2,7 @@
 
 ## Getting Started
 
-1. Make sure you have [NodeJS](https://nodejs.org/) and [npm](https://www.npmjs.com/) installed.
+1. Make sure you have [NodeJS](https://nodejs.org/) and [npmjs](https://www.npmjs.com/) installed.
 
 2. Install docker (https://docs.docker.com/engine/install)
 
